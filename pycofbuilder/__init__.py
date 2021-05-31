@@ -5,7 +5,7 @@ from pycofbuilder.core import *
 
 __version__ = '0.0.1'
 
-_all__ = ['Tools',
+__all__ = ['Tools',
            'Building_Block',
            'Reticulum',
            ]

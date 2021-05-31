@@ -15,8 +15,8 @@ pip install pycofbuilder
 ```
 
 ### Requirements
-0. Python v. 3.7
-1. pymatgen
+0. Python >= 3.7
+1. pymatgen >= 2022.0.0
 
 
 The Python dependencies are most easily satisfied using a conda
@@ -26,7 +26,8 @@ installation by running
 ## Usage
 
 ```python
-from pyCOFBuilder import Building_Block, Reticulum
+from pycofbuilder.building_block import Building_Block
+from pycofbuilder.reticulum import Reticulum
 
 BB_aldehyde = Building_Block(‘C3_BENZ_H_CHO’)
 BB_amine = Building_Block(‘C2_HDZ_NH2’)
@@ -40,6 +41,10 @@ COF.save_qe()
 COF.save_gjf()
 
 ```
+
+For more exemples see _examples/_ and the [docs](https://github.com/lipelopesoliveira/pyCOFBuilder/examples.html)
+for further examples.
+
 
 
 ## Citation
