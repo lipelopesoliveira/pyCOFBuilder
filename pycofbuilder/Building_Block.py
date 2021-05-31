@@ -7,24 +7,18 @@ Created on Thu Dec 17 11:31:19 2020
 
 import os
 import numpy as np
-import matplotlib.pyplot as plt
-import math
-import glob
-from tqdm import tqdm
+import Tools
 
-from pymatgen.core import Lattice, Structure
-from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
-from pymatgen.io.cif import CifParser
+from scipy.spatial import distance
 
+class Building_Block():
 
-class Building_Block(Tools):
-
-    def __init__(self, lib='built', name=None, verbosity=False):
+    def __init__(self, lib='bb_lib', name=None, verbosity=False):
 
         self.name = name
         self.verbosity = verbosity
-        self.main_path = os.getcwd()
-        self.lib_path = os.path.join('bb_lib', lib)
+        self.main_path = os.path.join('..', 'data')
+        self.lib_path = os.path.join(self.main_path, lib)
         self.connectivity = None
         self.simetry = None
         self.size = 0
@@ -72,15 +66,15 @@ class Building_Block(Tools):
 
     def get_Q_points(self, atom_labels, atom_pos):
 
-        if 'Q' in atom_labels:
-            Q_labels, Q_pos = [], []
+    
+        Q_labels, Q_pos = [], []
 
-            for i in range(len(atom_labels)):
-                if atom_labels[i] == 'Q':
-                    Q_labels += [atom_labels[i]]
-                    Q_pos += [atom_pos[i]]
+        for i in range(len(atom_labels)):
+            if atom_labels[i] == 'Q':
+                Q_labels += [atom_labels[i]]
+                Q_pos += [atom_pos[i]]
 
-            return Q_labels, np.array(Q_pos)
+        return Q_labels, np.array(Q_pos)
 
     def get_R_points(self, atom_labels, atom_pos):
 
@@ -199,7 +193,7 @@ class Building_Block(Tools):
     def align_to(self, vec=[0, 1, 0]):
 
         X_labels, X_pos = self.get_X_points()
-        R_matrix = self.rotation_matrix_from_vectors(X_pos[0], vec)
+        R_matrix = Tools.rotation_matrix_from_vectors(X_pos[0], vec)
 
         self.atom_pos = np.dot(self.atom_pos, np.transpose(R_matrix))
 
@@ -226,10 +220,11 @@ class Building_Block(Tools):
             print('{:<5s}{:>10.7f}{:>15.7f}{:>15.7f}'.format(self.atom_labels[i], self.atom_pos[i][0], self.atom_pos[i][1], self.atom_pos[i][2]))
 
     def add_connection_group(self, conector_name):
-        '''Adiciona o grupo funcional pelo qual o COF será formado em blocos de construção com simetria C3'''
+        '''Adiciona o grupo funcional pelo qual o COF será formado em blocos de construção'''
 
-        conector_label, conector_pos = self.read_gjf_file(os.path.join(self.main_path, 'Conectores'), conector_name)
-        location_Q_struct = self.get_Q_points(self.atom_labels, self.atom_pos)  # Pega a posição dos Q na estrutura
+        conector_label, conector_pos = Tools.read_gjf_file(os.path.join(self.main_path, 'conector'), conector_name)
+
+        location_Q_struct = self.get_Q_points(self.atom_labels, self.atom_pos)  # Get the position of the Q points in the structure
 
         for i in range(len(location_Q_struct[0])):
             n_conector_label = conector_label.copy()
@@ -246,7 +241,7 @@ class Building_Block(Tools):
             v1 = close_Q_struct - location_Q_struct[1][i]  # Cria o vetor Q na estrutura
             v2 = np.array(close_Q_connector) - np.array(location_Q_connector[1][0])  # Cria o vetor Q no conector
 
-            Rot_m = self.rotation_matrix_from_vectors(v2, v1)  # Determina a matriz de rotação que alinha V2 com V1
+            Rot_m = Tools.rotation_matrix_from_vectors(v2, v1)  # Determina a matriz de rotação que alinha V2 com V1
 
             # Deleta o átomo "Q" da lista de átomos e posições do conector
             n_conector_pos = np.delete(n_conector_pos, self.find_index(np.array([0., 0., 0.]), n_conector_pos), axis=0)
@@ -267,7 +262,7 @@ class Building_Block(Tools):
     def add_R_group(self, R_name, R_type):
         '''Adiciona o grupo em blocos de construção com simetria C4. '''
 
-        group_label, group_pos = self.read_gjf_file(os.path.join(self.main_path, 'Radicais'), R_name)
+        group_label, group_pos = Tools.read_gjf_file(os.path.join(self.main_path, 'radical'), R_name)
 
         location_R_struct = self.get_R_points(self.atom_labels, self.atom_pos)[R_type]  # Pega a posição dos R na estrutura
 
@@ -284,7 +279,7 @@ class Building_Block(Tools):
             v1 = close_R_struct - location_R_struct[i]  # Cria o vetor R na estrutura
             v2 = np.array(close_R_group) - np.array(pos_R_group[0])  # Cria o vetor R do grupo
 
-            Rot_m = self.rotation_matrix_from_vectors(v2, v1)  # Determina a matriz de rotação que alinha V2 com V1
+            Rot_m = Tools.rotation_matrix_from_vectors(v2, v1)  # Determina a matriz de rotação que alinha V2 com V1
 
             n_group_pos = np.delete(n_group_pos, self.find_index(np.array([0.0, 0.0, 0.0]), n_group_pos), axis=0)
 
@@ -306,7 +301,7 @@ class Building_Block(Tools):
 
         self.name = f'C2_{nucleo_name}_{conector}'
 
-        self.atom_labels, self.atom_pos = self.read_gjf_file(os.path.join(self.main_path, 'Nucleo', 'C2'), nucleo_name)
+        self.atom_labels, self.atom_pos = Tools.read_gjf_file(os.path.join(self.main_path, 'nucleo', 'C2'), nucleo_name)
 
         self.centralize_molecule()
 
@@ -327,7 +322,7 @@ class Building_Block(Tools):
 
         self.name = f'C3_{nucleo_name}_{conector}'
 
-        self.atom_labels, self.atom_pos = self.read_gjf_file(os.path.join(self.main_path, 'Nucleo', 'C3'), nucleo_name)
+        self.atom_labels, self.atom_pos = Tools.read_gjf_file(os.path.join(self.main_path, 'Nucleo', 'C3'), nucleo_name)
 
         self.centralize_molecule()
 
@@ -348,7 +343,7 @@ class Building_Block(Tools):
 
         self.name = f'C4_{nucleo_name}_{conector}'
 
-        self.atom_labels, self.atom_pos = self.read_gjf_file(os.path.join(self.main_path, 'Nucleo', 'C4'), nucleo_name)
+        self.atom_labels, self.atom_pos = Tools.read_gjf_file(os.path.join(self.main_path, 'Nucleo', 'C4'), nucleo_name)
 
         self.centralize_molecule()
 
@@ -364,18 +359,17 @@ class Building_Block(Tools):
 
         self.align_to()
 
-    def save_BB(self, extension='xyz'):
+    def save(self, extension='xyz'):
 
         if extension == 'xyz':
-            self.save_xyz(os.path.join('bb_lib', 'built'), self.name + '.xyz', self.atom_labels, self.atom_pos)
+            Tools.save_xyz(self.lib_path, self.name + '.xyz', self.atom_labels, self.atom_pos)
 
-    def read_structure(self, vec=[0, 1, 0]):
+    def read_structure(self):
 
         try:
-            self.atom_labels, self.atom_pos, self.n_atoms, self.connectivity = self.read_xyz_file(self.lib_path,
-                                                                                                  self.name, self.verbosity)
+            self.atom_labels, self.atom_pos, self.n_atoms, self.connectivity = Tools.read_xyz_file(self.lib_path, self.name)
         except Exception:
-            print(f'File {self.lib_path}\\{self.name}.xyz not found!')
+            print(f'Unable to load file {self.lib_path}\\{self.name}.xyz!')
 
         # self.centralize_molecule(True)
         # self.rotate_to_xy_plane()
@@ -384,66 +378,66 @@ class Building_Block(Tools):
 
     def get_bipodal_NH2(self):
 
-        files_list = os.listdir(os.path.join(self.main_path, self.lib_path))
+        files_list = os.listdir(self.lib_path)
 
         return [i.rstrip('.xyz') for i in files_list if 'C2' == i.split('_')[0] and 'NH2' in i.split('_')[2]]
 
     def get_tripodal_NH2(self):
 
-        files_list = os.listdir(os.path.join(self.main_path, self.lib_path))
+        files_list = os.listdir(self.lib_path)
 
         return [i.rstrip('.xyz') for i in files_list if 'C3' == i.split('_')[0] and 'NH2' in i.split('_')[2]]
 
     def get_bipodal_CHO(self):
 
-        files_list = os.listdir(os.path.join(self.main_path, self.lib_path))
+        files_list = os.listdir(self.lib_path)
 
         return [i.rstrip('.xyz') for i in files_list if 'C2' == i.split('_')[0] and 'CHO' == i.split('_')[2]]
 
     def get_tripodal_CHO(self):
 
-        files_list = os.listdir(os.path.join(self.main_path, self.lib_path))
+        files_list = os.listdir(self.lib_path)
 
         return [i.rstrip('.xyz') for i in files_list if 'C3' == i.split('_')[0] and 'CHO' == i.split('_')[2]]
 
     def get_bipodal_BOH2(self):
 
-        files_list = os.listdir(os.path.join(self.main_path, self.lib_path))
+        files_list = os.listdir(self.lib_path)
 
         return [i.rstrip('.xyz') for i in files_list if 'C2' == i.split('_')[0] and 'BOH2' == i.split('_')[2]]
 
     def get_tripodal_BOH2(self):
 
-        files_list = os.listdir(os.path.join(self.main_path, self.lib_path))
+        files_list = os.listdir(self.lib_path)
 
         return [i.rstrip('.xyz') for i in files_list if 'C3' == i.split('_')[0] and 'BOH2' == i.split('_')[2]]
 
     def get_bipodal_OH2(self):
 
-        files_list = os.listdir(os.path.join(self.main_path, self.lib_path))
+        files_list = os.listdir(self.lib_path)
 
         return [i.rstrip('.xyz') for i in files_list if 'C2' == i.split('_')[0] and 'OH2' == i.split('_')[2]]
 
     def get_tripodal_OH2(self):
 
-        files_list = os.listdir(os.path.join(self.main_path, self.lib_path))
+        files_list = os.listdir(self.lib_path)
 
         return [i.rstrip('.xyz') for i in files_list if 'C3' == i.split('_')[0] and 'OH2' == i.split('_')[2]]
 
     def get_tetrapodal_squared_CHO(self):
 
-        files_list = os.listdir(os.path.join(self.main_path, self.lib_path))
+        files_list = os.listdir(self.lib_path)
 
         return [i.rstrip('.xyz') for i in files_list if 'C2p' == i.split('_')[0] and 'CHO' == i.split('_')[2]]
 
     def get_tetrapodal_squared_BOH2(self):
 
-        files_list = os.listdir(os.path.join(self.main_path, self.lib_path))
+        files_list = os.listdir(self.lib_path)
 
         return [i.rstrip('.xyz') for i in files_list if 'C2p' == i.split('_')[0] and 'BOH2' == i.split('_')[2]]
 
     def get_tetrapodal_squared_NH2(self):
 
-        files_list = os.listdir(os.path.join(self.main_path, self.lib_path))
+        files_list = os.listdir(self.lib_path)
 
         return [i.rstrip('.xyz') for i in files_list if 'C2p' == i.split('_')[0] and 'NH2' in i.split('_')[2]]

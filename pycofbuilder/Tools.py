@@ -7,20 +7,14 @@ Created on Thu Dec 17 11:31:19 2020
 
 import os
 import numpy as np
-import matplotlib.pyplot as plt
 import math
-import glob
-from tqdm import tqdm
+try:
+    from pymatgen.io.cif import CifParser
+except Exception:
+    print('Could no import CifParser from pymatgen the conversion from cif to xyz may not work properlly')
+    cif_parser_imported = False
 
-from pymatgen.core import Lattice, Structure
-from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
-from pymatgen.io.cif import CifParser
-
-
-class Tools():
-
-    def __init__(self):
-        self.elements_dict = {'H': 1.00794, 'He': 4.002602, 'Li': 6.941, 'Be': 9.012182, 'B': 10.811, 'C': 12.0107, 'N': 14.0067,
+elements_dict = {'H': 1.00794, 'He': 4.002602, 'Li': 6.941, 'Be': 9.012182, 'B': 10.811, 'C': 12.0107, 'N': 14.0067,
               'O': 15.9994, 'F': 18.9984032, 'Ne': 20.1797, 'Na': 22.98976928, 'Mg': 24.305, 'Al': 26.9815386,
               'Si': 28.0855, 'P': 30.973762, 'S': 32.065, 'Cl': 35.453, 'Ar': 39.948, 'K': 39.0983, 'Ca': 40.078,
               'Sc': 44.955912, 'Ti': 47.867, 'V': 50.9415, 'Cr': 51.9961, 'Mn': 54.938045, 'Fe': 55.845, 
@@ -38,254 +32,265 @@ class Tools():
               'Cm': 247.0703, 'Bk': 247.0703, 'Cf': 251.0796, 'Es': 252.0829, 'Fm': 257.0951, 'Md': 258.0951,
               'No': 259.1009, 'Lr': 262, 'Rf': 267, 'Db': 268, 'Sg': 271, 'Bh': 270, 'Hs': 269, 'Mt': 278,
               'Ds': 281, 'Rg': 281, 'Cn': 285, 'Nh': 284, 'Fl': 289, 'Mc': 289, 'Lv': 292, 'Ts': 294, 'Og': 294,
-              'X': 0.0}
+              'X': 0.0, 'Q': 0.0, 'R': 0.0, 'R1': 0.0, 'R2': 0.0, 'R3': 0.0, 'R4': 0.0, 'R5': 0.0, 'R6': 0.0}
 
-    def angle_between(self, v1, v2):
-        """ Returns the angle in radians between vectors 'v1' and 'v2'::"""
-        v1_u = v1/np.linalg.norm(v1)
-        v2_u = v2/np.linalg.norm(v2)
-        return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
+def angle_between(v1, v2):
+    """ Returns the angle in radians between vectors 'v1' and 'v2'::"""
+    v1_u = v1/np.linalg.norm(v1)
+    v2_u = v2/np.linalg.norm(v2)
+    return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
 
-    def rotation_matrix_from_vectors(self, vec1, vec2):
-        """ Find the rotation matrix that aligns vec1 to vec2
-        :param vec1: A 3d "source" vector
-        :param vec2: A 3d "destination" vector
-        :return mat: A transform matrix (3x3) which when applied to vec1, aligns it with vec2.
-        """
-        a, b = (vec1 / np.linalg.norm(vec1)).reshape(3), (vec2 / np.linalg.norm(vec2)).reshape(3)
-        v = np.cross(a, b)
-        c = np.dot(a, b)
-        s = np.linalg.norm(v)
-        if s != 0:
-            kmat = np.array([[0, -v[2], v[1]], [v[2], 0, -v[0]], [-v[1], v[0], 0]])
-            rotation_matrix = np.eye(3) + kmat + kmat.dot(kmat) * ((1 - c) / (s ** 2))
-            return rotation_matrix
+def rotation_matrix_from_vectors(vec1, vec2):
+    """ Find the rotation matrix that aligns vec1 to vec2
+    :param vec1: A 3d "source" vector
+    :param vec2: A 3d "destination" vector
+    :return mat: A transform matrix (3x3) which when applied to vec1, aligns it with vec2.
+    """
+    a, b = (vec1 / np.linalg.norm(vec1)).reshape(3), (vec2 / np.linalg.norm(vec2)).reshape(3)
+    v = np.cross(a, b)
+    c = np.dot(a, b)
+    s = np.linalg.norm(v)
+    if s != 0:
+        kmat = np.array([[0, -v[2], v[1]], [v[2], 0, -v[0]], [-v[1], v[0], 0]])
+        rotation_matrix = np.eye(3) + kmat + kmat.dot(kmat) * ((1 - c) / (s ** 2))
+        return rotation_matrix
+    else:
+        return np.identity(3)
+
+def unit_vector(x):
+    """Return a unit vector in the same direction as x."""
+    y = np.array(x, dtype='float')
+    return y / np.linalg.norm(y)
+
+def angle(x, y):
+    """Return the angle between vectors a and b in degrees."""
+    return np.arccos(np.dot(x, y) / (np.linalg.norm(x) * np.linalg.norm(y))) * 180. / np.pi
+
+def cell_to_cellpar(cell, radians=False):
+    """Returns the cell parameters [a, b, c, alpha, beta, gamma].
+
+    Angles are in degrees unless radian=True is used.
+    """
+    lengths = [np.linalg.norm(v) for v in cell]
+    angles = []
+    for i in range(3):
+        j = i - 1
+        k = i - 2
+        ll = lengths[j] * lengths[k]
+        if ll > 1e-16:
+            x = np.dot(cell[j], cell[k]) / ll
+            angle = 180.0 / np.pi * np.arccos(x)
         else:
-            return np.identity(3)
+            angle = 90.0
+        angles.append(angle)
+    if radians:
+        angles = [angle * np.pi / 180 for angle in angles]
+    return np.array(lengths + angles)
 
-    def unit_vector(self, x):
-        """Return a unit vector in the same direction as x."""
-        y = np.array(x, dtype='float')
-        return y / np.linalg.norm(y)
+def cellpar_to_cell(cellpar, ab_normal=(0, 0, 1), a_direction=None):
+    """Return a 3x3 cell matrix from cellpar=[a,b,c,alpha,beta,gamma].
 
-    def angle(self, x, y):
-        """Return the angle between vectors a and b in degrees."""
-        return np.arccos(np.dot(x, y) / (np.linalg.norm(x) * np.linalg.norm(y))) * 180. / np.pi
+    Angles must be in degrees.
 
-    def cell_to_cellpar(self, cell, radians=False):
-        """Returns the cell parameters [a, b, c, alpha, beta, gamma].
+    The returned cell is orientated such that a and b
+    are normal to `ab_normal` and a is parallel to the projection of
+    `a_direction` in the a-b plane.
 
-        Angles are in degrees unless radian=True is used.
-        """
-        lengths = [np.linalg.norm(v) for v in cell]
-        angles = []
-        for i in range(3):
-            j = i - 1
-            k = i - 2
-            ll = lengths[j] * lengths[k]
-            if ll > 1e-16:
-                x = np.dot(cell[j], cell[k]) / ll
-                angle = 180.0 / np.pi * np.arccos(x)
-            else:
-                angle = 90.0
-            angles.append(angle)
-        if radians:
-            angles = [angle * np.pi / 180 for angle in angles]
-        return np.array(lengths + angles)
+    Default `a_direction` is (1,0,0), unless this is parallel to
+    `ab_normal`, in which case default `a_direction` is (0,0,1).
 
-    def cellpar_to_cell(self, cellpar, ab_normal=(0, 0, 1), a_direction=None):
-        """Return a 3x3 cell matrix from cellpar=[a,b,c,alpha,beta,gamma].
-
-        Angles must be in degrees.
-
-        The returned cell is orientated such that a and b
-        are normal to `ab_normal` and a is parallel to the projection of
-        `a_direction` in the a-b plane.
-
-        Default `a_direction` is (1,0,0), unless this is parallel to
-        `ab_normal`, in which case default `a_direction` is (0,0,1).
-
-        The returned cell has the vectors va, vb and vc along the rows. The
-        cell will be oriented such that va and vb are normal to `ab_normal`
-        and va will be along the projection of `a_direction` onto the a-b
-        plane.
-        Example:
-        >>> cell = cellpar_to_cell([1, 2, 4, 10, 20, 30], (0, 1, 1), (1, 2, 3))
-        >>> np.round(cell, 3)
-        array([[ 0.816, -0.408,  0.408],
-               [ 1.992, -0.13 ,  0.13 ],
-               [ 3.859, -0.745,  0.745]])
-        """
-        if a_direction is None:
-            if np.linalg.norm(np.cross(ab_normal, (1, 0, 0))) < 1e-5:
-                a_direction = (0, 0, 1)
-            else:
-                a_direction = (1, 0, 0)
-
-        # Define rotated X,Y,Z-system, with Z along ab_normal and X along
-        # the projection of a_direction onto the normal plane of Z.
-        ad = np.array(a_direction)
-        Z = self.unit_vector(ab_normal)
-        X = self.unit_vector(ad - np.dot(ad, Z) * Z)
-        Y = np.cross(Z, X)
-
-        # Express va, vb and vc in the X,Y,Z-system
-        alpha, beta, gamma = 90., 90., 90.
-        if isinstance(cellpar, (int, float)):
-            a = b = c = cellpar
-        elif len(cellpar) == 1:
-            a = b = c = cellpar[0]
-        elif len(cellpar) == 3:
-            a, b, c = cellpar
+    The returned cell has the vectors va, vb and vc along the rows. The
+    cell will be oriented such that va and vb are normal to `ab_normal`
+    and va will be along the projection of `a_direction` onto the a-b
+    plane.
+    Example:
+    >>> cell = cellpar_to_cell([1, 2, 4, 10, 20, 30], (0, 1, 1), (1, 2, 3))
+    >>> np.round(cell, 3)
+    array([[ 0.816, -0.408,  0.408],
+            [ 1.992, -0.13 ,  0.13 ],
+            [ 3.859, -0.745,  0.745]])
+    """
+    if a_direction is None:
+        if np.linalg.norm(np.cross(ab_normal, (1, 0, 0))) < 1e-5:
+            a_direction = (0, 0, 1)
         else:
-            a, b, c, alpha, beta, gamma = cellpar
+            a_direction = (1, 0, 0)
 
-        # Handle orthorhombic cells separately to avoid rounding errors
-        eps = 2 * np.spacing(90.0, dtype=np.float64)  # around 1.4e-14
-        # alpha
-        if abs(abs(alpha) - 90) < eps:
-            cos_alpha = 0.0
-        else:
-            cos_alpha = np.cos(alpha * np.pi / 180.0)
-        # beta
-        if abs(abs(beta) - 90) < eps:
-            cos_beta = 0.0
-        else:
-            cos_beta = np.cos(beta * np.pi / 180.0)
-        # gamma
-        if abs(gamma - 90) < eps:
-            cos_gamma = 0.0
-            sin_gamma = 1.0
-        elif abs(gamma + 90) < eps:
-            cos_gamma = 0.0
-            sin_gamma = -1.0
-        else:
-            cos_gamma = np.cos(gamma * np.pi / 180.0)
-            sin_gamma = np.sin(gamma * np.pi / 180.0)
+    # Define rotated X,Y,Z-system, with Z along ab_normal and X along
+    # the projection of a_direction onto the normal plane of Z.
+    ad = np.array(a_direction)
+    Z = unit_vector(ab_normal)
+    X = unit_vector(ad - np.dot(ad, Z) * Z)
+    Y = np.cross(Z, X)
 
-        # Build the cell vectors
-        va = a * np.array([1, 0, 0])
-        vb = b * np.array([cos_gamma, sin_gamma, 0])
-        cx = cos_beta
-        cy = (cos_alpha - cos_beta * cos_gamma) / sin_gamma
-        cz_sqr = 1. - cx * cx - cy * cy
-        assert cz_sqr >= 0
-        cz = np.sqrt(cz_sqr)
-        vc = c * np.array([cx, cy, cz])
+    # Express va, vb and vc in the X,Y,Z-system
+    alpha, beta, gamma = 90., 90., 90.
+    if isinstance(cellpar, (int, float)):
+        a = b = c = cellpar
+    elif len(cellpar) == 1:
+        a = b = c = cellpar[0]
+    elif len(cellpar) == 3:
+        a, b, c = cellpar
+    else:
+        a, b, c, alpha, beta, gamma = cellpar
 
-        # Convert to the Cartesian x,y,z-system
-        abc = np.vstack((va, vb, vc))
-        T = np.vstack((X, Y, Z))
-        cell = np.dot(abc, T)
+    # Handle orthorhombic cells separately to avoid rounding errors
+    eps = 2 * np.spacing(90.0, dtype=np.float64)  # around 1.4e-14
+    # alpha
+    if abs(abs(alpha) - 90) < eps:
+        cos_alpha = 0.0
+    else:
+        cos_alpha = np.cos(alpha * np.pi / 180.0)
+    # beta
+    if abs(abs(beta) - 90) < eps:
+        cos_beta = 0.0
+    else:
+        cos_beta = np.cos(beta * np.pi / 180.0)
+    # gamma
+    if abs(gamma - 90) < eps:
+        cos_gamma = 0.0
+        sin_gamma = 1.0
+    elif abs(gamma + 90) < eps:
+        cos_gamma = 0.0
+        sin_gamma = -1.0
+    else:
+        cos_gamma = np.cos(gamma * np.pi / 180.0)
+        sin_gamma = np.sin(gamma * np.pi / 180.0)
 
-        return cell
+    # Build the cell vectors
+    va = a * np.array([1, 0, 0])
+    vb = b * np.array([cos_gamma, sin_gamma, 0])
+    cx = cos_beta
+    cy = (cos_alpha - cos_beta * cos_gamma) / sin_gamma
+    cz_sqr = 1. - cx * cx - cy * cy
+    assert cz_sqr >= 0
+    cz = np.sqrt(cz_sqr)
+    vc = c * np.array([cx, cy, cz])
 
-    def get_reciprocal_vectors(self, v):
-        v1, v2, v3 = v
-        vol = np.dot(v1, np.cross(v2, v3))
-        b1 = 2*np.pi*np.cross(v2, v3)/vol
-        b2 = 2*np.pi*np.cross(v3, v1)/vol
-        b3 = 2*np.pi*np.cross(v1, v2)/vol
+    # Convert to the Cartesian x,y,z-system
+    abc = np.vstack((va, vb, vc))
+    T = np.vstack((X, Y, Z))
+    cell = np.dot(abc, T)
 
-        return np.array([np.linalg.norm(b1), np.linalg.norm(b2), np.linalg.norm(b3)])
+    return cell
 
-    def get_kgrid(self, cell, distance=0.3):
-        b = self.get_reciprocal_vectors(cell)
-        return [math.ceil(b[0]/distance), math.ceil(b[1]/distance), math.ceil(b[2]/distance)]
+def get_reciprocal_vectors(cell):
+    '''
+    Get the reciprocal vectors of a cell given in cell parameters of cell vectors
+    ----------
+    cell : array
+        (3,1) array for cell vectors or (6,1) array for cell parameters
+    Returns
+    -------
+    b1 : array
+        (3,1) array containing b_1 vector in the reciprocal space
+    b2 : array
+        (3,1) array containing b_2 vector in the reciprocal space
+    b3 : array
+        (3,1) array containing b_3 vector in the reciprocal space
+    '''
+    if len(cell) == 3:
+        v1, v2, v3 = cell
+    if len(cell) == 6:
+        v1, v2, v3 = cellpar_to_cell(cell)
 
-    def save_gjf(self, path, file_name, atom_labels, atom_pos, text='opt pm6'):
+    vol = np.dot(v1, np.cross(v2, v3))
+    b1 = 2*np.pi*np.cross(v2, v3)/vol
+    b2 = 2*np.pi*np.cross(v3, v1)/vol
+    b3 = 2*np.pi*np.cross(v1, v2)/vol
 
-        temp_file = open(os.path.join(path, file_name), 'w')
-        temp_file.write(f'%chk={file_name[:-4]}.chk \n')
-        temp_file.write(f'# {text}\n')
-        temp_file.write('\n')
-        temp_file.write('Title Card Required\n')
-        temp_file.write('\n')
-        temp_file.write('0 1 \n')
+    return b1, b2, b3
 
-        for i in range(len(atom_labels)):
-            temp_file.write('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(atom_labels[i], atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]))
+def get_kgrid(cell, distance=0.3):
+    '''
+    Get the k-points grid in the reciprocal space with a given distance for a 
+    cell given in cell parameters of cell vectors.
+    ----------
+    cell : array
+        (3,1) array for cell vectors or (6,1) array for cell parameters
+    distance : float
+        distance between the points in the reciprocal space
+    Returns
+    -------
+    kx : int
+        Number of points in the x direction on reciprocal space
+    ky : int
+        Number of points in the y direction on reciprocal space
+    kz : int
+        Number of points in the z direction on reciprocal space
+    '''
+    
+    b1, b2, b3 = get_reciprocal_vectors(cell)
+    b = np.array([np.linalg.norm(b1), np.linalg.norm(b2), np.linalg.norm(b3)])
+    kx = math.ceil(b[0]/distance)
+    ky = math.ceil(b[1]/distance)
+    kz = math.ceil(b[2]/distance)
 
-        temp_file.write('\n')
-        temp_file.write('\n')
-        temp_file.close()
+    return kx, ky, kz
 
-    def save_xyz(self, path, file_name, atom_labels, atom_pos):
+def read_xyz_file(path, file_name):
+    '''Lê um arquivo em formato .xyz e retorna uma lista com os átomos e um array Nx3 contendo as coordenadas dos N átomos'''
+    
+    if os.path.exists(os.path.join(path, file_name + '.xyz')):
+        temp_file = open(os.path.join(path, file_name + '.xyz'), 'r').readlines()
 
-        temp_file = open(os.path.join(path, file_name), 'w')
-        temp_file.write(f'{len(atom_labels)} \n')
-        temp_file.write(f'{file_name[:-4]} rotated \n')
+        n_atoms = int(temp_file[0].rstrip('\n'))
+        atoms = [i.split() for i in temp_file[2:]]
 
-        for i in range(len(atom_labels)):
-            temp_file.write('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(atom_labels[i], atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]))
+        atom_labels = [i[0] for i in atoms if len(i) > 1]
+        atom_pos = np.array([[float(i[1]), float(i[2]), float(i[3])] for i in atoms if len(i) > 1])
 
-        temp_file.close()
-
-    def read_xyz_file(self, path, file_name, verbosity):
-        '''Lê um arquivo em formato .xyz e retorna uma lista com os átomos e um array Nx3 contendo as coordenadas dos N átomos'''
-
-        if verbosity is True:
-            print(f'Reading file {file_name}.xyz')
-
-        if os.path.exists(os.path.join(os.getcwd(), path, file_name + '.xyz')):
-            temp_file = open(os.path.join(os.getcwd(), path, file_name + '.xyz'), 'r').readlines()
-
-            n_atoms = int(temp_file[0].rstrip('\n'))
-            atoms = [i.split() for i in temp_file[2:]]
-
-            atom_labels = [i[0] for i in atoms if len(i) > 1]
-            atom_pos = np.array([[float(i[1]), float(i[2]), float(i[3])] for i in atoms if len(i) > 1])
-
-            connectivity = len([i for i in atom_labels if 'X' in i])
-
-            if connectivity == 0:
-                print('Non X point could be found!')
-            if verbosity:
-                print(f'{file_name}: Connectivity =', connectivity)
-
-            return atom_labels, atom_pos, n_atoms, connectivity,
-        else:
-            print(f'File {file_name} not found!')
-
-    def read_gjf_file(self, path, file_name):
-        '''Lê um arquivo em formato .gjf e retorna uma lista com os átomos e um array Nx3 contendo as coordenadas dos N átomos'''
-
-        if self.verbosity:
-            print(f'Reading file {self.name}.gjf')
-
-        temp_file = open(os.path.join(path, file_name + '.gjf'), 'r').readlines()
-        temp_file = [i.split() for i in temp_file if i != '\n']
-
-        atoms = [i for i in temp_file if i[0] in self.elements_dict]
-
-        atom_labels = [i[0] for i in atoms]
-        atom_pos = np.array([[float(i[1]), float(i[2]), float(i[3])] for i in atoms])
-
-        n_atoms = len(atom_labels)
         connectivity = len([i for i in atom_labels if 'X' in i])
 
-        if 'X' not in atom_labels:
-            print('No X point could be found!')
-        return atom_labels, atom_pos, n_atoms, connectivity
+        if connectivity == 0:
+            print('Non X point could be found!')
 
-    def convert_gjf_2_xyz(self, path, file_name):
+        return atom_labels, atom_pos, n_atoms, connectivity,
+    else:
+        print(f'File {file_name} not found!')
 
-        atom_labels, atom_pos = self.read_gjf_file()
+def read_gjf_file(path, file_name):
+    '''Lê um arquivo em formato .gjf e retorna uma lista com os átomos e um array Nx3 contendo as coordenadas dos N átomos'''
 
-        self.save_xyz(path, file_name[:-4] + '.xyz', atom_labels, atom_pos)
+    temp_file = open(os.path.join(path, file_name + '.gjf'), 'r').readlines()
+    temp_file = [i.split() for i in temp_file if i != '\n']
 
-    def convert_xyz_2_gjf(self, path, file_name):
+    atoms = [i for i in temp_file if i[0] in elements_dict]
 
-        atom_labels, atom_pos = self.read_xyz_file(path, file_name)
+    atom_labels = [i[0] for i in atoms]
+    atom_pos = np.array([[float(i[1]), float(i[2]), float(i[3])] for i in atoms])
 
-        self.save_xyz(path, file_name[:-4] + '.gjf', atom_labels, atom_pos)
+    n_atoms = len(atom_labels)
+    connectivity = len([i for i in atom_labels if 'X' in i])
 
-    def convert_cif_2_xyz(self, path, file, supercell=[1, 1, 1]):
+    return atom_labels, atom_pos
 
-        structure = CifParser(os.path.join(path, file)).get_structures(primitive=True)[0]
-        # structure.translate_sites(range(len(structure.as_dict()['sites'])), [0, 0, 0.5], frac_coords=True, to_unit_cell=True)
+def convert_gjf_2_xyz(path, file_name):
+
+    file_name = file_name.split('.')[0]
+
+    atom_labels, atom_pos = read_gjf_file(path, file_name + '.gjf')
+
+    save_xyz(path, file_name + '.xyz', atom_labels, atom_pos)
+
+def convert_xyz_2_gjf(path, file_name):
+
+    file_name = file_name.split('.')[0]
+
+    atom_labels, atom_pos = read_xyz_file(path, file_name + '.xyz')
+
+    save_xyz(path, file_name + '.gjf', atom_labels, atom_pos)
+
+def convert_cif_2_xyz(path, file_name, supercell=[1, 1, 1]):
+
+    file_name = file_name.split('.')[0]
+
+    if cif_parser_imported is not False:
+
+        structure = CifParser(os.path.join(path, file_name + '.cif')).get_structures(primitive=True)[0]
 
         structure.make_supercell([[supercell[0], 0, 0], [0, supercell[1], 0], [0, 0, supercell[2]]])
+
         dict_sctructure = structure.as_dict()
         a, b, c = dict_sctructure['lattice']['a'], dict_sctructure['lattice']['b'], dict_sctructure['lattice']['c']
         alpha = round(dict_sctructure['lattice']['alpha'])
@@ -296,245 +301,282 @@ class Tools():
 
         atom_pos = [i['xyz'] for i in dict_sctructure['sites']]
 
-        temp_file = open(os.path.join(path, file[:-4] + '.xyz'), 'w')
-        temp_file.write(f'{len(atom_labels)} \n')
+    if cif_parser_imported is False:
+        cell, atom_labels, atom_pos, charges = read_cif(path, file_name)
+        a, b, c, alpha, beta, gamma = cell
 
-        temp_file.write(f'{a}  {b}  {c}  {alpha}  {beta}  {gamma}\n')
+    temp_file = open(os.path.join(path, file_name + '.xyz'), 'w')
+    temp_file.write(f'{len(atom_labels)} \n')
 
-        for i in range(len(atom_labels)):
-            temp_file.write('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(atom_labels[i], atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]))
+    temp_file.write(f'{a}  {b}  {c}  {alpha}  {beta}  {gamma}\n')
 
-        temp_file.close()
+    for i in range(len(atom_labels)):
+        temp_file.write('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(atom_labels[i], atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]))
 
-    def translate_inside(self, matrix):
-        for i in range(len(matrix)):
-            for j in range(len(matrix[i])):
-                if matrix[i][j] >= 1:
-                    matrix[i][j] -= 1
-        return matrix
+    temp_file.close()
 
-    def cos_angle(self, v1, v2, angle=False):
-        """
-        Calculates the cossine of the angle between two vectors v1 and v2.
-        ----------
-        v1 : array
-            (N,1) matrix with N dimensions
-        v2 : array
-            (N,1) matrix with N dimensions
-        angle : boolean
-            True for output in radian angle of False for output in cossine form
-        Returns
-        -------
-        angle : float
-            Angle in radians if angle == True
-        cos : float
-            Cossine of the angle if angle == False
-        """
-        unit_vector1 = v1 / np.linalg.norm(v1)
-        unit_vector2 = v2 / np.linalg.norm(v2)
+def translate_inside(matrix):
+    for i in range(len(matrix)):
+        for j in range(len(matrix[i])):
+            if matrix[i][j] >= 1:
+                matrix[i][j] -= 1
+    return matrix
 
-        dot_product = np.dot(unit_vector1, unit_vector2)
+def cos_angle(v1, v2, angle=False):
+    """
+    Calculates the cossine of the angle between two vectors v1 and v2.
+    ----------
+    v1 : array
+        (N,1) matrix with N dimensions
+    v2 : array
+        (N,1) matrix with N dimensions
+    angle : boolean
+        True for output in radian angle of False for output in cossine form
+    Returns
+    -------
+    angle : float
+        Angle in radians if angle == True
+    cos : float
+        Cossine of the angle if angle == False
+    """
+    unit_vector1 = v1 / np.linalg.norm(v1)
+    unit_vector2 = v2 / np.linalg.norm(v2)
 
-        if angle is not True:
-            return np.arccos(dot_product)  # angle in radian
-        else:
-            return dot_product  # cos of the angle
+    dot_product = np.dot(unit_vector1, unit_vector2)
 
-    def rmsd(self, V, W):
-        """
-        Calculate Root-mean-square deviation from two sets of vectors V and W.
-        Parameters
-        ----------
-        V : array
-            (N,D) matrix, where N is points and D is dimension.
-        W : array
-            (N,D) matrix, where N is points and D is dimension.
-        Returns
-        -------
-        rmsd : float
-            Root-mean-square deviation between the two vectors
-        """
-        diff = np.array(V) - np.array(W)
-        N = len(V)
-        return np.sqrt((diff * diff).sum() / N)
+    if angle is not True:
+        return np.arccos(dot_product)  # angle in radian
+    else:
+        return dot_product  # cos of the angle
 
-    def get_fractional_to_cartesian_matrix(self, a, b, c, alpha, beta, gamma, angle_in_degrees=True):
-        """
-        Return the transformation matrix that converts fractional coordinates to
-        cartesian coordinates.
-        Parameters
-        ----------
-        a, b, c : float
-            The lengths of the edges.
-        alpha, gamma, beta : float
-            The angles between the sides.
-        angle_in_degrees : bool
-            True if alpha, beta and gamma are expressed in degrees.
-        Returns
-        -------
-        r : array_like
-            The 3x3 rotation matrix. ``V_cart = np.dot(r, V_frac)``.
-        """
-        if angle_in_degrees:
-            alpha = np.deg2rad(alpha)
-            beta = np.deg2rad(beta)
-            gamma = np.deg2rad(gamma)
-        cosa = np.cos(alpha)
-        cosb = np.cos(beta)
-        cosg = np.cos(gamma)
-        sing = np.sin(gamma)
-        volume = 1.0 - cosa**2.0 - cosb**2.0 - cosg**2.0 + 2.0 * cosa * cosb * cosg
-        volume = np.sqrt(volume)
-        r = np.zeros((3, 3))
-        r[0, 0] = a
-        r[0, 1] = b * cosg
-        r[0, 2] = c * cosb
-        r[1, 1] = b * sing
-        r[1, 2] = c * (cosa - cosb * cosg) / sing
-        r[2, 2] = c * volume / sing
-        return r
+def rmsd(V, W):
+    """
+    Calculate Root-mean-square deviation from two sets of vectors V and W.
+    Parameters
+    ----------
+    V : array
+        (N,D) matrix, where N is points and D is dimension.
+    W : array
+        (N,D) matrix, where N is points and D is dimension.
+    Returns
+    -------
+    rmsd : float
+        Root-mean-square deviation between the two vectors
+    """
+    diff = np.array(V) - np.array(W)
+    N = len(V)
+    return np.sqrt((diff * diff).sum() / N)
 
-    def get_cartesian_to_fractional_matrix(self, a, b, c, alpha, beta, gamma, angle_in_degrees=True):
-        """
-        Return the transformation matrix that converts cartesian coordinates to
-        fractional coordinates.
-        Parameters
-        ----------
-        a, b, c : float
-            The lengths of the edges.
-        alpha, gamma, beta : float
-            The angles between the sides.
-        angle_in_degrees : bool
-            True if alpha, beta and gamma are expressed in degrees.
-        Returns
-        -------
-        r : array_like
-            The 3x3 rotation matrix. ``V_frac = np.dot(r, V_cart)``.
-        """
-        if angle_in_degrees:
-            alpha = np.deg2rad(alpha)
-            beta = np.deg2rad(beta)
-            gamma = np.deg2rad(gamma)
-        cosa = np.cos(alpha)
-        cosb = np.cos(beta)
-        cosg = np.cos(gamma)
-        sing = np.sin(gamma)
-        volume = 1.0 - cosa**2.0 - cosb**2.0 - cosg**2.0 + 2.0 * cosa * cosb * cosg
-        volume = np.sqrt(volume)
-        r = np.zeros((3, 3))
-        r[0, 0] = 1.0 / a
-        r[0, 1] = -cosg / (a * sing)
-        r[0, 2] = (cosa * cosg - cosb) / (a * volume * sing)
-        r[1, 1] = 1.0 / (b * sing)
-        r[1, 2] = (cosb * cosg - cosa) / (b * volume * sing)
-        r[2, 2] = sing / (c * volume)
-        return r
+def get_fractional_to_cartesian_matrix(a, b, c, alpha, beta, gamma, angle_in_degrees=True):
+    """
+    Return the transformation matrix that converts fractional coordinates to
+    cartesian coordinates.
+    Parameters
+    ----------
+    a, b, c : float
+        The lengths of the edges.
+    alpha, gamma, beta : float
+        The angles between the sides.
+    angle_in_degrees : bool
+        True if alpha, beta and gamma are expressed in degrees.
+    Returns
+    -------
+    r : array_like
+        The 3x3 rotation matrix. ``V_cart = np.dot(r, V_frac)``.
+    """
+    if angle_in_degrees:
+        alpha = np.deg2rad(alpha)
+        beta = np.deg2rad(beta)
+        gamma = np.deg2rad(gamma)
+    cosa = np.cos(alpha)
+    cosb = np.cos(beta)
+    cosg = np.cos(gamma)
+    sing = np.sin(gamma)
+    volume = 1.0 - cosa**2.0 - cosb**2.0 - cosg**2.0 + 2.0 * cosa * cosb * cosg
+    volume = np.sqrt(volume)
+    r = np.zeros((3, 3))
+    r[0, 0] = a
+    r[0, 1] = b * cosg
+    r[0, 2] = c * cosb
+    r[1, 1] = b * sing
+    r[1, 2] = c * (cosa - cosb * cosg) / sing
+    r[2, 2] = c * volume / sing
+    return r
 
-    def save_csv(self, file_name, data, delimiter=';', head=False):
+def get_cartesian_to_fractional_matrix(a, b, c, alpha, beta, gamma, angle_in_degrees=True):
+    """
+    Return the transformation matrix that converts cartesian coordinates to
+    fractional coordinates.
+    Parameters
+    ----------
+    a, b, c : float
+        The lengths of the edges.
+    alpha, gamma, beta : float
+        The angles between the sides.
+    angle_in_degrees : bool
+        True if alpha, beta and gamma are expressed in degrees.
+    Returns
+    -------
+    r : array_like
+        The 3x3 rotation matrix. ``V_frac = np.dot(r, V_cart)``.
+    """
+    if angle_in_degrees:
+        alpha = np.deg2rad(alpha)
+        beta = np.deg2rad(beta)
+        gamma = np.deg2rad(gamma)
+    cosa = np.cos(alpha)
+    cosb = np.cos(beta)
+    cosg = np.cos(gamma)
+    sing = np.sin(gamma)
+    volume = 1.0 - cosa**2.0 - cosb**2.0 - cosg**2.0 + 2.0 * cosa * cosb * cosg
+    volume = np.sqrt(volume)
+    r = np.zeros((3, 3))
+    r[0, 0] = 1.0 / a
+    r[0, 1] = -cosg / (a * sing)
+    r[0, 2] = (cosa * cosg - cosb) / (a * volume * sing)
+    r[1, 1] = 1.0 / (b * sing)
+    r[1, 2] = (cosb * cosg - cosa) / (b * volume * sing)
+    r[2, 2] = sing / (c * volume)
+    return r
 
-        file_temp = open(file_name, 'w')
-        if head is not False:
-            file_temp.write(head)
-        for i in range(len(data)):
-            file_temp.write(delimiter.join([str(j) for j in data[i]]) + '\n')
+def save_csv(file_name, data, delimiter=';', head=False):
 
-        file_temp.close()
+    file_temp = open(file_name, 'w')
+    if head is not False:
+        file_temp.write(head)
+    for i in range(len(data)):
+        file_temp.write(delimiter.join([str(j) for j in data[i]]) + '\n')
 
-    def save_xsf(self, file_name, cell, atom_pos):
+    file_temp.close()
 
-        xsf_file = open(os.path.join(os.getcwd(), file_name, 'OPT_1', file_name + '.xsf'), 'w')
-        xsf_file.write(' CRYSTAL\n')
-        xsf_file.write('  PRIMVEC\n')
+def save_xsf(file_path, file_name, cell, atom_pos):
 
-        for i in range(len(cell)):
-            xsf_file.write(f'  {cell[i][0]:<.9f}    {cell[i][1]:<.9f}    {cell[i][2]:<.9f}\n')
+    file_name = file_name.split('.')[0]
 
-        xsf_file.write('   PRIMCOORD\n')
-        xsf_file.write(f'           {len(atom_pos)}           1\n')
+    xsf_file = open(os.path.join(file_path, file_name + '.xsf'), 'w')
+    xsf_file.write(' CRYSTAL\n')
+    xsf_file.write('  PRIMVEC\n')
 
-        for i in range(len(atom_pos)):
-            xsf_file.write(f'{atom_pos[i][0]}        {atom_pos[i][1]:<.9f}    {atom_pos[i][2]:<.9f}    {atom_pos[i][3]:<.9f}\n')
+    for i in range(len(cell)):
+        xsf_file.write(f'  {cell[i][0]:<.9f}    {cell[i][1]:<.9f}    {cell[i][2]:<.9f}\n')
 
-        xsf_file.close()
+    xsf_file.write('   PRIMCOORD\n')
+    xsf_file.write(f'           {len(atom_pos)}           1\n')
+
+    for i in range(len(atom_pos)):
+        xsf_file.write(f'{atom_pos[i][0]}        {atom_pos[i][1]:<.9f}    {atom_pos[i][2]:<.9f}    {atom_pos[i][3]:<.9f}\n')
+
+    xsf_file.close()
+
+def save_gjf(file_path, file_name, atom_labels, atom_pos, text='opt pm6'):
+
+    file_name = file_name.split('.')[0]
+
+    temp_file = open(os.path.join(file_path, file_name), 'w')
+    temp_file.write(f'%chk={file_name[:-4]}.chk \n')
+    temp_file.write(f'# {text}\n')
+    temp_file.write('\n')
+    temp_file.write(f'{file_name}\n')
+    temp_file.write('\n')
+    temp_file.write('0 1 \n')
+
+    for i in range(len(atom_labels)):
+        temp_file.write('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(atom_labels[i], atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]))
+
+    temp_file.write('\n')
+    temp_file.write('\n')
+    temp_file.close()
+
+def save_xyz(file_path, file_name, atom_labels, atom_pos):
+
+    file_name = file_name.split('.')[0]
+
+    temp_file = open(os.path.join(file_path, file_name + '.xyz'), 'w')
+    temp_file.write(f'{len(atom_labels)} \n')
+    temp_file.write(f'{file_name[:-4]} rotated \n')
+
+    for i in range(len(atom_labels)):
+        temp_file.write('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(atom_labels[i], atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]))
+
+    temp_file.close()
+    
+def read_cif(file_path, file_name):
+    tmp = open(os.path.join(file_path, file_name), 'r').readlines()
+    cell = []
+    atom_label = []
+    atom_pos = []
+    charges = []
+    has_charges = False
+    for i in tmp:
+        if 'cell_length_a' in i:
+            cell += [float(i.split()[-1])]
+        if 'cell_length_b' in i:
+            cell += [float(i.split()[-1])]    
+        if 'cell_length_c' in i:
+            cell += [float(i.split()[-1])]  
+        if 'cell_angle_alpha' in i:
+            cell += [float(i.split()[-1])]  
+        if '_cell_angle_beta' in i:
+            cell += [float(i.split()[-1])]  
+        if '_cell_angle_gamma' in i:
+            cell += [float(i.split()[-1])]  
+
+    for i in tmp:
+        line = i.split()
+        if len(line) > 1 and line[0] in elements_dict.keys():
+            atom_label += [line[0]]
+            atom_pos += [[float(j) for j in line[2:-1]]]
+            charges += [float(line[-1])]
+    cell = cellpar_to_cell(cell)
+
+    return cell, atom_label, atom_pos, charges
         
-    def read_cif(self, path, file):
-        tmp = open(os.path.join(path, file), 'r').readlines()
-        cell = []
-        atom_label = []
-        atom_pos = []
-        charges = []
-        has_charges = False
-        for i in tmp:
-            if 'cell_length_a' in i:
-                cell += [float(i.split()[-1])]
-            if 'cell_length_b' in i:
-                cell += [float(i.split()[-1])]    
-            if 'cell_length_c' in i:
-                cell += [float(i.split()[-1])]  
-            if 'cell_angle_alpha' in i:
-                cell += [float(i.split()[-1])]  
-            if '_cell_angle_beta' in i:
-                cell += [float(i.split()[-1])]  
-            if '_cell_angle_gamma' in i:
-                cell += [float(i.split()[-1])]  
 
-        for i in tmp:
-            line = i.split()
-            if len(line) > 1 and line[0] in self.elements_dict.keys():
-                atom_label += [line[0]]
-                atom_pos += [[float(j) for j in line[2:-1]]]
-                charges += [float(line[-1])]
-        cell = self.cellpar_to_cell(cell)
+def save_cif(file_path, file_name, cell, atom_labels, atom_pos, partial_charges=False, frac_coords=True ):
 
-        return cell, atom_label, atom_pos, charges
-            
+    file_name = file_name.split('.')[0]
 
-    def save_cif(self, file_name, cell, atom_labels, atom_pos, partial_charges=False, path=False, frac_coords=True ):
+    if len(cell) == 3:
+        a, b, c, alpha, beta, gamma = cell_to_cellpar(cell)
+    if len(cell) == 6:
+        a, b, c, alpha, beta, gamma = cell
 
-        a, b, c, alpha, beta, gamma = self.cell_to_cellpar(cell)
-        '''a, b, c = np.linalg.norm(cell[0]), np.linalg.norm(cell[1]), np.linalg.norm(cell[2])
-        alpha = round(self.angle(cell[0], cell[2]))
-        beta = round(self.angle(cell[1], cell[2]))
-        gamma = round(self.angle(cell[0], cell[1]))'''
+    r = get_cartesian_to_fractional_matrix(a, b, c, alpha, beta, gamma)
 
-        r = self.get_cartesian_to_fractional_matrix(a, b, c, alpha, beta, gamma)
+    cif_file = open(os.path.join(file_path, file_name + '.cif'), 'w')
 
-        if path is False:
-            path = os.getcwd()
-        cif_file = open(os.path.join(path, file_name + '.cif'), 'w')
+    cif_file.write(f'data_{file_name}\n')
+    cif_file.write(f'_chemical_name_common                  \'{file_name}\'\n')
+    cif_file.write(f'_cell_length_a                         {a:.6f}\n')
+    cif_file.write(f'_cell_length_b                         {b:.6f}\n')
+    cif_file.write(f'_cell_length_c                         {c:.6f}\n')
+    cif_file.write(f'_cell_angle_alpha                      {alpha:.2f}\n')
+    cif_file.write(f'_cell_angle_beta                       {beta:.2f}\n')
+    cif_file.write(f'_cell_angle_gamma                      {gamma:.2f}\n')
+    cif_file.write('_space_group_name_H-M_alt              \'P 1\'\n')
+    cif_file.write('_space_group_IT_number                 1\n')
+    cif_file.write('\n')
+    cif_file.write('loop_\n')
+    cif_file.write('_symmetry_equiv_pos_as_xyz\n')
+    cif_file.write('   \'x, y, z\'\n')
+    cif_file.write('\n')
+    cif_file.write('loop_\n')
+    cif_file.write('   _atom_site_label\n')
+    cif_file.write('   _atom_site_type_symbol\n')
+    cif_file.write('   _atom_site_fract_x\n')
+    cif_file.write('   _atom_site_fract_y\n')
+    cif_file.write('   _atom_site_fract_z\n')
+    if partial_charges is not False:
+        cif_file.write('   _atom_site_charge\n')
 
-        cif_file.write(f'data_{file_name}_OPT1\n')
-        cif_file.write(f'_chemical_name_common                  \'{file_name}\'\n')
-        cif_file.write(f'_cell_length_a                         {a:.6f}\n')
-        cif_file.write(f'_cell_length_b                         {b:.6f}\n')
-        cif_file.write(f'_cell_length_c                         {c:.6f}\n')
-        cif_file.write(f'_cell_angle_alpha                      {alpha:.2f}\n')
-        cif_file.write(f'_cell_angle_beta                       {beta:.2f}\n')
-        cif_file.write(f'_cell_angle_gamma                      {gamma:.2f}\n')
-        cif_file.write('_space_group_name_H-M_alt              \'P 1\'\n')
-        cif_file.write('_space_group_IT_number                 1\n')
-        cif_file.write('\n')
-        cif_file.write('loop_\n')
-        cif_file.write('_symmetry_equiv_pos_as_xyz\n')
-        cif_file.write('   \'x, y, z\'\n')
-        cif_file.write('\n')
-        cif_file.write('loop_\n')
-        cif_file.write('   _atom_site_label\n')
-        cif_file.write('   _atom_site_type_symbol\n')
-        cif_file.write('   _atom_site_fract_x\n')
-        cif_file.write('   _atom_site_fract_y\n')
-        cif_file.write('   _atom_site_fract_z\n')
+    if frac_coords == False:
+        atom_pos = [np.dot(r, [i[0], i[1], i[2]]) for i in atom_pos]
+
+    for i in range(len(atom_pos)):
+        u, v, w = atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]
         if partial_charges is not False:
-            cif_file.write('   _atom_site_charge\n')
+            cif_file.write(f'{atom_labels[i]}    {atom_labels[i]}    {u:<.9f}    {v:<.9f}    {w:<.9f}   {partial_charges[i]:.5f}\n')
+        else:
+            cif_file.write(f'{atom_labels[i]}    {atom_labels[i]}    {u:<.9f}    {v:<.9f}    {w:<.9f}\n')
 
-        for i in range(len(atom_pos)):
-            if frac_coords == False:
-                u, v, w = np.dot(r, [atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]])
-            if frac_coords == True:
-                u, v, w = atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]
-            if partial_charges is not False:
-                cif_file.write(f'{atom_labels[i]}    {atom_labels[i]}    {u:<.9f}    {v:<.9f}    {w:<.9f}   {partial_charges[i]:.5f}\n')
-            else:
-                cif_file.write(f'{atom_labels[i]}    {atom_labels[i]}    {u:<.9f}    {v:<.9f}    {w:<.9f}\n')
-
-        cif_file.close()
+    cif_file.close()

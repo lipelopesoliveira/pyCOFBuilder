@@ -7,27 +7,25 @@ Created on Thu Dec 17 11:31:19 2020
 
 import os
 import numpy as np
-import matplotlib.pyplot as plt
-import math
-import glob
-from tqdm import tqdm
 
 from pymatgen.core import Lattice, Structure
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
-from pymatgen.io.cif import CifParser
+from scipy.spatial.transform import Rotation as R
 
+import Tools
+import Building_Block as BB
 
-class Reticulum(Tools):
+class Reticulum():
 
-    def __init__(self, bb_lib='built', verbosity=False):
+    def __init__(self, bb_lib='bb_lib', verbosity=False):
 
         self.verbosity = verbosity
         self.available_2D_topologies = ['hcb', 'hcb-a', 'sql', 'sql-a', 'kgm', 'kgm-a', 'hxl', 'hxl-a', 'kgd', 'kgd-a']
         self.available_3D_topologies = ['dia', 'bor', 'srs', 'pts', 'ctn', 'rra', 'fcc', 'lon', 'stp', 'acs', 'tbo', 'bcu', 'fjh', 'ceq']
         self.available_topologies = self.available_2D_topologies + self.available_3D_topologies
-        self.out_path = os.getcwd()
+        self.out_path = os.path.join('..', 'out')
         self.lib_bb = bb_lib
-        self.lib_path = f'bb_lib\\{bb_lib}'
+        self.lib_path = os.path.join('..', 'data', bb_lib)
         self.name = None
         self.topology = None
         self.dimenton = None
@@ -64,10 +62,10 @@ class Reticulum(Tools):
         self.topology = 'hcb'
         self.dimension = 2
 
-        bb_1 = Building_Block(self.lib_bb, name_a)
+        bb_1 = BB.Building_Block(self.lib_bb, name_a)
         bb_1.read_structure()
 
-        bb_2 = Building_Block(self.lib_bb, name_b)
+        bb_2 = BB.Building_Block(self.lib_bb, name_b)
         bb_2.read_structure()
 
         self.name = f'{bb_1.name}-{bb_2.name}-HCB-{stack}'
@@ -282,10 +280,10 @@ class Reticulum(Tools):
         self.topology = 'hcb-a'
         self.dimension = 2
 
-        bb_triangular = Building_Block(self.lib_bb, name_a, verbosity=self.verbosity)
+        bb_triangular = BB.Building_Block(self.lib_bb, name_a, verbosity=self.verbosity)
         bb_triangular.read_structure()
 
-        bb_linear = Building_Block(self.lib_bb, name_b, verbosity=self.verbosity)
+        bb_linear = BB.Building_Block(self.lib_bb, name_b, verbosity=self.verbosity)
         bb_linear.read_structure()
 
         self.charge = bb_linear.charge + bb_triangular.charge
@@ -948,42 +946,42 @@ class Reticulum(Tools):
 
     def print_result(self, name, lattice, hall, space_group, space_number, symm_op):
 
-        print('{:<60s} {:^12s} {:^3s} {:^4s} #{:^5s} {:^2} sym. op.'.format(name, lattice, hall.lstrip('-'), space_group, space_number, symm_op))
+        print('{:<60s} {:^12s} {:<4s} {:^4s} #{:^5s} {:^2} sym. op.'.format(name, lattice, hall.lstrip('-'), space_group, space_number, symm_op))
 
     def save_cif(self, supercell=False, path=None):
 
         if path is not None:
             self.out_path = path
         try:
-            os.mkdir(f'{self.out_path}\\out')
+            os.mkdir(self.out_path)
         except Exception:
             None
 
         if supercell is not False:
             self.symm_structure.make_supercell([[supercell[0], 0, 0], [0, supercell[1], 0], [0, 0, supercell[2]]])
 
-        self.symm_structure.to(filename=os.path.join(self.out_path, 'out', self.name + '.cif'))
+        self.symm_structure.to(filename=os.path.join(self.out_path, self.name + '.cif'))
 
     def save_vasp(self, supercell=False, path=None):
 
         if path is not None:
             self.out_path = path
         try:
-            os.mkdir(f'{self.out_path}\\out')
+            os.mkdir(self.out_path)
         except Exception:
             None
 
         if supercell is not False:
             self.symm_structure.make_supercell([[supercell[0], 0, 0], [0, supercell[1], 0], [0, 0, supercell[2]]])
 
-        self.symm_structure.to(fmt='poscar', filename=f"{self.out_path}\\out\\{self.name}.vasp")
+        self.symm_structure.to(fmt='poscar', filename=os.path.join(self.out_path, self.name + '.vasp'))
 
     def save_turbomole(self, supercell=[1,1,2], path=None):
 
         if path is not None:
             self.out_path = path
         try:
-            os.mkdir(f'{self.out_path}\\out')
+            os.mkdir(self.out_path)
         except Exception:
             None
 
@@ -1002,7 +1000,7 @@ class Reticulum(Tools):
 
         atom_pos = [i['xyz'] for i in dict_sctructure['sites']]
 
-        temp_file = open(f"{self.out_path}\\out\\{self.name}.coord", 'w')
+        temp_file = open(os.path.join(self.out_path ,self.name + '.coord'), 'w')
         temp_file.write('$coord angs\n')
 
         for i in range(len(atom_labels)):
@@ -1022,7 +1020,7 @@ class Reticulum(Tools):
         if path is not None:
             self.out_path = path
         try:
-            os.mkdir(f'{self.out_path}\\out')
+            os.mkdir(self.out_path)
         except Exception:
             None
 
@@ -1041,7 +1039,7 @@ class Reticulum(Tools):
 
         atom_pos = [i['xyz'] for i in dict_sctructure['sites']]
 
-        temp_file = open(os.path.join(self.out_path, 'out', self.name + '.xyz'), 'w')
+        temp_file = open(os.path.join(self.out_path, self.name + '.xyz'), 'w')
         temp_file.write(f'{len(atom_labels)} \n')
 
         temp_file.write(f'{a}  {b}  {c}  {alpha}  {beta}  {gamma}\n')
@@ -1051,12 +1049,12 @@ class Reticulum(Tools):
 
         temp_file.close()
 
-    def save_qe(self, supercell=False, angs=False, path=None, ecut=40, erho=360):
+    def save_qe(self, supercell=False, angs=False, path=None, ecut=40, erho=360, k_dist=0.3):
 
         if path is not None:
             self.out_path = path
         try:
-            os.mkdir(f'{self.out_path}\\out')
+            os.mkdir(self.out_path)
         except Exception:
             None
 
@@ -1074,11 +1072,11 @@ class Reticulum(Tools):
         celldm1 = a*1.8897259886  # 1 angstrom = 1.8897259886 bohr
         celldm2 = b/a
         celldm3 = c/a
-        celldm4 = self.cos_angle(cell[0], cell[1])
-        celldm5 = self.cos_angle(cell[0], cell[2])
+        celldm4 = Tools.cos_angle(cell[0], cell[1])
+        celldm5 = Tools.cos_angle(cell[0], cell[2])
         # cellcm6 = self.cos_angle(cell[1], cell[2])
 
-        kx, ky, kz = self.get_kgrid(self.cellpar_to_cell(cell))
+        kx, ky, kz = Tools.get_kgrid(self.cellpar_to_cell(cell), k_dist)
 
         ion_conv_crystal = [[i['label']] + i['abc'] for i in dict_sctructure['sites']]
         ion_conv_angstrom = [[i['label']] + i['xyz'] for i in dict_sctructure['sites']]
@@ -1088,7 +1086,7 @@ class Reticulum(Tools):
         if angs is True:
             ion_pos = ion_conv_angstrom
 
-        out_file = open(f"{self.out_path}\\out\\{self.name}.sh", 'w', newline='\n')
+        out_file = open(os.path.join(self.out_path, self.name + '.in'), 'w', newline='\n')
 
         out_file.write('#!/bin/sh\n')
         out_file.write('\n')
