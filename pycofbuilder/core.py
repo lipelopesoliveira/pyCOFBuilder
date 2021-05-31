@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 import os
 
-import Tools
-import Reticulum
-import Building_Block
+import pycofbuilder.tools as Tools
+from pycofbuilder.reticulum import Reticulum
+from pycofbuilder.building_block import Building_Block
 
 def create_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, cif=True, turbomole=False, vasp=False):
 
-    BB = Building_Block.Building_Block(lib=lib)
+    BB = Building_Block(lib=lib)
 
     lista_amina_2 = BB.get_bipodal_NH2()
     lista_amina_3 = BB.get_tripodal_NH2()
@@ -27,7 +27,7 @@ def create_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, 
     for file_a in lista_aldeido_3:
         for file_b in lista_amina_2:
             try:
-                Ret = Reticulum.Reticulum(bb_lib=lib)
+                Ret = Reticulum(bb_lib=lib)
                 Ret.create_hcb_a_structure(file_a, file_b, stack=stacking)
                 if cif is True:
                     Ret.save_cif()
@@ -49,7 +49,7 @@ def create_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, 
     for file_a in lista_aldeido_3:
         for file_b in lista_amina_3:
             try:
-                Ret = Reticulum.Reticulum(bb_lib=lib)
+                Ret = Reticulum(bb_lib=lib)
                 Ret.create_hcb_structure(file_a, file_b, stack=stacking)
                 if cif is True:
                     Ret.save_cif()
@@ -71,7 +71,7 @@ def create_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, 
     for file_a in lista_amina_3:
         for file_b in lista_aldeido_2:
             try:
-                Ret = Reticulum.Reticulum(bb_lib=lib)
+                Ret = Reticulum(bb_lib=lib)
                 Ret.create_hcb_a_structure(file_a, file_b, stack=stacking)
                 if cif is True:
                     Ret.save_cif()
@@ -92,7 +92,7 @@ def create_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, 
 
     for file_b in lista_b_2:
         try:
-            Ret = Reticulum.Reticulum(bb_lib=lib)
+            Ret = Reticulum(bb_lib=lib)
             Ret.create_hcb_a_structure('BDBA_1', file_b, stack=stacking, bond_atom='B')
             if cif is True:
                 Ret.save_cif()
@@ -127,7 +127,7 @@ def create_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, 
     for file_a in lista_b_4:
         for file_b in lista_oh_2:
             try:
-                Ret = Reticulum.Reticulum(bb_lib=lib)
+                Ret = Reticulum(bb_lib=lib)
                 Ret.create_sql_a_structure(file_a, file_b, stack=stacking, bond_atom='B')
                 if cif is True:
                     Ret.save_cif()
@@ -149,7 +149,7 @@ def create_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, 
     for file_a in lista_oh_3:
         for file_b in lista_b_2:
             try:
-                Ret = Reticulum.Reticulum(bb_lib=lib)
+                Ret = Reticulum(bb_lib=lib)
                 Ret.create_hcb_a_structure(file_a, file_b, stack=stacking, bond_atom='B')
                 if cif is True:
                     Ret.save_cif()
@@ -171,7 +171,7 @@ def create_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, 
     for file_a in lista_b_3:
         for file_b in lista_oh_2:
             try:
-                Ret = Reticulum.Reticulum(bb_lib=lib)
+                Ret = Reticulum(bb_lib=lib)
                 Ret.create_hcb_a_structure(file_a, file_b, stack=stacking, bond_atom='B')
                 if cif is True:
                     Ret.save_cif()
@@ -193,7 +193,7 @@ def create_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, 
     for file_a in lista_oh_3:
         for file_b in lista_b_3:
             try:
-                Ret = Reticulum.Reticulum(bb_lib=lib)
+                Ret = Reticulum(bb_lib=lib)
                 Ret.create_hcb_structure(file_a, file_b, stack=stacking, bond_atom='B')
                 if cif is True:
                     Ret.save_cif()
@@ -215,7 +215,7 @@ def create_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, 
     for file_a in lista_amina_4:
         for file_b in lista_aldeido_2:
             try:
-                Ret = Reticulum.Reticulum(bb_lib=lib)
+                Ret = Reticulum(bb_lib=lib)
                 Ret.create_sql_a_structure(file_a, file_b, stack=stacking)
                 if cif is True:
                     Ret.save_cif()
@@ -237,7 +237,7 @@ def create_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, 
     for file_a in lista_aldeido_4:
         for file_b in lista_amina_2:
             try:
-                Ret = Reticulum.Reticulum(bb_lib=lib)
+                Ret = Reticulum(bb_lib=lib)
                 Ret.create_sql_a_structure(file_a, file_b, stack=stacking)
                 if cif is True:
                     Ret.save_cif()
@@ -259,7 +259,7 @@ def create_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, 
     for file_a in lista_aldeido_4:
         for file_b in lista_amina_4:
             try:
-                Ret = Reticulum.Reticulum(bb_lib=lib)
+                Ret = Reticulum(bb_lib=lib)
                 Ret.create_sql_structure(file_a, file_b, stack=stacking)
                 if cif is True:
                     Ret.save_cif()
@@ -296,7 +296,7 @@ def creat_all_C2():
     for n in nucleos:
         for c in conectores:
             for r1 in radicais:
-                BB = Building_Block.Building_Block()
+                BB = Building_Block()
                 BB.create_C2_BB(n, c, r1)
                 print(BB.name, 'created')
                 BB.save()
@@ -314,7 +314,7 @@ def creat_all_C3():
     for n in nucleos:
         for c in conectores:
             for r1 in radicais:
-                BB = Building_Block.Building_Block()
+                BB = Building_Block()
                 BB.create_C3_BB(n, c, r1)
                 print(BB.name, 'created')
                 BB.save()
@@ -332,7 +332,7 @@ def creat_all_C4():
         for c in conectores:
             for r1 in radicais:
                 print(n, c, r1)
-                BB = Building_Block.Building_Block()
+                BB = Building_Block()
                 BB.create_C4_BB(n, c, r1)
                 print(BB.name, 'created')
                 BB.save()

@@ -12,8 +12,8 @@ from pymatgen.core import Lattice, Structure
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 from scipy.spatial.transform import Rotation as R
 
-import Tools
-import Building_Block as BB
+import pycofbuilder.tools as Tools
+from pycofbuilder.building_block import Building_Block
 
 class Reticulum():
 
@@ -23,9 +23,9 @@ class Reticulum():
         self.available_2D_topologies = ['hcb', 'hcb-a', 'sql', 'sql-a', 'kgm', 'kgm-a', 'hxl', 'hxl-a', 'kgd', 'kgd-a']
         self.available_3D_topologies = ['dia', 'bor', 'srs', 'pts', 'ctn', 'rra', 'fcc', 'lon', 'stp', 'acs', 'tbo', 'bcu', 'fjh', 'ceq']
         self.available_topologies = self.available_2D_topologies + self.available_3D_topologies
-        self.out_path = os.path.join('..', 'out')
+        self.out_path = 'out'
         self.lib_bb = bb_lib
-        self.lib_path = os.path.join('..', 'data', bb_lib)
+        self.lib_path = os.path.join('data', bb_lib)
         self.name = None
         self.topology = None
         self.dimenton = None
@@ -62,10 +62,10 @@ class Reticulum():
         self.topology = 'hcb'
         self.dimension = 2
 
-        bb_1 = BB.Building_Block(self.lib_bb, name_a)
+        bb_1 = Building_Block(self.lib_bb, name_a)
         bb_1.read_structure()
 
-        bb_2 = BB.Building_Block(self.lib_bb, name_b)
+        bb_2 = Building_Block(self.lib_bb, name_b)
         bb_2.read_structure()
 
         self.name = f'{bb_1.name}-{bb_2.name}-HCB-{stack}'
@@ -280,10 +280,10 @@ class Reticulum():
         self.topology = 'hcb-a'
         self.dimension = 2
 
-        bb_triangular = BB.Building_Block(self.lib_bb, name_a, verbosity=self.verbosity)
+        bb_triangular = Building_Block(self.lib_bb, name_a, verbosity=self.verbosity)
         bb_triangular.read_structure()
 
-        bb_linear = BB.Building_Block(self.lib_bb, name_b, verbosity=self.verbosity)
+        bb_linear = Building_Block(self.lib_bb, name_b, verbosity=self.verbosity)
         bb_linear.read_structure()
 
         self.charge = bb_linear.charge + bb_triangular.charge

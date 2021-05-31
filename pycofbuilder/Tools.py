@@ -231,6 +231,8 @@ def get_kgrid(cell, distance=0.3):
 def read_xyz_file(path, file_name):
     '''Lê um arquivo em formato .xyz e retorna uma lista com os átomos e um array Nx3 contendo as coordenadas dos N átomos'''
     
+    file_name = file_name.split('.')[0]
+
     if os.path.exists(os.path.join(path, file_name + '.xyz')):
         temp_file = open(os.path.join(path, file_name + '.xyz'), 'r').readlines()
 

@@ -7,7 +7,7 @@ Created on Thu Dec 17 11:31:19 2020
 
 import os
 import numpy as np
-import Tools
+import pycofbuilder.tools as Tools
 
 from scipy.spatial import distance
 
@@ -17,7 +17,7 @@ class Building_Block():
 
         self.name = name
         self.verbosity = verbosity
-        self.main_path = os.path.join('..', 'data')
+        self.main_path = 'data'
         self.lib_path = os.path.join(self.main_path, lib)
         self.connectivity = None
         self.simetry = None
