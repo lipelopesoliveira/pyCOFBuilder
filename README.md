@@ -26,19 +26,9 @@ installation by running
 ## Usage
 
 ```python
-from pycofbuilder.building_block import Building_Block
-from pycofbuilder.reticulum import Reticulum
+import pycofbuilder
 
-BB_aldehyde = Building_Block(‘C3_BENZ_H_CHO’)
-BB_amine = Building_Block(‘C2_HDZ_NH2’)
-
-COF = Reticulum()
-COF.create_hcb_a_structure(BB_aldehyde, BB_amine, stacking=‘AA’)
-
-COF.save_cif()
-COF.save_xyz(supercell=[1, 1, 2])
-COF.save_qe()
-COF.save_gjf()
+pycofbuilder.core.create_all_available_COFs()
 
 ```
 
