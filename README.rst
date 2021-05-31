@@ -1,9 +1,9 @@
 pyCOFBuilder
 ========================
 
-This simple project is an example repo for Python projects.
+pyCOFBuilder is a simple and powerfull python package to assembly COF structures with specifics bulding blocks, topologies and functionalizations.
 
-`Learn more <http://www.kennethreitz.org/essays/repository-structure-and-python>`_.
+`Learn more <https://tonanoandbeyondblog.wordpress.com/>`_.
 
 ---------------
 
