@@ -1,0 +1,6 @@
+os
+numpy
+scipy
+pymatgen
+math
+itertools

@@ -1,0 +1,11 @@
+%chk=C:\Users\lipel\Google Drive\Laboratório\Quím-Mat\Projetos\Doutorado\Resultados\Teste_Pipeline\4 - Blocos de construção\Núcleos\R\CH3.chk
+# opt pbepbe/6-311g/auto
+
+Title Card Required
+
+0 2
+ R                  0.00000000    0.00000000    0.00000000
+ N                  0.43000000    0.00000000    0.00000000
+ H                  0.93564026    0.88708817    0.00000000
+ H                  0.93564026   -0.88708817    0.00000000
+
