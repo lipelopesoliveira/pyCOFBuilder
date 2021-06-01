@@ -62,11 +62,9 @@ class Reticulum():
         self.topology = 'hcb'
         self.dimension = 2
 
-        bb_1 = Building_Block(self.lib_bb, name_a)
-        bb_1.read_structure()
+        bb_1 = Building_Block(name_a, self.lib_bb)
 
-        bb_2 = Building_Block(self.lib_bb, name_b)
-        bb_2.read_structure()
+        bb_2 = Building_Block(name_b, self.lib_bb)
 
         self.name = f'{bb_1.name}-{bb_2.name}-HCB-{stack}'
         self.charge = bb_1.charge + bb_2.charge
@@ -280,11 +278,9 @@ class Reticulum():
         self.topology = 'hcb-a'
         self.dimension = 2
 
-        bb_triangular = Building_Block(self.lib_bb, name_a, verbosity=self.verbosity)
-        bb_triangular.read_structure()
+        bb_triangular = Building_Block(name_a, self.lib_bb, verbosity=self.verbosity)
 
-        bb_linear = Building_Block(self.lib_bb, name_b, verbosity=self.verbosity)
-        bb_linear.read_structure()
+        bb_linear = Building_Block(name_b, self.lib_bb, verbosity=self.verbosity)
 
         self.charge = bb_linear.charge + bb_triangular.charge
         self.chirality = bb_linear.chirality or bb_triangular.chirality
@@ -517,11 +513,9 @@ class Reticulum():
         self.topology = 'sql'
         self.dimension = 2
 
-        bb_1 = Building_Block(self.lib_bb, name_a, verbosity=self.verbosity)
-        bb_1.read_structure()
+        bb_1 = Building_Block(name_a, self.lib_bb, verbosity=self.verbosity)
 
-        bb_2 = Building_Block(self.lib_bb, name_b, verbosity=self.verbosity)
-        bb_2.read_structure()
+        bb_2 = Building_Block(name_b, self.lib_bb, verbosity=self.verbosity)
 
         self.charge = bb_1.charge + bb_2.charge
         self.chirality = bb_1.chirality or bb_2.chirality
@@ -725,11 +719,9 @@ class Reticulum():
         self.topology = 'sql-a'
         self.dimension = 2
 
-        bb_1 = Building_Block(self.lib_bb, name_a, verbosity=self.verbosity)
-        bb_1.read_structure()
+        bb_1 = Building_Block(name_a, self.lib_bb, verbosity=self.verbosity)
 
-        bb_2 = Building_Block(self.lib_bb, name_b, verbosity=self.verbosity)
-        bb_2.read_structure()
+        bb_2 = Building_Block(name_b, self.lib_bb, verbosity=self.verbosity)
 
         self.charge = bb_1.charge + bb_2.charge
         self.chirality = bb_1.chirality or bb_2.chirality

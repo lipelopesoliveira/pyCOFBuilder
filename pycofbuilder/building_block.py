@@ -13,7 +13,7 @@ from scipy.spatial import distance
 
 class Building_Block():
 
-    def __init__(self, lib='bb_lib', name=None, verbosity=False):
+    def __init__(self, name=None, lib='bb_lib', verbosity=False):
 
         self.name = name
         self.verbosity = verbosity
@@ -30,6 +30,9 @@ class Building_Block():
         self.chirality = False
         self.atom_labels = None
         self.atom_pos = None
+
+        if self.name is not None:
+            self.read_structure()
 
     def n_atoms(self):
         ''' Returns the number of atoms in the unitary cell'''
@@ -122,29 +125,6 @@ class Building_Block():
                     R6_pos += [atom_pos[i]]
 
         return {'R': R_pos, 'R1': R1_pos, 'R2': R2_pos, 'R3': R3_pos, 'R4': R4_pos, 'R5': R5_pos, 'R6': R6_pos}
-
-    '''def add_R(self, label, pos, R1='H', R2='H', R3='H', R4='H', R5='H', R6='H'):
-
-        for i in range(len(label)):
-            if label[i] == 'R1':
-                label[i] = R1
-
-            if label[i] == 'R2':
-                label[i] = R2
-
-            if label[i] == 'R3':
-                label[i] = R3
-
-            if label[i] == 'R4':
-                label[i] = R4
-
-            if label[i] == 'R5':
-                label[i] = R5
-
-            if label[i] == 'R6':
-                label[i] = R6
-
-        return label, pos'''
 
     def add_X(self, label, pos, X='N'):
 
@@ -441,3 +421,7 @@ class Building_Block():
         files_list = os.listdir(self.lib_path)
 
         return [i.rstrip('.xyz') for i in files_list if 'C2p' == i.split('_')[0] and 'NH2' in i.split('_')[2]]
+
+
+if __name__ == '__main__':
+    main()

@@ -277,7 +277,7 @@ def read_xyz_file(path, file_name):
         if connectivity == 0:
             print('Non X point could be found!')
 
-        return atom_labels, atom_pos, n_atoms, connectivity,
+        return atom_labels, atom_pos, n_atoms, connectivity
     else:
         print(f'File {file_name} not found!')
 
@@ -309,7 +309,7 @@ def convert_xyz_2_gjf(path, file_name):
 
     file_name = file_name.split('.')[0]
 
-    atom_labels, atom_pos = read_xyz_file(path, file_name + '.xyz')
+    atom_labels, atom_pos, n_atoms, connectivity = read_xyz_file(path, file_name + '.xyz')
 
     save_xyz(path, file_name + '.gjf', atom_labels, atom_pos)
 
