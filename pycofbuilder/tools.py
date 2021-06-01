@@ -11,10 +11,34 @@ import math
 try:
     from pymatgen.io.cif import CifParser
 except Exception:
-    print('Could no import CifParser from pymatgen the conversion from cif to xyz may not work properlly')
+    print('WARNING: Could no import CifParser from pymatgen the conversion from cif to xyz and COF generation may not work properlly')
     cif_parser_imported = False
 
-elements_dict = {'H': 1.00794, 'He': 4.002602, 'Li': 6.941, 'Be': 9.012182, 'B': 10.811, 'C': 12.0107, 'N': 14.0067,
+def elements_dict():
+
+    element_symbols = [
+    'X',
+    'H', 'He',  # Period 1
+    'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne',  # Period 2
+    'Na', 'Mg', 'Al', 'Si', 'P', 'S', 'Cl', 'Ar',  # Period 3
+    'K', 'Ca', 'Sc', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Co',  # Period 4
+    'Ni', 'Cu', 'Zn', 'Ga', 'Ge', 'As', 'Se', 'Br', 'Kr',  # Period 4
+    'Rb', 'Sr', 'Y', 'Zr', 'Nb', 'Mo', 'Tc', 'Ru', 'Rh',  # Period 5
+    'Pd', 'Ag', 'Cd', 'In', 'Sn', 'Sb', 'Te', 'I', 'Xe',  # Period 5
+    'Cs', 'Ba',  # Period 6
+    'La', 'Ce', 'Pr', 'Nd', 'Pm', 'Sm', 'Eu', 'Gd', 'Tb',  # Lanthanides
+    'Dy', 'Ho', 'Er', 'Tm', 'Yb', 'Lu',  # Lanthanides
+    'Hf', 'Ta', 'W', 'Re', 'Os', 'Ir', 'Pt', 'Au', 'Hg',  # Period 6
+    'Tl', 'Pb', 'Bi', 'Po', 'At', 'Rn',  # Period 6
+    'Fr', 'Ra',  # Period 7
+    'Ac', 'Th', 'Pa', 'U', 'Np', 'Pu', 'Am', 'Cm', 'Bk',  # Actinides
+    'Cf', 'Es', 'Fm', 'Md', 'No', 'Lr',  # Actinides
+    'Rf', 'Db', 'Sg', 'Bh', 'Hs', 'Mt', 'Ds', 'Rg', 'Cn',  # Period 7
+    'Uut', 'Fl', 'Uup', 'Lv', 'Uus', 'Uuo', # Period 7
+    'X', 'Q', 'R', 'R1', 'R2', 'R3', 'R4', 'R5', 'R6']  #Specific for the programm
+
+    """Returns a dictionary containing the elements and its respective atomic mass in g/mol"""
+    return {'H': 1.00794, 'He': 4.002602, 'Li': 6.941, 'Be': 9.012182, 'B': 10.811, 'C': 12.0107, 'N': 14.0067,
               'O': 15.9994, 'F': 18.9984032, 'Ne': 20.1797, 'Na': 22.98976928, 'Mg': 24.305, 'Al': 26.9815386,
               'Si': 28.0855, 'P': 30.973762, 'S': 32.065, 'Cl': 35.453, 'Ar': 39.948, 'K': 39.0983, 'Ca': 40.078,
               'Sc': 44.955912, 'Ti': 47.867, 'V': 50.9415, 'Cr': 51.9961, 'Mn': 54.938045, 'Fe': 55.845, 
@@ -35,17 +59,24 @@ elements_dict = {'H': 1.00794, 'He': 4.002602, 'Li': 6.941, 'Be': 9.012182, 'B':
               'X': 0.0, 'Q': 0.0, 'R': 0.0, 'R1': 0.0, 'R2': 0.0, 'R3': 0.0, 'R4': 0.0, 'R5': 0.0, 'R6': 0.0}
 
 def angle_between(v1, v2):
-    """ Returns the angle in radians between vectors 'v1' and 'v2'::"""
+    """ Returns the angle in radians between vectors 'v1' and 'v2'"""
     v1_u = v1/np.linalg.norm(v1)
     v2_u = v2/np.linalg.norm(v2)
     return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
 
 def rotation_matrix_from_vectors(vec1, vec2):
-    """ Find the rotation matrix that aligns vec1 to vec2
-    :param vec1: A 3d "source" vector
-    :param vec2: A 3d "destination" vector
-    :return mat: A transform matrix (3x3) which when applied to vec1, aligns it with vec2.
-    """
+    '''
+    Find the rotation matrix that aligns vec1 to vec2
+    ----------
+    vec1 : array
+        (3,3) array 
+    vec2 : array
+        (3,3) array 
+    Returns
+    -------
+    rotation_matrix : array
+        A transform matrix (3x3) which when applied to vec1, aligns it with vec2.
+    '''
     a, b = (vec1 / np.linalg.norm(vec1)).reshape(3), (vec2 / np.linalg.norm(vec2)).reshape(3)
     v = np.cross(a, b)
     c = np.dot(a, b)
@@ -219,7 +250,6 @@ def get_kgrid(cell, distance=0.3):
     kz : int
         Number of points in the z direction on reciprocal space
     '''
-    
     b1, b2, b3 = get_reciprocal_vectors(cell)
     b = np.array([np.linalg.norm(b1), np.linalg.norm(b2), np.linalg.norm(b3)])
     kx = math.ceil(b[0]/distance)
@@ -257,7 +287,7 @@ def read_gjf_file(path, file_name):
     temp_file = open(os.path.join(path, file_name + '.gjf'), 'r').readlines()
     temp_file = [i.split() for i in temp_file if i != '\n']
 
-    atoms = [i for i in temp_file if i[0] in elements_dict]
+    atoms = [i for i in temp_file if i[0] in elements_dict()]
 
     atom_labels = [i[0] for i in atoms]
     atom_pos = np.array([[float(i[1]), float(i[2]), float(i[3])] for i in atoms])
@@ -525,7 +555,7 @@ def read_cif(file_path, file_name):
 
     for i in tmp:
         line = i.split()
-        if len(line) > 1 and line[0] in elements_dict.keys():
+        if len(line) > 1 and line[0] in elements_dict().keys():
             atom_label += [line[0]]
             atom_pos += [[float(j) for j in line[2:-1]]]
             charges += [float(line[-1])]
@@ -582,3 +612,7 @@ def save_cif(file_path, file_name, cell, atom_labels, atom_pos, partial_charges=
             cif_file.write(f'{atom_labels[i]}    {atom_labels[i]}    {u:<.9f}    {v:<.9f}    {w:<.9f}\n')
 
     cif_file.close()
+
+
+if __name__ == '__main__':
+    main()

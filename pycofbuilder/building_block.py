@@ -32,10 +32,11 @@ class Building_Block():
         self.atom_pos = None
 
     def n_atoms(self):
+        ''' Returns the number of atoms in the unitary cell'''
         return len(self.atom_labels)
 
     def centralize_molecule(self, by_X=False):
-        ''' Centralize the molecule in its geometrical center'''
+        ''' Centralize the molecule on its geometrical center'''
 
         transposed = np.transpose(self.atom_pos)
         if by_X is True:
@@ -66,7 +67,6 @@ class Building_Block():
 
     def get_Q_points(self, atom_labels, atom_pos):
 
-    
         Q_labels, Q_pos = [], []
 
         for i in range(len(atom_labels)):
@@ -123,7 +123,7 @@ class Building_Block():
 
         return {'R': R_pos, 'R1': R1_pos, 'R2': R2_pos, 'R3': R3_pos, 'R4': R4_pos, 'R5': R5_pos, 'R6': R6_pos}
 
-    def add_R(self, label, pos, R1='H', R2='H', R3='H', R4='H', R5='H', R6='H'):
+    '''def add_R(self, label, pos, R1='H', R2='H', R3='H', R4='H', R5='H', R6='H'):
 
         for i in range(len(label)):
             if label[i] == 'R1':
@@ -144,7 +144,7 @@ class Building_Block():
             if label[i] == 'R6':
                 label[i] = R6
 
-        return label, pos
+        return label, pos'''
 
     def add_X(self, label, pos, X='N'):
 
