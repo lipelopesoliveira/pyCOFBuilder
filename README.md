@@ -34,7 +34,7 @@ c = COF.build('C3_BENZ_CHO_OH-C2_HDZ_NH2-HCB_A-AA')
 ```
 
 A `.cif` file will be created in the `out` folder. The code will print some information of the structure created:
-```python
+```
 C3_BENZ_CHO_OH-C2_HDZ_NH2-HCB_A-AA                            hexagonal   P    P6/m # 175    12 sym. op.
 ```
 Besides, the variable `c` now is a list wit two elements. The first element is a Boolean value indicating whether the network creation was successful. 
