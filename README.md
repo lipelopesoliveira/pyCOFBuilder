@@ -57,7 +57,7 @@ COF.build_all_available_COFs()
 
 You should see this output
 
-```python
+```
 16 COFs will be created. Do you want o proceed? Type [y] to continue.
 y
                       COF Name                              |    Lattice    | Point Group | N° of symmetry op. |
