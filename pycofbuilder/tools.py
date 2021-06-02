@@ -613,6 +613,10 @@ def save_cif(file_path, file_name, cell, atom_labels, atom_pos, partial_charges=
 
     cif_file.close()
 
+def print_result(name, lattice, hall, space_group, space_number, symm_op):
+
+    print('{:<60s} {:^12s} {:<4s} {:^4s} #{:^5s}   {:^2} sym. op.'.format(name, lattice, hall.lstrip('-'), space_group, space_number, symm_op))
+
 
 if __name__ == '__main__':
     main()

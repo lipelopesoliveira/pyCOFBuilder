@@ -57,7 +57,7 @@ class Reticulum():
             for i in self.available_3D_topologies:
                 print(i)
 
-    def create_hcb_structure(self, name_a, name_b, stack='AA', bond_atom='N', c_cell=3.6):
+    def create_hcb_structure(self, name_a, name_b, stack='AA', bond_atom='N', c_cell=3.6, print_result=True):
 
         self.topology = 'hcb'
         self.dimension = 2
@@ -271,9 +271,12 @@ class Reticulum():
         symm_op = symm.get_point_group_operations()
         self.hall = symm.get_hall()
 
-        self.print_result(self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op))
+        if print_result == True:
+            Tools.print_result(self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op))
 
-    def create_hcb_a_structure(self, name_a, name_b, stack='AA', bond_atom='N', c_cell=3.6):
+        return [self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op)]
+
+    def create_hcb_a_structure(self, name_a, name_b, stack='AA', bond_atom='N', c_cell=3.6, print_result=True):
 
         self.topology = 'hcb-a'
         self.dimension = 2
@@ -506,9 +509,12 @@ class Reticulum():
         symm_op = symm.get_point_group_operations()
         self.hall = symm.get_hall()
 
-        self.print_result(self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op))
+        if print_result == True:
+            Tools.print_result(self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op))
 
-    def create_sql_structure(self, name_a, name_b, stack='AA', bond_atom='N', c_cell=3.6):
+        return [self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op)]
+
+    def create_sql_structure(self, name_a, name_b, stack='AA', bond_atom='N', c_cell=3.6, print_result=True):
 
         self.topology = 'sql'
         self.dimension = 2
@@ -712,9 +718,12 @@ class Reticulum():
         symm_op = symm.get_point_group_operations()
         self.hall = symm.get_hall()
 
-        self.print_result(self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op))
+        if print_result == True:
+            Tools.print_result(self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op))
 
-    def create_sql_a_structure(self, name_a, name_b, stack='AA', bond_atom='N', c_cell=3.6):
+        return [self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op)]
+
+    def create_sql_a_structure(self, name_a, name_b, stack='AA', bond_atom='N', c_cell=3.6, print_resut=True):
 
         self.topology = 'sql-a'
         self.dimension = 2
@@ -934,11 +943,10 @@ class Reticulum():
         symm_op = symm.get_point_group_operations()
         self.hall = symm.get_hall()
 
-        self.print_result(self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op))
+        if print_resut == True:
+            Tools.print_result(self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op))
 
-    def print_result(self, name, lattice, hall, space_group, space_number, symm_op):
-
-        print('{:<60s} {:^12s} {:<4s} {:^4s} #{:^5s}   {:^2} sym. op.'.format(name, lattice, hall.lstrip('-'), space_group, space_number, symm_op))
+        return [self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op)]
 
     def save_cif(self, supercell=False, path=None):
 

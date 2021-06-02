@@ -2,6 +2,7 @@
 import os
 import glob
 import time
+from tqdm import tqdm
 
 import pycofbuilder.tools as Tools
 from pycofbuilder.reticulum import Reticulum
@@ -37,7 +38,7 @@ def build(cof_name=None, save_format=['cif'], bond_atom='N', lib='bb_lib'):
     if net == 'HCB':
         try:
             Ret = Reticulum(bb_lib=lib)
-            Ret.create_hcb_structure(bb1, bb2, stack=stacking, bond_atom=bond_atom)
+            simm_data = Ret.create_hcb_structure(bb1, bb2, stack=stacking, bond_atom=bond_atom, print_result=False)
             if cif is True:
                 Ret.save_cif()
             if xyz is True:
@@ -51,13 +52,14 @@ def build(cof_name=None, save_format=['cif'], bond_atom='N', lib='bb_lib'):
                 Ret.save_turbomole()
             if vasp is True:
                 Ret.save_vasp()
-            return  [True, f'{bb1}-{bb2}-{net}-{stacking}']
+            return  [True, simm_data]
         except Exception:
             return [False, f'{bb1}-{bb2}-{net}-{stacking}']
 
     if net == 'HCB_A':
+        try:
             Ret = Reticulum(bb_lib=lib)
-            Ret.create_hcb_a_structure(bb1, bb2, stack=stacking, bond_atom=bond_atom)
+            simm_data = Ret.create_hcb_a_structure(bb1, bb2, stack=stacking, bond_atom=bond_atom, print_result=False)
             if cif is True:
                 Ret.save_cif()
             if xyz is True:
@@ -71,7 +73,9 @@ def build(cof_name=None, save_format=['cif'], bond_atom='N', lib='bb_lib'):
                 Ret.save_turbomole()
             if vasp is True:
                 Ret.save_vasp()
-            return  [True, f'{bb1}-{bb2}-{net}-{stacking}']
+            return  [True, simm_data]
+        except Exception:
+            return [False, f'{bb1}-{bb2}-{net}-{stacking}']
 
 
 def build_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, cif=True, turbomole=False, vasp=False):
@@ -305,13 +309,16 @@ def build_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, c
 
     if val == 'y':
         t_i = time.time()
-        print('                      COF Name                              |    Lattice    | Point Group | N° of symmetry op. |')
-        for cof in cofs_list:
+        for cof in tqdm(cofs_list):
             succes, name = build(cof, save_format=save_f)
             if succes is True:
                 sucess_list += [name]
             if succes is False:
                 failed_list += [name]
+        
+        print('                      COF Name                              |    Lattice    | Point Group | N° of symmetry op. |')
+        for s in sucess_list:
+            Tools.print_result(*s)
 
 
         print(f'{len(sucess_list)} sucessful. {len(failed_list)} failled ({100*len(sucess_list)/(len(failed_list) + len(sucess_list))} % success rate)')
@@ -324,61 +331,76 @@ def build_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, c
         print('Exiting...')
 
 
-def creat_all_C2():
-    nucleos = [i.rstrip('.gjf') for i in os.listdir(os.path.join('data', 'nucleo', 'C2'))]
-    radicais = [i.rstrip('.gjf') for i in os.listdir(os.path.join('data', 'radical'))]
-    conectores = [i.rstrip('.gjf') for i in os.listdir(os.path.join('data', 'conector'))]
+def creat_all_C2(nucleos=None, radicais=None, conectores=None):
 
-    nucleos = ['BENZ', 'NAPT', 'BPNY', 'ANTR', 'TPNY', 'DPBY', 'PYRN', 'BPYB', 'DPEY']
-    radicais = ['H']
-    conectores = ['NH2']
+    if nucleos == None:
+        nucleos = [i.rstrip('.gjf') for i in os.listdir(os.path.join('data', 'nucleo', 'C2'))]
+    if radicais == None:
+        radicais = [i.rstrip('.gjf') for i in os.listdir(os.path.join('data', 'radical'))]
+    if conectores == None:
+        conectores = [i.rstrip('.gjf') for i in os.listdir(os.path.join('data', 'conector'))]
+
+    #nucleos = ['BENZ', 'NAPT', 'BPNY', 'ANTR', 'TPNY', 'DPBY', 'PYRN', 'BPYB', 'DPEY']
+    #radicais = ['H']
+    #conectores = ['NH2']
     for n in nucleos:
         for c in conectores:
-            for r1 in radicais:
+            for r in radicais:
                 BB = Building_Block()
-                BB.create_C2_BB(n, c, r1)
+                BB.create_C2_BB(n, c, r)
                 print(BB.name, 'created')
                 BB.save()
 
 
-def creat_all_C3():
+def creat_all_C3(nucleos=None, radicais=None, conectores=None):
 
-    nucleos = [i.rstrip('.gjf') for i in os.listdir(os.path.join('data', 'nucleo', 'C3'))]
-    radicais = [i.rstrip('.gjf') for i in os.listdir(os.path.join('data', 'radical'))]
-    conectores = [i.rstrip('.gjf') for i in os.listdir(os.path.join('data', 'conector'))]
+    if nucleos == None:
+        nucleos = [i.rstrip('.gjf') for i in os.listdir(os.path.join('data', 'nucleo', 'C3'))]
+    if radicais == None:
+        radicais = [i.rstrip('.gjf') for i in os.listdir(os.path.join('data', 'radical'))]
+    if conectores == None:
+        conectores = [i.rstrip('.gjf') for i in os.listdir(os.path.join('data', 'conector'))]
 
-    nucleos = ['BENZ', 'TPBZ', 'TPOB', 'DICZ']
-    radicais = ['H']
-    conectores = ['NH2', 'CHO']
+    #nucleos = ['BENZ', 'TPBZ', 'TPOB', 'DICZ']
+    #radicais = ['H']
+    #conectores = ['NH2', 'CHO']
     for n in nucleos:
         for c in conectores:
-            for r1 in radicais:
+            for r in radicais:
                 BB = Building_Block()
-                BB.create_C3_BB(n, c, r1)
+                BB.create_C3_BB(n, c, r)
                 print(BB.name, 'created')
                 BB.save()
 
 
-def creat_all_C4():
+def creat_all_C4(nucleos=None, radicais=None, conectores=None):
 
-    nucleos = [i.rstrip('.gjf') for i in os.listdir(os.path.join('data', 'nucleo', 'C4'))]
-    radicais = [i.rstrip('.gjf') for i in os.listdir(os.path.join('data', 'radical'))]
-    conectores = [i.rstrip('.gjf') for i in os.listdir(os.path.join('data', 'conector'))]
+    if nucleos == None:
+        nucleos = [i.rstrip('.gjf') for i in os.listdir(os.path.join('data', 'nucleo', 'C4'))]
+    if radicais == None:
+        radicais = [i.rstrip('.gjf') for i in os.listdir(os.path.join('data', 'radical'))]
+    if conectores == None:
+        conectores = [i.rstrip('.gjf') for i in os.listdir(os.path.join('data', 'conector'))]
 
     radicais = ['H']
     conectores = ['CHO']
     for n in nucleos:
         for c in conectores:
-            for r1 in radicais:
-                print(n, c, r1)
+            for r in radicais:
+                print(n, c, r)
                 BB = Building_Block()
-                BB.create_C4_BB(n, c, r1)
+                BB.create_C4_BB(n, c, r)
                 print(BB.name, 'created')
                 BB.save()
 
 def clean_bb_list():
-    #Loop Through the folder projects all files and deleting them one by one
+    #Loop Through all files and deleting them one by one
     for file in glob.glob(os.path.join('data', 'bb_lib', '*')):
         os.remove(file)
         print("Deleted " + str(file))
 
+def clean_cof_out():
+    #Loop Through all files and deleting them one by one
+    for file in glob.glob(os.path.join('out', '*')):
+        os.remove(file)
+        print("Deleted " + str(file))
