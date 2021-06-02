@@ -37,7 +37,7 @@ A `.cif` file will be created in the `out` folder. The code will print some info
 ```python
 C3_BENZ_CHO_OH-C2_HDZ_NH2-HCB_A-AA                            hexagonal   P    P6/m # 175    12 sym. op.
 ```
-Besides, the variable `c` now is a list wit two elements. The first element is a Boolean value indicating whether network creation was successful. 
+Besides, the variable `c` now is a list wit two elements. The first element is a Boolean value indicating whether the network creation was successful. 
 The second element is the name of the created network. This information can be useful for workflows for creating multiple structures in series.
 
 You can also create multiple building blocks and then construct all available COFs from the connection of those blocks.
