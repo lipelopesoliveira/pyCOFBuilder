@@ -25,20 +25,77 @@ installation by running
 
 ## Usage
 
-To create a specific COF, like `C3_BENZ_CHO_H-C2_HDZ_NH2-HCB-A-AA`:
+To create a specific COF, like `C3_BENZ_CHO_OH-C2_HDZ_NH2-HCB_A-AA`:
 ```python
 import pycofbuilder as COF
 
-COF.build('C3_BENZ_CHO_H-C2_HDZ_NH2-HCB-A-AA')
+c = COF.build('C3_BENZ_CHO_OH-C2_HDZ_NH2-HCB_A-AA')
 
 ```
 
-A `.cif` file will be created in the `out` folder. 
+A `.cif` file will be created in the `out` folder. The code will print some information of the structure created:
+```python
+C3_BENZ_CHO_OH-C2_HDZ_NH2-HCB_A-AA                            hexagonal   P    P6/m # 175    12 sym. op.
+```
+Besides, the variable `c` now is a list wit two elements. The first element is a Boolean value indicating whether network creation was successful. 
+The second element is the name of the created network. This information can be useful for workflows for creating multiple structures in series.
+
+You can also create multiple building blocks and then construct all available COFs from the connection of those blocks.
+
+```python
+import pycofbuilder as COF
+
+for BB1 in ['C3_BENZ_CHO_H', 'C3_BENZ_CHO_OH', 'C3_BENZ_CHO_CH3', 'C3_BENZ_CHO_F']:
+	COF.Building_Block(BB1)
+	
+for BB2 in ['C2_BENZ_NH2_H', 'C2_BENZ_NH2_OH', 'C2_BENZ_NH2_CH3', 'C2_BENZ_NH2_F']:
+	COF.Building_Block(BB2)
+
+COF.build_all_available_COFs()
+
+```
+
+You should see this output
+
+```python
+y
+                      COF Name                              |    Lattice    | Point Group | N° of symmetry op. |
+C3_BENZ_CHO_CH3-C2_BENZ_NH2_CH3_H-HCB_A-AA                    hexagonal   P     P6  # 168    6  sym. op.
+C3_BENZ_CHO_CH3-C2_BENZ_NH2_F_H-HCB_A-AA                      hexagonal   P     P6  # 168    6  sym. op.
+C3_BENZ_CHO_CH3-C2_BENZ_NH2_H_H-HCB_A-AA                      hexagonal   P     P6  # 168    6  sym. op.
+C3_BENZ_CHO_CH3-C2_BENZ_NH2_OH_H-HCB_A-AA                     hexagonal   P     P6  # 168    6  sym. op.
+C3_BENZ_CHO_F-C2_BENZ_NH2_CH3_H-HCB_A-AA                      hexagonal   P     P6  # 168    6  sym. op.
+C3_BENZ_CHO_F-C2_BENZ_NH2_F_H-HCB_A-AA                        hexagonal   P    P6/m # 175    12 sym. op.
+C3_BENZ_CHO_F-C2_BENZ_NH2_H_H-HCB_A-AA                        hexagonal   P    P6/m # 175    12 sym. op.
+C3_BENZ_CHO_F-C2_BENZ_NH2_OH_H-HCB_A-AA                       hexagonal   P    P6/m # 175    12 sym. op.
+C3_BENZ_CHO_H-C2_BENZ_NH2_CH3_H-HCB_A-AA                      hexagonal   P     P6  # 168    6  sym. op.
+C3_BENZ_CHO_H-C2_BENZ_NH2_F_H-HCB_A-AA                        hexagonal   P    P6/m # 175    12 sym. op.
+C3_BENZ_CHO_H-C2_BENZ_NH2_H_H-HCB_A-AA                        hexagonal   P    P6/m # 175    12 sym. op.
+C3_BENZ_CHO_H-C2_BENZ_NH2_OH_H-HCB_A-AA                       hexagonal   P    P6/m # 175    12 sym. op.
+C3_BENZ_CHO_OH-C2_BENZ_NH2_CH3_H-HCB_A-AA                     hexagonal   P     P6  # 168    6  sym. op.
+C3_BENZ_CHO_OH-C2_BENZ_NH2_F_H-HCB_A-AA                       hexagonal   P    P6/m # 175    12 sym. op.
+C3_BENZ_CHO_OH-C2_BENZ_NH2_H_H-HCB_A-AA                       hexagonal   P    P6/m # 175    12 sym. op.
+C3_BENZ_CHO_OH-C2_BENZ_NH2_OH_H-HCB_A-AA                      hexagonal   P    P6/m # 175    12 sym. op.
+16 sucessful. 0 failled (100.0 % success rate)
+
+```
+Finally, it is possible to clean all the building blocks created
+
+```python
+COF.clean_bb_list()
+Deleted data\bb_lib\C2_BENZ_NH2_CH3_H.xyz
+Deleted data\bb_lib\C2_BENZ_NH2_F_H.xyz
+Deleted data\bb_lib\C2_BENZ_NH2_H_H.xyz
+Deleted data\bb_lib\C2_BENZ_NH2_OH_H.xyz
+Deleted data\bb_lib\C2_HDZ_NH2.xyz
+Deleted data\bb_lib\C3_BENZ_CHO_CH3.xyz
+Deleted data\bb_lib\C3_BENZ_CHO_F.xyz
+Deleted data\bb_lib\C3_BENZ_CHO_H.xyz
+Deleted data\bb_lib\C3_BENZ_CHO_OH.xyz
+```
 
 For more exemples see _examples/_ and the [docs](https://github.com/lipelopesoliveira/pyCOFBuilder/examples.html)
 for further examples.
-
-
 
 ## Citation
 
@@ -47,4 +104,4 @@ If you find **pyCOFBuilder** useful in your research please consider citing the 
 F. L. Oliveira and P. M. Esteves,
 *pyCOFBuilder: A Python Module for Automated Assembly of Covalent Organic Frameworks*
 
-*in preparation.* [DOI](https://doi.org/)
+*Manuscript in preparation.* [DOI](https://doi.org/)

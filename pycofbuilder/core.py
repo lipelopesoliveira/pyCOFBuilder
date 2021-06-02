@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
-
-from numpy import save
-from numpy.core.shape_base import stack
+import glob
 
 import pycofbuilder.tools as Tools
 from pycofbuilder.reticulum import Reticulum
@@ -75,7 +73,7 @@ def build(cof_name=None, save_format=['cif'], bond_atom='N', lib='bb_lib'):
             return  [True, f'{bb1}-{bb2}-{net}-{stacking}']
 
 
-def create_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, cif=True, turbomole=False, vasp=False):
+def build_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, cif=True, turbomole=False, vasp=False):
 
     save_f = []
 
@@ -307,7 +305,7 @@ def create_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, 
     if val == 'y':
         print('                      COF Name                              |    Lattice    | Point Group | N° of symmetry op. |')
         for cof in cofs_list:
-            succes, name = create_cof(cof, save_format=save_f)
+            succes, name = build(cof, save_format=save_f)
             if succes is True:
                 sucess_list += [name]
             if succes is False:
@@ -374,4 +372,10 @@ def creat_all_C4():
                 BB.create_C4_BB(n, c, r1)
                 print(BB.name, 'created')
                 BB.save()
+
+def clean_bb_list():
+    #Loop Through the folder projects all files and deleting them one by one
+    for file in glob.glob(os.path.join('data', 'bb_lib', '*')):
+        os.remove(file)
+        print("Deleted " + str(file))
 
