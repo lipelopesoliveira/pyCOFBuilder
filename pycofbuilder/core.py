@@ -9,7 +9,7 @@ from pycofbuilder.reticulum import Reticulum
 from pycofbuilder.building_block import Building_Block
 
 
-def build(cof_name=None, save_format=['cif'], bond_atom='N', lib='bb_lib'):
+def build(cof_name=None, save_format=['cif'], bond_atom='N', lib='bb_lib', print_result=True):
     '''Create a COF with a given name'''
 
     qe = False
@@ -38,7 +38,7 @@ def build(cof_name=None, save_format=['cif'], bond_atom='N', lib='bb_lib'):
     if net == 'HCB':
         try:
             Ret = Reticulum(bb_lib=lib)
-            simm_data = Ret.create_hcb_structure(bb1, bb2, stack=stacking, bond_atom=bond_atom, print_result=False)
+            simm_data = Ret.create_hcb_structure(bb1, bb2, stack=stacking, bond_atom=bond_atom, print_result=print_result)
             if cif is True:
                 Ret.save_cif()
             if xyz is True:
@@ -59,7 +59,7 @@ def build(cof_name=None, save_format=['cif'], bond_atom='N', lib='bb_lib'):
     if net == 'HCB_A':
         try:
             Ret = Reticulum(bb_lib=lib)
-            simm_data = Ret.create_hcb_a_structure(bb1, bb2, stack=stacking, bond_atom=bond_atom, print_result=False)
+            simm_data = Ret.create_hcb_a_structure(bb1, bb2, stack=stacking, bond_atom=bond_atom, print_result=print_result)
             if cif is True:
                 Ret.save_cif()
             if xyz is True:
@@ -310,7 +310,7 @@ def build_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, c
     if val == 'y':
         t_i = time.time()
         for cof in tqdm(cofs_list):
-            succes, name = build(cof, save_format=save_f)
+            succes, name = build(cof, save_format=save_f, print_result=False)
             if succes is True:
                 sucess_list += [name]
             if succes is False:
