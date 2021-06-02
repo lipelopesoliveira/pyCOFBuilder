@@ -104,6 +104,13 @@ COF.clean_bb_list()
 For more exemples see _examples/_ and the [docs](https://github.com/lipelopesoliveira/pyCOFBuilder/examples.html)
 for further examples.
 
+
+## COFs and Building Blocks nomenclature
+
+
+
+
+
 ## Citation
 
 If you find **pyCOFBuilder** useful in your research please consider citing the paper:
