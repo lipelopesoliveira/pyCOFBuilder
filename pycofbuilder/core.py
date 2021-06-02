@@ -9,7 +9,7 @@ from pycofbuilder.reticulum import Reticulum
 from pycofbuilder.building_block import Building_Block
 
 
-def create_cof(cof_name=None, save_format=['cif'], bond_atom='N', lib='bb_lib'):
+def build(cof_name=None, save_format=['cif'], bond_atom='N', lib='bb_lib'):
     '''Create a COF with a given name'''
 
     qe = False
@@ -302,7 +302,7 @@ def create_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, 
             except Exception:
                 failed_list += [f'{file_a}_{file_b}']'''
 
-    val = input(f'{len(cofs_list)} will be created. Are you sure? Type [y] to continue.\n')
+    val = input(f'{len(cofs_list)} COFs will be created. Do you want o proceed? Type [y] to continue.\n')
 
     if val == 'y':
         print('                      COF Name                              |    Lattice    | Point Group | N° of symmetry op. |')

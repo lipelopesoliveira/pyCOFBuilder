@@ -25,12 +25,15 @@ installation by running
 
 ## Usage
 
+To create a specific COF, like C3_BENZ_CHO_H-C2_HDZ_NH2-HCB-A-AA:
 ```python
-import pycofbuilder
+import pycofbuilder as COF
 
-pycofbuilder.core.create_all_available_COFs()
+COF.build('C3_BENZ_CHO_H-C2_HDZ_NH2-HCB-A-AA')
 
 ```
+
+A `.cif` file will be created in the `out` folder. 
 
 For more exemples see _examples/_ and the [docs](https://github.com/lipelopesoliveira/pyCOFBuilder/examples.html)
 for further examples.

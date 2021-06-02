@@ -31,29 +31,34 @@ class Building_Block():
         self.atom_labels = None
         self.atom_pos = None
 
-        self.get_BB()
+        if self.name != None:
+            self.get_BB()
 
     def get_BB(self):
 
-        if self.name + '.xyz' in os.listdir(self.lib_path):
-            self.read_structure()
+        
+        simm_check, nucleo_check, conector_check, radicals_check = self.check_existence()
 
-        else:
-            BB_name  = self.name.split('_')
-            simmetry = BB_name[0]
-            nucleo = BB_name[1]
-            conector = BB_name[2]
-            radicals = BB_name[3:] + ['H']*(6 - len(BB_name[3:]))
+        if simm_check and nucleo_check and conector_check and radicals_check:
+            if self.name + '.xyz' in os.listdir(self.lib_path):
+                self.read_structure()
 
-            if simmetry == 'C2':
-                self.create_C2_BB(nucleo, conector, radicals[0], radicals[1], radicals[2], radicals[3], radicals[4], radicals[5])
-                self.save()
-            if simmetry == 'C3':
-                self.create_C3_BB(nucleo, conector, radicals[0], radicals[1], radicals[2], radicals[3], radicals[4], radicals[5])
-                self.save()
-            if simmetry == 'C4':
-                self.create_C4_BB(nucleo, conector, radicals[0], radicals[1], radicals[2], radicals[3], radicals[4], radicals[5])
-                self.save()
+            else:
+                BB_name  = self.name.split('_')
+                simmetry = BB_name[0]
+                nucleo = BB_name[1]
+                conector = BB_name[2]
+                radicals = BB_name[3:] + ['H']*(6 - len(BB_name[3:]))
+
+                if simmetry == 'C2':
+                    self.create_C2_BB(nucleo, conector, radicals[0], radicals[1], radicals[2], radicals[3], radicals[4], radicals[5])
+                    self.save()
+                if simmetry == 'C3':
+                    self.create_C3_BB(nucleo, conector, radicals[0], radicals[1], radicals[2], radicals[3], radicals[4], radicals[5])
+                    self.save()
+                if simmetry == 'C4':
+                    self.create_C4_BB(nucleo, conector, radicals[0], radicals[1], radicals[2], radicals[3], radicals[4], radicals[5])
+                    self.save()
     
     def n_atoms(self):
         ''' Returns the number of atoms in the unitary cell'''
@@ -221,7 +226,7 @@ class Building_Block():
             print('{:<5s}{:>10.7f}{:>15.7f}{:>15.7f}'.format(self.atom_labels[i], self.atom_pos[i][0], self.atom_pos[i][1], self.atom_pos[i][2]))
 
     def add_connection_group(self, conector_name):
-        '''Adiciona o grupo funcional pelo qual o COF será formado em blocos de construção'''
+        '''Adds the functional group by which the COF will be formed from the building blocks'''
 
         conector_label, conector_pos = Tools.read_gjf_file(os.path.join(self.main_path, 'conector'), conector_name)
 
@@ -231,37 +236,43 @@ class Building_Block():
             n_conector_label = conector_label.copy()
             n_conector_pos = conector_pos.copy()
 
-            # Pega a posição do átomo mais próximo ao primeiro Q na estrutrua
-            close_Q_struct = self.closest_atom('Q', location_Q_struct[1][i], self.atom_labels, self.atom_pos)[1]
+            try:
+                # Get the position of the closest atom to Q in the structure
+                close_Q_struct = self.closest_atom('Q', location_Q_struct[1][i], self.atom_labels, self.atom_pos)[1]
+            except Exception:
+                # Set the closest position to origin, for building blocks as HDZ that only has two atoms
+                close_Q_struct = [0, 0, 0]
 
-            location_Q_connector = self.get_Q_points(n_conector_label, n_conector_pos)  # Pega a posição de Q no grupo conector
+            # Get the position of Q in the conection group
+            location_Q_connector = self.get_Q_points(n_conector_label, n_conector_pos)  
 
-            # Pega a posição do átomo mais próximo a Q no grupo conector
+            # Get the position of the closest atom to Q in the conection group
             close_Q_connector = self.closest_atom('Q', location_Q_connector[1][0], n_conector_label, n_conector_pos)[1]
 
-            v1 = close_Q_struct - location_Q_struct[1][i]  # Cria o vetor Q na estrutura
-            v2 = np.array(close_Q_connector) - np.array(location_Q_connector[1][0])  # Cria o vetor Q no conector
+            v1 = close_Q_struct - location_Q_struct[1][i]  # Create the vector Q in the structure
+            v2 = np.array(close_Q_connector) - np.array(location_Q_connector[1][0])  # Create the vector Q in the conector
 
-            Rot_m = Tools.rotation_matrix_from_vectors(v2, v1)  # Determina a matriz de rotação que alinha V2 com V1
+            Rot_m = Tools.rotation_matrix_from_vectors(v2, v1)  # Find the rotation matrix that align v2 with v1
 
-            # Deleta o átomo "Q" da lista de átomos e posições do conector
+            # Delet the "Q" atom position of the conector group and the structure
             n_conector_pos = np.delete(n_conector_pos, self.find_index(np.array([0., 0., 0.]), n_conector_pos), axis=0)
-
-            # Rotaciona e translada o grupo radical para a posição Q
+            
+            self.atom_pos = np.delete(self.atom_pos, self.find_index(location_Q_struct[1][i], self.atom_pos), axis=0)
+            
+            # Rotate and translade the conector group to Q position in the strucutre
             rotated_translated_group = np.dot(n_conector_pos, -np.transpose(Rot_m)) + location_Q_struct[1][i]
 
-            self.atom_pos = np.delete(self.atom_pos, self.find_index(location_Q_struct[1][i], self.atom_pos), axis=0)
-
+            # Add the position of conector atoms to the main structure
             self.atom_pos = np.append(self.atom_pos, rotated_translated_group, axis=0)
-
+            
+            # Remove the Q atoms from structure
             self.atom_labels.remove('Q')
-
             n_conector_label.remove('Q')
 
             self.atom_labels = self.atom_labels + n_conector_label
 
     def add_R_group(self, R_name, R_type):
-        '''Adiciona o grupo em blocos de construção com simetria C4. '''
+        '''Adds group R in building blocks'''
 
         group_label, group_pos = Tools.read_gjf_file(os.path.join(self.main_path, 'radical'), R_name)
 
@@ -321,7 +332,7 @@ class Building_Block():
         self.calculate_size()
 
     def create_C3_BB(self, nucleo_name='BENZ', conector='CHO', R1='H', R2='H', R3='H', R4='H', R5='H', R6='H'):
-        '''Cria o bloco de construção com simetria C3'''
+        '''Create a building block with C3 simmetry'''
 
         self.name = f'C3_{nucleo_name}_{conector}'
 
@@ -344,11 +355,11 @@ class Building_Block():
         self.calculate_size()
 
     def create_C4_BB(self, nucleo_name='BENZ', conector='CHO', R1='H', R2='H', R3='H', R4='H', R5='H', R6='H'):
-        '''Cria o bloco de construção com simetria C3'''
+        '''Create a building block with C4 simmetry'''
 
         self.name = f'C4_{nucleo_name}_{conector}'
 
-        self.atom_labels, self.atom_pos = Tools.read_gjf_file(os.path.join(self.main_path, 'Nucleo', 'C4'), nucleo_name)
+        self.atom_labels, self.atom_pos = Tools.read_gjf_file(os.path.join(self.main_path, 'nucleo', 'C4'), nucleo_name)
 
         self.centralize_molecule()
 
@@ -381,6 +392,71 @@ class Building_Block():
         except Exception:
             None
         
+    def get_available_nucleo(self):
+
+        C2_list = [i.rstrip('.gjf') for i in os.listdir(os.path.join(self.main_path, 'nucleo', 'C2')) if '.gjf' in i]
+        C3_list = [i.rstrip('.gjf') for i in os.listdir(os.path.join(self.main_path, 'nucleo', 'C3')) if '.gjf' in i]
+        C4_list = [i.rstrip('.gjf') for i in os.listdir(os.path.join(self.main_path, 'nucleo', 'C4')) if '.gjf' in i]
+
+        return C2_list, C3_list, C4_list
+    
+    def get_available_R(self):
+
+        R_list = [i.rstrip('.gjf') for i in os.listdir(os.path.join(self.main_path, 'radical')) if '.gjf' in i]
+
+        return R_list
+
+    def get_available_conector(self):
+
+        c_list = [i.rstrip('.gjf') for i in os.listdir(os.path.join(self.main_path, 'conector')) if '.gjf' in i]
+
+        return c_list
+
+    def check_existence(self):
+
+        simm_check = True
+        nucleo_check = True
+        conector_check = True
+        radicals_check = True
+
+        if self.name != None:
+            name = self.name.split('_')
+            simm = name[0]
+            nucleo = name[1]
+            conector = name[2]
+            radicals = name[3:]
+
+            if simm not in ['C2', 'C3', 'C4']:
+                print('ERROR!: Building Block simmetry must be C2, C3 or C4.')
+                simm_check = False
+
+            if simm == 'C2':
+                list = self.get_available_nucleo()[0]
+                if nucleo not in list:
+                    print(f'ERROR!: {nucleo} not available! Available nucleos with C2 simmetry is {list}')
+                    nucleo_check = False
+            if simm == 'C3':
+                list = self.get_available_nucleo()[1]
+                if nucleo not in list:
+                    print(f'ERROR!: {nucleo} not available! Available nucleos with C3 simmetry is {list}')
+                    nucleo_check = False
+            if simm == 'C4':
+                list = self.get_available_nucleo()[2]
+                if nucleo not in list:
+                    print(f'ERROR!: {nucleo} not available! Available nucleos with C4 simmetry is {list}')
+                    nucleo_check = False
+            
+            if conector not in self.get_available_conector():
+                print(f'ERROR! {conector} is not a available conector. Available list: {self.get_available_conector()}')
+                conector_check = False
+
+            radicals_list = self.get_available_R()
+            for rad in radicals:
+                if rad not in radicals_list:
+                    print(f'ERROR! Radical {rad} is not a available radical: Available list{radicals_list}')
+                    radicals_check = False
+
+        return simm_check, nucleo_check, conector_check, radicals_check
 
     def get_bipodal_NH2(self):
 
