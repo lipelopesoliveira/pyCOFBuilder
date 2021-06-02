@@ -31,9 +31,30 @@ class Building_Block():
         self.atom_labels = None
         self.atom_pos = None
 
-        if self.name is not None:
+        self.get_BB()
+
+    def get_BB(self):
+
+        if self.name + '.xyz' in os.listdir(self.lib_path):
             self.read_structure()
 
+        else:
+            BB_name  = self.name.split('_')
+            simmetry = BB_name[0]
+            nucleo = BB_name[1]
+            conector = BB_name[2]
+            radicals = BB_name[3:] + ['H']*(6 - len(BB_name[3:]))
+
+            if simmetry == 'C2':
+                self.create_C2_BB(nucleo, conector, radicals[0], radicals[1], radicals[2], radicals[3], radicals[4], radicals[5])
+                self.save()
+            if simmetry == 'C3':
+                self.create_C3_BB(nucleo, conector, radicals[0], radicals[1], radicals[2], radicals[3], radicals[4], radicals[5])
+                self.save()
+            if simmetry == 'C4':
+                self.create_C4_BB(nucleo, conector, radicals[0], radicals[1], radicals[2], radicals[3], radicals[4], radicals[5])
+                self.save()
+    
     def n_atoms(self):
         ''' Returns the number of atoms in the unitary cell'''
         return len(self.atom_labels)
@@ -295,7 +316,9 @@ class Building_Block():
                 self.add_R_group(R_list_names[i], R_list_labels[i])
                 self.name += f'_{R_list_names[i]}'
 
+        self.connectivity =  len([i for i in self.atom_labels if 'X' in i])
         self.align_to()
+        self.calculate_size()
 
     def create_C3_BB(self, nucleo_name='BENZ', conector='CHO', R1='H', R2='H', R3='H', R4='H', R5='H', R6='H'):
         '''Cria o bloco de construção com simetria C3'''
@@ -316,7 +339,9 @@ class Building_Block():
                 self.add_R_group(R_list_names[i], R_list_labels[i])
                 self.name += f'_{R_list_names[i]}'
 
+        self.connectivity =  len([i for i in self.atom_labels if 'X' in i])
         self.align_to()
+        self.calculate_size()
 
     def create_C4_BB(self, nucleo_name='BENZ', conector='CHO', R1='H', R2='H', R3='H', R4='H', R5='H', R6='H'):
         '''Cria o bloco de construção com simetria C3'''
@@ -337,7 +362,9 @@ class Building_Block():
                 self.add_R_group(R_list_names[i], R_list_labels[i])
                 self.name += f'_{R_list_names[i]}'
 
+        self.connectivity =  len([i for i in self.atom_labels if 'X' in i])
         self.align_to()
+        self.calculate_size()
 
     def save(self, extension='xyz'):
 
@@ -348,13 +375,12 @@ class Building_Block():
 
         try:
             self.atom_labels, self.atom_pos, self.n_atoms, self.connectivity = Tools.read_xyz_file(self.lib_path, self.name)
-        except Exception:
-            print(f'Unable to load file {self.lib_path}\\{self.name}.xyz!')
 
-        # self.centralize_molecule(True)
-        # self.rotate_to_xy_plane()
-        self.align_to()
-        self.calculate_size()
+            self.align_to()
+            self.calculate_size()
+        except Exception:
+            None
+        
 
     def get_bipodal_NH2(self):
 

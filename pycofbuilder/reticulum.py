@@ -262,7 +262,7 @@ class Reticulum():
         if self.verbosity is True:
             print(self.symm_structure)
 
-        # Imprime os elementos de simetria da estrutura gerada
+        # Get the simmetry information of the generated structure
         lattice_type = symm.get_lattice_type()
         self.lattice_type = lattice_type
         self.space_group = symm.get_space_group_symbol()
@@ -288,7 +288,7 @@ class Reticulum():
         self.name = f'{bb_triangular.name}-{bb_linear.name}-HCB_A-{stack}'
 
         if self.verbosity is True:
-            print('Starting the creation of a hcb net')
+            print('Starting the creation of a hcb_a net...')
 
         if bb_triangular.connectivity != 3:
             print('Building block A must present connectivity 3 insted of', bb_triangular.connectivity)
@@ -498,7 +498,7 @@ class Reticulum():
         if self.verbosity is True:
             print(self.symm_structure)
 
-        # Imprime os elementos de simetria da estrutura gerada
+        # Get the simmetry information of the generated structure
         self.lattice_type = symm.get_lattice_type()
         self.space_group = symm.get_space_group_symbol()
         self.space_group_n = symm.get_space_group_number()
@@ -704,7 +704,7 @@ class Reticulum():
         if self.verbosity is True:
             print(self.symm_structure)
 
-        # Imprime os elementos de simetria da estrutura gerada
+        # Get the simmetry information of the generated structure
         self.lattice_type = symm.get_lattice_type()
         self.space_group = symm.get_space_group_symbol()
         self.space_group_n = symm.get_space_group_number()
@@ -926,7 +926,7 @@ class Reticulum():
         if self.verbosity is True:
             print(self.symm_structure)
 
-        # Imprime os elementos de simetria da estrutura gerada
+        # Get the simmetry information of the generated structure
         self.lattice_type = symm.get_lattice_type()
         self.space_group = symm.get_space_group_symbol()
         self.space_group_n = symm.get_space_group_number()
@@ -938,7 +938,7 @@ class Reticulum():
 
     def print_result(self, name, lattice, hall, space_group, space_number, symm_op):
 
-        print('{:<60s} {:^12s} {:<4s} {:^4s} #{:^5s} {:^2} sym. op.'.format(name, lattice, hall.lstrip('-'), space_group, space_number, symm_op))
+        print('{:<60s} {:^12s} {:<4s} {:^4s} #{:^5s}   {:^2} sym. op.'.format(name, lattice, hall.lstrip('-'), space_group, space_number, symm_op))
 
     def save_cif(self, supercell=False, path=None):
 
@@ -1066,9 +1066,9 @@ class Reticulum():
         celldm3 = c/a
         celldm4 = Tools.cos_angle(cell[0], cell[1])
         celldm5 = Tools.cos_angle(cell[0], cell[2])
-        # cellcm6 = self.cos_angle(cell[1], cell[2])
+        cellcm6 = Tools.cos_angle(cell[1], cell[2])
 
-        kx, ky, kz = Tools.get_kgrid(self.cellpar_to_cell(cell), k_dist)
+        kx, ky, kz = Tools.get_kgrid(Tools.cellpar_to_cell(cell), k_dist)
 
         ion_conv_crystal = [[i['label']] + i['abc'] for i in dict_sctructure['sites']]
         ion_conv_angstrom = [[i['label']] + i['xyz'] for i in dict_sctructure['sites']]
@@ -1240,9 +1240,9 @@ class Reticulum():
         out_file.write('ATOMIC_SPECIES\n')
         for atom in set(self.atom_labels):
             if atom == 'H':
-                out_file.write(f' {atom}   {self.elements_dict()[atom]:.4f}  {atom}.pbe-rrkjus_psl.1.0.0.UPF\n')
+                out_file.write(f' {atom}   {Tools.elements_dict()[atom]:.4f}  {atom}.pbe-rrkjus_psl.1.0.0.UPF\n')
             else:
-                out_file.write(f' {atom}   {self.elements_dict()[atom]:.4f}  {atom}.pbe-n-rrkjus_psl.1.0.0.UPF\n')
+                out_file.write(f' {atom}   {Tools.elements_dict()[atom]:.4f}  {atom}.pbe-n-rrkjus_psl.1.0.0.UPF\n')
         out_file.write('\n')
 
         if self.lattice_type == 'triclinic':
@@ -1260,7 +1260,7 @@ class Reticulum():
             out_file.write('{:<5s}{:>15.9f}{:>15.9f}{:>15.9f}\n'.format(atom[0], atom[1], atom[2], atom[3]))
 
         out_file.write('K_POINTS automatic\n')
-        out_file.write(f'   {kx} {ky} {kz}  0 0 0\n')
+        out_file.write(f'   {kx} {ky} {kz}  1 1 1\n')
 
         out_file.write('EOF\n')
         out_file.write('$CMD_PW < $PREFIX.$CALC.in > $PREFIX.$CALC.out')
