@@ -38,7 +38,7 @@ A `.cif` file will be created in the `out` folder. The code will print some info
 C3_BENZ_CHO_OH-C2_HDZ_NH2-HCB_A-AA                            hexagonal   P    P6/m # 175    12 sym. op.
 ```
 Besides, the variable `c` now is a list wit two elements. The first element is a Boolean value indicating whether the network creation was successful. 
-The second element is the name of the created network. This information can be useful for workflows for creating multiple structures in series.
+The second element is the name of the created network. This information can be usefull for workflows for creating multiple structures.
 
 You can also create multiple building blocks and then construct all available COFs from the connection of those blocks.
 
@@ -78,6 +78,7 @@ C3_BENZ_CHO_OH-C2_BENZ_NH2_F_H-HCB_A-AA                       hexagonal   P    P
 C3_BENZ_CHO_OH-C2_BENZ_NH2_H_H-HCB_A-AA                       hexagonal   P    P6/m # 175    12 sym. op.
 C3_BENZ_CHO_OH-C2_BENZ_NH2_OH_H-HCB_A-AA                      hexagonal   P    P6/m # 175    12 sym. op.
 16 sucessful. 0 failled (100.0 % success rate)
+Enlapsed time: 1.149 s
 
 ```
 Finally, it is possible to clean all the building blocks created

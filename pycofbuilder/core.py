@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import glob
+import time
 
 import pycofbuilder.tools as Tools
 from pycofbuilder.reticulum import Reticulum
@@ -303,6 +304,7 @@ def build_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, c
     val = input(f'{len(cofs_list)} COFs will be created. Do you want o proceed? Type [y] to continue.\n')
 
     if val == 'y':
+        t_i = time.time()
         print('                      COF Name                              |    Lattice    | Point Group | N° of symmetry op. |')
         for cof in cofs_list:
             succes, name = build(cof, save_format=save_f)
@@ -312,7 +314,8 @@ def build_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, c
                 failed_list += [name]
 
 
-        print(f'{len(sucess_list)} sucessful. {len(failed_list)} failled ({100*len(sucess_list)/(len(failed_list) + len(sucess_list))} % success rate)\n')
+        print(f'{len(sucess_list)} sucessful. {len(failed_list)} failled ({100*len(sucess_list)/(len(failed_list) + len(sucess_list))} % success rate)')
+        print(f'Enlapsed time: {time.time() - t_i:.3f} s \n')
         if len(failed_list) > 0:
             print('Failed list:')
             for i in failed_list:
