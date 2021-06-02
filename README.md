@@ -25,7 +25,7 @@ installation by running
 
 ## Usage
 
-To create a specific COF, like C3_BENZ_CHO_H-C2_HDZ_NH2-HCB-A-AA:
+To create a specific COF, like `C3_BENZ_CHO_H-C2_HDZ_NH2-HCB-A-AA`:
 ```python
 import pycofbuilder as COF
 
