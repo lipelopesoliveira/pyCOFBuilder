@@ -85,15 +85,15 @@ Finally, it is possible to clean all the building blocks created
 
 ```python
 COF.clean_bb_list()
-Deleted data\bb_lib\C2_BENZ_NH2_CH3_H.xyz
-Deleted data\bb_lib\C2_BENZ_NH2_F_H.xyz
-Deleted data\bb_lib\C2_BENZ_NH2_H_H.xyz
-Deleted data\bb_lib\C2_BENZ_NH2_OH_H.xyz
-Deleted data\bb_lib\C2_HDZ_NH2.xyz
-Deleted data\bb_lib\C3_BENZ_CHO_CH3.xyz
-Deleted data\bb_lib\C3_BENZ_CHO_F.xyz
-Deleted data\bb_lib\C3_BENZ_CHO_H.xyz
-Deleted data\bb_lib\C3_BENZ_CHO_OH.xyz
+> Deleted data\bb_lib\C2_BENZ_NH2_CH3_H.xyz
+> Deleted data\bb_lib\C2_BENZ_NH2_F_H.xyz
+> Deleted data\bb_lib\C2_BENZ_NH2_H_H.xyz
+> Deleted data\bb_lib\C2_BENZ_NH2_OH_H.xyz
+> Deleted data\bb_lib\C2_HDZ_NH2.xyz
+> Deleted data\bb_lib\C3_BENZ_CHO_CH3.xyz
+> Deleted data\bb_lib\C3_BENZ_CHO_F.xyz
+> Deleted data\bb_lib\C3_BENZ_CHO_H.xyz
+> Deleted data\bb_lib\C3_BENZ_CHO_OH.xyz
 ```
 
 For more exemples see _examples/_ and the [docs](https://github.com/lipelopesoliveira/pyCOFBuilder/examples.html)
