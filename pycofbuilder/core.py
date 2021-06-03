@@ -96,8 +96,8 @@ def build_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, c
     lista_aldeido_2 = BB.get_bipodal_CHO()
     lista_aldeido_3 = BB.get_tripodal_CHO()
     lista_aldeido_4 = BB.get_tetrapodal_squared_CHO()
-    lista_b_3 = BB.get_tripodal_BOH2()
     lista_b_2 = BB.get_bipodal_BOH2()
+    lista_b_3 = BB.get_tripodal_BOH2()
     lista_b_4 = BB.get_tetrapodal_squared_BOH2()
 
     cofs_list = []
@@ -115,6 +115,14 @@ def build_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, c
 
     for file_a in lista_amina_3:
         for file_b in lista_aldeido_2:
+            cofs_list += [f'{file_a}-{file_b}-HCB_A-{stacking}']
+    
+    for file_a in lista_b_3:
+        for file_b in lista_oh_2:
+            cofs_list += [f'{file_a}-{file_b}-HCB_A-{stacking}']
+
+    for file_a in lista_oh_3:
+        for file_b in lista_b_2:
             cofs_list += [f'{file_a}-{file_b}-HCB_A-{stacking}']
 
     '''for file_b in lista_b_2:
@@ -310,7 +318,8 @@ def build_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, c
     if val == 'y':
         t_i = time.time()
         for cof in tqdm(cofs_list):
-            succes, name = build(cof, save_format=save_f, print_result=False)
+            print(find_bond_atom(cof))
+            succes, name = build(cof, save_format=save_f, print_result=False, bond_atom=find_bond_atom(cof))
             if succes is True:
                 sucess_list += [name]
             if succes is False:
@@ -404,3 +413,15 @@ def clean_cof_out():
     for file in glob.glob(os.path.join('out', '*')):
         os.remove(file)
         print("Deleted " + str(file))
+
+def find_bond_atom(cof_name):
+    bb1, bb2, net, stacking = cof_name.split('-')
+    conect_1 = bb1.split('_')[2]
+    conect_2 = bb2.split('_')[2]
+
+    if 'NH2' in [conect_1, conect_2]:
+        return 'N'
+    if 'B(OH)2' in [conect_1, conect_2]:
+        return 'B'
+    if 'Cl' in [conect_1, conect_2]:
+        return 'C'
