@@ -20,7 +20,7 @@ class Reticulum():
     def __init__(self, bb_lib='bb_lib', verbosity=False):
 
         self.verbosity = verbosity
-        self.available_2D_topologies = ['hcb', 'hcb-a', 'sql', 'sql-a', 'kgm', 'kgm-a', 'hxl', 'hxl-a', 'kgd', 'kgd-a']
+        self.available_2D_topologies = ['HCB', 'HCB_A', 'SQL', 'SQL_A', 'KGM', 'HGM_A', 'HXL', 'HXL_A', 'KGD', 'KGD_A']
         self.available_3D_topologies = ['dia', 'bor', 'srs', 'pts', 'ctn', 'rra', 'fcc', 'lon', 'stp', 'acs', 'tbo', 'bcu', 'fjh', 'ceq']
         self.available_topologies = self.available_2D_topologies + self.available_3D_topologies
         self.out_path = 'out'
@@ -28,7 +28,7 @@ class Reticulum():
         self.lib_path = os.path.join('data', bb_lib)
         self.name = None
         self.topology = None
-        self.dimenton = None
+        self.dimention = None
         self.lattice = None
         self.lattice_sgs = None
         self.space_group = None
@@ -39,25 +39,23 @@ class Reticulum():
         self.charge = 0
         self.multiplicity = 1
         self.chirality = False
-        self.atom_labels = None
-        self.atom_pos = None
+        self.atom_labels = []
+        self.atom_pos = []
         self.symm_tol = 0.2
         self.angle_tol = 0.2
-
-    def n_atoms(self):
-        return len(self.atom_labels)
+        self.n_atoms = len(self.atom_labels)
 
     def print_available_topologies(self, dimensionality='all'):
 
         if dimensionality == 'all' or dimensionality == '2D':
             print('Available 2D Topologies:')
             for i in self.available_2D_topologies:
-                print(i)
+                print(i.upper())
 
         if dimensionality == 'all' or dimensionality == '3D':
             print('Available 3D Topologies:')
             for i in self.available_3D_topologies:
-                print(i)
+                print(i.upper())
 
     def create_hcb_structure(self, name_a, name_b, stack='AA', bond_atom='N', c_cell=3.6, print_result=True):
         '''Creates a COF with HCB network'''
@@ -246,7 +244,7 @@ class Reticulum():
                 self.symm_structure = ABC_f_symm.get_primitive_standard_structure()
 
         else:
-            print('Available stackin are: AA, AB1, AB2, AAl, AAt, ABC1 e ABC2')
+            print('Available stacking for HCB net are: AA, AB1, AB2, AAl, AAt, ABC1 e ABC2')
             print('Continuing with AA stacking')
             self.symm_structure = struct_symm_prim
 
@@ -483,8 +481,8 @@ class Reticulum():
                 self.symm_structure = ABC_f_symm.get_refined_structure()
 
         else:
-            print('Os padrões de empilhamento dispoíveis são: AA, AB1, AB2, AAl, AAt, ABC1 e ABC2')
-            print('Continuando com empulhamento AA')
+            print('Available stacking for HCB_A net are: AA, AB1, AB2, AAl, AAt, ABC1 e ABC2')
+            print('Continuing with AA stacking')
             self.symm_structure = struct_symm_prim
 
         dict_structure = self.symm_structure.as_dict()
@@ -534,7 +532,7 @@ class Reticulum():
             print(f'Building block B ({name_b}) must present connectivity 4 insted of', bb_2.connectivity)
             return None
 
-        # Calcula o parâmetro de célula com base no tamanho dos blocos de construção
+        # Calculates the cell parameter based on the building blocks size
         size_a = bb_1.size
         if self.verbosity:
             print('BB_A size:', size_a)
@@ -594,14 +592,14 @@ class Reticulum():
                 cell = np.array(struct_symm_prim.as_dict()['lattice']['matrix'])*(1, 1, 2)
 
                 A = ion_conv_crystal*(1, 1, 0.5)
-                B = self.translate_inside(ion_conv_crystal*(1, 1, 1.5) + (2/3, 1/3, 0))
+                B = Tools.translate_inside(ion_conv_crystal*(1, 1, 1.5) + (1/4, 1/4, 0))
 
                 AB = np.concatenate((A, B))
                 AB_label = [i[0] for i in labels_conv_crystal]
 
                 lattice = Lattice(cell)
                 AB_1 = Structure(lattice, AB_label + AB_label, AB, coords_are_cartesian=False)
-                AB_1_symm = SpacegroupAnalyzer(AB_1, symprec=0.2, angle_tolerance=2.0)
+                AB_1_symm = SpacegroupAnalyzer(AB_1, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
 
                 self.symm_structure = AB_1_symm.get_refined_structure()
 
@@ -612,14 +610,14 @@ class Reticulum():
                 cell = np.array(struct_symm_prim.as_dict()['lattice']['matrix'])*(1, 1, 2)
 
                 A = ion_conv_crystal*(1, 1, 0.5)
-                B = self.translate_inside(ion_conv_crystal*(1, 1, 1.5) + (1/2, 0, 0))
+                B = Tools.translate_inside(ion_conv_crystal*(1, 1, 1.5) + (1/2, 0, 0))
 
                 AB = np.concatenate((A, B))
                 AB_label = [i[0] for i in labels_conv_crystal]
 
                 lattice = Lattice(cell)
                 AB_2 = Structure(lattice, AB_label + AB_label, AB, coords_are_cartesian=False)
-                AB_2_symm = SpacegroupAnalyzer(AB_2, symprec=0.2, angle_tolerance=2.0)
+                AB_2_symm = SpacegroupAnalyzer(AB_2, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
 
                 self.symm_structure = AB_2_symm.get_refined_structure()
 
@@ -632,7 +630,7 @@ class Reticulum():
                 A = ion_conv_crystal*(1, 1, 0.5)
 
                 B = ion_conv_crystal*(1, 1, 1.5) + (.1, .1, 0)
-                B = self.translate_inside(B)
+                B = Tools.translate_inside(B)
 
                 AB = np.concatenate((A, B))
                 AB_label = [i[0] for i in labels_conv_crystal]
@@ -640,7 +638,7 @@ class Reticulum():
                 lattice = Lattice(cell)
                 AAl_f = Structure(lattice, AB_label+AB_label, AB, coords_are_cartesian=False)
 
-                AAl_f_symm = SpacegroupAnalyzer(AAl_f, symprec=0.1, angle_tolerance=2.0)
+                AAl_f_symm = SpacegroupAnalyzer(AAl_f, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
 
                 self.symm_structure = AAl_f_symm.get_refined_structure()
 
@@ -656,8 +654,8 @@ class Reticulum():
                 cell = np.array(struct_symm_prim.as_dict()['lattice']['matrix'])*(1, 1, 3)
 
                 A = ion_conv_crystal*(1, 1, 5/3)
-                B = self.translate_inside(ion_conv_crystal*(1, 1, 1) + (2/3, 1/3, 0))
-                C = self.translate_inside(ion_conv_crystal*(1, 1, 1/3) + (4/3, 2/3, 0))
+                B = Tools.translate_inside(ion_conv_crystal*(1, 1, 1) + (2/3, 1/3, 0))
+                C = Tools.translate_inside(ion_conv_crystal*(1, 1, 1/3) + (4/3, 2/3, 0))
 
                 ABC = np.concatenate((A, B, C))
                 ABC_label = [i[0] for i in labels_conv_crystal]
@@ -665,7 +663,7 @@ class Reticulum():
                 lattice = Lattice(cell)
 
                 ABC_f = Structure(lattice, ABC_label+ABC_label+ABC_label, ABC, coords_are_cartesian=False)
-                ABC_f_symm = SpacegroupAnalyzer(ABC_f, symprec=0.2, angle_tolerance=2.0)
+                ABC_f_symm = SpacegroupAnalyzer(ABC_f, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
 
                 self.symm_structure = ABC_f_symm.get_refined_structure()
 
@@ -676,8 +674,8 @@ class Reticulum():
                 cell = np.array(struct_symm_prim.as_dict()['lattice']['matrix'])*(1, 1, 3)
 
                 A = ion_conv_crystal*(1, 1, 5/3)
-                B = self.translate_inside(ion_conv_crystal*(1, 1, 1) + (1/3, 0, 0))
-                C = self.translate_inside(ion_conv_crystal*(1, 1, 1/3) + (2/3, 0, 0))
+                B = Tools.translate_inside(ion_conv_crystal*(1, 1, 1) + (1/3, 0, 0))
+                C = Tools.translate_inside(ion_conv_crystal*(1, 1, 1/3) + (2/3, 0, 0))
 
                 ABC = np.concatenate((A, B, C))
                 ABC_label = [i[0] for i in labels_conv_crystal]
@@ -685,13 +683,13 @@ class Reticulum():
                 lattice = Lattice(cell)
 
                 ABC_f = Structure(lattice, ABC_label+ABC_label+ABC_label, ABC, coords_are_cartesian=False)
-                ABC_f_symm = SpacegroupAnalyzer(ABC_f, symprec=0.2, angle_tolerance=2.0)
+                ABC_f_symm = SpacegroupAnalyzer(ABC_f, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
 
                 self.symm_structure = ABC_f_symm.get_refined_structure()
 
         else:
-            print('Os padrões de empilhamento dispoíveis são: AA, AB1, AB2, AAl, AAt, ABC1 e ABC2')
-            print('Continuando com empulhamento AA')
+            print('Available stacking for SQL net are: AA, AB1, AB2, AAl, AAt, ABC1 e ABC2')
+            print('Continuing with AA stacking')
             self.symm_structure = struct_symm_prim
 
         dict_structure = self.symm_structure.as_dict()
@@ -717,7 +715,7 @@ class Reticulum():
 
         return [self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op)]
 
-    def create_sql_a_structure(self, name_a, name_b, stack='AA', bond_atom='N', c_cell=3.6, print_resut=True):
+    def create_sql_a_structure(self, name_a, name_b, stack='AA', bond_atom='N', c_cell=3.6, print_result=True):
 
         self.topology = 'sql-a'
         self.dimension = 2
@@ -791,18 +789,18 @@ class Reticulum():
         final_pos = np.vstack((final_pos, np.dot(bb_2.atom_pos, R.from_euler('z', 315, degrees=True).as_matrix()) + np.array([0.25, 0.75, 0])*a))
         final_label += bb_2.atom_labels
 
-        # Changes the X atoms by the desirede bond_atom
+        # Changes the X atoms by the desired bond_atom
         final_label, final_pos = Tools.change_X_atoms(final_label, final_pos, bond_atom)
 
         # Cria a estrutura como entidade do pymatgen
         struct = Structure(lattice, final_label, final_pos, coords_are_cartesian=True)
 
         # Remove os átomos duplicados
-        struct.merge_sites(tol=1, mode='delete')
+        struct.merge_sites(tol=.7, mode='delete')
         struct.translate_sites(range(len(struct.as_dict()['sites'])), [0, 0, 0.5], frac_coords=True, to_unit_cell=True)
 
         # Simetriza a estrutura
-        symm = SpacegroupAnalyzer(struct, symprec=1, angle_tolerance=5.0)
+        symm = SpacegroupAnalyzer(struct, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
         struct_symm_prim = symm.get_refined_structure()
 
         if stack in ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2']:
@@ -817,14 +815,14 @@ class Reticulum():
                 cell = np.array(struct_symm_prim.as_dict()['lattice']['matrix'])*(1, 1, 2)
 
                 A = ion_conv_crystal*(1, 1, 0.5)
-                B = self.translate_inside(ion_conv_crystal*(1, 1, 1.5) + (2/3, 1/3, 0))
+                B = Tools.translate_inside(ion_conv_crystal*(1, 1, 1.5) + (1/4, 1/4, 0))
 
                 AB = np.concatenate((A, B))
                 AB_label = [i[0] for i in labels_conv_crystal]
 
                 lattice = Lattice(cell)
                 AB_1 = Structure(lattice, AB_label + AB_label, AB, coords_are_cartesian=False)
-                AB_1_symm = SpacegroupAnalyzer(AB_1, symprec=0.2, angle_tolerance=2.0)
+                AB_1_symm = SpacegroupAnalyzer(AB_1, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
 
                 self.symm_structure = AB_1_symm.get_refined_structure()
 
@@ -835,14 +833,14 @@ class Reticulum():
                 cell = np.array(struct_symm_prim.as_dict()['lattice']['matrix'])*(1, 1, 2)
 
                 A = ion_conv_crystal*(1, 1, 0.5)
-                B = self.translate_inside(ion_conv_crystal*(1, 1, 1.5) + (1/2, 0, 0))
+                B = Tools.translate_inside(ion_conv_crystal*(1, 1, 1.5) + (1/2, 0, 0))
 
                 AB = np.concatenate((A, B))
                 AB_label = [i[0] for i in labels_conv_crystal]
 
                 lattice = Lattice(cell)
                 AB_2 = Structure(lattice, AB_label + AB_label, AB, coords_are_cartesian=False)
-                AB_2_symm = SpacegroupAnalyzer(AB_2, symprec=0.2, angle_tolerance=2.0)
+                AB_2_symm = SpacegroupAnalyzer(AB_2, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
 
                 self.symm_structure = AB_2_symm.get_refined_structure()
 
@@ -855,7 +853,7 @@ class Reticulum():
                 A = ion_conv_crystal*(1, 1, 0.5)
 
                 B = ion_conv_crystal*(1, 1, 1.5) + (.1, .1, 0)
-                B = self.translate_inside(B)
+                B = Tools.translate_inside(B)
 
                 AB = np.concatenate((A, B))
                 AB_label = [i[0] for i in labels_conv_crystal]
@@ -863,7 +861,7 @@ class Reticulum():
                 lattice = Lattice(cell)
                 AAl_f = Structure(lattice, AB_label+AB_label, AB, coords_are_cartesian=False)
 
-                AAl_f_symm = SpacegroupAnalyzer(AAl_f, symprec=0.1, angle_tolerance=2.0)
+                AAl_f_symm = SpacegroupAnalyzer(AAl_f, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
 
                 self.symm_structure = AAl_f_symm.get_refined_structure()
 
@@ -879,8 +877,8 @@ class Reticulum():
                 cell = np.array(struct_symm_prim.as_dict()['lattice']['matrix'])*(1, 1, 3)
 
                 A = ion_conv_crystal*(1, 1, 5/3)
-                B = self.translate_inside(ion_conv_crystal*(1, 1, 1) + (2/3, 1/3, 0))
-                C = self.translate_inside(ion_conv_crystal*(1, 1, 1/3) + (4/3, 2/3, 0))
+                B = Tools.translate_inside(ion_conv_crystal*(1, 1, 1) + (2/3, 1/3, 0))
+                C = Tools.translate_inside(ion_conv_crystal*(1, 1, 1/3) + (4/3, 2/3, 0))
 
                 ABC = np.concatenate((A, B, C))
                 ABC_label = [i[0] for i in labels_conv_crystal]
@@ -888,7 +886,7 @@ class Reticulum():
                 lattice = Lattice(cell)
 
                 ABC_f = Structure(lattice, ABC_label+ABC_label+ABC_label, ABC, coords_are_cartesian=False)
-                ABC_f_symm = SpacegroupAnalyzer(ABC_f, symprec=0.2, angle_tolerance=2.0)
+                ABC_f_symm = SpacegroupAnalyzer(ABC_f, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
 
                 self.symm_structure = ABC_f_symm.get_refined_structure()
 
@@ -899,8 +897,8 @@ class Reticulum():
                 cell = np.array(struct_symm_prim.as_dict()['lattice']['matrix'])*(1, 1, 3)
 
                 A = ion_conv_crystal*(1, 1, 5/3)
-                B = self.translate_inside(ion_conv_crystal*(1, 1, 1) + (1/3, 0, 0))
-                C = self.translate_inside(ion_conv_crystal*(1, 1, 1/3) + (2/3, 0, 0))
+                B = Tools.translate_inside(ion_conv_crystal*(1, 1, 1) + (1/3, 0, 0))
+                C = Tools.translate_inside(ion_conv_crystal*(1, 1, 1/3) + (2/3, 0, 0))
 
                 ABC = np.concatenate((A, B, C))
                 ABC_label = [i[0] for i in labels_conv_crystal]
@@ -908,13 +906,13 @@ class Reticulum():
                 lattice = Lattice(cell)
 
                 ABC_f = Structure(lattice, ABC_label+ABC_label+ABC_label, ABC, coords_are_cartesian=False)
-                ABC_f_symm = SpacegroupAnalyzer(ABC_f, symprec=0.2, angle_tolerance=2.0)
+                ABC_f_symm = SpacegroupAnalyzer(ABC_f, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
 
                 self.symm_structure = ABC_f_symm.get_refined_structure()
 
         else:
-            print('Os padrões de empilhamento dispoíveis são: AA, AB1, AB2, AAl, AAt, ABC1 e ABC2')
-            print('Continuando com empulhamento AA')
+            print('Available stacking for SQL_A net are: AA, AB1, AB2, AAl, AAt, ABC1 e ABC2')
+            print('Continuing with AA stacking')
             self.symm_structure = struct_symm_prim
 
         dict_structure = self.symm_structure.as_dict()
@@ -935,10 +933,12 @@ class Reticulum():
         symm_op = symm.get_point_group_operations()
         self.hall = symm.get_hall()
 
-        if print_resut == True:
+        if print_result == True:
             Tools.print_result(self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op))
 
         return [self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op)]
+
+################   Save file in different formats  ############################
 
     def save_cif(self, supercell=False, path=None):
 

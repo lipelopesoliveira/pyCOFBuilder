@@ -17,7 +17,6 @@ except Exception:
 def elements_dict():
 
     element_symbols = [
-    'X',
     'H', 'He',  # Period 1
     'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne',  # Period 2
     'Na', 'Mg', 'Al', 'Si', 'P', 'S', 'Cl', 'Ar',  # Period 3
@@ -35,7 +34,7 @@ def elements_dict():
     'Cf', 'Es', 'Fm', 'Md', 'No', 'Lr',  # Actinides
     'Rf', 'Db', 'Sg', 'Bh', 'Hs', 'Mt', 'Ds', 'Rg', 'Cn',  # Period 7
     'Uut', 'Fl', 'Uup', 'Lv', 'Uus', 'Uuo', # Period 7
-    'X', 'Q', 'R', 'R1', 'R2', 'R3', 'R4', 'R5', 'R6']  #Specific for the programm
+    'X', 'Q', 'R', 'R1', 'R2', 'R3', 'R4', 'R5', 'R6']  #Specific labels for the programm
 
     """Returns a dictionary containing the elements and its respective atomic mass in g/mol"""
     return {'H': 1.00794, 'He': 4.002602, 'Li': 6.941, 'Be': 9.012182, 'B': 10.811, 'C': 12.0107, 'N': 14.0067,
@@ -440,9 +439,9 @@ def find_bond_atom(cof_name):
         return 'R'
 
 def print_result(name, lattice, hall, space_group, space_number, symm_op):
-
+    '''Print the results of the created structure'''
     print('{:<60s} {:^12s} {:<4s} {:^4s} #{:^5s}   {:^2} sym. op.'.format(name, lattice, hall.lstrip('-'), space_group, space_number, symm_op))
-    
+
 ############# Reads and save files #####################
 
 def read_xyz_file(path, file_name):
@@ -676,6 +675,7 @@ def save_cif(file_path, file_name, cell, atom_labels, atom_pos, partial_charges=
             cif_file.write(f'{atom_labels[i]}    {atom_labels[i]}    {u:<.9f}    {v:<.9f}    {w:<.9f}\n')
 
     cif_file.close()
+    
 
 if __name__ == '__main__':
     main()
