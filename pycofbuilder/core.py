@@ -9,8 +9,9 @@ from pycofbuilder.reticulum import Reticulum
 from pycofbuilder.building_block import Building_Block
 
 
-def build(cof_name=None, save_format=['cif'], bond_atom='N', lib='bb_lib', print_result=True):
+def build(cof_name=None, save_format=['cif'], lib='bb_lib', print_result=True):
     '''Create a COF with a given name'''
+    bond_atom = Tools.find_bond_atom(cof_name)
 
     qe = False
     xyz = False
@@ -318,8 +319,7 @@ def build_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, c
     if val == 'y':
         t_i = time.time()
         for cof in tqdm(cofs_list):
-            print(find_bond_atom(cof))
-            succes, name = build(cof, save_format=save_f, print_result=False, bond_atom=find_bond_atom(cof))
+            succes, name = build(cof, save_format=save_f, print_result=False)
             if succes is True:
                 sucess_list += [name]
             if succes is False:
@@ -406,22 +406,11 @@ def clean_bb_list():
     #Loop Through all files and deleting them one by one
     for file in glob.glob(os.path.join('data', 'bb_lib', '*')):
         os.remove(file)
-        print("Deleted " + str(file))
+        print(f'Deleted {file}')
 
 def clean_cof_out():
     #Loop Through all files and deleting them one by one
     for file in glob.glob(os.path.join('out', '*')):
         os.remove(file)
-        print("Deleted " + str(file))
+        print(f'Deleted {file}')
 
-def find_bond_atom(cof_name):
-    bb1, bb2, net, stacking = cof_name.split('-')
-    conect_1 = bb1.split('_')[2]
-    conect_2 = bb2.split('_')[2]
-
-    if 'NH2' in [conect_1, conect_2]:
-        return 'N'
-    if 'B(OH)2' in [conect_1, conect_2]:
-        return 'B'
-    if 'Cl' in [conect_1, conect_2]:
-        return 'C'

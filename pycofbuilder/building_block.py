@@ -161,10 +161,7 @@ class Building_Block():
                 label[i] = X
         return label, pos
 
-    def find_index(self, element, e_list):
-        for i in range(len(e_list)):
-            if np.array_equal(e_list[i], element):
-                return i
+
 
     def closest_atom(self, label_1, pos_1, labels, pos):
 
@@ -255,9 +252,9 @@ class Building_Block():
             Rot_m = Tools.rotation_matrix_from_vectors(v2, v1)  # Find the rotation matrix that align v2 with v1
 
             # Delet the "Q" atom position of the conector group and the structure
-            n_conector_pos = np.delete(n_conector_pos, self.find_index(np.array([0., 0., 0.]), n_conector_pos), axis=0)
+            n_conector_pos = np.delete(n_conector_pos, Tools.find_index(np.array([0., 0., 0.]), n_conector_pos), axis=0)
             
-            self.atom_pos = np.delete(self.atom_pos, self.find_index(location_Q_struct[1][i], self.atom_pos), axis=0)
+            self.atom_pos = np.delete(self.atom_pos, Tools.find_index(location_Q_struct[1][i], self.atom_pos), axis=0)
             
             # Rotate and translade the conector group to Q position in the strucutre
             rotated_translated_group = np.dot(n_conector_pos, -np.transpose(Rot_m)) + location_Q_struct[1][i]
@@ -293,12 +290,12 @@ class Building_Block():
 
             Rot_m = Tools.rotation_matrix_from_vectors(v2, v1)  # Determina a matriz de rotação que alinha V2 com V1
 
-            n_group_pos = np.delete(n_group_pos, self.find_index(np.array([0.0, 0.0, 0.0]), n_group_pos), axis=0)
+            n_group_pos = np.delete(n_group_pos, Tools.find_index(np.array([0.0, 0.0, 0.0]), n_group_pos), axis=0)
 
             # Rotaciona e translada o grupo radical para a posição R
             rotated_translated_group = np.dot(n_group_pos, - np.transpose(Rot_m)) + location_R_struct[i]
 
-            self.atom_pos = np.delete(self.atom_pos, self.find_index(location_R_struct[i], self.atom_pos), axis=0)
+            self.atom_pos = np.delete(self.atom_pos, Tools.find_index(location_R_struct[i], self.atom_pos), axis=0)
 
             self.atom_pos = np.append(self.atom_pos, rotated_translated_group, axis=0)
 

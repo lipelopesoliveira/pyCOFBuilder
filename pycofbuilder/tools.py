@@ -64,6 +64,42 @@ def angle_between(v1, v2):
     v2_u = v2/np.linalg.norm(v2)
     return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
 
+def cos_angle(v1, v2, angle=False):
+    """
+    Calculates the cossine of the angle between two vectors v1 and v2.
+    ----------
+    v1 : array
+        (N,1) matrix with N dimensions
+    v2 : array
+        (N,1) matrix with N dimensions
+    angle : boolean
+        True for output in radian angle of False for output in cossine form
+    Returns
+    -------
+    angle : float
+        Angle in radians if angle == True
+    cos : float
+        Cossine of the angle if angle == False
+    """
+    unit_vector1 = v1 / np.linalg.norm(v1)
+    unit_vector2 = v2 / np.linalg.norm(v2)
+
+    dot_product = np.dot(unit_vector1, unit_vector2)
+
+    if angle is not True:
+        return np.arccos(dot_product)  # angle in radian
+    else:
+        return dot_product  # cos of the angle
+    
+def angle(x, y):
+    """Return the angle between vectors a and b in degrees."""
+    return np.arccos(np.dot(x, y) / (np.linalg.norm(x) * np.linalg.norm(y))) * 180. / np.pi
+
+def unit_vector(x):
+    """Return a unit vector in the same direction as x."""
+    y = np.array(x, dtype='float')
+    return y / np.linalg.norm(y)
+
 def rotation_matrix_from_vectors(vec1, vec2):
     '''
     Find the rotation matrix that aligns vec1 to vec2
@@ -88,14 +124,30 @@ def rotation_matrix_from_vectors(vec1, vec2):
     else:
         return np.identity(3)
 
-def unit_vector(x):
-    """Return a unit vector in the same direction as x."""
-    y = np.array(x, dtype='float')
-    return y / np.linalg.norm(y)
+def translate_inside(matrix):
+    for i in range(len(matrix)):
+        for j in range(len(matrix[i])):
+            if matrix[i][j] >= 1:
+                matrix[i][j] -= 1
+    return matrix
 
-def angle(x, y):
-    """Return the angle between vectors a and b in degrees."""
-    return np.arccos(np.dot(x, y) / (np.linalg.norm(x) * np.linalg.norm(y))) * 180. / np.pi
+def rmsd(V, W):
+    """
+    Calculate Root-mean-square deviation from two sets of vectors V and W.
+    Parameters
+    ----------
+    V : array
+        (N,D) matrix, where N is points and D is dimension.
+    W : array
+        (N,D) matrix, where N is points and D is dimension.
+    Returns
+    -------
+    rmsd : float
+        Root-mean-square deviation between the two vectors
+    """
+    diff = np.array(V) - np.array(W)
+    N = len(V)
+    return np.sqrt((diff * diff).sum() / N)
 
 def cell_to_cellpar(cell, radians=False):
     """Returns the cell parameters [a, b, c, alpha, beta, gamma].
@@ -205,6 +257,78 @@ def cellpar_to_cell(cellpar, ab_normal=(0, 0, 1), a_direction=None):
 
     return cell
 
+def get_fractional_to_cartesian_matrix(a, b, c, alpha, beta, gamma, angle_in_degrees=True):
+    """
+    Return the transformation matrix that converts fractional coordinates to
+    cartesian coordinates.
+    Parameters
+    ----------
+    a, b, c : float
+        The lengths of the edges.
+    alpha, gamma, beta : float
+        The angles between the sides.
+    angle_in_degrees : bool
+        True if alpha, beta and gamma are expressed in degrees.
+    Returns
+    -------
+    r : array_like
+        The 3x3 rotation matrix. ``V_cart = np.dot(r, V_frac)``.
+    """
+    if angle_in_degrees:
+        alpha = np.deg2rad(alpha)
+        beta = np.deg2rad(beta)
+        gamma = np.deg2rad(gamma)
+    cosa = np.cos(alpha)
+    cosb = np.cos(beta)
+    cosg = np.cos(gamma)
+    sing = np.sin(gamma)
+    volume = 1.0 - cosa**2.0 - cosb**2.0 - cosg**2.0 + 2.0 * cosa * cosb * cosg
+    volume = np.sqrt(volume)
+    r = np.zeros((3, 3))
+    r[0, 0] = a
+    r[0, 1] = b * cosg
+    r[0, 2] = c * cosb
+    r[1, 1] = b * sing
+    r[1, 2] = c * (cosa - cosb * cosg) / sing
+    r[2, 2] = c * volume / sing
+    return r
+
+def get_cartesian_to_fractional_matrix(a, b, c, alpha, beta, gamma, angle_in_degrees=True):
+    """
+    Return the transformation matrix that converts cartesian coordinates to
+    fractional coordinates.
+    Parameters
+    ----------
+    a, b, c : float
+        The lengths of the edges.
+    alpha, gamma, beta : float
+        The angles between the sides.
+    angle_in_degrees : bool
+        True if alpha, beta and gamma are expressed in degrees.
+    Returns
+    -------
+    r : array_like
+        The 3x3 rotation matrix. ``V_frac = np.dot(r, V_cart)``.
+    """
+    if angle_in_degrees:
+        alpha = np.deg2rad(alpha)
+        beta = np.deg2rad(beta)
+        gamma = np.deg2rad(gamma)
+    cosa = np.cos(alpha)
+    cosb = np.cos(beta)
+    cosg = np.cos(gamma)
+    sing = np.sin(gamma)
+    volume = 1.0 - cosa**2.0 - cosb**2.0 - cosg**2.0 + 2.0 * cosa * cosb * cosg
+    volume = np.sqrt(volume)
+    r = np.zeros((3, 3))
+    r[0, 0] = 1.0 / a
+    r[0, 1] = -cosg / (a * sing)
+    r[0, 2] = (cosa * cosg - cosb) / (a * volume * sing)
+    r[1, 1] = 1.0 / (b * sing)
+    r[1, 2] = (cosb * cosg - cosa) / (b * volume * sing)
+    r[2, 2] = sing / (c * volume)
+    return r
+
 def get_reciprocal_vectors(cell):
     '''
     Get the reciprocal vectors of a cell given in cell parameters of cell vectors
@@ -257,6 +381,69 @@ def get_kgrid(cell, distance=0.3):
     kz = math.ceil(b[2]/distance)
 
     return kx, ky, kz
+
+def find_index(element, e_list):
+    '''Finds the index of a given element in a list
+    ----------
+    element : string
+        String containing the label of the element in e_list
+    e_list : list
+        List with the atom labels
+    Returns
+    ----------
+    i : int
+        The index of element in the e_list
+    '''
+    for i in range(len(e_list)):
+        if np.array_equal(e_list[i], element):
+            return i
+
+def change_X_atoms(atom_labels, atom_pos, bond_atom):
+    ''' Changes the X atom for the desired bond_atom or remove it if bond_atom == 'R'.
+    ----------
+    atom_labels : list
+        List containing the atom labels
+    atom_pos : list 
+        List containing the atom position
+    Returns
+    ----------
+    labels : list
+        List containing the processed atom labels
+    pos : list 
+        List containing the processed atom position
+    '''
+    label = []
+    pos = []
+
+    for i in range(len(atom_labels)):
+        if atom_labels[i] == 'X' and bond_atom != 'R':
+            label += [bond_atom]
+            pos += [atom_pos[i]]
+        if atom_labels[i] != 'X':
+            label += [atom_labels[i]]
+            pos += [atom_pos[i]]
+
+    return label, pos 
+
+def find_bond_atom(cof_name):
+    bb1, bb2, net, stacking = cof_name.split('-')
+    conect_1 = bb1.split('_')[2]
+    conect_2 = bb2.split('_')[2]
+
+    if 'NH2' in [conect_1, conect_2]:
+        return 'N'
+    if 'B(OH)2' in [conect_1, conect_2]:
+        return 'B'
+    if 'Cl' in [conect_1, conect_2]:
+        return 'R'
+    if 'Br' in [conect_1, conect_2]:
+        return 'R'
+
+def print_result(name, lattice, hall, space_group, space_number, symm_op):
+
+    print('{:<60s} {:^12s} {:<4s} {:^4s} #{:^5s}   {:^2} sym. op.'.format(name, lattice, hall.lstrip('-'), space_group, space_number, symm_op))
+    
+############# Reads and save files #####################
 
 def read_xyz_file(path, file_name):
     '''Lê um arquivo em formato .xyz e retorna uma lista com os átomos e um array Nx3 contendo as coordenadas dos N átomos'''
@@ -347,129 +534,6 @@ def convert_cif_2_xyz(path, file_name, supercell=[1, 1, 1]):
 
     temp_file.close()
 
-def translate_inside(matrix):
-    for i in range(len(matrix)):
-        for j in range(len(matrix[i])):
-            if matrix[i][j] >= 1:
-                matrix[i][j] -= 1
-    return matrix
-
-def cos_angle(v1, v2, angle=False):
-    """
-    Calculates the cossine of the angle between two vectors v1 and v2.
-    ----------
-    v1 : array
-        (N,1) matrix with N dimensions
-    v2 : array
-        (N,1) matrix with N dimensions
-    angle : boolean
-        True for output in radian angle of False for output in cossine form
-    Returns
-    -------
-    angle : float
-        Angle in radians if angle == True
-    cos : float
-        Cossine of the angle if angle == False
-    """
-    unit_vector1 = v1 / np.linalg.norm(v1)
-    unit_vector2 = v2 / np.linalg.norm(v2)
-
-    dot_product = np.dot(unit_vector1, unit_vector2)
-
-    if angle is not True:
-        return np.arccos(dot_product)  # angle in radian
-    else:
-        return dot_product  # cos of the angle
-
-def rmsd(V, W):
-    """
-    Calculate Root-mean-square deviation from two sets of vectors V and W.
-    Parameters
-    ----------
-    V : array
-        (N,D) matrix, where N is points and D is dimension.
-    W : array
-        (N,D) matrix, where N is points and D is dimension.
-    Returns
-    -------
-    rmsd : float
-        Root-mean-square deviation between the two vectors
-    """
-    diff = np.array(V) - np.array(W)
-    N = len(V)
-    return np.sqrt((diff * diff).sum() / N)
-
-def get_fractional_to_cartesian_matrix(a, b, c, alpha, beta, gamma, angle_in_degrees=True):
-    """
-    Return the transformation matrix that converts fractional coordinates to
-    cartesian coordinates.
-    Parameters
-    ----------
-    a, b, c : float
-        The lengths of the edges.
-    alpha, gamma, beta : float
-        The angles between the sides.
-    angle_in_degrees : bool
-        True if alpha, beta and gamma are expressed in degrees.
-    Returns
-    -------
-    r : array_like
-        The 3x3 rotation matrix. ``V_cart = np.dot(r, V_frac)``.
-    """
-    if angle_in_degrees:
-        alpha = np.deg2rad(alpha)
-        beta = np.deg2rad(beta)
-        gamma = np.deg2rad(gamma)
-    cosa = np.cos(alpha)
-    cosb = np.cos(beta)
-    cosg = np.cos(gamma)
-    sing = np.sin(gamma)
-    volume = 1.0 - cosa**2.0 - cosb**2.0 - cosg**2.0 + 2.0 * cosa * cosb * cosg
-    volume = np.sqrt(volume)
-    r = np.zeros((3, 3))
-    r[0, 0] = a
-    r[0, 1] = b * cosg
-    r[0, 2] = c * cosb
-    r[1, 1] = b * sing
-    r[1, 2] = c * (cosa - cosb * cosg) / sing
-    r[2, 2] = c * volume / sing
-    return r
-
-def get_cartesian_to_fractional_matrix(a, b, c, alpha, beta, gamma, angle_in_degrees=True):
-    """
-    Return the transformation matrix that converts cartesian coordinates to
-    fractional coordinates.
-    Parameters
-    ----------
-    a, b, c : float
-        The lengths of the edges.
-    alpha, gamma, beta : float
-        The angles between the sides.
-    angle_in_degrees : bool
-        True if alpha, beta and gamma are expressed in degrees.
-    Returns
-    -------
-    r : array_like
-        The 3x3 rotation matrix. ``V_frac = np.dot(r, V_cart)``.
-    """
-    if angle_in_degrees:
-        alpha = np.deg2rad(alpha)
-        beta = np.deg2rad(beta)
-        gamma = np.deg2rad(gamma)
-    cosa = np.cos(alpha)
-    cosb = np.cos(beta)
-    cosg = np.cos(gamma)
-    sing = np.sin(gamma)
-    volume = 1.0 - cosa**2.0 - cosb**2.0 - cosg**2.0 + 2.0 * cosa * cosb * cosg
-    volume = np.sqrt(volume)
-    r = np.zeros((3, 3))
-    r[0, 0] = 1.0 / a
-    r[0, 1] = -cosg / (a * sing)
-    r[0, 2] = (cosa * cosg - cosb) / (a * volume * sing)
-    r[1, 1] = 1.0 / (b * sing)
-    r[1, 2] = (cosb * cosg - cosa) / (b * volume * sing)
-    r[2, 2] = sing / (c * volume)
-    return r
 
 def save_csv(file_name, data, delimiter=';', head=False):
 
@@ -612,11 +676,6 @@ def save_cif(file_path, file_name, cell, atom_labels, atom_pos, partial_charges=
             cif_file.write(f'{atom_labels[i]}    {atom_labels[i]}    {u:<.9f}    {v:<.9f}    {w:<.9f}\n')
 
     cif_file.close()
-
-def print_result(name, lattice, hall, space_group, space_number, symm_op):
-
-    print('{:<60s} {:^12s} {:<4s} {:^4s} #{:^5s}   {:^2} sym. op.'.format(name, lattice, hall.lstrip('-'), space_group, space_number, symm_op))
-
 
 if __name__ == '__main__':
     main()

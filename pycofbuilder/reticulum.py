@@ -41,6 +41,8 @@ class Reticulum():
         self.chirality = False
         self.atom_labels = None
         self.atom_pos = None
+        self.symm_tol = 0.2
+        self.angle_tol = 0.2
 
     def n_atoms(self):
         return len(self.atom_labels)
@@ -58,6 +60,7 @@ class Reticulum():
                 print(i)
 
     def create_hcb_structure(self, name_a, name_b, stack='AA', bond_atom='N', c_cell=3.6, print_result=True):
+        '''Creates a COF with HCB network'''
 
         self.topology = 'hcb'
         self.dimension = 2
@@ -80,7 +83,7 @@ class Reticulum():
             print('Building block B must present connectivity 3 insted of', len(bb_2.connectivity))
             return None
 
-        # Calcula o parâmetro de célula com base no tamanho dos blocos de construção
+        # Calculate the cell parameter based on the size of the building blocks
         size_a = bb_1.size
         if self.verbosity:
             print('BB_A size:', size_a)
@@ -88,48 +91,43 @@ class Reticulum():
         if self.verbosity:
             print('BB_B size:', size_b)
 
+        # Defines the cell parameter a
         a = np.cos(np.radians(30))*2*(size_a[0] + size_b[0])
 
         if self.verbosity:
             print('Calculated cell parameter a:', a)
 
-        # Mede o valor do delta c dos blocos de construção
+        # Gets the maximum distace in the z axis to create the c parameter
         delta_a = abs(max(np.transpose(bb_1.atom_pos)[2])) + abs(min(np.transpose(bb_1.atom_pos)[2]))
         delta_b = abs(max(np.transpose(bb_2.atom_pos)[2])) + abs(min(np.transpose(bb_2.atom_pos)[2]))
 
-        # Constrói a matriz da célula unitária hexagonal
+        # Build the matrix of unitary hexagonal cell
         lattice = [[a, 0, 0], [-0.5*a, np.sqrt(3)/2*a, 0], [0, 0, c_cell + max([delta_a, delta_b])]]
         if self.verbosity is True:
             print('Unitary cell built:', lattice)
 
-        # Adiciona o bloco A na origem da célula unitária (sítio A1)
+        # Adds the building block A in the origin of the unitary cell (A1 site)
         final_label = bb_1.atom_labels
         final_pos = bb_1.atom_pos
 
-        # Rotaciona o bloco A e adiciona no sítio A2 da célula unitária
+        # Rotates and add the building block A to site A2 of unitary cell
         r_pos_a_2 = np.dot(bb_2.atom_pos, R.from_euler('z', 180, degrees=True).as_matrix()) + np.array([0, np.sqrt(3)/3, 0])*a
 
         final_pos = np.vstack((final_pos, r_pos_a_2))
         final_label += bb_2.atom_labels
 
-        # Troca os átomos X por átomos N
-        for i in range(len(final_label)):
-            if final_label[i] == 'X':
-                final_label[i] = bond_atom
+        # Changes the X atoms by the desirede bond_atom
+        final_label, final_pos = Tools.change_X_atoms(final_label, final_pos, bond_atom)
 
-        # save_xyz(path, 'teste.xyz', final_label, final_pos)
-        # s = show_XYZ_structure(path, 'teste.xyz')
-        # s.show()
-
-        # Cria a estrutura como entidade do pymatgen
+        # Creates the COF as a pymatgen structure
         struct = Structure(lattice, final_label, final_pos, coords_are_cartesian=True)
 
-        # Remove os átomos duplicados
+        # Remove duplicate atoms and translate the structure to the center of the cell
         struct.merge_sites(tol=.5, mode='delete')
         struct.translate_sites(range(len(struct.as_dict()['sites'])), [0, 0, 0.5], frac_coords=True, to_unit_cell=True)
 
-        # Simetriza a estrutura
-        symm = SpacegroupAnalyzer(struct, symprec=.3, angle_tolerance=3.0)
+        # Simetrizes the structure
+        symm = SpacegroupAnalyzer(struct, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
         struct_symm_prim = symm.get_primitive_standard_structure()
 
         if stack in ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2']:
@@ -155,7 +153,7 @@ class Reticulum():
                 B_list = np.arange(len(AB_label)) + len(AB_label)
 
                 AB_1.translate_sites(B_list, [2/3, 1/3, 0.5], frac_coords=True, to_unit_cell=True)
-                AB_1_symm = SpacegroupAnalyzer(AB_1, symprec=0.05, angle_tolerance=.5)
+                AB_1_symm = SpacegroupAnalyzer(AB_1, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
 
                 self.symm_structure = AB_1_symm.get_refined_structure()
 
@@ -176,7 +174,7 @@ class Reticulum():
 
                 B_list = np.arange(len(AB_label)) + len(AB_label)
                 AB_2.translate_sites(B_list, [1/2, 0, 0.5], frac_coords=True, to_unit_cell=True)
-                AB_2_symm = SpacegroupAnalyzer(AB_2, symprec=0.05, angle_tolerance=0.5)
+                AB_2_symm = SpacegroupAnalyzer(AB_2, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
 
                 self.symm_structure = AB_2_symm.get_refined_structure()
                 
@@ -198,7 +196,7 @@ class Reticulum():
                 lattice = Lattice(cell)
                 AAl_f = Structure(lattice, AB_label+AB_label, AB, coords_are_cartesian=False)
 
-                AAl_f_symm = SpacegroupAnalyzer(AAl_f, symprec=0.5, angle_tolerance=2.0)
+                AAl_f_symm = SpacegroupAnalyzer(AAl_f, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
 
                 self.symm_structure = AAl_f_symm.get_primitive_standard_structure()
 
@@ -223,7 +221,7 @@ class Reticulum():
                 lattice = Lattice(cell)
 
                 ABC_f = Structure(lattice, ABC_label+ABC_label+ABC_label, ABC, coords_are_cartesian=False)
-                ABC_f_symm = SpacegroupAnalyzer(ABC_f, symprec=0.2, angle_tolerance=2.0)
+                ABC_f_symm = SpacegroupAnalyzer(ABC_f, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
 
                 self.symm_structure = ABC_f_symm.get_primitive_standard_structure()
 
@@ -243,13 +241,13 @@ class Reticulum():
                 lattice = Lattice(cell)
 
                 ABC_f = Structure(lattice, ABC_label+ABC_label+ABC_label, ABC, coords_are_cartesian=False)
-                ABC_f_symm = SpacegroupAnalyzer(ABC_f, symprec=0.2, angle_tolerance=2.0)
+                ABC_f_symm = SpacegroupAnalyzer(ABC_f, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
 
                 self.symm_structure = ABC_f_symm.get_primitive_standard_structure()
 
         else:
-            print('Os padrões de empilhamento dispoíveis são: AA, AB1, AB2, AAl, AAt, ABC1 e ABC2')
-            print('Continuando com empulhamento AA')
+            print('Available stackin are: AA, AB1, AB2, AAl, AAt, ABC1 e ABC2')
+            print('Continuing with AA stacking')
             self.symm_structure = struct_symm_prim
 
         dict_structure = self.symm_structure.as_dict()
@@ -349,10 +347,8 @@ class Reticulum():
         final_pos = np.vstack((final_pos, r_pos_b_2))
         final_label += bb_linear.atom_labels
 
-        # Troca os átomos X por átomos N
-        for i in range(len(final_label)):
-            if final_label[i] == 'X':
-                final_label[i] = bond_atom
+        # Changes the X atoms by the desirede bond_atom
+        final_label, final_pos = Tools.change_X_atoms(final_label, final_pos, bond_atom)
 
         # save_xyz(path, 'teste.xyz', final_label, final_pos)
         # s = show_XYZ_structure(path, 'teste.xyz')
@@ -572,10 +568,8 @@ class Reticulum():
         final_pos = np.vstack((final_pos, np.dot(bb_2.atom_pos, R.from_euler('z', 45, degrees=True).as_matrix()) + np.array([0.5, 0.5, 0])*a))
         final_label += bb_2.atom_labels
 
-        # Troca os átomos X por átomos N
-        for i in range(len(final_label)):
-            if final_label[i] == 'X':
-                final_label[i] = bond_atom
+        # Changes the X atoms by the desirede bond_atom
+        final_label, final_pos = Tools.change_X_atoms(final_label, final_pos, bond_atom)
 
         # Cria a estrutura como entidade do pymatgen
         struct = Structure(lattice, final_label, final_pos, coords_are_cartesian=True)
@@ -797,10 +791,8 @@ class Reticulum():
         final_pos = np.vstack((final_pos, np.dot(bb_2.atom_pos, R.from_euler('z', 315, degrees=True).as_matrix()) + np.array([0.25, 0.75, 0])*a))
         final_label += bb_2.atom_labels
 
-        # Troca os átomos X por átomos N
-        for i in range(len(final_label)):
-            if final_label[i] == 'X':
-                final_label[i] = bond_atom
+        # Changes the X atoms by the desirede bond_atom
+        final_label, final_pos = Tools.change_X_atoms(final_label, final_pos, bond_atom)
 
         # Cria a estrutura como entidade do pymatgen
         struct = Structure(lattice, final_label, final_pos, coords_are_cartesian=True)
