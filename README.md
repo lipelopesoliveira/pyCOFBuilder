@@ -35,8 +35,7 @@ C3_BENZ_CHO_OH-C2_HDZ_NH2-HCB_A-AA                            hexagonal   P    P
 
 A `.cif` file (the defaut save format is CIF, but it can be easly changed) will be created in the `out` folder. The code will print out some information of the structure created.
 
-Besides, the variable `c` now is a list wit two elements. The first element is a Boolean value indicating whether the network creation was successful. 
-The second element is the name of the created network. This information can be usefull for workflows for creating multiple structures.
+Besides, the variable `c` now is a list wit two elements. The first element is a Boolean value indicating whether the network creation was successful and the second element is the name of the created network. This information can be usefull for workflows for creating multiple structures.
 
 You can also create multiple building blocks and then construct all available COFs from the connection of those blocks.
 
