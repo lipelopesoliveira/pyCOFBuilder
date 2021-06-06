@@ -52,7 +52,7 @@ COF.build_all_available_COFs()
 
 ```
 
-You should see this output
+You should see this output, where the code will calculate how many COFs will be created and ask for confirmation. Once you type `y` to confirm, a progress bar will indicate the the creation of the structures as well as the estimated time for conclude the task. Afther the creation the code will print some informations about the COFs created, how many of the structures was created succesfully and the enlapsed time.  
 
 ```
 >>> 20 COFs will be created. Do you want o proceed? Type [y] to continue.
