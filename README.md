@@ -101,7 +101,7 @@ Deleted data\bb_lib\C3_BENZ_CHO_OH.xyz
 ```
 
 For more exemples see _examples/_ and the [docs](https://github.com/lipelopesoliveira/pyCOFBuilder/examples.html)
-for the complete documentation and more examples.
+for the complete explanation of implementation and functionalities.
 
 
 ## COFs and Building Blocks nomenclature
