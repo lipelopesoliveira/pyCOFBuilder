@@ -27,7 +27,7 @@ class Reticulum():
         self.available_topologies = self.available_2D_topologies + self.available_3D_topologies
         self.lib_bb = bb_lib
         self.main_path = os.path.join(_ROOT, 'data')
-        self.lib_path = os.path.join(self.main_path, self.bb_lib)
+        self.lib_path = os.path.join(self.main_path, bb_lib)
         self.out_path = os.path.join(os.getcwd(), 'out')
         self.name = None
         self.topology = None
@@ -44,6 +44,7 @@ class Reticulum():
         self.chirality = False
         self.atom_labels = []
         self.atom_pos = []
+        self.lattice = [[], [], []]
         self.symm_tol = 0.2
         self.angle_tol = 0.2
         self.n_atoms = len(self.atom_labels)
@@ -252,6 +253,8 @@ class Reticulum():
             self.symm_structure = struct_symm_prim
 
         dict_structure = self.symm_structure.as_dict()
+
+        self.lattice = dict_structure['lattice']['matrix']
 
         self.atom_labels = [i['label'] for i in dict_structure['sites']]
         self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
