@@ -57,47 +57,38 @@ def elements_dict():
               'Ds': 281, 'Rg': 281, 'Cn': 285, 'Nh': 284, 'Fl': 289, 'Mc': 289, 'Lv': 292, 'Ts': 294, 'Og': 294,
               'X': 0.0, 'Q': 0.0, 'R': 0.0, 'R1': 0.0, 'R2': 0.0, 'R3': 0.0, 'R4': 0.0, 'R5': 0.0, 'R6': 0.0}
 
-def angle_between(v1, v2):
-    """ Returns the angle in radians between vectors 'v1' and 'v2'"""
-    v1_u = v1/np.linalg.norm(v1)
-    v2_u = v2/np.linalg.norm(v2)
-    return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
+def unit_vector(x):
+    """Return a unit vector in the same direction as x."""
+    y = np.array(x, dtype='float')
+    return y / np.linalg.norm(y)
 
-def cos_angle(v1, v2, angle=False):
+def angle(v1, v2, unit='degree'):
     """
-    Calculates the cossine of the angle between two vectors v1 and v2.
+    Calculates the angle between two vectors v1 and v2.
     ----------
     v1 : array
         (N,1) matrix with N dimensions
     v2 : array
         (N,1) matrix with N dimensions
-    angle : boolean
-        True for output in radian angle of False for output in cossine form
+    unit : str
+        Unit of the output. Could be 'degree', 'radians' or 'cos'.
     Returns
     -------
     angle : float
-        Angle in radians if angle == True
-    cos : float
-        Cossine of the angle if angle == False
+        Angle in the selected unit. 
     """
-    unit_vector1 = v1 / np.linalg.norm(v1)
-    unit_vector2 = v2 / np.linalg.norm(v2)
+    unit_vector1 = unit_vector(v1)
+    unit_vector2 = unit_vector(v2)
 
     dot_product = np.dot(unit_vector1, unit_vector2)
 
-    if angle is not True:
-        return np.arccos(dot_product)  # angle in radian
-    else:
-        return dot_product  # cos of the angle
-    
-def angle(x, y):
-    """Return the angle between vectors a and b in degrees."""
-    return np.arccos(np.dot(x, y) / (np.linalg.norm(x) * np.linalg.norm(y))) * 180. / np.pi
-
-def unit_vector(x):
-    """Return a unit vector in the same direction as x."""
-    y = np.array(x, dtype='float')
-    return y / np.linalg.norm(y)
+    if unit == 'degree':
+        angle = np.arccos(dot_product) * 180. / np.pi
+    if unit == 'radians':
+        angle = np.arccos(dot_product)
+    if unit == 'cos':
+        angle = dot_product
+    return angle
 
 def rotation_matrix_from_vectors(vec1, vec2):
     '''
@@ -356,8 +347,7 @@ def get_reciprocal_vectors(cell):
     return b1, b2, b3
 
 def get_kgrid(cell, distance=0.3):
-    '''
-    Get the k-points grid in the reciprocal space with a given distance for a 
+    '''Get the k-points grid in the reciprocal space with a given distance for a 
     cell given in cell parameters of cell vectors.
     ----------
     cell : array

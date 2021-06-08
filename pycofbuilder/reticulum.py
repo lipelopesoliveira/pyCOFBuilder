@@ -19,13 +19,17 @@ class Reticulum():
 
     def __init__(self, bb_lib='bb_lib', verbosity=False):
 
+        _ROOT = os.path.abspath(os.path.dirname(__file__))
+
         self.verbosity = verbosity
         self.available_2D_topologies = ['HCB', 'HCB_A', 'SQL', 'SQL_A', 'KGM', 'HGM_A', 'HXL', 'HXL_A', 'KGD', 'KGD_A']
         self.available_3D_topologies = ['dia', 'bor', 'srs', 'pts', 'ctn', 'rra', 'fcc', 'lon', 'stp', 'acs', 'tbo', 'bcu', 'fjh', 'ceq']
         self.available_topologies = self.available_2D_topologies + self.available_3D_topologies
-        self.out_path = 'out'
+        
         self.lib_bb = bb_lib
-        self.lib_path = os.path.join('data', bb_lib)
+        self.main_path = os.path.join(_ROOT, 'data')
+        self.lib_path = os.path.join(self.main_path, bb_lib)
+        self.out_path = os.path.join(os.getcwd(), 'out')
         self.name = None
         self.topology = None
         self.dimention = None
@@ -1064,9 +1068,9 @@ class Reticulum():
         celldm1 = a*1.8897259886  # 1 angstrom = 1.8897259886 bohr
         celldm2 = b/a
         celldm3 = c/a
-        celldm4 = Tools.cos_angle(cell[0], cell[1])
-        celldm5 = Tools.cos_angle(cell[0], cell[2])
-        cellcm6 = Tools.cos_angle(cell[1], cell[2])
+        celldm4 = Tools.angle(cell[0], cell[1], unit='cos')
+        celldm5 = Tools.angle(cell[0], cell[2], unit='cos')
+        cellcm6 = Tools.angle(cell[1], cell[2], unit='cos')
 
         kx, ky, kz = Tools.get_kgrid(Tools.cellpar_to_cell(cell), k_dist)
 
@@ -1239,10 +1243,7 @@ class Reticulum():
 
         out_file.write('ATOMIC_SPECIES\n')
         for atom in set(self.atom_labels):
-            if atom == 'H':
-                out_file.write(f' {atom}   {Tools.elements_dict()[atom]:.4f}  {atom}.pbe-rrkjus_psl.1.0.0.UPF\n')
-            else:
-                out_file.write(f' {atom}   {Tools.elements_dict()[atom]:.4f}  {atom}.pbe-n-rrkjus_psl.1.0.0.UPF\n')
+            out_file.write(f' {atom}   {Tools.elements_dict()[atom]:.4f}  {atom}.PSEUDO.UPF\n')
         out_file.write('\n')
 
         if self.lattice_type == 'triclinic':

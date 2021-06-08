@@ -14,10 +14,12 @@ from scipy.spatial import distance
 class Building_Block():
 
     def __init__(self, name=None, lib='bb_lib', verbosity=False):
+        
+        _ROOT = os.path.abspath(os.path.dirname(__file__))
 
         self.name = name
         self.verbosity = verbosity
-        self.main_path = 'data'
+        self.main_path = os.path.join(_ROOT, 'data')
         self.lib_path = os.path.join(self.main_path, lib)
         self.connectivity = None
         self.simetry = None
@@ -80,6 +82,7 @@ class Building_Block():
         return np.transpose([cm_x, cm_y, cm_z])
 
     def get_X_points(self):
+        '''Get the X points in a molecule'''
 
         if 'X' in self.atom_labels:
             X_labels, X_pos = [], []
@@ -95,6 +98,7 @@ class Building_Block():
             return self.atom_labels, self.atom_pos
 
     def get_Q_points(self, atom_labels, atom_pos):
+        '''Get the Q points in a molecule'''
 
         Q_labels, Q_pos = [], []
 
@@ -161,8 +165,6 @@ class Building_Block():
                 label[i] = X
         return label, pos
 
-
-
     def closest_atom(self, label_1, pos_1, labels, pos):
 
         list_labels = []
@@ -218,6 +220,7 @@ class Building_Block():
                 self.atom_pos = np.dot(self.atom_pos, np.transpose(R_matrix))
 
     def print_structure(self):
+        '''Print the structurein the form: atom_label     pos_x    pos_y    pos_z'''
 
         for i in range(len(self.atom_labels)):
             print('{:<5s}{:>10.7f}{:>15.7f}{:>15.7f}'.format(self.atom_labels[i], self.atom_pos[i][0], self.atom_pos[i][1], self.atom_pos[i][2]))
@@ -251,7 +254,7 @@ class Building_Block():
 
             Rot_m = Tools.rotation_matrix_from_vectors(v2, v1)  # Find the rotation matrix that align v2 with v1
 
-            # Delet the "Q" atom position of the conector group and the structure
+            # Delete the "Q" atom position of the conector group and the structure
             n_conector_pos = np.delete(n_conector_pos, Tools.find_index(np.array([0., 0., 0.]), n_conector_pos), axis=0)
             
             self.atom_pos = np.delete(self.atom_pos, Tools.find_index(location_Q_struct[1][i], self.atom_pos), axis=0)

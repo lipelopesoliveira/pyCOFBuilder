@@ -193,106 +193,6 @@ def build_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, c
         for file_b in lista_oh_2:
             cofs_list += [f'{file_a}-{file_b}-SQL_A-{stacking}']
 
-    '''for file_b in lista_b_2:
-        try:
-            Ret = Reticulum(bb_lib=lib)
-            Ret.create_hcb_a_structure('BDBA_1', file_b, stack=stacking, bond_atom='B')
-            if cif is True:
-                Ret.save_cif()
-            if xyz is True:
-                if stacking == 'AA':
-                    Ret.save_xyz(supercell=[1, 1, 2])
-                else:
-                    Ret.save_xyz()
-            if qe is True:
-                Ret.save_qe()
-            if turbomole is True:
-                Ret.save_turbomole()
-            if vasp is True:
-                Ret.save_vasp()
-            sucess_list += [f'BDBA_1_{file_b}']
-        except Exception:
-            failed_list += [f'BDBA_1_{file_b}']
-
-    Ret = Reticulum(bb_lib=lib)
-    Ret.create_hcb_a_structure('BDBA_1', 'BDBA_2', stack='AB1', bond_atom='B')
-    if cif is True:
-        Ret.save_cif()
-    if xyz is True:
-        Ret.save_xyz(supercell=[1, 1, 2])
-    if qe is True:
-        Ret.save_qe()
-    if turbomole is True:
-        Ret.save_turbomole()
-    if vasp is True:
-        Ret.save_vasp()
-
-    for file_a in lista_b_4:
-        for file_b in lista_oh_2:
-            try:
-                Ret = Reticulum(bb_lib=lib)
-                Ret.create_sql_a_structure(file_a, file_b, stack=stacking, bond_atom='B')
-                if cif is True:
-                    Ret.save_cif()
-                if xyz is True:
-                    if stacking == 'AA':
-                        Ret.save_xyz(supercell=[1, 1, 2])
-                    else:
-                        Ret.save_xyz()
-                if qe is True:
-                    Ret.save_qe()
-                if turbomole is True:
-                    Ret.save_turbomole()
-                if vasp is True:
-                    Ret.save_vasp()
-                sucess_list += [f'{file_a}_{file_b}']
-            except Exception:
-                failed_list += [f'{file_a}_{file_b}']
-
-    for file_a in lista_oh_3:
-        for file_b in lista_b_2:
-            try:
-                Ret = Reticulum(bb_lib=lib)
-                Ret.create_hcb_a_structure(file_a, file_b, stack=stacking, bond_atom='B')
-                if cif is True:
-                    Ret.save_cif()
-                if xyz is True:
-                    if stacking == 'AA':
-                        Ret.save_xyz(supercell=[1, 1, 2])
-                    else:
-                        Ret.save_xyz()
-                if qe is True:
-                    Ret.save_qe()
-                if turbomole is True:
-                    Ret.save_turbomole()
-                if vasp is True:
-                    Ret.save_vasp()
-                sucess_list += [f'{file_a}_{file_b}']
-            except Exception:
-                failed_list += [f'{file_a}_{file_b}']
-
-    for file_a in lista_b_3:
-        for file_b in lista_oh_2:
-            try:
-                Ret = Reticulum(bb_lib=lib)
-                Ret.create_hcb_a_structure(file_a, file_b, stack=stacking, bond_atom='B')
-                if cif is True:
-                    Ret.save_cif()
-                if xyz is True:
-                    if stacking == 'AA':
-                        Ret.save_xyz(supercell=[1, 1, 2])
-                    else:
-                        Ret.save_xyz()
-                if qe is True:
-                    Ret.save_qe()
-                if turbomole is True:
-                    Ret.save_turbomole()
-                if vasp is True:
-                    Ret.save_vasp()
-                sucess_list += [f'{file_a}_{file_b}']
-            except Exception:
-                failed_list += [f'{file_a}_{file_b}']'''
-
     val = input(
         f'{len(cofs_list)} COFs will be created. Do you want o proceed? Type [y] to continue.\n')
 
@@ -320,6 +220,31 @@ def build_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, c
 
 
 def creat_all_C2(nucleos=None, radicais=None, conectores=None):
+    '''Creates a set of C2 symmetry building block based on your choice of a nucleo, a radical group, and a type of connector group. 
+
+    Be warned that the building blocks created only had a radical group in position R1. 
+
+    The creation of blocks with more than one group or in specific positions must be done manually.
+
+    For exemple, the code below will create a `C2` building block based on a `Antracene` core with a `NH2` connection group and a `OH` group in the position `R2`:
+
+    >>> BB = Building_Block()
+
+    >>> BB.create_C4_BB('ANTR', 'NH2', *['H', 'OH'])
+
+    ----------
+    nucleos : list
+        List containing the desired cores for the creation of blocks. 
+        Ex.: ['2BPD', '3BPD', 'ANTR', 'BBTZ', 'BENZ', 'BPNY', 'BPYB', 'BTPH',
+              'DBTP', 'DHPI', 'DHSI', 'DPBY', 'DPDA', 'DPEL', 'DPEY', 'HDZ, 
+              'NAPT', 'PYRN', 'TPNY', 'TTPH']
+    conectores : list
+        List containing the connector groups desired for the creation of blocks. 
+        Ex.: ['NH2', 'CHO', 'B(OH)2', '(OH)2', 'Cl', 'Br', 'NHNH2']
+    radicais : list
+        List containing the desired radical groups for the creation of blocks. 
+        Ex.: ['CH3', 'CHO', 'CN', 'COOH', 'F', 'H', 'NC2H', 'NH2', 'NO2', 'O', 'OEt', 'OH', 'OMe', 'SO2H', 'tBut']
+    '''
 
     if nucleos == None:
         nucleos = [i.rstrip('.gjf') for i in os.listdir(
@@ -331,9 +256,6 @@ def creat_all_C2(nucleos=None, radicais=None, conectores=None):
         conectores = [i.rstrip('.gjf') for i in os.listdir(
             os.path.join('data', 'conector'))]
 
-    #nucleos = ['BENZ', 'NAPT', 'BPNY', 'ANTR', 'TPNY', 'DPBY', 'PYRN', 'BPYB', 'DPEY']
-    #radicais = ['H']
-    #conectores = ['NH2']
     for n in nucleos:
         for c in conectores:
             for r in radicais:
@@ -344,7 +266,29 @@ def creat_all_C2(nucleos=None, radicais=None, conectores=None):
 
 
 def creat_all_C3(nucleos=None, radicais=None, conectores=None):
+    '''Creates a set of C3 symmetry building block based on your choice of a nucleo, a radical group, and a type of connector group. 
 
+    Be warned that the building blocks created only had a radical group in position R1. 
+
+    The creation of blocks with more than one group or in specific positions must be done manually.
+
+    For exemple, the code below will create a `C4` building block based on a `Triphenilene` core with a `NH2` connection group and a `OH` group in the position `R2`:
+
+    >>> BB = Building_Block()
+
+    >>> BB.create_C4_BB('TPNY', 'NH2', *['H', 'OH'])
+
+    ----------
+    nucleos : list
+        List containing the desired cores for the creation of blocks. 
+        Ex.: ['BENZ', 'DICZ', 'TPAM', 'TPBZ', 'TPNY', 'TPOB', 'TPTA', 'TPTZ']
+    conectores : list
+        List containing the connector groups desired for the creation of blocks. 
+        Ex.: ['NH2', 'CHO', 'B(OH)2', '(OH)2', 'Cl', 'Br', 'NHNH2']
+    radicais : list
+        List containing the desired radical groups for the creation of blocks.
+        Ex.: ['CH3', 'CHO', 'CN', 'COOH', 'F', 'H', 'NC2H', 'NH2', 'NO2', 'O', 'OEt', 'OH', 'OMe', 'SO2H', 'tBut']
+    '''
     if nucleos == None:
         nucleos = [i.rstrip('.gjf') for i in os.listdir(
             os.path.join('data', 'nucleo', 'C3'))]
@@ -355,9 +299,6 @@ def creat_all_C3(nucleos=None, radicais=None, conectores=None):
         conectores = [i.rstrip('.gjf') for i in os.listdir(
             os.path.join('data', 'conector'))]
 
-    #nucleos = ['BENZ', 'TPBZ', 'TPOB', 'DICZ']
-    #radicais = ['H']
-    #conectores = ['NH2', 'CHO']
     for n in nucleos:
         for c in conectores:
             for r in radicais:
@@ -367,7 +308,30 @@ def creat_all_C3(nucleos=None, radicais=None, conectores=None):
                 BB.save()
 
 
-def creat_all_C4(nucleos=None, radicais=None, conectores=None):
+def creat_all_C4(nucleos=None, conectores=None, radicais=None):
+    '''Creates a set of C4 symmetry building block based on your choice of a core, a radical group, and a type of connector group. 
+
+    Be warned that the building blocks created only had a radical group in position R1. 
+
+    The creation of blocks with more than one group or in specific positions must be done manually.
+
+    For exemple, the code below will create a `C4` building block based on a `Porphirin` core with a `NH2` connection group and a `OH` group in the position `R2`:
+
+    >>> BB = Building_Block()
+
+    >>> BB.create_C4_BB('PORP', 'NH2', *['H', 'OH', 'H'])
+
+    ----------
+    nucleos : list
+        List containing the desired cores for the creation of blocks. 
+        Ex.: ['BENZ', 'PHPR', 'PORP', 'PYRN']
+    conectores : list
+        List containing the connector groups desired for the creation of blocks. 
+        Ex.: ['NH2', 'CHO', 'B(OH)2', '(OH)2', 'Cl', 'Br', 'NHNH2']
+    radicais : list
+        List containing the desired radical groups for the creation of blocks. 
+        Ex.: ['CH3', 'CHO', 'CN', 'COOH', 'F', 'H', 'NC2H', 'NH2', 'NO2', 'O', 'OEt', 'OH', 'OMe', 'SO2H', 'tBut']
+    '''
 
     if nucleos == None:
         nucleos = [i.rstrip('.gjf') for i in os.listdir(
@@ -379,8 +343,6 @@ def creat_all_C4(nucleos=None, radicais=None, conectores=None):
         conectores = [i.rstrip('.gjf') for i in os.listdir(
             os.path.join('data', 'conector'))]
 
-    radicais = ['H']
-    conectores = ['CHO']
     for n in nucleos:
         for c in conectores:
             for r in radicais:

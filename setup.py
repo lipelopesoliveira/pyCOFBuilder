@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from setuptools import setup, find_packages
+from setuptools import setup
 
-
-with open('README.rst') as f:
-    readme = f.read()
 
 with open('LICENSE') as f:
     license = f.read()
@@ -17,13 +14,17 @@ setup(
     name='pyCOFBuilder',
     version=VERSION,
     description=DESCRIPTION,
-    long_description=readme,
+    long_description=open('README.md').read(),
     author='Felipe Lopes Oliveira',
     author_email='felipe.lopes@nano.ufrj.br',
-    url='https://github.com/kennethreitz/samplemod',
+    url='https://github.com/lipelopesoliveira/pyCOFBuilder',
     license=license,
     package_dir={'':'pycofbuilder'},
     install_requires=['os', 'numpy', 'scipy', 'pymatgen'], 
-    #packages=find_packages(exclude=('tests', 'docs', 'data'))
+    classifiers=[
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6',
+    ],
 )
 

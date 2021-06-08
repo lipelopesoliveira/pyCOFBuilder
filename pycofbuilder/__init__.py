@@ -1,3 +1,4 @@
+import os
 import pycofbuilder.tools as Tools
 from pycofbuilder.building_block import Building_Block
 from pycofbuilder.reticulum import Reticulum
