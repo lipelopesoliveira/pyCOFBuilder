@@ -25,10 +25,9 @@ class Reticulum():
         self.available_2D_topologies = ['HCB', 'HCB_A', 'SQL', 'SQL_A', 'KGM', 'HGM_A', 'HXL', 'HXL_A', 'KGD', 'KGD_A']
         self.available_3D_topologies = ['dia', 'bor', 'srs', 'pts', 'ctn', 'rra', 'fcc', 'lon', 'stp', 'acs', 'tbo', 'bcu', 'fjh', 'ceq']
         self.available_topologies = self.available_2D_topologies + self.available_3D_topologies
-        
         self.lib_bb = bb_lib
         self.main_path = os.path.join(_ROOT, 'data')
-        self.lib_path = os.path.join(self.main_path, bb_lib)
+        self.lib_path = os.path.join(self.main_path, self.bb_lib)
         self.out_path = os.path.join(os.getcwd(), 'out')
         self.name = None
         self.topology = None

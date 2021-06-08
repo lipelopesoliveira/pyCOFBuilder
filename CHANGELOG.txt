@@ -1,1 +1,3 @@
-include LICENSE
+v0.0.1
+------
+* pyCOFBuilder alpha release

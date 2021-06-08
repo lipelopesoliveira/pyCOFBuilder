@@ -353,16 +353,15 @@ def creat_all_C4(nucleos=None, conectores=None, radicais=None):
                 BB.save()
 
 
-def clean_bb_list():
+def clean_bb_dir():
     # Loop Through all files and deleting them one by one
-    
     ROOT = os.path.abspath(os.path.dirname(__file__))
     for file in glob.glob(os.path.join(ROOT, 'data', 'bb_lib', '*')):
         os.remove(file)
         print(f'Deleted {file}')
 
 
-def clean_cof_out():
+def clean_cof_outdir():
     # Loop Through all files and deleting them one by one
     for file in glob.glob(os.path.join(os.getcwd(), 'out', '*')):
         os.remove(file)

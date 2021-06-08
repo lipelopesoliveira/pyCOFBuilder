@@ -114,7 +114,7 @@ for the complete explanation of implementation and functionalities.
 
 If you find **pyCOFBuilder** useful in your research please consider citing the paper:
 
-F. L. Oliveira and P. M. Esteves,
-*pyCOFBuilder: A Python Module for Automated Assembly of Covalent Organic Frameworks*
-
-*Manuscript in preparation.* [DOI](https://doi.org/)
+> F. L. Oliveira and P. M. Esteves,
+> *pyCOFBuilder: A Python Module for Automated Assembly of Covalent Organic Frameworks*
+> 
+> *Manuscript in preparation.* [DOI](https://doi.org/)
