@@ -421,6 +421,8 @@ def find_bond_atom(cof_name):
 
     if 'NH2' in [conect_1, conect_2]:
         return 'N'
+    if 'CONHNH2' in [conect_1, conect_2]:
+        return 'N'
     if 'B(OH)2' in [conect_1, conect_2]:
         return 'B'
     if 'Cl' in [conect_1, conect_2]:
@@ -665,7 +667,3 @@ def save_cif(file_path, file_name, cell, atom_labels, atom_pos, partial_charges=
             cif_file.write(f'{atom_labels[i]}    {atom_labels[i]}    {u:<.9f}    {v:<.9f}    {w:<.9f}\n')
 
     cif_file.close()
-    
-
-if __name__ == '__main__':
-    main()

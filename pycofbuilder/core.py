@@ -8,6 +8,8 @@ import pycofbuilder.tools as Tools
 from pycofbuilder.reticulum import Reticulum
 from pycofbuilder.building_block import Building_Block
 
+_ROOT = os.path.abspath(os.path.dirname(__file__))
+
 
 def build(cof_name=None, save_format=['cif'], lib='bb_lib', print_result=True):
     '''Create a COF with a given name'''
@@ -183,7 +185,7 @@ def build_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, c
 
     for file_a in lista_oh_3:
         for file_b in lista_b_2:
-            cofs_list += [f'{file_a}-{file_b}-HCB-{stacking}']
+            cofs_list += [f'{file_a}-{file_b}-HCB_A-{stacking}']
 
     for file_a in lista_oh_4:
         for file_b in lista_b_2:
@@ -209,7 +211,7 @@ def build_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, c
         for s in sucess_list:
             Tools.print_result(*s)
 
-        print(f'{len(sucess_list)} sucessful. {len(failed_list)} failled ({100*len(sucess_list)/(len(failed_list) + len(sucess_list))} % success rate)')
+        print(f'{len(sucess_list)} sucessful. {len(failed_list)} failled ({100*len(sucess_list)/(len(failed_list) + len(sucess_list)):.2f} % success rate)')
         print(f'Enlapsed time: {time.time() - t_i:.3f} s \n')
         if len(failed_list) > 0:
             print('Failed list:')
@@ -248,13 +250,13 @@ def creat_all_C2(nucleos=None, radicais=None, conectores=None):
 
     if nucleos == None:
         nucleos = [i.rstrip('.gjf') for i in os.listdir(
-            os.path.join('data', 'nucleo', 'C2'))]
+            os.path.join(_ROOT, 'data', 'nucleo', 'C2'))]
     if radicais == None:
-        radicais = [i.rstrip('.gjf')
-                    for i in os.listdir(os.path.join('data', 'radical'))]
+        radicais = [i.rstrip('.gjf') for i in os.listdir(
+            os.path.join(_ROOT, 'data', 'radical'))]
     if conectores == None:
         conectores = [i.rstrip('.gjf') for i in os.listdir(
-            os.path.join('data', 'conector'))]
+            os.path.join(_ROOT, 'data', 'conector'))]
 
     for n in nucleos:
         for c in conectores:
@@ -291,13 +293,13 @@ def creat_all_C3(nucleos=None, radicais=None, conectores=None):
     '''
     if nucleos == None:
         nucleos = [i.rstrip('.gjf') for i in os.listdir(
-            os.path.join('data', 'nucleo', 'C3'))]
+            os.path.join(_ROOT, 'data', 'nucleo', 'C3'))]
     if radicais == None:
-        radicais = [i.rstrip('.gjf')
-                    for i in os.listdir(os.path.join('data', 'radical'))]
+        radicais = [i.rstrip('.gjf') for i in os.listdir(
+            os.path.join(_ROOT, 'data', 'radical'))]
     if conectores == None:
         conectores = [i.rstrip('.gjf') for i in os.listdir(
-            os.path.join('data', 'conector'))]
+            os.path.join(_ROOT, 'data', 'conector'))]
 
     for n in nucleos:
         for c in conectores:
@@ -335,13 +337,13 @@ def creat_all_C4(nucleos=None, conectores=None, radicais=None):
 
     if nucleos == None:
         nucleos = [i.rstrip('.gjf') for i in os.listdir(
-            os.path.join('data', 'nucleo', 'C4'))]
+            os.path.join(_ROOT, 'data', 'nucleo', 'C4'))]
     if radicais == None:
-        radicais = [i.rstrip('.gjf')
-                    for i in os.listdir(os.path.join('data', 'radical'))]
+        radicais = [i.rstrip('.gjf') for i in os.listdir(
+            os.path.join(_ROOT, 'data', 'radical'))]
     if conectores == None:
         conectores = [i.rstrip('.gjf') for i in os.listdir(
-            os.path.join('data', 'conector'))]
+            os.path.join(_ROOT, 'data', 'conector'))]
 
     for n in nucleos:
         for c in conectores:
@@ -355,8 +357,7 @@ def creat_all_C4(nucleos=None, conectores=None, radicais=None):
 
 def clean_bb_dir():
     # Loop Through all files and deleting them one by one
-    ROOT = os.path.abspath(os.path.dirname(__file__))
-    for file in glob.glob(os.path.join(ROOT, 'data', 'bb_lib', '*')):
+    for file in glob.glob(os.path.join(_ROOT, 'data', 'bb_lib', '*')):
         os.remove(file)
         print(f'Deleted {file}')
 
@@ -366,3 +367,11 @@ def clean_cof_outdir():
     for file in glob.glob(os.path.join(os.getcwd(), 'out', '*')):
         os.remove(file)
         print(f'Deleted {file}')
+
+def clean():
+    val = input(
+        f'This action will delete all building blocks and COFs created, do you want to proceed? Type [y] to continue.\n')
+
+    if val == 'y':
+        clean_bb_dir()
+        clean_cof_outdir()

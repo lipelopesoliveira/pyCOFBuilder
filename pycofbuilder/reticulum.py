@@ -493,6 +493,8 @@ class Reticulum():
 
         dict_structure = self.symm_structure.as_dict()
 
+        self.lattice = dict_structure['lattice']['matrix']
+
         self.atom_labels = [i['label'] for i in dict_structure['sites']]
         self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
         self.n_atoms = len(self.symm_structure)
@@ -699,6 +701,8 @@ class Reticulum():
             self.symm_structure = struct_symm_prim
 
         dict_structure = self.symm_structure.as_dict()
+
+        self.lattice = dict_structure['lattice']['matrix']
 
         self.atom_labels = [i['label'] for i in dict_structure['sites']]
         self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
@@ -922,6 +926,8 @@ class Reticulum():
             self.symm_structure = struct_symm_prim
 
         dict_structure = self.symm_structure.as_dict()
+
+        self.lattice = dict_structure['lattice']['matrix']
 
         self.atom_labels = [i['label'] for i in dict_structure['sites']]
         self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
