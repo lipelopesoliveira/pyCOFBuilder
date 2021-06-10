@@ -221,10 +221,10 @@ def build_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, c
         print('Exiting...')
 
 
-def creat_all_C2(nucleos=None, radicais=None, conectores=None):
+def create_all_C2(nucleos=None, radicais=None, conectores=None):
     '''Creates a set of C2 symmetry building block based on your choice of a nucleo, a radical group, and a type of connector group. 
 
-    Be warned that the building blocks created only had a radical group in position R1. 
+    Be warned that the building blocks created only had one radical group at the position R1.  
 
     The creation of blocks with more than one group or in specific positions must be done manually.
 
@@ -267,10 +267,10 @@ def creat_all_C2(nucleos=None, radicais=None, conectores=None):
                 BB.save()
 
 
-def creat_all_C3(nucleos=None, radicais=None, conectores=None):
+def create_all_C3(nucleos=None, radicais=None, conectores=None):
     '''Creates a set of C3 symmetry building block based on your choice of a nucleo, a radical group, and a type of connector group. 
 
-    Be warned that the building blocks created only had a radical group in position R1. 
+    Be warned that the building blocks created only had one radical group at the position R1. 
 
     The creation of blocks with more than one group or in specific positions must be done manually.
 
@@ -310,10 +310,10 @@ def creat_all_C3(nucleos=None, radicais=None, conectores=None):
                 BB.save()
 
 
-def creat_all_C4(nucleos=None, conectores=None, radicais=None):
+def create_all_C4(nucleos=None, conectores=None, radicais=None):
     '''Creates a set of C4 symmetry building block based on your choice of a core, a radical group, and a type of connector group. 
 
-    Be warned that the building blocks created only had a radical group in position R1. 
+    Be warned that the building blocks created only had one radical group at the position R1. 
 
     The creation of blocks with more than one group or in specific positions must be done manually.
 
@@ -354,7 +354,6 @@ def creat_all_C4(nucleos=None, conectores=None, radicais=None):
                 print(BB.name, 'created')
                 BB.save()
 
-
 def clean_bb_dir():
     # Loop Through all files and deleting them one by one
     for file in glob.glob(os.path.join(_ROOT, 'data', 'bb_lib', '*')):
@@ -362,16 +361,16 @@ def clean_bb_dir():
         print(f'Deleted {file}')
 
 
-def clean_cof_outdir():
+def clean_out_dir():
     # Loop Through all files and deleting them one by one
     for file in glob.glob(os.path.join(os.getcwd(), 'out', '*')):
         os.remove(file)
         print(f'Deleted {file}')
 
 def clean():
+    '''Clean both the building block dir and the out dir'''
     val = input(
         f'This action will delete all building blocks and COFs created, do you want to proceed? Type [y] to continue.\n')
-
     if val == 'y':
         clean_bb_dir()
         clean_cof_outdir()

@@ -8,6 +8,7 @@ Created on Thu Dec 17 11:31:19 2020
 import os
 import numpy as np
 import math
+from scipy.spatial import distance
 try:
     from pymatgen.io.cif import CifParser
 except Exception:
@@ -415,6 +416,7 @@ def change_X_atoms(atom_labels, atom_pos, bond_atom):
     return label, pos 
 
 def find_bond_atom(cof_name):
+    '''Finds the type of atom that the program heve to substitute X based on the building blocks'''
     bb1, bb2, net, stacking = cof_name.split('-')
     conect_1 = bb1.split('_')[2]
     conect_2 = bb2.split('_')[2]
@@ -429,6 +431,32 @@ def find_bond_atom(cof_name):
         return 'R'
     if 'Br' in [conect_1, conect_2]:
         return 'R'
+
+def closest_atom(label_1, pos_1, labels, pos):
+
+    list_labels = []
+    list_pos = []
+
+    for i in range(len(labels)):
+        if labels[i] != label_1:
+            list_labels += [labels[i]]
+            list_pos += [pos[i]]
+
+    closest_index = distance.cdist([pos_1], list_pos).argmin()
+
+    return list_labels[closest_index], list_pos[closest_index], np.linalg.norm(pos_1 - list_pos[closest_index])
+
+def closest_atom_struc(label_1, pos_1, labels, pos):
+    list_labels = []
+    list_pos = []
+    for i in range(len(labels)):
+        if labels[i] != label_1:
+            if 'C' in labels[i]:
+                list_labels += [labels[i]]
+                list_pos += [pos[i]]
+    closest_index = distance.cdist([pos_1], list_pos).argmin()
+
+    return list_labels[closest_index], list_pos[closest_index], np.linalg.norm(pos_1-list_pos[closest_index])
 
 def print_result(name, lattice, hall, space_group, space_number, symm_op):
     '''Print the results of the created structure'''

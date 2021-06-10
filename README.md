@@ -19,13 +19,15 @@ pip install pycofbuilder
 ### Requirements
 0. Python >= 3.7
 1. pymatgen >= 2022.0.0
+2. numpy
+3. scipy
 
 
 The Python dependencies are most easily satisfied using a conda
 ([anaconda](https://www.anaconda.com/distribution)/[miniconda](https://docs.conda.io/en/latest/miniconda.html))
 installation by running
 
-## Usage
+## Basic Usage
 
 To create a specific COF, like `C3_BENZ_CHO_OH-C2_HDZ_NH2-HCB_A-AA`:
 ```python
@@ -106,8 +108,14 @@ for the complete explanation of implementation and functionalities.
 
 ## COFs and Building Blocks nomenclature
 
+In order to ensure greater reproducibility as well as quickly and easily access to relevant information from the COFs, I've developed a simple nomenclature to name the structure. Generally speaking, a COF can be described as `Building_Block_1`-`Building_Block_2`-`Net`-`Stacking`, where:
 
+ - `Building_Block_1`: The building block with the greater connectivity.
+ - `Building_Block_2`: The building block with the smaller connectivity.
+ - `Net`: The net describing the reticular structure.
+ - `Stacking`: The stacking (for 2D structures) or interpenetrating degree (for 3D structures) 
 
+To name the building blocks I also developed a set of rules. The building block can be described as `Simmetry`_`Core`_`Conector`_`RadicalGroupR1`_`RadicalGroupR1`_...
 
 
 ## Citation

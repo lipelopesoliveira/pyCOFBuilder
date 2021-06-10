@@ -727,7 +727,7 @@ class Reticulum():
 
     def create_sql_a_structure(self, name_a, name_b, stack='AA', bond_atom='N', c_cell=3.6, print_result=True):
 
-        self.topology = 'sql-a'
+        self.topology = 'SQL_A'
         self.dimension = 2
 
         bb_1 = Building_Block(name_a, self.lib_bb, verbosity=self.verbosity)

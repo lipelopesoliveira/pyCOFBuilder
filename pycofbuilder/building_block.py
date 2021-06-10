@@ -9,8 +9,6 @@ import os
 import numpy as np
 import pycofbuilder.tools as Tools
 
-from scipy.spatial import distance
-
 class Building_Block():
 
     def __init__(self, name=None, lib='bb_lib', verbosity=False):
@@ -37,8 +35,7 @@ class Building_Block():
             self.get_BB()
 
     def get_BB(self):
-
-        
+        '''Automatically read or creats a buiding block based on its name'''
         simm_check, nucleo_check, conector_check, radicals_check = self.check_existence()
 
         if simm_check and nucleo_check and conector_check and radicals_check:
@@ -165,32 +162,6 @@ class Building_Block():
                 label[i] = X
         return label, pos
 
-    def closest_atom(self, label_1, pos_1, labels, pos):
-
-        list_labels = []
-        list_pos = []
-
-        for i in range(len(labels)):
-            if labels[i] != label_1:
-                list_labels += [labels[i]]
-                list_pos += [pos[i]]
-
-        closest_index = distance.cdist([pos_1], list_pos).argmin()
-
-        return list_labels[closest_index], list_pos[closest_index], np.linalg.norm(pos_1 - list_pos[closest_index])
-
-    def closest_atom_struc(self, label_1, pos_1, labels, pos):
-        list_labels = []
-        list_pos = []
-        for i in range(len(labels)):
-            if labels[i] != label_1:
-                if 'C' in labels[i]:
-                    list_labels += [labels[i]]
-                    list_pos += [pos[i]]
-        closest_index = distance.cdist([pos_1], list_pos).argmin()
-
-        return list_labels[closest_index], list_pos[closest_index], np.linalg.norm(pos_1-list_pos[closest_index])
-
     def calculate_size(self):
         X_labels, X_pos = self.get_X_points()
         self.size = [np.linalg.norm(i) for i in X_pos]
@@ -238,7 +209,7 @@ class Building_Block():
 
             try:
                 # Get the position of the closest atom to Q in the structure
-                close_Q_struct = self.closest_atom('Q', location_Q_struct[1][i], self.atom_labels, self.atom_pos)[1]
+                close_Q_struct = Tools.closest_atom('Q', location_Q_struct[1][i], self.atom_labels, self.atom_pos)[1]
             except Exception:
                 # Set the closest position to origin, for building blocks as HDZ that only has two atoms
                 close_Q_struct = [0, 0, 0]
@@ -247,7 +218,7 @@ class Building_Block():
             location_Q_connector = self.get_Q_points(n_conector_label, n_conector_pos)  
 
             # Get the position of the closest atom to Q in the conection group
-            close_Q_connector = self.closest_atom('Q', location_Q_connector[1][0], n_conector_label, n_conector_pos)[1]
+            close_Q_connector = Tools.closest_atom('Q', location_Q_connector[1][0], n_conector_label, n_conector_pos)[1]
 
             v1 = close_Q_struct - location_Q_struct[1][i]  # Create the vector Q in the structure
             v2 = np.array(close_Q_connector) - np.array(location_Q_connector[1][0])  # Create the vector Q in the conector
@@ -283,10 +254,10 @@ class Building_Block():
             n_group_pos = group_pos.copy()
 
             # Pega a posição do átomo mais próximo ao R na estrutrua
-            close_R_struct = self.closest_atom_struc(R_type, location_R_struct[i], self.atom_labels, self.atom_pos)[1]
+            close_R_struct = Tools.closest_atom_struc(R_type, location_R_struct[i], self.atom_labels, self.atom_pos)[1]
 
             pos_R_group = self.get_R_points(n_group_label, n_group_pos)['R']  # Pega a posição de Q no grupo radical
-            close_R_group = self.closest_atom('R', pos_R_group[0], n_group_label, n_group_pos)[1]  # Pega a posição do átomo mais próximo a Q no grupo radical
+            close_R_group = Tools.closest_atom('R', pos_R_group[0], n_group_label, n_group_pos)[1]  # Pega a posição do átomo mais próximo a Q no grupo radical
 
             v1 = close_R_struct - location_R_struct[i]  # Cria o vetor R na estrutura
             v2 = np.array(close_R_group) - np.array(pos_R_group[0])  # Cria o vetor R do grupo
