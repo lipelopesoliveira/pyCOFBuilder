@@ -18,8 +18,8 @@ pip install pycofbuilder
 ### Requirements
 0. Python >= 3.7
 1. pymatgen >= 2022.0.0
-2. numpy
-3. scipy
+2. numpy >= 1.2
+3. scipy >= 1.6.3
 
 
 The Python dependencies are most easily satisfied using a conda

@@ -291,7 +291,7 @@ class Reticulum():
 
         self.name = f'{bb_triangular.name}-{bb_linear.name}-HCB_A-{stack}'
 
-        Tools.print_comand(f'Starting the creation of {self.name}', self.verbosity, 'high')
+        Tools.print_comand(f'Starting the creation of {self.name}', self.verbosity, ['debug', 'high'])
 
         if bb_triangular.connectivity != 3:
             print('Building block A must present connectivity 3 insted of', bb_triangular.connectivity)
@@ -304,13 +304,12 @@ class Reticulum():
         size_a = bb_triangular.size
         size_b = bb_linear.size
 
-        Tools.print_comand(f'BB_A size: {size_a}', self.verbosity, 'debug')
-        Tools.print_comand(f'BB_B size: {size_b}', self.verbosity, 'debug')
+        Tools.print_comand(f'BB_A size: {size_a}', self.verbosity, ['debug'])
+        Tools.print_comand(f'BB_B size: {size_b}', self.verbosity, ['debug'])
 
         a = 2*np.cos(np.radians(30))*2*(size_a[0] + size_b[0])
 
-        if self.verbosity:
-            print('Calculated cell parameter a:', a)
+        Tools.print_comand(f'Calculated cell parameter a: {a}', self.verbosity, ['debug'])
 
         # Mede o valor do delta c dos blocos de construção
         delta_a = abs(max(np.transpose(bb_triangular.atom_pos)[2])) + abs(min(np.transpose(bb_triangular.atom_pos)[2]))
@@ -497,8 +496,7 @@ class Reticulum():
         self.n_atoms = len(self.symm_structure)
         self.composition = self.symm_structure.formula
 
-        if self.verbosity is True:
-            print(self.symm_structure)
+        Tools.print_comand(self.symm_structure, self.verbosity, ['debug'])
 
         # Get the simmetry information of the generated structure
         self.lattice_type = symm.get_lattice_type()
