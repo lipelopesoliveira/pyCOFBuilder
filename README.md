@@ -116,12 +116,13 @@ In order to ensure greater reproducibility as well as quickly and easily access 
 
 To name the building blocks I also developed a set of rules. The building block can be described as `Simmetry`\_`Core`\_`Conector`\_`RadicalGroupR1`\_`RadicalGroupR1`\_... where:
 
- - `Simmetry`: The general simmetry of the building block. For 2D building blocks can be `C2`, `C3` or `C4`, and for 3D building blocks can be `D4`. 
+ - `Simmetry`: The general simmetry of the building block. Also represets the connectvity of the building block. For 2D building blocks can be `C2`, `C3` or `C4`, and for 3D building blocks can be `D4`. 
  - `Core`: The 4 letters code refering to the building block core. 
  - `Conector`: The type of functional group that will be used to assembly the COF structure. Ex.: `NH2`, `CHO`, `CONHNH2`, etc. 
  - `RadicalGroupRN`: The Nth radical group in the structure. The number of Radical groups will change acording to the avaliability of the core.   
 
-Note that every "card" for the building block name is separated by a underline (\_) and every "card" for the COF name is separated by a dash (-). This makes easy to split tha name into usefull information from the COF name.  
+Note that every "card" for the building block name is separated by a underline (\_) and every "card" for the COF name is separated by a dash (-). This makes easy to split the COF name into usefull information.  
+
 ## Citation
 
 If you find **pyCOFBuilder** useful in your research please consider citing the following papers:
