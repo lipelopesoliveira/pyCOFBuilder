@@ -10,7 +10,7 @@ Learn more at [ToNano&Beyond](https://tonanoandbeyondblog.wordpress.com/)
 ## Installation
 
 For detailed instructions see the [installation instructions](https://tonanoandbeyondblog.wordpress.com/).
-If the requirements are already satisfied
+If the requirements are already satisfied [WILL BE UPDATED!!!!]
 ```
 pip install pycofbuilder
 ```
