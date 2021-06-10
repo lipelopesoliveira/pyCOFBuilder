@@ -462,6 +462,10 @@ def print_result(name, lattice, hall, space_group, space_number, symm_op):
     '''Print the results of the created structure'''
     print('{:<60s} {:^12s} {:<4s} {:^4s} #{:^5s}   {:^2} sym. op.'.format(name, lattice, hall.lstrip('-'), space_group, space_number, symm_op))
 
+def print_comand(text, verbose, match):
+    if verbose in match:
+        print(text)
+
 ############# Reads and save files #####################
 
 def read_xyz_file(path, file_name):

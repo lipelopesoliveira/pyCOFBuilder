@@ -68,7 +68,6 @@ class Reticulum():
         self.dimension = 2
 
         bb_1 = Building_Block(name_a, self.lib_bb)
-
         bb_2 = Building_Block(name_b, self.lib_bb)
 
         self.name = f'{bb_1.name}-{bb_2.name}-HCB-{stack}'
@@ -292,8 +291,7 @@ class Reticulum():
 
         self.name = f'{bb_triangular.name}-{bb_linear.name}-HCB_A-{stack}'
 
-        if self.verbosity is True:
-            print('Starting the creation of a hcb_a net...')
+        Tools.print_comand(f'Starting the creation of {self.name}', self.verbosity, 'high')
 
         if bb_triangular.connectivity != 3:
             print('Building block A must present connectivity 3 insted of', bb_triangular.connectivity)
@@ -304,11 +302,10 @@ class Reticulum():
 
         # Calcula o parâmetro de célula com base no tamanho dos blocos de construção
         size_a = bb_triangular.size
-        if self.verbosity:
-            print('BB_A size:', size_a)
         size_b = bb_linear.size
-        if self.verbosity:
-            print('BB_B size:', size_b)
+
+        Tools.print_comand(f'BB_A size: {size_a}', self.verbosity, 'debug')
+        Tools.print_comand(f'BB_B size: {size_b}', self.verbosity, 'debug')
 
         a = 2*np.cos(np.radians(30))*2*(size_a[0] + size_b[0])
 
