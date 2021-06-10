@@ -1,4 +1,4 @@
-pyCOFBuilder
+# pyCOFBuilder
 ========================
 
 ![puCOFBuilder](docs/header.png)
