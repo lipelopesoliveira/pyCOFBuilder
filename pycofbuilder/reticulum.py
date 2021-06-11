@@ -47,7 +47,11 @@ class Reticulum():
         self.lattice = [[], [], []]
         self.symm_tol = 0.2
         self.angle_tol = 0.2
-        self.n_atoms = len(self.atom_labels)
+        self.n_atoms = self.n_atoms()
+
+    def n_atoms(self):
+        ''' Returns the number of atoms in the unitary cell'''
+        return len(self.atom_labels)
 
     def print_available_topologies(self, dimensionality='all'):
 

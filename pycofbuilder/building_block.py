@@ -356,7 +356,8 @@ class Building_Block():
     def read_structure(self):
 
         try:
-            self.atom_labels, self.atom_pos, self.n_atoms, self.connectivity = Tools.read_xyz_file(self.lib_path, self.name)
+            self.atom_labels, self.atom_pos = Tools.read_xyz_file(self.lib_path, self.name)
+            self.connectivity = len([i for i in atom_labels if 'X' in i])
 
             self.align_to()
             self.calculate_size()

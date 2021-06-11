@@ -196,7 +196,7 @@ def build_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, c
             cofs_list += [f'{file_a}-{file_b}-SQL_A-{stacking}']
 
     val = input(
-        f'{len(cofs_list)} COFs will be created. Do you want o proceed? Type [y] to continue.\n')
+        f'{len(cofs_list)} COFs will be created. Do you want to proceed? Type [y] to continue.\n')
 
     if val == 'y':
         t_i = time.time()
