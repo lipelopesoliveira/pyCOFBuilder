@@ -298,7 +298,7 @@ class Building_Block():
                 self.add_R_group(R_list_names[i], R_list_labels[i])
                 self.name += f'_{R_list_names[i]}'
 
-        self.connectivity =  len([i for i in self.atom_labels if 'X' in i])
+        self.connectivity = len([i for i in self.atom_labels if 'X' in i])
         self.align_to()
         self.calculate_size()
 
@@ -357,7 +357,7 @@ class Building_Block():
 
         try:
             self.atom_labels, self.atom_pos = Tools.read_xyz_file(self.lib_path, self.name)
-            self.connectivity = len([i for i in atom_labels if 'X' in i])
+            self.connectivity = len([i for i in self.atom_labels if 'X' in i])
 
             self.align_to()
             self.calculate_size()
