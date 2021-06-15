@@ -12,7 +12,7 @@ _ROOT = os.path.abspath(os.path.dirname(__file__))
 
 
 def build(cof_name=None, save_format=['cif'], lib='bb_lib', print_result=True):
-    '''Create a COF with a given name'''
+    '''Build a COF with a given name'''
     bond_atom = Tools.find_bond_atom(cof_name)
 
     qe = False
