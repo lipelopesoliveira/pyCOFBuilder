@@ -307,7 +307,7 @@ class Building_Block():
 
         self.name = f'C3_{nucleo_name}_{conector}'
 
-        self.atom_labels, self.atom_pos = Tools.read_gjf_file(os.path.join(self.main_path, 'Nucleo', 'C3'), nucleo_name)
+        self.atom_labels, self.atom_pos = Tools.read_gjf_file(os.path.join(self.main_path, 'nucleo', 'C3'), nucleo_name)
 
         self.centralize_molecule()
 

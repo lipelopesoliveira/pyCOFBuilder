@@ -1,5 +1,4 @@
-%chk=C:\Users\lipel\Google Drive\Laboratório\Quím-Mat\Projetos\Doutorado\pyCOF\Nucleo\C2\TTPH.chk
-# freq rb3lyp/6-31g scrf=check guess=tcheck genchk
+# freq rb3lyp/6-31g 
 
 Title Card Required
 
