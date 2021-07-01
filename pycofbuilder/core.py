@@ -355,14 +355,14 @@ def create_all_C4(nucleos=None, conectores=None, radicais=None):
                 BB.save()
 
 def clean_bb_dir():
-    # Loop Through all files and deleting them one by one
+    # Loop Through all building block files and deleting them one by one
     for file in glob.glob(os.path.join(_ROOT, 'data', 'bb_lib', '*')):
         os.remove(file)
         print(f'Deleted {file}')
 
 
 def clean_out_dir():
-    # Loop Through all files and deleting them one by one
+    # Loop Through all output files and deleting them one by one
     for file in glob.glob(os.path.join(os.getcwd(), 'out', '*')):
         os.remove(file)
         print(f'Deleted {file}')
@@ -373,4 +373,6 @@ def clean():
         f'This action will delete all building blocks and COFs created, do you want to proceed? Type [y] to continue.\n')
     if val == 'y':
         clean_bb_dir()
-        clean_cof_outdir()
+        clean_out_dir()
+    else:
+        print(f'{val} pressed. Nothing to be done.')
