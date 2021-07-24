@@ -2,7 +2,7 @@
 
 ![puCOFBuilder](docs/header.png)
 
-**pyCOFBuilder** is a simple and powerful python package to automatically assembly COF structures with specifics building blocks, topologies, and functionalizations.
+**pyCOFBuilder** is a simple and powerful python package to automatically assembly COF structures with specifics building blocks, topologies, and functionalizations. The project was developed to address the need for generation of COFs structures in a high-throughput style, based on a nomenclature tha allows direct sctructural feature interpretation from a simple name. 
 
 Learn more at [ToNano&Beyond](https://tonanoandbeyondblog.wordpress.com/)
 
