@@ -730,13 +730,17 @@ def save_gjf(file_path, file_name, atom_labels, atom_pos, text='opt pm6'):
     temp_file.write('\n')
     temp_file.close()
 
-def save_xyz(file_path, file_name, atom_labels, atom_pos):
+def save_xyz(file_path, file_name, atom_labels, atom_pos, cell=None):
 
     file_name = file_name.split('.')[0]
 
     temp_file = open(os.path.join(file_path, file_name + '.xyz'), 'w')
-    temp_file.write(f'{len(atom_labels)} \n')
-    temp_file.write(f'{file_name[:-4]} rotated \n')
+    temp_file.write(f'{len(atom_labels)}\n')
+    
+    if cell is None:
+        temp_file.write(f'{file_name}\n')
+    else:
+        temp_file.write(f'{cell[0]}  {cell[1]}  {cell[2]}  {cell[3]}  {cell[4]}  {cell[5]}\n')
 
     for i in range(len(atom_labels)):
         temp_file.write('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(atom_labels[i], atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]))
