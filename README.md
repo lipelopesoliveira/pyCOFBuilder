@@ -136,3 +136,18 @@ If you find **pyCOFBuilder** useful in your research please consider citing the 
 > *Exploring Machine Learning Strategies for Partial Atomic Charges Prediction  on Covalent Organic Framework*
 > 
 > *Manuscript in preparation.* [DOI](https://doi.org/)
+
+#TO DO
+
+- Implementar novas topologias 2D
+- Implementar novas topologias 3D
+- Adicionar novos grupos R
+- Adicionar novas conexões entre os grupos
+- Implementar topologias 3D
+- Salvar a estrutura final em novos formatos:
+	- PDB
+	- XSF
+	- JSON
+	- Formato proprietário do VMD (script de visualização?)
+- Aceitar SMILES ou SELFIES dos possíveis grupos R
+- Aceitar SMILES ou SELFIES dos possíveis núcleos orgânicos
