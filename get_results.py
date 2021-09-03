@@ -10,7 +10,7 @@ import numpy as np
 from tqdm import tqdm
 import traceback
 
-from pymatgen.core import Lattice, Structure
+from pymatgen.core import Structure
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 
 COF_PATH= os.getcwd()
@@ -121,7 +121,7 @@ def get_optimized_cell_parameters(cof_name, opt_type='OPT_1'):
     cell = [cell[:3], cell[3:6], cell[6:]]
     return cell 
 
-def get_all_structures_CP2k(name):
+def get_all_structures_CP2k(name, save_opt_history=False):
     
     pos_1_file = os.path.join(COF_PATH, name, 'OPT_1', name + '-pos-1.xyz')
     pos_2_file = os.path.join(COF_PATH, name, 'OPT_2', name + '-pos-1.xyz')
@@ -137,118 +137,132 @@ def get_all_structures_CP2k(name):
 
     if cp2k_concluded(os.path.join(COF_PATH, name, 'OPT_1', name + '.cell_opt.out')):
 
-        tmp = open(pos_1_file).readlines()
-        n_atoms = int(tmp[0])
-        n_steps = [i for i in tmp if 'i' in i]
+        if save_opt_history:
 
-        for i in range(len(n_steps)):
-            start = i*(n_atoms + 2)+2
-            end =i*(n_atoms + 2) + 2 + n_atoms
-            step = tmp[start -1].split()[2].rstrip(',')
-            opt_1[step] = {
-                            'cell_matrix':[],
-                            'atom_label':[],
-                            'atom_pos':[],
-                            'energy':[]}
+            tmp = open(pos_1_file).readlines()
+            n_atoms = int(tmp[0])
+            n_steps = [i for i in tmp if 'i' in i]
 
-            tmp_pos = tmp[start: end]
-            energy = float(tmp[start -1].split()[-1])
-            opt_1[step]['energy'] = energy
+            for i in range(len(n_steps)):
+                start = i*(n_atoms + 2)+2
+                end =i*(n_atoms + 2) + 2 + n_atoms
+                step = tmp[start -1].split()[2].rstrip(',')
+                opt_1[step] = {
+                                'cell_matrix':[],
+                                'atom_label':[],
+                                'atom_pos':[],
+                                'energy':[]}
 
-            tmp_atom_labels, tmp_atom_pos = [], []
-            for j in range(len(tmp_pos)):
-                tmp_atom_labels += [tmp_pos[j].split()[0]]
-                tmp_atom_pos += [[float(k) for k in tmp_pos[j].split()[1:]]]
+                tmp_pos = tmp[start: end]
+                energy = float(tmp[start -1].split()[-1])
+                opt_1[step]['energy'] = energy
 
-            opt_1[step]['atom_label'] = tmp_atom_labels
-            opt_1[step]['atom_pos'] = tmp_atom_pos
+                tmp_atom_labels, tmp_atom_pos = [], []
+                for j in range(len(tmp_pos)):
+                    tmp_atom_labels += [tmp_pos[j].split()[0]]
+                    tmp_atom_pos += [[float(k) for k in tmp_pos[j].split()[1:]]]
 
-        tmp_cell = open(cell_1_file).readlines()[1:]
-        for t in range(len(tmp_cell)):
-            step = tmp_cell[t].split()[0]
-            cell = np.reshape(np.array([float(i) for i in tmp_cell[t].split()[2:-1]]), (3,3)).tolist()
-            opt_1[step]['cell_matrix'] = cell
-            
+                opt_1[step]['atom_label'] = tmp_atom_labels
+                opt_1[step]['atom_pos'] = tmp_atom_pos
+
+            tmp_cell = open(cell_1_file).readlines()[1:]
+            for t in range(len(tmp_cell)):
+                step = tmp_cell[t].split()[0]
+                cell = np.reshape(np.array([float(i) for i in tmp_cell[t].split()[2:-1]]), (3,3)).tolist()
+                opt_1[step]['cell_matrix'] = cell
+        
+        if save_opt_history is False:
+            tmp = open(pos_1_file).readlines()
+            opt_1['energy'] = [float(i.split()[-1]) for i in tmp if 'i' in i]
 
     if cp2k_concluded(os.path.join(COF_PATH, name, 'BOMD', name + '.bomd.out')):
 
-        tmp = open(pos_bomd_file).readlines()
-        n_atoms = int(tmp[0])
-        n_steps = [i for i in tmp if 'i' in i]
+        if save_opt_history:
 
-        for i in range(len(n_steps)):
+            tmp = open(pos_bomd_file).readlines()
+            n_atoms = int(tmp[0])
+            n_steps = [i for i in tmp if 'i' in i]
 
-            start = i*(n_atoms + 2)+2
-            end =i*(n_atoms + 2) + 2 + n_atoms
+            for i in range(len(n_steps)):
 
-            step = tmp[start -1].split()[2].rstrip(',')
-            bomd[step] = {
-                            'cell_matrix':[],
-                            'atom_label':[],
-                            'atom_pos':[],
-                            'energy':[]}
+                start = i*(n_atoms + 2)+2
+                end =i*(n_atoms + 2) + 2 + n_atoms
 
-            tmp_pos = tmp[start: end]
+                step = tmp[start -1].split()[2].rstrip(',')
+                bomd[step] = {
+                                'cell_matrix':[],
+                                'atom_label':[],
+                                'atom_pos':[],
+                                'energy':[]}
 
-            energy = float(tmp[start -1].split()[-1])
-            bomd[step]['energy'] = energy
+                tmp_pos = tmp[start: end]
 
-            tmp_atom_labels, tmp_atom_pos = [], []
-            for j in range(len(tmp_pos)):
-                tmp_atom_labels += [tmp_pos[j].split()[0]]
-                tmp_atom_pos += [[float(k) for k in tmp_pos[j].split()[1:]]]
+                energy = float(tmp[start -1].split()[-1])
+                bomd[step]['energy'] = energy
 
-            bomd[step]['atom_label'] = tmp_atom_labels
-            bomd[step]['atom_pos'] = tmp_atom_pos
+                tmp_atom_labels, tmp_atom_pos = [], []
+                for j in range(len(tmp_pos)):
+                    tmp_atom_labels += [tmp_pos[j].split()[0]]
+                    tmp_atom_pos += [[float(k) for k in tmp_pos[j].split()[1:]]]
 
-        tmp_cell = open(cell_bomd_file).readlines()[1:]
-        for t in range(len(tmp_cell)):
-            step = tmp_cell[t].split()[0]
-            cell = np.reshape(np.array([float(i) for i in tmp_cell[t].split()[2:-1]]), (3,3)).tolist()
-            bomd[step]['cell_matrix'] = cell
+                bomd[step]['atom_label'] = tmp_atom_labels
+                bomd[step]['atom_pos'] = tmp_atom_pos
+
+            tmp_cell = open(cell_bomd_file).readlines()[1:]
+            for t in range(len(tmp_cell)):
+                step = tmp_cell[t].split()[0]
+                cell = np.reshape(np.array([float(i) for i in tmp_cell[t].split()[2:-1]]), (3,3)).tolist()
+                bomd[step]['cell_matrix'] = cell
+        
+        if save_opt_history is False:
+            tmp = open(pos_bomd_file).readlines()
+            bomd['energy'] = [float(i.split()[-1]) for i in tmp if 'i' in i]
     
     if cp2k_concluded(os.path.join(COF_PATH, name, 'OPT_2', name + '.cell_opt.out')):
 
-        tmp = open(pos_2_file).readlines()
-        n_atoms = int(tmp[0])
+        if save_opt_history:
 
-        n_steps = [i for i in tmp if 'i' in i]
+            tmp = open(pos_2_file).readlines()
+            n_atoms = int(tmp[0])
 
-        for i in range(len(n_steps)):
+            n_steps = [i for i in tmp if 'i' in i]
 
-            start = i*(n_atoms + 2)+2
-            end =i*(n_atoms + 2) + 2 + n_atoms
+            for i in range(len(n_steps)):
 
-            step = tmp[start -1].split()[2].rstrip(',')
-            opt_2[step] = {
-                            'cell_matrix':[],
-                            'atom_label':[],
-                            'atom_pos':[],
-                            'energy':[]}
+                start = i*(n_atoms + 2)+2
+                end =i*(n_atoms + 2) + 2 + n_atoms
 
-            tmp_pos = tmp[start: end]
+                step = tmp[start -1].split()[2].rstrip(',')
+                opt_2[step] = {
+                                'cell_matrix':[],
+                                'atom_label':[],
+                                'atom_pos':[],
+                                'energy':[]}
 
-            energy = float(tmp[start -1].split()[-1])
-            opt_2[step]['energy'] = energy
+                tmp_pos = tmp[start: end]
 
-            tmp_atom_labels, tmp_atom_pos = [], []
-            for j in range(len(tmp_pos)):
-                tmp_atom_labels += [tmp_pos[j].split()[0]]
-                tmp_atom_pos += [[float(k) for k in tmp_pos[j].split()[1:]]]
+                energy = float(tmp[start -1].split()[-1])
+                opt_2[step]['energy'] = energy
 
-            opt_2[step]['atom_label'] = tmp_atom_labels
-            opt_2[step]['atom_pos'] = tmp_atom_pos
+                tmp_atom_labels, tmp_atom_pos = [], []
+                for j in range(len(tmp_pos)):
+                    tmp_atom_labels += [tmp_pos[j].split()[0]]
+                    tmp_atom_pos += [[float(k) for k in tmp_pos[j].split()[1:]]]
 
-        tmp_cell = open(cell_2_file).readlines()[1:]
-        for t in range(len(tmp_cell)):
-            step = tmp_cell[t].split()[0]
-            cell = np.reshape(np.array([float(i) for i in tmp_cell[t].split()[2:-1]]), (3,3)).tolist()
-            opt_2[step]['cell_matrix'] = cell
+                opt_2[step]['atom_label'] = tmp_atom_labels
+                opt_2[step]['atom_pos'] = tmp_atom_pos
 
+            tmp_cell = open(cell_2_file).readlines()[1:]
+            for t in range(len(tmp_cell)):
+                step = tmp_cell[t].split()[0]
+                cell = np.reshape(np.array([float(i) for i in tmp_cell[t].split()[2:-1]]), (3,3)).tolist()
+                opt_2[step]['cell_matrix'] = cell
+
+        if save_opt_history is False:
+            tmp = open(pos_2_file).readlines()
+            opt_2['energy'] = [float(i.split()[-1]) for i in tmp if 'i' in i]
 
     return opt_1, bomd, opt_2
-
-   
     
 def get_charges(cof_name):
     
@@ -435,6 +449,7 @@ def create_COF_json(name):
         adsorption_info = 'Information about the adsorption simulation experiments on RASPA2'
         textural_info = 'Information about the textural calculations of the structure such as specific area, pore volume, void fraction.'
         spectrum_info = 'Information about spectra simulation like DRX, FTIR, ssNMR, UV-VIS, Band dispersion, Phonon dispersion...'
+        experimental_info = 'Experimental data DRX, FTIR, ssNMR, UV-VIS...'
         
         COF_json = {'system':{'description':system_info,
                                'name':name},
@@ -442,65 +457,67 @@ def create_COF_json(name):
                     'optimization':{'description':optimization_info},
                     'adsorption':{'description':adsorption_info},
                     'textural':{'description':textural_info},
-                    'spectrum':{'description':spectrum_info}
+                    'spectrum':{'description':spectrum_info},
+                    'experimental':{'description':experimental_info}
                     }
         
         save_json(COF_PATH, name, COF_json)
 
-def add_opt_geo(name, save_opt_history=True):
+def add_opt_geo(name, save_opt_history=False):
     
-    opt1, bomd, opt2 = get_all_structures_CP2k(name)
+    opt1, bomd, opt2 = get_all_structures_CP2k(name, save_opt_history)
     COF_json = read_json(COF_PATH, name)
 
+    opt_type = False
     
-    if len(opt1.keys()) > 1:
-        opt_type = 'OPT_1'
-        if save_opt_history:
-            COF_json['optimization']['opt1'] = opt1
+    if len(opt1.keys()) >= 1:
+        opt_type = ['OPT_1']
+        COF_json['optimization']['opt1'] = opt1
     
-    if len(bomd.keys()) > 1:
-        opt_type = 'BOMD'
-        if save_opt_history:
-            COF_json['optimization']['bomd'] = bomd
+    if len(bomd.keys()) >= 1:
+        opt_type += ['BOMD']
+        COF_json['optimization']['bomd'] = bomd
         
-    if len(opt2.keys()) > 1:
-        opt_type = 'OPT_2'
-        if save_opt_history:
-            COF_json['optimization']['opt2'] = opt2
+    if len(opt2.keys()) >= 1:
+        opt_type += ['OPT_2']
+        COF_json['optimization']['opt2'] = opt2
+
+    if opt_type is not False:
     
-    cp2k_results = get_cp2k_opt_results(name, opt_type=opt_type)
+        cp2k_results = get_cp2k_opt_results(name, opt_type=opt_type[-1])
 
-    if cp2k_results is not False:
-        cell, opt_labels, opt_pos, fermi, gap, energy_list, density, composition, symm_info = cp2k_results
+        if cp2k_results is not False:
+            cell, opt_labels, opt_pos, fermi, gap, energy_list, density, composition, symm_info = cp2k_results
 
-        cell_par = Tools.cell_to_cellpar(np.array(cell)).tolist()
-        cell_par =  [round(i, 10) for i in cell_par]
+            cell_par = Tools.cell_to_cellpar(np.array(cell)).tolist()
+            cell_par =  [round(i, 10) for i in cell_par]
 
-    
-        COF_json['system']['geo_opt'] = opt_concluded(name, opt_type)
-        COF_json['system']['opt_type'] = [opt_type]
-        COF_json['system']['charges'] = charges_concluded(name)
-        
-        COF_json['geometry']['cell_matrix'] = cell
-        COF_json['geometry']['cell_parameters'] = cell_par
-        COF_json['geometry']['atom_labels'] = opt_labels
-        COF_json['geometry']['atom_pos'] = opt_pos
-        COF_json['geometry']['energy'] = energy_list[-1]
-        COF_json['geometry']['band_gap'] = gap
-        COF_json['geometry']['fermi_level'] = fermi
-        COF_json['geometry']['density'] = density
-        COF_json['geometry']['composition'] = composition
+            opt_file = os.path.join(COF_PATH, name, opt_type[-1], name + '.cell_opt.out')
 
-        if symm_info is not None:
-            lattice_type, space_group, space_group_n, symm_op, hall = symm_info
+            COF_json['system']['geo_opt'] = cp2k_concluded(opt_file)
+            COF_json['system']['opt_type'] = opt_type
+            COF_json['system']['charges'] = charges_concluded(name)
+            
+            COF_json['geometry']['cell_matrix'] = cell
+            COF_json['geometry']['cell_parameters'] = cell_par
+            COF_json['geometry']['atom_labels'] = opt_labels
+            COF_json['geometry']['atom_pos'] = opt_pos
+            COF_json['geometry']['energy'] = energy_list[-1]
+            COF_json['geometry']['band_gap'] = gap
+            COF_json['geometry']['fermi_level'] = fermi
+            COF_json['geometry']['density'] = density
+            COF_json['geometry']['composition'] = composition
 
-            COF_json['geometry']['lattice_type'] = lattice_type
-            COF_json['geometry']['space_group'] = space_group
-            COF_json['geometry']['space_group_number'] = space_group_n
-            COF_json['geometry']['symm_op'] = symm_op
-            COF_json['geometry']['hall'] = hall
-        
-        save_json(COF_PATH, name, COF_json)
+            if symm_info is not None:
+                lattice_type, space_group, space_group_n, symm_op, hall = symm_info
+
+                COF_json['geometry']['lattice_type'] = lattice_type
+                COF_json['geometry']['space_group'] = space_group
+                COF_json['geometry']['space_group_number'] = space_group_n
+                COF_json['geometry']['symm_op'] = symm_op
+                COF_json['geometry']['hall'] = hall
+            
+            save_json(COF_PATH, name, COF_json)
 
 def add_charges(cof_name):
 
@@ -534,10 +551,8 @@ for cof in tqdm(COFs):
         create_COF_json(cof)
         add_opt_geo(cof, save_opt_history=False)
         add_charges(cof)
-        add_RASPA_data(cof, 'CO2')
-        add_RASPA_data(cof, 'methane')
-        add_RASPA_data(cof, 'CO')
-        add_RASPA_data(cof, 'H2')
+        for g in ['CO2', 'methane', 'CO', 'H2']:
+            add_RASPA_data(cof, g)
     except Exception:
         print('Erro:', cof)
         traceback.print_exc()
