@@ -14,6 +14,8 @@ try:
 except Exception:
     print('WARNING: Could no import CifParser from pymatgen the conversion from cif to xyz and COF generation may not work properlly')
     cif_parser_imported = False
+    
+import simplejson
 
 def elements_dict(prop='mass'):
     '''Returns a dictionary containing the elements symbol and its selected property.
@@ -827,3 +829,49 @@ def save_cif(file_path, file_name, cell, atom_labels, atom_pos, partial_charges=
             cif_file.write(f'{atom_labels[i]}    {atom_labels[i]}    {u:<.9f}    {v:<.9f}    {w:<.9f}\n')
 
     cif_file.close()
+    
+########################### JSON related ##########################  
+
+
+def save_json(path, name, COF_json):
+
+    if os.path.exists(os.path.join(path, 'concluido')) is not True:
+        os.mkdir(os.path.join(path, 'concluido'))
+    
+    save_path = os.path.join(path, 'concluido', name + '.json')
+    
+    with open(save_path, 'w', encoding='utf-8') as f:
+        simplejson.dump(COF_json, f, ensure_ascii=False, separators=(',', ':'), indent=2, ignore_nan=True)
+        
+def read_json(path, cof_name):
+    
+    cof_path = os.path.join(path, 'concluido', cof_name + '.json')
+    
+    with open(cof_path, 'r') as r:
+        json_object = simplejson.loads(r.read())
+    
+    return json_object
+    
+def create_COF_json(name):
+    
+    if os.path.exists(name + '.json') is not True:
+
+        system_info = 'Informations about the system such as name, if it is optimized and other relevant information.'
+        geometry_info = 'Informations about the geometry: cell parameters, cell matrix, atomic positions, partial charges, bond orders, simmetry information'
+        optimization_info = 'Information about the optimization process such as level of calculations, optimization schema and optimization steps.'
+        adsorption_info = 'Information about the adsorption simulation experiments on RASPA2'
+        textural_info = 'Information about the textural calculations of the structure such as specific area, pore volume, void fraction.'
+        spectrum_info = 'Information about spectra simulation like DRX, FTIR, ssNMR, UV-VIS, Band dispersion, Phonon dispersion...'
+        experimental_info = 'Experimental data DRX, FTIR, ssNMR, UV-VIS...'
+        
+        COF_json = {'system':{'description':system_info,
+                               'name':name},
+                    'geometry':{'description':geometry_info},
+                    'optimization':{'description':optimization_info},
+                    'adsorption':{'description':adsorption_info},
+                    'textural':{'description':textural_info},
+                    'spectrum':{'description':spectrum_info},
+                    'experimental':{'description':experimental_info}
+                    }
+        
+        return COF_json
