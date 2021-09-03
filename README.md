@@ -20,6 +20,7 @@ pip install pycofbuilder
 1. pymatgen >= 2022.0.0
 2. numpy >= 1.2
 3. scipy >= 1.6.3
+4. simplejson
 
 
 The Python dependencies are most easily satisfied using a conda
