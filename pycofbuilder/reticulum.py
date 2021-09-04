@@ -964,6 +964,58 @@ class Reticulum():
             self.symm_structure.make_supercell([[supercell[0], 0, 0], [0, supercell[1], 0], [0, 0, supercell[2]]])
 
         self.symm_structure.to(filename=os.path.join(self.out_path, self.name + '.cif'))
+    
+    def save_json(self, supercell=False, path=None):
+
+        if path is not None:
+            self.out_path = path
+        try:
+            os.mkdir(self.out_path)
+        except Exception:
+            None
+
+        if supercell is not False:
+            self.symm_structure.make_supercell([[supercell[0], 0, 0], [0, supercell[1], 0], [0, 0, supercell[2]]])
+
+        dict_sctructure = self.symm_structure.as_dict()
+
+        a, b, c = dict_sctructure['lattice']['a'], dict_sctructure['lattice']['b'], dict_sctructure['lattice']['c']
+
+        alpha = round(dict_sctructure['lattice']['alpha'], 3)
+        beta = round(dict_sctructure['lattice']['beta'], 3)
+        gamma = round(dict_sctructure['lattice']['gamma'], 3)
+
+        atom_labels = [i['label'] for i in dict_sctructure['sites']]
+
+        atom_pos = [i['xyz'] for i in dict_sctructure['sites']]
+
+        Tools.save_json(self.out_path, self.name, [a, b, c, alpha, beta, gamma], atom_labels, atom_pos)
+
+    def save_xsf(self, supercell=False, path=None):
+
+        if path is not None:
+            self.out_path = path
+        try:
+            os.mkdir(self.out_path)
+        except Exception:
+            None
+
+        if supercell is not False:
+            self.symm_structure.make_supercell([[supercell[0], 0, 0], [0, supercell[1], 0], [0, 0, supercell[2]]])
+
+        dict_sctructure = self.symm_structure.as_dict()
+
+        a, b, c = dict_sctructure['lattice']['a'], dict_sctructure['lattice']['b'], dict_sctructure['lattice']['c']
+
+        alpha = round(dict_sctructure['lattice']['alpha'], 3)
+        beta = round(dict_sctructure['lattice']['beta'], 3)
+        gamma = round(dict_sctructure['lattice']['gamma'], 3)
+
+        atom_labels = [i['label'] for i in dict_sctructure['sites']]
+
+        atom_pos = [i['xyz'] for i in dict_sctructure['sites']]
+
+        Tools.save_xsf(self.out_path, self.name, [a, b, c, alpha, beta, gamma], atom_labels, atom_pos)
 
     def save_vasp(self, supercell=False, path=None):
 
