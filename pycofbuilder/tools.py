@@ -698,9 +698,12 @@ def save_csv(file_name, data, delimiter=';', head=False):
 
     file_temp.close()
 
-def save_xsf(file_path, file_name, cell, atom_pos):
+def save_xsf(file_path, file_name, cell, atom_label, atom_pos):
 
     file_name = file_name.split('.')[0]
+
+    if len(cell) == 6:
+        cell = cellpar_to_cell(cell)
 
     xsf_file = open(os.path.join(file_path, file_name + '.xsf'), 'w')
     xsf_file.write(' CRYSTAL\n')
@@ -713,7 +716,7 @@ def save_xsf(file_path, file_name, cell, atom_pos):
     xsf_file.write(f'           {len(atom_pos)}           1\n')
 
     for i in range(len(atom_pos)):
-        xsf_file.write(f'{atom_pos[i][0]}        {atom_pos[i][1]:<.9f}    {atom_pos[i][2]:<.9f}    {atom_pos[i][3]:<.9f}\n')
+        xsf_file.write(f'{atom_label[i]}        {atom_pos[i][0]:<.9f}    {atom_pos[i][1]:<.9f}    {atom_pos[i][2]:<.9f}\n')
 
     xsf_file.close()
 
@@ -752,6 +755,29 @@ def save_xyz(file_path, file_name, atom_labels, atom_pos, cell=None):
         temp_file.write('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(atom_labels[i], atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]))
 
     temp_file.close()
+
+def save_json(path, file_name, cell, atom_labels, atom_pos):
+
+    file_name = file_name.split('.')[0]
+
+    cof_json = create_COF_json(file_name)
+
+    if len(cell) == 3:
+        cell_par = cell_to_cellpar(np.array(cell)).tolist()
+        cell_par =  [round(i, 10) for i in cell_par]
+
+    if len(cell) == 6:
+        cell_par = cell
+        cell = cellpar_to_cell(cell_par).tolist()
+
+    cof_json['system']['geo_opt'] = False
+    
+    cof_json['geometry']['cell_matrix'] = cell
+    cof_json['geometry']['cell_parameters'] = cell_par
+    cof_json['geometry']['atom_labels'] = atom_labels
+    cof_json['geometry']['atom_pos'] = atom_pos
+
+    write_json(path, file_name, cof_json)
     
 def read_cif(file_path, file_name):
     tmp = open(os.path.join(file_path, file_name), 'r').readlines()
@@ -837,7 +863,9 @@ def save_cif(file_path, file_name, cell, atom_labels, atom_pos, partial_charges=
 ########################### JSON related ##########################  
 
 
-def save_json(path, name, COF_json):
+def write_json(path, name, COF_json):
+
+    name = name.split('.')[0]
 
     if os.path.exists(path) is not True:
         os.mkdir(path)
