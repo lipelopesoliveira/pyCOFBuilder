@@ -20,6 +20,8 @@ def build(cof_name=None, save_format=['cif'], lib='bb_lib', print_result=True):
     cif = False
     turbomole = False
     vasp = False
+    json = False
+    xsf = False
 
     if type(save_format) is not list:
         save_format = [save_format]
@@ -35,6 +37,10 @@ def build(cof_name=None, save_format=['cif'], lib='bb_lib', print_result=True):
             turbomole = True
         if i == 'vasp':
             vasp = True
+        if i == 'json':
+            json = True
+        if i == 'xsf':
+            xsf = True
 
     bb1, bb2, net, stacking = cof_name.split('-')
 
@@ -52,6 +58,10 @@ def build(cof_name=None, save_format=['cif'], lib='bb_lib', print_result=True):
                     Ret.save_xyz()
             if qe is True:
                 Ret.save_qe()
+            if json is True:
+                Ret.save_json()
+            if xsf is True:
+                Ret.save_xsf()
             if turbomole is True:
                 Ret.save_turbomole()
             if vasp is True:
@@ -74,6 +84,10 @@ def build(cof_name=None, save_format=['cif'], lib='bb_lib', print_result=True):
                     Ret.save_xyz()
             if qe is True:
                 Ret.save_qe()
+            if json is True:
+                Ret.save_json()
+            if xsf is True:
+                Ret.save_xsf()
             if turbomole is True:
                 Ret.save_turbomole()
             if vasp is True:
@@ -96,6 +110,10 @@ def build(cof_name=None, save_format=['cif'], lib='bb_lib', print_result=True):
                     Ret.save_xyz()
             if qe is True:
                 Ret.save_qe()
+            if json is True:
+                Ret.save_json()
+            if xsf is True:
+                Ret.save_xsf()
             if turbomole is True:
                 Ret.save_turbomole()
             if vasp is True:
@@ -118,6 +136,10 @@ def build(cof_name=None, save_format=['cif'], lib='bb_lib', print_result=True):
                     Ret.save_xyz()
             if qe is True:
                 Ret.save_qe()
+            if json is True:
+                Ret.save_json()
+            if xsf is True:
+                Ret.save_xsf()
             if turbomole is True:
                 Ret.save_turbomole()
             if vasp is True:
@@ -321,7 +343,7 @@ def create_all_C4(nucleos=None, conectores=None, radicais=None):
 
     >>> BB = Building_Block()
 
-    >>> BB.create_C4_BB('PORP', 'NH2', *['H', 'OH', 'H'])
+    >>> BB.create_C4_BB('PORP', 'NH2', ['H', 'OH', 'H'])
 
     ----------
     nucleos : list
