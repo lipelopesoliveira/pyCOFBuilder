@@ -14,7 +14,6 @@ try:
 except Exception:
     print('WARNING: Could no import CifParser from pymatgen the conversion from cif to xyz and COF generation may not work properlly')
     cif_parser_imported = False
-    
 import simplejson
 
 def elements_dict(prop='mass'):
@@ -277,7 +276,8 @@ def rmsd(V, W):
     return np.sqrt((diff * diff).sum() / N)
 
 def cell_to_cellpar(cell, radians=False):
-    """Returns the cell parameters [a, b, c, alpha, beta, gamma].
+    """Returns the cell parameters [a, b, c, alpha, beta, gamma] 
+    given a 3x3 cell matrix [v1, v2, v3]
 
     Angles are in degrees unless radian=True is used.
     """
@@ -604,7 +604,8 @@ def print_comand(text, verbose, match):
 ############# Reads and save files #####################
 
 def read_xyz_file(path, file_name):
-    '''Lê um arquivo em formato .xyz e retorna uma lista com os átomos e um array Nx3 contendo as coordenadas dos N átomos'''
+    '''Reads a file in format `.xyz` from the `path` given and returns a list containg the N atom labels and 
+    a Nx3 array contaning the atoms coordinates.'''
     
     file_name = file_name.split('.')[0]
 
@@ -621,8 +622,11 @@ def read_xyz_file(path, file_name):
         print(f'File {file_name} not found!')
 
 def read_gjf_file(path, file_name):
-    '''Lê um arquivo em formato .gjf e retorna uma lista com os átomos e um array Nx3 contendo as coordenadas dos N átomos'''
-
+    '''Reads a file in format `.gjf` from the `path` given and returns a list containg the N atom labels and 
+    a Nx3 array contaning the atoms coordinates.'''
+    
+    file_name = file_name.split('.')[0]
+    
     temp_file = open(os.path.join(path, file_name + '.gjf'), 'r').readlines()
     temp_file = [i.split() for i in temp_file if i != '\n']
 
@@ -778,8 +782,7 @@ def read_cif(file_path, file_name):
             charges += [float(line[-1])]
     cell = cellpar_to_cell(cell)
 
-    return cell, atom_label, atom_pos, charges
-        
+    return cell, atom_label, atom_pos, charges     
 
 def save_cif(file_path, file_name, cell, atom_labels, atom_pos, partial_charges=False, frac_coords=True ):
 
@@ -818,7 +821,7 @@ def save_cif(file_path, file_name, cell, atom_labels, atom_pos, partial_charges=
     if partial_charges is not False:
         cif_file.write('   _atom_site_charge\n')
 
-    if frac_coords == False:
+    if frac_coords is False:
         atom_pos = [np.dot(r, [i[0], i[1], i[2]]) for i in atom_pos]
 
     for i in range(len(atom_pos)):
@@ -829,23 +832,24 @@ def save_cif(file_path, file_name, cell, atom_labels, atom_pos, partial_charges=
             cif_file.write(f'{atom_labels[i]}    {atom_labels[i]}    {u:<.9f}    {v:<.9f}    {w:<.9f}\n')
 
     cif_file.close()
-    
+
+
 ########################### JSON related ##########################  
 
 
 def save_json(path, name, COF_json):
 
-    if os.path.exists(os.path.join(path, 'concluido')) is not True:
-        os.mkdir(os.path.join(path, 'concluido'))
+    if os.path.exists(path) is not True:
+        os.mkdir(path)
     
-    save_path = os.path.join(path, 'concluido', name + '.json')
+    save_path = os.path.join(path, name + '.json')
     
     with open(save_path, 'w', encoding='utf-8') as f:
         simplejson.dump(COF_json, f, ensure_ascii=False, separators=(',', ':'), indent=2, ignore_nan=True)
         
 def read_json(path, cof_name):
     
-    cof_path = os.path.join(path, 'concluido', cof_name + '.json')
+    cof_path = os.path.join(path, cof_name + '.json')
     
     with open(cof_path, 'r') as r:
         json_object = simplejson.loads(r.read())
@@ -853,25 +857,23 @@ def read_json(path, cof_name):
     return json_object
     
 def create_COF_json(name):
-    
-    if os.path.exists(name + '.json') is not True:
 
-        system_info = 'Informations about the system such as name, if it is optimized and other relevant information.'
-        geometry_info = 'Informations about the geometry: cell parameters, cell matrix, atomic positions, partial charges, bond orders, simmetry information'
-        optimization_info = 'Information about the optimization process such as level of calculations, optimization schema and optimization steps.'
-        adsorption_info = 'Information about the adsorption simulation experiments on RASPA2'
-        textural_info = 'Information about the textural calculations of the structure such as specific area, pore volume, void fraction.'
-        spectrum_info = 'Information about spectra simulation like DRX, FTIR, ssNMR, UV-VIS, Band dispersion, Phonon dispersion...'
-        experimental_info = 'Experimental data DRX, FTIR, ssNMR, UV-VIS...'
-        
-        COF_json = {'system':{'description':system_info,
-                               'name':name},
-                    'geometry':{'description':geometry_info},
-                    'optimization':{'description':optimization_info},
-                    'adsorption':{'description':adsorption_info},
-                    'textural':{'description':textural_info},
-                    'spectrum':{'description':spectrum_info},
-                    'experimental':{'description':experimental_info}
-                    }
-        
-        return COF_json
+    system_info = 'Informations about the system such as name, if it is optimized and other relevant information.'
+    geometry_info = 'Informations about the geometry: cell parameters, cell matrix, atomic positions, partial charges, bond orders, simmetry information'
+    optimization_info = 'Information about the optimization process such as level of calculations, optimization schema and optimization steps.'
+    adsorption_info = 'Information about the adsorption simulation experiments on RASPA2'
+    textural_info = 'Information about the textural calculations of the structure such as specific area, pore volume, void fraction.'
+    spectrum_info = 'Information about spectra simulation like DRX, FTIR, ssNMR, UV-VIS, Band dispersion, Phonon dispersion...'
+    experimental_info = 'Experimental data DRX, FTIR, ssNMR, UV-VIS...'
+
+    COF_json = {'system':{'description':system_info,
+                           'name':name},
+                'geometry':{'description':geometry_info},
+                'optimization':{'description':optimization_info},
+                'adsorption':{'description':adsorption_info},
+                'textural':{'description':textural_info},
+                'spectrum':{'description':spectrum_info},
+                'experimental':{'description':experimental_info}
+                }
+
+    return COF_json
