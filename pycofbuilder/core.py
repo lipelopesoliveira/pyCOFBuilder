@@ -22,6 +22,7 @@ def build(cof_name=None, save_format=['cif'], lib='bb_lib', print_result=True):
     vasp = False
     json = False
     xsf = False
+    pdb = False
 
     if type(save_format) is not list:
         save_format = [save_format]
@@ -41,6 +42,8 @@ def build(cof_name=None, save_format=['cif'], lib='bb_lib', print_result=True):
             json = True
         if i == 'xsf':
             xsf = True
+        if i == 'pdb':
+            pdb = True
 
     bb1, bb2, net, stacking = cof_name.split('-')
 
@@ -62,6 +65,8 @@ def build(cof_name=None, save_format=['cif'], lib='bb_lib', print_result=True):
                 Ret.save_json()
             if xsf is True:
                 Ret.save_xsf()
+            if pdb is True:
+                Ret.save_pdb()
             if turbomole is True:
                 Ret.save_turbomole()
             if vasp is True:
@@ -88,6 +93,8 @@ def build(cof_name=None, save_format=['cif'], lib='bb_lib', print_result=True):
                 Ret.save_json()
             if xsf is True:
                 Ret.save_xsf()
+            if pdb is True:
+                Ret.save_pdb()
             if turbomole is True:
                 Ret.save_turbomole()
             if vasp is True:
@@ -114,6 +121,8 @@ def build(cof_name=None, save_format=['cif'], lib='bb_lib', print_result=True):
                 Ret.save_json()
             if xsf is True:
                 Ret.save_xsf()
+            if pdb is True:
+                Ret.save_pdb()
             if turbomole is True:
                 Ret.save_turbomole()
             if vasp is True:
@@ -140,6 +149,8 @@ def build(cof_name=None, save_format=['cif'], lib='bb_lib', print_result=True):
                 Ret.save_json()
             if xsf is True:
                 Ret.save_xsf()
+            if pdb is True:
+                Ret.save_pdb()
             if turbomole is True:
                 Ret.save_turbomole()
             if vasp is True:
