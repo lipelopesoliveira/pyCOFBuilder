@@ -895,7 +895,8 @@ def create_COF_json(name):
     experimental_info = 'Experimental data DRX, FTIR, ssNMR, UV-VIS...'
 
     COF_json = {'system':{'description':system_info,
-                           'name':name},
+                          'name':name,
+                          'geo_opt':False},
                 'geometry':{'description':geometry_info},
                 'optimization':{'description':optimization_info},
                 'adsorption':{'description':adsorption_info},
