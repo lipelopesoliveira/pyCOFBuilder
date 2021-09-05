@@ -720,6 +720,28 @@ def save_xsf(file_path, file_name, cell, atom_label, atom_pos):
 
     xsf_file.close()
 
+def save_pdb(file_path, file_name, cell, atom_label, atom_pos, partial_charges=False):
+
+    file_name = file_name.split('.')[0]
+
+    if len(cell) == 3:
+        cell = cell_to_cellpar(cell)
+
+    pqr_file = open(os.path.join(file_path, file_name + '.pqr'), 'w')
+    pqr_file.write(f'TITLE       {file_name}  \n')
+    pqr_file.write('REMARK   4\n')
+    pqr_file.write('REMARK   4      COMPLIES WITH FORMAT V. 2.2, 16-DEC-1996\n')
+    pqr_file.write(f'CRYST1    {cell[0]:>5.9f}     {cell[1]:>5.9f}     {cell[2]:>5.9f}  {cell[3]:>5.9f}  {cell[4]:>5.9f}  {cell[5]:>5.9f} P1\n')
+
+    if partial_charges is not False:
+        for i in range(len(atom_pos)):
+            pqr_file.write(f'ATOM      {i+1} {atom_label[i]}    MOL A   0      {atom_pos[i][0]:>3.6f}   {atom_pos[i][1]:>3.6f}   {atom_pos[i][2]:>3.6f}  {partial_charges:>3.5f}                {atom_label[i]}\n')
+    if partial_charges is False:
+        for i in range(len(atom_pos)):
+            pqr_file.write(f'ATOM      {i+1} {atom_label[i]}    MOL A   0      {atom_pos[i][0]:>3.6f}   {atom_pos[i][1]:>3.6f}   {atom_pos[i][2]:>3.6f}                {atom_label[i]}\n')
+
+    pqr_file.close()
+    
 def save_gjf(file_path, file_name, atom_labels, atom_pos, text='opt pm6'):
 
     file_name = file_name.split('.')[0]
