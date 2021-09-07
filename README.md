@@ -146,9 +146,6 @@ If you find **pyCOFBuilder** useful in your research please consider citing the 
 - Adicionar novas conexões entre os grupos
 - Implementar topologias 3D
 - Salvar a estrutura final em novos formatos:
-	- PDB
-	- XSF
-	- JSON
 	- Formato proprietário do VMD (script de visualização?)
 - Aceitar SMILES ou SELFIES dos possíveis grupos R
 - Aceitar SMILES ou SELFIES dos possíveis núcleos orgânicos
