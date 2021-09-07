@@ -730,17 +730,17 @@ def save_pqr(file_path, file_name, cell, atom_label, atom_pos, partial_charges=F
     pqr_file = open(os.path.join(file_path, file_name + '.pqr'), 'w')
     pqr_file.write(f'TITLE       {file_name}  \n')
     pqr_file.write('REMARK   4\n')
-    pqr_file.write(f'CRYST1{cell[0]:>5.3f}{cell[1]:>5.3f}{cell[2]:>5.3f}{cell[3]:>5.3f}{cell[4]:>5.3f}{cell[5]:>5.3f} P1\n')
+    pdb_file.write(f'CRYST1{cell[0]:>9.3f}{cell[1]:>9.3f}{cell[2]:>9.3f}{cell[3]:>7.2f}{cell[4]:>7.2f}{cell[5]:>7.2f} P1\n')
 
     if partial_charges is not False:
         for i in range(len(atom_pos)):
-            pqr_file.write(f'ATOM      {i+1} {atom_label[i]}    MOL A   0      {atom_pos[i][0]:>3.6f}   {atom_pos[i][1]:>3.6f}   {atom_pos[i][2]:>3.6f}  {partial_charges:>3.5f}                {atom_label[i]}\n')
+            pqr_file.write(f'ATOM   {i+1:>4} {atom_label[i]:>2}   MOL A   0      {atom_pos[i][0]:>8.3f}{atom_pos[i][1]:>8.3f}{atom_pos[i][2]:>8.3f}  {partial_charges:>3.5f}                {atom_label[i]}\n')
     if partial_charges is False:
         for i in range(len(atom_pos)):
-            pqr_file.write(f'ATOM      {i+1} {atom_label[i]}    MOL A   0      {atom_pos[i][0]:>3.6f}   {atom_pos[i][1]:>3.6f}   {atom_pos[i][2]:>3.6f}                {atom_label[i]}\n')
+            pqr_file.write(f'ATOM   {i+1:>4} {atom_label[i]:>2}   MOL A   0      {atom_pos[i][0]:>8.3f}{atom_pos[i][1]:>8.3f}{atom_pos[i][2]:>8.3f}                {atom_label[i]}\n')
 
     pqr_file.close()
-
+    
 def save_pdb(file_path, file_name, cell, atom_label, atom_pos):
 
     file_name = file_name.split('.')[0]
@@ -751,10 +751,10 @@ def save_pdb(file_path, file_name, cell, atom_label, atom_pos):
     pdb_file = open(os.path.join(file_path, file_name + '.pdb'), 'w')
     pdb_file.write(f'TITLE       {file_name}  \n')
     pdb_file.write('REMARK   pyCOFBuilder\n')
-    pdb_file.write(f'CRYST1{cell[0]:>5.3f}{cell[1]:>5.3f}{cell[2]:>5.3f}{cell[3]:>5.3f}{cell[4]:>5.3f}{cell[5]:>5.3f} P1\n')
+    pdb_file.write(f'CRYST1{cell[0]:>9.3f}{cell[1]:>9.3f}{cell[2]:>9.3f}{cell[3]:>7.2f}{cell[4]:>7.2f}{cell[5]:>7.2f} P1\n')
 
     for i in range(len(atom_pos)):
-        pdb_file.write(f'ATOM   {i+1:>4} {atom_label[i]:>2} MOL       {atom_pos[i][0]:>8.3f}{atom_pos[i][1]:>8.3f}{atom_pos[i][2]:>8.3f}  1.00  0.00           {atom_label[i]}\n')
+        pdb_file.write(f'ATOM   {i+1:>4} {atom_label[i]:>2}   MOL          {atom_pos[i][0]:>8.3f}{atom_pos[i][1]:>8.3f}{atom_pos[i][2]:>8.3f}  1.00  0.00           {atom_label[i]}\n')
 
     pdb_file.close()
     
