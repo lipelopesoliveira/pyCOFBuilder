@@ -863,12 +863,12 @@ def save_cif(file_path, file_name, cell, atom_labels, atom_pos, partial_charges=
 
     cif_file.write(f'data_{file_name}\n')
     cif_file.write(f'_chemical_name_common                  \'{file_name}\'\n')
-    cif_file.write(f'_cell_length_a                         {a:.6f}\n')
-    cif_file.write(f'_cell_length_b                         {b:.6f}\n')
-    cif_file.write(f'_cell_length_c                         {c:.6f}\n')
-    cif_file.write(f'_cell_angle_alpha                      {alpha:.2f}\n')
-    cif_file.write(f'_cell_angle_beta                       {beta:.2f}\n')
-    cif_file.write(f'_cell_angle_gamma                      {gamma:.2f}\n')
+    cif_file.write(f'_cell_length_a                         {a:>10.6f}\n')
+    cif_file.write(f'_cell_length_b                         {b:>10.6f}\n')
+    cif_file.write(f'_cell_length_c                         {c:>10.6f}\n')
+    cif_file.write(f'_cell_angle_alpha                      {alpha:>6.2f}\n')
+    cif_file.write(f'_cell_angle_beta                       {beta:>6.2f}\n')
+    cif_file.write(f'_cell_angle_gamma                      {gamma:>6.2f}\n')
     cif_file.write('_space_group_name_H-M_alt              \'P 1\'\n')
     cif_file.write('_space_group_IT_number                 1\n')
     cif_file.write('\n')
@@ -891,9 +891,9 @@ def save_cif(file_path, file_name, cell, atom_labels, atom_pos, partial_charges=
     for i in range(len(atom_pos)):
         u, v, w = atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]
         if partial_charges is not False:
-            cif_file.write(f'{atom_labels[i]}    {atom_labels[i]}    {u:<.9f}    {v:<.9f}    {w:<.9f}   {partial_charges[i]:.5f}\n')
+            cif_file.write(f'{atom_labels[i]}    {atom_labels[i]} {u:>15.9f} {v:>15.9f} {w:>15.9f} {partial_charges[i]:>10.5f}\n')
         else:
-            cif_file.write(f'{atom_labels[i]}    {atom_labels[i]}    {u:<.9f}    {v:<.9f}    {w:<.9f}\n')
+            cif_file.write(f'{atom_labels[i]}    {atom_labels[i]} {u:>15.9f} {v:>15.9f} {w:>15.9f}\n')
 
     cif_file.close()
 
