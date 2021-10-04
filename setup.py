@@ -19,7 +19,7 @@ setup(
     url='https://github.com/lipelopesoliveira/pyCOFBuilder',
     license=license,
     package_dir={'':'pycofbuilder'},
-    install_requires=['os', 'math', 'numpy>=1.2', 'scipy>=1.6.3', 'pymatgen>=2022.0.8'], 
+    install_requires=['os', 'math', 'simplejason', 'numpy>=1.2', 'scipy>=1.6.3', 'pymatgen>=2022.0.8'], 
     classifiers=[
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
