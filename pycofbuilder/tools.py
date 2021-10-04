@@ -18,6 +18,7 @@ import simplejson
 
 def elements_dict(prop='mass'):
     '''Returns a dictionary containing the elements symbol and its selected property.
+    Parameters
     ----------
     prop : string
         The desired property. Can be:
@@ -69,7 +70,7 @@ def elements_dict(prop='mass'):
     'No': 102, 'Lr': 103, 'Rf': 104, 'Ha': 105, 'Sg': 106, 'Hs': 107, 'Bh': 108, 'Mt': 109, 'Uun': 110,
     'X': 0.0, 'Q': 0.0, 'R': 0.0, 'R1': 0.0, 'R2': 0.0, 'R3': 0.0, 'R4': 0.0, 'R5': 0.0, 'R6': 0.0}
     
-        # https://www.tandfonline.com/doi/full/10.1080/00268976.2018.1535143
+    # https://www.tandfonline.com/doi/full/10.1080/00268976.2018.1535143
     polarizability = {'H': 4.51, 'He': 1.38, 'Li': 164, 'Be': 37.7, 'B': 20.5, 'C': 11.3, 'N': 7.4,
     'O': 5.3, 'F': 3.74, 'Ne': 2.66, 'Na': 163, 'Mg': 71.2, 'Al': 58, 'Si': 37.3,
     'P': 25, 'S': 19.4, 'Cl': 14.6, 'Ar': 11.1, 'K': 290, 'Ca': 161, 'Sc': 97,
@@ -103,7 +104,7 @@ def elements_dict(prop='mass'):
     'Kr': 3.23, 'Xe': 3.02, 'Rn': 2.81,'X': 0.0, 'Q': 0.0, 'R': 0.0, 'R1': 0.0,
      'R2': 0.0, 'R3': 0.0, 'R4': 0.0, 'R5': 0.0, 'R6': 0.0}
         
-        # https://www.nature.com/articles/s41467-021-22429-0#Sec5
+    # https://www.nature.com/articles/s41467-021-22429-0#Sec5
     thermo_electronecativity = {'H': 3.04, 'Li': 2.17, 'Na': 2.15, 'K': 2.07, 'Rb': 2.07, 'Cs': 1.97,
     'Fr': 2.01, 'Be': 2.42, 'Mg': 2.39, 'Ca': 2.2, 'Sr': 2.13, 'Ba': 2.02,
     'Sc': 2.35, 'Ti': 2.23, 'V': 2.08, 'Cr': 2.12, 'Mn': 2.2, 'Fe': 2.32,
@@ -603,11 +604,55 @@ def print_comand(text, verbose, match):
 
 ############# Reads and save files #####################
 
+def save_csv(path, file_name, data, delimiter=',', head=False):
+    """
+    Saves a file in format `.csv`.
+
+    Parameters
+    ----------
+    path : str
+        Path to the file.
+    file_name : str
+        Name of the `csv` file. Does not neet to contain the `.csv` extention. 
+    data : list
+        Data to be saved.
+    delimiter: str
+        Delimiter of the columns. `,` is the default. 
+    head : str
+        Names of the columns.
+    """
+    file_name = file_name.split('.')[0] # Remove the extention if exists
+    file_name = os.path.join(path, file_name + '.csv')
+
+    file_temp = open(file_name, 'w')
+    if head is not False:
+        file_temp.write(head)
+    for i in range(len(data)):
+        file_temp.write(delimiter.join([str(j) for j in data[i]]) + '\n')
+
+    file_temp.close()
+
 def read_xyz_file(path, file_name):
-    '''Reads a file in format `.xyz` from the `path` given and returns a list containg the N atom labels and 
-    a Nx3 array contaning the atoms coordinates.'''
+    """
+    Reads a file in format `.xyz` from the `path` given and returns a list containg the N atom labels and 
+    a Nx3 array contaning the atoms coordinates.
+
+    Parameters
+    ----------
+    path : str
+        Path to the file.
+    file_name : str
+        Name of the `xyz` file. Does not neet to contain the `.xyz` extention. 
+
+    Returns
+    -------
+    atom_labels : list
+        List of strings containing containg the N atom labels. 
+    atom_pos : numpy array
+        Nx3 array contaning the atoms coordinates
+    """
     
-    file_name = file_name.split('.')[0]
+    file_name = file_name.split('.')[0] # Remove the extention if exists
 
     if os.path.exists(os.path.join(path, file_name + '.xyz')):
         temp_file = open(os.path.join(path, file_name + '.xyz'), 'r').readlines()
@@ -620,24 +665,396 @@ def read_xyz_file(path, file_name):
         return atom_labels, atom_pos
     else:
         print(f'File {file_name} not found!')
+        return None
 
 def read_gjf_file(path, file_name):
-    '''Reads a file in format `.gjf` from the `path` given and returns a list containg the N atom labels and 
-    a Nx3 array contaning the atoms coordinates.'''
+    """
+    Reads a file in format `.gjf` from the `path` given and returns a list containg the N atom labels and 
+    a Nx3 array contaning the atoms coordinates.
+
+    Parameters
+    ----------
+    path : str
+        Path to the file.
+    file_name : str
+        Name of the `gjf` file. Does not neet to contain the `.gjf` extention. 
+
+    Returns
+    -------
+    atom_labels : list
+        List of strings containing containg the N atom labels. 
+    atom_pos : numpy array
+        Nx3 array contaning the atoms coordinates
+    """
+
+    file_name = file_name.split('.')[0] # Remove the extention if exists
+
+    if os.path.exists(os.path.join(path, file_name + '.gjf')):
     
+        temp_file = open(os.path.join(path, file_name + '.gjf'), 'r').readlines()
+        temp_file = [i.split() for i in temp_file if i != '\n']
+
+        atoms = [i for i in temp_file if i[0] in elements_dict()]
+
+        atom_labels = [i[0] for i in atoms]
+        atom_pos = np.array([[float(i[1]), float(i[2]), float(i[3])] for i in atoms])
+
+        return atom_labels, atom_pos
+    else:
+        print(f'File {file_name} not found!')
+        return None
+
+def read_cif(path, file_name):
+    """
+    Reads a file in format `.cif` from the `path` given and returns a list containg the N atom labels and 
+    a Nx3 array contaning the atoms coordinates.
+
+    Parameters
+    ----------
+    path : str
+        Path to the file.
+    file_name : str
+        Name of the `cif` file. Does not neet to contain the `.cif` extention. 
+
+    Returns
+    -------
+    cell : numpy array
+        3x3 array contaning the cell vectors.
+    atom_labels : list
+        List of strings containing containg the N atom labels. 
+    atom_pos : numpy array
+        Nx3 array contaning the atoms coordinates
+    charges : list
+        List of strings containing containg the N atom partial charges. 
+    """
+
+    file_name = file_name.split('.')[0] # Remove the extention if exists
+
+    if os.path.exists(os.path.join(path, file_name + '.cif')):
+
+        temp_file = open(os.path.join(path, file_name), 'r').readlines()
+        cell = []
+        atom_label = []
+        atom_pos = []
+        charges = []
+        has_charges = False
+        for i in temp_file:
+            if 'cell_length_a' in i:
+                cell += [float(i.split()[-1])]
+            if 'cell_length_b' in i:
+                cell += [float(i.split()[-1])]    
+            if 'cell_length_c' in i:
+                cell += [float(i.split()[-1])]  
+            if 'cell_angle_alpha' in i:
+                cell += [float(i.split()[-1])]  
+            if '_cell_angle_beta' in i:
+                cell += [float(i.split()[-1])]  
+            if '_cell_angle_gamma' in i:
+                cell += [float(i.split()[-1])]  
+            if '_atom_site_charge' in i:
+                has_charges = True
+
+        for i in temp_file:
+            line = i.split()
+            if len(line) > 1 and line[0] in elements_dict().keys():
+                atom_label += [line[0]]
+                atom_pos += [[float(j) for j in line[2:5]]]
+                if has_charges:
+                    charges += [float(line[-1])]
+        cell = cellpar_to_cell(cell)
+
+        return cell, atom_label, atom_pos, charges 
+    else:
+        print(f'File {file_name} not found!')
+        return None   
+
+def save_xsf(path, file_name, cell, atom_label, atom_pos):
+    """
+    Save a file in format `.xsf` on the `path`.
+
+    Parameters
+    ----------
+    path : str
+        Path to the file.
+    file_name : str
+        Name of the file. Does not neet to contain the `.xsf` extention. 
+    cell : numpy array
+        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters. 
+    atom_label : list
+        List of strings containing containg the N atom label. 
+    atom_pos : list
+        Nx3 array contaning the atoms coordinates.
+    """
+
     file_name = file_name.split('.')[0]
+
+    if len(cell) == 6:
+        cell = cellpar_to_cell(cell)
+
+    xsf_file = open(os.path.join(path, file_name + '.xsf'), 'w')
+    xsf_file.write(' CRYSTAL\n')
+    xsf_file.write('  PRIMVEC\n')
+
+    for i in range(len(cell)):
+        xsf_file.write(f'  {cell[i][0]:>5.9f}    {cell[i][1]:>5.9f}    {cell[i][2]:>5.9f}\n')
+
+    xsf_file.write('   PRIMCOORD\n')
+    xsf_file.write(f'           {len(atom_pos)}           1\n')
+
+    for i in range(len(atom_pos)):
+        xsf_file.write(f'{atom_label[i]}        {atom_pos[i][0]:>5.9f}    {atom_pos[i][1]:>5.9f}    {atom_pos[i][2]:>5.9f}\n')
+
+    xsf_file.close()
+
+def save_pqr(path, file_name, cell, atom_label, atom_pos, partial_charges=False):
+    """
+    Save a file in format `.pqr` on the `path`.
+
+    Parameters
+    ----------
+    path : str
+        Path to the file.
+    file_name : str
+        Name of the file. Does not neet to contain the `.pqr` extention. 
+    cell : numpy array
+        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters. 
+    atom_label : list
+        List of strings containing containg the N atom partial charges. 
+    atom_pos : list
+        Nx3 array contaning the atoms coordinates.
+    partial_charges: list
+        List of strings containing containg the N atom partial charges. 
+    """
+
+    file_name = file_name.split('.')[0]
+
+    if len(cell) == 3:
+        cell = cell_to_cellpar(cell)
+
+    pqr_file = open(os.path.join(path, file_name + '.pqr'), 'w')
+    pqr_file.write(f'TITLE       {file_name}  \n')
+    pqr_file.write('REMARK   4\n')
+    pqr_file.write(f'CRYST1{cell[0]:>9.3f}{cell[1]:>9.3f}{cell[2]:>9.3f}{cell[3]:>7.2f}{cell[4]:>7.2f}{cell[5]:>7.2f} P1\n')
+
+    if partial_charges is not False:
+        for i in range(len(atom_pos)):
+            pqr_file.write(f'ATOM   {i+1:>4} {atom_label[i]:>2}   MOL A   0    {atom_pos[i][0]:>8.3f}{atom_pos[i][1]:>8.3f}{atom_pos[i][2]:>8.3f}{partial_charges:>8.5f}                {atom_label[i]}\n')
+    if partial_charges is False:
+        for i in range(len(atom_pos)):
+            pqr_file.write(f'ATOM   {i+1:>4} {atom_label[i]:>2}   MOL A   0    {atom_pos[i][0]:>8.3f}{atom_pos[i][1]:>8.3f}{atom_pos[i][2]:>8.3f}                {atom_label[i]}\n')
+
+    pqr_file.close()
+
+def save_pdb(path, file_name, cell, atom_label, atom_pos):
+    """
+    Save a file in format `.pdb` on the `path`.
+
+    Parameters
+    ----------
+    path : str
+        Path to the file.
+    file_name : str
+        Name of the file. Does not neet to contain the `.pdb` extention. 
+    cell : numpy array
+        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters. 
+    atom_label : list
+        List of strings containing containg the N atom partial charges. 
+    atom_pos : list
+        Nx3 array contaning the atoms coordinates.
+    """
+
+    file_name = file_name.split('.')[0]
+
+    if len(cell) == 3:
+        cell = cell_to_cellpar(cell)
+
+    pdb_file = open(os.path.join(path, file_name + '.pdb'), 'w')
+    pdb_file.write(f'TITLE       {file_name}  \n')
+    pdb_file.write('REMARK   pyCOFBuilder\n')
+    pdb_file.write(f'CRYST1{cell[0]:>9.3f}{cell[1]:>9.3f}{cell[2]:>9.3f}{cell[3]:>7.2f}{cell[4]:>7.2f}{cell[5]:>7.2f} P1\n')
+
+    for i in range(len(atom_pos)):
+        pdb_file.write(f'ATOM   {i+1:>4} {atom_label[i]:>2}   MOL          {atom_pos[i][0]:>8.3f}{atom_pos[i][1]:>8.3f}{atom_pos[i][2]:>8.3f}  1.00  0.00           {atom_label[i]}\n')
+
+    pdb_file.close()
+
+def save_gjf(path, file_name, atom_labels, atom_pos, text='opt pm6'):
+    """
+    Save a file in format `.gjf` on the `path`.
+
+    Parameters
+    ----------
+    path : str
+        Path to the file.
+    file_name : str
+        Name of the file. Does not neet to contain the `.gjf` extention. 
+    cell : numpy array
+        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters. 
+    atom_label : list
+        List of strings containing containg the N atom partial charges. 
+    atom_pos : list
+        Nx3 array contaning the atoms coordinates.
+    text : str
+        Parameters for Gaussian calculations.
+    """
+
+    file_name = file_name.split('.')[0]
+
+    temp_file = open(os.path.join(path, file_name), 'w')
+    temp_file.write(f'%chk={file_name}.chk \n')
+    temp_file.write(f'# {text}\n')
+    temp_file.write('\n')
+    temp_file.write(f'{file_name}\n')
+    temp_file.write('\n')
+    temp_file.write('0 1 \n')
+
+    for i in range(len(atom_labels)):
+        temp_file.write('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(atom_labels[i], atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]))
+
+    temp_file.write('\n')
+    temp_file.write('\n')
+    temp_file.close()
+
+def save_xyz(path, file_name, atom_labels, atom_pos, cell=None):
+    """
+    Save a file in format `.xyz` on the `path`.
+
+    Parameters
+    ----------
+    path : str
+        Path to the file.
+    file_name : str
+        Name of the file. Does not neet to contain the `.xyz` extention. 
+    atom_label : list
+        List of strings containing containg the N atom partial charges. 
+    atom_pos : list
+        Nx3 array contaning the atoms coordinates.
+    cell : numpy array
+        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters. 
+    """
+
+    file_name = file_name.split('.')[0]
+
+    temp_file = open(os.path.join(path, file_name + '.xyz'), 'w')
+    temp_file.write(f'{len(atom_labels)}\n')
+
+    if len(cell) == 3:
+        cell = cell_to_cellpar(cell)
     
-    temp_file = open(os.path.join(path, file_name + '.gjf'), 'r').readlines()
-    temp_file = [i.split() for i in temp_file if i != '\n']
+    if cell is None:
+        temp_file.write(f'{file_name}\n')
+    else:
+        temp_file.write(f'{cell[0]}  {cell[1]}  {cell[2]}  {cell[3]}  {cell[4]}  {cell[5]}\n')
 
-    atoms = [i for i in temp_file if i[0] in elements_dict()]
+    for i in range(len(atom_labels)):
+        temp_file.write('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(atom_labels[i], atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]))
 
-    atom_labels = [i[0] for i in atoms]
-    atom_pos = np.array([[float(i[1]), float(i[2]), float(i[3])] for i in atoms])
+    temp_file.close()
 
+def save_json(path, file_name, cell, atom_labels, atom_pos):
+    """
+    Save a file in format `.json` on the `path`.
 
-    return atom_labels, atom_pos
+    Parameters
+    ----------
+    path : str
+        Path to the file.
+    file_name : str
+        Name of the file. Does not neet to contain the `.cif` extention. 
+    atom_label : list
+        List of strings containing containg the N atom partial charges. 
+    atom_pos : list
+        Nx3 array contaning the atoms coordinates.
+    cell : numpy array
+        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters. 
+    """
 
+    file_name = file_name.split('.')[0]
+
+    cof_json = create_COF_json(file_name)
+
+    if len(cell) == 3:
+        cell_par = cell_to_cellpar(np.array(cell)).tolist()
+        cell_par =  [round(i, 10) for i in cell_par]
+
+    if len(cell) == 6:
+        cell_par = cell
+        cell = cellpar_to_cell(cell_par).tolist()
+
+    cof_json['system']['geo_opt'] = False
+    
+    cof_json['geometry']['cell_matrix'] = cell
+    cof_json['geometry']['cell_parameters'] = cell_par
+    cof_json['geometry']['atom_labels'] = atom_labels
+    cof_json['geometry']['atom_pos'] = atom_pos
+
+    write_json(path, file_name, cof_json)
+
+def save_cif(path, file_name, cell, atom_labels, atom_pos, partial_charges=False, frac_coords=True ):
+    """
+    Save a file in format `.cif` on the `path`.
+
+    Parameters
+    ----------
+    path : str
+        Path to the file.
+    file_name : str
+        Name of the file. Does not neet to contain the `.cif` extention. 
+    atom_label : list
+        List of strings containing containg the N atom partial charges. 
+    atom_pos : list
+        Nx3 array contaning the atoms coordinates.
+    cell : numpy array
+        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters. 
+    """
+
+    file_name = file_name.split('.')[0]
+
+    if len(cell) == 3:
+        a, b, c, alpha, beta, gamma = cell_to_cellpar(cell)
+    if len(cell) == 6:
+        a, b, c, alpha, beta, gamma = cell
+
+    r = get_cartesian_to_fractional_matrix(a, b, c, alpha, beta, gamma)
+
+    cif_file = open(os.path.join(path, file_name + '.cif'), 'w')
+
+    cif_file.write(f'data_{file_name}\n')
+    cif_file.write(f'_chemical_name_common                  \'{file_name}\'\n')
+    cif_file.write(f'_cell_length_a                         {a:>10.6f}\n')
+    cif_file.write(f'_cell_length_b                         {b:>10.6f}\n')
+    cif_file.write(f'_cell_length_c                         {c:>10.6f}\n')
+    cif_file.write(f'_cell_angle_alpha                      {alpha:>6.2f}\n')
+    cif_file.write(f'_cell_angle_beta                       {beta:>6.2f}\n')
+    cif_file.write(f'_cell_angle_gamma                      {gamma:>6.2f}\n')
+    cif_file.write('_space_group_name_H-M_alt              \'P 1\'\n')
+    cif_file.write('_space_group_IT_number                 1\n')
+    cif_file.write('\n')
+    cif_file.write('loop_\n')
+    cif_file.write('_symmetry_equiv_pos_as_xyz\n')
+    cif_file.write('   \'x, y, z\'\n')
+    cif_file.write('\n')
+    cif_file.write('loop_\n')
+    cif_file.write('   _atom_site_label\n')
+    cif_file.write('   _atom_site_type_symbol\n')
+    cif_file.write('   _atom_site_fract_x\n')
+    cif_file.write('   _atom_site_fract_y\n')
+    cif_file.write('   _atom_site_fract_z\n')
+    if partial_charges is not False:
+        cif_file.write('   _atom_site_charge\n')
+
+    if frac_coords is False:
+        atom_pos = [np.dot(r, [i[0], i[1], i[2]]) for i in atom_pos]
+
+    for i in range(len(atom_pos)):
+        u, v, w = atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]
+        if partial_charges is not False:
+            cif_file.write(f'{atom_labels[i]}    {atom_labels[i]} {u:>15.9f} {v:>15.9f} {w:>15.9f} {partial_charges[i]:>10.5f}\n')
+        else:
+            cif_file.write(f'{atom_labels[i]}    {atom_labels[i]} {u:>15.9f} {v:>15.9f} {w:>15.9f}\n')
+
+    cif_file.close()
+     
 def convert_gjf_2_xyz(path, file_name):
 
     file_name = file_name.split('.')[0]
@@ -687,215 +1104,6 @@ def convert_cif_2_xyz(path, file_name, supercell=[1, 1, 1]):
         temp_file.write('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(atom_labels[i], atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]))
 
     temp_file.close()
-    
-def save_csv(file_name, data, delimiter=';', head=False):
-
-    file_temp = open(file_name, 'w')
-    if head is not False:
-        file_temp.write(head)
-    for i in range(len(data)):
-        file_temp.write(delimiter.join([str(j) for j in data[i]]) + '\n')
-
-    file_temp.close()
-
-def save_xsf(file_path, file_name, cell, atom_label, atom_pos):
-
-    file_name = file_name.split('.')[0]
-
-    if len(cell) == 6:
-        cell = cellpar_to_cell(cell)
-
-    xsf_file = open(os.path.join(file_path, file_name + '.xsf'), 'w')
-    xsf_file.write(' CRYSTAL\n')
-    xsf_file.write('  PRIMVEC\n')
-
-    for i in range(len(cell)):
-        xsf_file.write(f'  {cell[i][0]:<.9f}    {cell[i][1]:<.9f}    {cell[i][2]:<.9f}\n')
-
-    xsf_file.write('   PRIMCOORD\n')
-    xsf_file.write(f'           {len(atom_pos)}           1\n')
-
-    for i in range(len(atom_pos)):
-        xsf_file.write(f'{atom_label[i]}        {atom_pos[i][0]:<.9f}    {atom_pos[i][1]:<.9f}    {atom_pos[i][2]:<.9f}\n')
-
-    xsf_file.close()
-
-def save_pqr(file_path, file_name, cell, atom_label, atom_pos, partial_charges=False):
-
-    file_name = file_name.split('.')[0]
-
-    if len(cell) == 3:
-        cell = cell_to_cellpar(cell)
-
-    pqr_file = open(os.path.join(file_path, file_name + '.pqr'), 'w')
-    pqr_file.write(f'TITLE       {file_name}  \n')
-    pqr_file.write('REMARK   4\n')
-    pqr_file.write(f'CRYST1{cell[0]:>9.3f}{cell[1]:>9.3f}{cell[2]:>9.3f}{cell[3]:>7.2f}{cell[4]:>7.2f}{cell[5]:>7.2f} P1\n')
-
-    if partial_charges is not False:
-        for i in range(len(atom_pos)):
-            pqr_file.write(f'ATOM   {i+1:>4} {atom_label[i]:>2}   MOL A   0    {atom_pos[i][0]:>8.3f}{atom_pos[i][1]:>8.3f}{atom_pos[i][2]:>8.3f}{partial_charges:>8.5f}                {atom_label[i]}\n')
-    if partial_charges is False:
-        for i in range(len(atom_pos)):
-            pqr_file.write(f'ATOM   {i+1:>4} {atom_label[i]:>2}   MOL A   0    {atom_pos[i][0]:>8.3f}{atom_pos[i][1]:>8.3f}{atom_pos[i][2]:>8.3f}                {atom_label[i]}\n')
-
-    pqr_file.close()
-    
-def save_pdb(file_path, file_name, cell, atom_label, atom_pos):
-
-    file_name = file_name.split('.')[0]
-
-    if len(cell) == 3:
-        cell = cell_to_cellpar(cell)
-
-    pdb_file = open(os.path.join(file_path, file_name + '.pdb'), 'w')
-    pdb_file.write(f'TITLE       {file_name}  \n')
-    pdb_file.write('REMARK   pyCOFBuilder\n')
-    pdb_file.write(f'CRYST1{cell[0]:>9.3f}{cell[1]:>9.3f}{cell[2]:>9.3f}{cell[3]:>7.2f}{cell[4]:>7.2f}{cell[5]:>7.2f} P1\n')
-
-    for i in range(len(atom_pos)):
-        pdb_file.write(f'ATOM   {i+1:>4} {atom_label[i]:>2}   MOL          {atom_pos[i][0]:>8.3f}{atom_pos[i][1]:>8.3f}{atom_pos[i][2]:>8.3f}  1.00  0.00           {atom_label[i]}\n')
-
-    pdb_file.close()
-    
-def save_gjf(file_path, file_name, atom_labels, atom_pos, text='opt pm6'):
-
-    file_name = file_name.split('.')[0]
-
-    temp_file = open(os.path.join(file_path, file_name), 'w')
-    temp_file.write(f'%chk={file_name[:-4]}.chk \n')
-    temp_file.write(f'# {text}\n')
-    temp_file.write('\n')
-    temp_file.write(f'{file_name}\n')
-    temp_file.write('\n')
-    temp_file.write('0 1 \n')
-
-    for i in range(len(atom_labels)):
-        temp_file.write('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(atom_labels[i], atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]))
-
-    temp_file.write('\n')
-    temp_file.write('\n')
-    temp_file.close()
-
-def save_xyz(file_path, file_name, atom_labels, atom_pos, cell=None):
-
-    file_name = file_name.split('.')[0]
-
-    temp_file = open(os.path.join(file_path, file_name + '.xyz'), 'w')
-    temp_file.write(f'{len(atom_labels)}\n')
-    
-    if cell is None:
-        temp_file.write(f'{file_name}\n')
-    else:
-        temp_file.write(f'{cell[0]}  {cell[1]}  {cell[2]}  {cell[3]}  {cell[4]}  {cell[5]}\n')
-
-    for i in range(len(atom_labels)):
-        temp_file.write('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(atom_labels[i], atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]))
-
-    temp_file.close()
-
-def save_json(path, file_name, cell, atom_labels, atom_pos):
-
-    file_name = file_name.split('.')[0]
-
-    cof_json = create_COF_json(file_name)
-
-    if len(cell) == 3:
-        cell_par = cell_to_cellpar(np.array(cell)).tolist()
-        cell_par =  [round(i, 10) for i in cell_par]
-
-    if len(cell) == 6:
-        cell_par = cell
-        cell = cellpar_to_cell(cell_par).tolist()
-
-    cof_json['system']['geo_opt'] = False
-    
-    cof_json['geometry']['cell_matrix'] = cell
-    cof_json['geometry']['cell_parameters'] = cell_par
-    cof_json['geometry']['atom_labels'] = atom_labels
-    cof_json['geometry']['atom_pos'] = atom_pos
-
-    write_json(path, file_name, cof_json)
-    
-def read_cif(file_path, file_name):
-    tmp = open(os.path.join(file_path, file_name), 'r').readlines()
-    cell = []
-    atom_label = []
-    atom_pos = []
-    charges = []
-    has_charges = False
-    for i in tmp:
-        if 'cell_length_a' in i:
-            cell += [float(i.split()[-1])]
-        if 'cell_length_b' in i:
-            cell += [float(i.split()[-1])]    
-        if 'cell_length_c' in i:
-            cell += [float(i.split()[-1])]  
-        if 'cell_angle_alpha' in i:
-            cell += [float(i.split()[-1])]  
-        if '_cell_angle_beta' in i:
-            cell += [float(i.split()[-1])]  
-        if '_cell_angle_gamma' in i:
-            cell += [float(i.split()[-1])]  
-
-    for i in tmp:
-        line = i.split()
-        if len(line) > 1 and line[0] in elements_dict().keys():
-            atom_label += [line[0]]
-            atom_pos += [[float(j) for j in line[2:-1]]]
-            charges += [float(line[-1])]
-    cell = cellpar_to_cell(cell)
-
-    return cell, atom_label, atom_pos, charges     
-
-def save_cif(file_path, file_name, cell, atom_labels, atom_pos, partial_charges=False, frac_coords=True ):
-
-    file_name = file_name.split('.')[0]
-
-    if len(cell) == 3:
-        a, b, c, alpha, beta, gamma = cell_to_cellpar(cell)
-    if len(cell) == 6:
-        a, b, c, alpha, beta, gamma = cell
-
-    r = get_cartesian_to_fractional_matrix(a, b, c, alpha, beta, gamma)
-
-    cif_file = open(os.path.join(file_path, file_name + '.cif'), 'w')
-
-    cif_file.write(f'data_{file_name}\n')
-    cif_file.write(f'_chemical_name_common                  \'{file_name}\'\n')
-    cif_file.write(f'_cell_length_a                         {a:>10.6f}\n')
-    cif_file.write(f'_cell_length_b                         {b:>10.6f}\n')
-    cif_file.write(f'_cell_length_c                         {c:>10.6f}\n')
-    cif_file.write(f'_cell_angle_alpha                      {alpha:>6.2f}\n')
-    cif_file.write(f'_cell_angle_beta                       {beta:>6.2f}\n')
-    cif_file.write(f'_cell_angle_gamma                      {gamma:>6.2f}\n')
-    cif_file.write('_space_group_name_H-M_alt              \'P 1\'\n')
-    cif_file.write('_space_group_IT_number                 1\n')
-    cif_file.write('\n')
-    cif_file.write('loop_\n')
-    cif_file.write('_symmetry_equiv_pos_as_xyz\n')
-    cif_file.write('   \'x, y, z\'\n')
-    cif_file.write('\n')
-    cif_file.write('loop_\n')
-    cif_file.write('   _atom_site_label\n')
-    cif_file.write('   _atom_site_type_symbol\n')
-    cif_file.write('   _atom_site_fract_x\n')
-    cif_file.write('   _atom_site_fract_y\n')
-    cif_file.write('   _atom_site_fract_z\n')
-    if partial_charges is not False:
-        cif_file.write('   _atom_site_charge\n')
-
-    if frac_coords is False:
-        atom_pos = [np.dot(r, [i[0], i[1], i[2]]) for i in atom_pos]
-
-    for i in range(len(atom_pos)):
-        u, v, w = atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]
-        if partial_charges is not False:
-            cif_file.write(f'{atom_labels[i]}    {atom_labels[i]} {u:>15.9f} {v:>15.9f} {w:>15.9f} {partial_charges[i]:>10.5f}\n')
-        else:
-            cif_file.write(f'{atom_labels[i]}    {atom_labels[i]} {u:>15.9f} {v:>15.9f} {w:>15.9f}\n')
-
-    cif_file.close()
 
 
 ########################### JSON related ##########################  
@@ -933,8 +1141,8 @@ def create_COF_json(name):
     experimental_info = 'Experimental data DRX, FTIR, ssNMR, UV-VIS...'
 
     COF_json = {'system':{'description':system_info,
-                          'name':name,
-                          'geo_opt':False},
+                           'name':name,
+                            'geo_opt':False},
                 'geometry':{'description':geometry_info},
                 'optimization':{'description':optimization_info},
                 'adsorption':{'description':adsorption_info},
