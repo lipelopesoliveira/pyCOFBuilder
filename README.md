@@ -108,14 +108,22 @@ for the complete explanation of implementation and functionalities.
 
 ## COFs and Building Blocks nomenclature
 
-In order to ensure greater reproducibility as well as quickly and easily access to relevant information from the COFs, I've developed a simple nomenclature to name the structure. Generally speaking, a COF can be described as `Building_Block_1`-`Building_Block_2`-`Net`-`Stacking`, where:
+In order to ensure greater reproducibility as well as quickly and easily access to relevant information from the COFs, I've developed a simple nomenclature to name the structure. Generally speaking, a COF can be described as 
+
+### `Building_Block_1`-`Building_Block_2`-`Net`-`Stacking`
+
+, where:
 
  - `Building_Block_1`: The building block with the greater connectivity.
  - `Building_Block_2`: The building block with the smaller connectivity.
  - `Net`: The net describing the reticular structure.
  - `Stacking`: The stacking (for 2D structures) or interpenetrating degree (for 3D structures) 
 
-To name the building blocks I also developed a set of rules. The building block can be described as `Symmetry`\_`Core`\_`Connector`\_`RadicalGroupR1`\_`RadicalGroupR1`\_... where:
+To name the building blocks I also developed a set of rules. The building block can be described as 
+
+### `Symmetry`\_`Core`\_`Connector`\_`RadicalGroupR1`\_`RadicalGroupR2`\_`RadicalGroupR3`\_`...`
+
+where:
 
  - `Symmetry`: The general symmetry of the building block. Also represents the connectivity of the building block. For 2D building blocks can be `C2`, `C3` or `C4`, and for 3D building blocks can be `D4`. 
  - `Core`: The 4 letters code referring to the building block core. 
