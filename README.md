@@ -112,7 +112,7 @@ In order to ensure greater reproducibility as well as quickly and easily access 
 
 ### `Building_Block_1`-`Building_Block_2`-`Net`-`Stacking`
 
-, where:
+where:
 
  - `Building_Block_1`: The building block with the greater connectivity.
  - `Building_Block_2`: The building block with the smaller connectivity.
