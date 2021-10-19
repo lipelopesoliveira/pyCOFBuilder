@@ -160,7 +160,7 @@ def build(cof_name=None, save_format=['cif'], lib='bb_lib', print_result=True):
             return [False, f'{bb1}-{bb2}-{net}-{stacking}']
 
 
-def build_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=True, cif=False, turbomole=False, vasp=False, json=True):
+def build_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, cif=True, turbomole=False, vasp=False, json=True):
 
     save_f = []
 
