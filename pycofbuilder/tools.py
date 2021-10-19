@@ -7,7 +7,7 @@ Created on Thu Dec 17 11:31:19 2020
 
 import os
 import numpy as np
-import math
+from math import ceil
 from scipy.spatial import distance
 try:
     from pymatgen.io.cif import CifParser
@@ -503,11 +503,71 @@ def get_kgrid(cell, distance=0.3):
     '''
     b1, b2, b3 = get_reciprocal_vectors(cell)
     b = np.array([np.linalg.norm(b1), np.linalg.norm(b2), np.linalg.norm(b3)])
-    kx = math.ceil(b[0]/distance)
-    ky = math.ceil(b[1]/distance)
-    kz = math.ceil(b[2]/distance)
+    kx = ceil(b[0]/distance)
+    ky = ceil(b[1]/distance)
+    kz = ceil(b[2]/distance)
 
     return kx, ky, kz
+
+def create_CellBox(A, B, C, alpha, beta, gamma):
+    """Creates the CellBox using the same expression as RASPA."""
+    tempd = np.cos(alpha) - np.cos(gamma) * np.cos(beta) / np.sin(gamma)
+    ax = A
+    ay = 0
+    az = 0
+    bx = B * np.cos(gamma)
+    by = B * np.sin(gamma)
+    bz = 0 
+    cx = C * np.cos(beta)
+    cy = C * tempd
+    cz = C * np.sqrt(1 - np.cos(beta) ** 2 - tempd ** 2 )
+    
+    CellBox = np.array([[ax, ay, az], [bx, by, bz], [cx, cy, cz]])
+    
+    return CellBox
+
+def calculate_UnitCells(cell, cutoff):
+    '''
+    Calculate the number of unit cell repetitions so that all supercell lengths are larger than
+    twice the interaction potential cut-off radius. 
+    
+    RASPA considers the perpendicular directions the directions perpendicular to the `ab`, `bc`,
+    and `ca` planes. Thus, the directions depend on who the crystallographic vectors `a`, `b`, 
+    and `c` are and the length in the perpendicular directions would be the projections 
+    of the crystallographic vectors on the vectors `a x b`, `b x c`, and `c x a`. 
+    (here `x` means cross product)
+    ----------
+    cell_matrix : array
+        (3,3) cell vectors or (6,1)
+    Returns
+    -------
+    SuperCell
+        (3,1) list containg the number of repiting units in `x`, `y`, `z` directions. 
+    '''
+
+    # Make sure that the cell is in the format of cell matrix
+    if len(cell) == 6:
+        CellBox = cellpar_to_cell(cell)
+    if len(cell) == 3:
+        CellBox = cell
+    
+    # Pre-calculate the cross products
+    axb = np.cross(CellBox[0], CellBox[1])
+    bxc = np.cross(CellBox[1], CellBox[2])
+    cxa = np.cross(CellBox[2], CellBox[1])
+    
+    # Calculates the cell volume
+    V = np.dot(np.cross(CellBox[0], CellBox[1]), CellBox[2])
+
+    # Calculate perpendicular widths
+    cx = V / np.linalg.norm(bxc)
+    cy = V / np.linalg.norm(cxa)
+    cz = V / np.linalg.norm(axb)
+
+    # Calculate UnitCells array
+    SuperCell = np.ceil(2.0 * cutoff / np.array([cx, cy, cz])).astype(int)
+
+    return SuperCell
 
 def find_index(element, e_list):
     '''Finds the index of a given element in a list
@@ -557,16 +617,16 @@ def find_bond_atom(cof_name):
     conect_1 = bb1.split('_')[2]
     conect_2 = bb2.split('_')[2]
 
-    if 'NH2' in [conect_1, conect_2]:
-        return 'N'
-    if 'CONHNH2' in [conect_1, conect_2]:
-        return 'N'
-    if 'B(OH)2' in [conect_1, conect_2]:
-        return 'B'
-    if 'Cl' in [conect_1, conect_2]:
-        return 'R'
-    if 'Br' in [conect_1, conect_2]:
-        return 'R'
+    bond_dict = {'NH2':'N',
+                 'CONHNH2':'N',
+                 'B(OH)2': 'B',
+                 'Cl': 'R',
+                 'Br':'R'}
+
+    for group in list(bond_dict.keys()):
+        if group in [conect_1, conect_2]:
+            return bond_dict[group]
+
 
 def closest_atom(label_1, pos_1, labels, pos):
 
@@ -938,11 +998,12 @@ def save_xyz(path, file_name, atom_labels, atom_pos, cell=None):
     temp_file = open(os.path.join(path, file_name + '.xyz'), 'w')
     temp_file.write(f'{len(atom_labels)}\n')
 
+    if len(cell) == 3:
+        cell = cell_to_cellpar(cell)
+    
     if cell is None:
         temp_file.write(f'{file_name}\n')
     else:
-        if len(cell) == 3:
-            cell = cell_to_cellpar(cell)
         temp_file.write(f'{cell[0]}  {cell[1]}  {cell[2]}  {cell[3]}  {cell[4]}  {cell[5]}\n')
 
     for i in range(len(atom_labels)):
@@ -1054,6 +1115,33 @@ def save_cif(path, file_name, cell, atom_labels, atom_pos, partial_charges=False
 
     cif_file.close()
      
+def convert_json_2_cif(origin_path, file_name, destiny_path, charge_type='None'):
+    """
+    Convert a file in format `.json` to `.cif`.
+
+    Parameters
+    ----------
+    origin_path : str
+        Path to the '.json' file.
+    file_name : str
+        Name of the file. Does not neet to contain the `.json` extention. 
+    destiny_path : str
+        path where the `.cif` file will be saved.
+    """
+
+    framework_JSON = read_json(origin_path, file_name)
+
+    cell = framework_JSON['geometry']['cell_matrix']
+    atom_labels = framework_JSON['geometry']['atom_labels']
+    atom_pos = framework_JSON['geometry']['atom_pos']
+
+    if charge_type + '_charges' in list(framework_JSON['system'].keys()):
+        partial_charges = framework_JSON['geometry'][charge_type + '_charges']
+    else:
+        partial_charges = False
+
+    save_cif(destiny_path, file_name, cell, atom_labels, atom_pos, partial_charges, frac_coords=False)
+
 def convert_gjf_2_xyz(path, file_name):
 
     file_name = file_name.split('.')[0]
@@ -1151,3 +1239,4 @@ def create_COF_json(name):
                 }
 
     return COF_json
+
