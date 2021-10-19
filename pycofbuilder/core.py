@@ -53,22 +53,22 @@ def build(cof_name=None, save_format=['cif'], lib='bb_lib', print_result=True):
             simm_data = Ret.create_hcb_structure(
                 bb1, bb2, stack=stacking, bond_atom=bond_atom, print_result=print_result)
             if cif is True:
-                Ret.save_cif()
+                Ret.save_cif(supercell=[1, 1, 2])
             if xyz is True:
                 if stacking == 'AA':
                     Ret.save_xyz(supercell=[1, 1, 2])
                 else:
                     Ret.save_xyz()
             if qe is True:
-                Ret.save_qe()
+                Ret.save_qe(supercell=[1, 1, 2])
             if json is True:
-                Ret.save_json()
+                Ret.save_json(supercell=[1, 1, 2])
             if xsf is True:
-                Ret.save_xsf()
+                Ret.save_xsf(supercell=[1, 1, 2])
             if pdb is True:
-                Ret.save_pdb()
+                Ret.save_pdb(supercell=[1, 1, 2])
             if turbomole is True:
-                Ret.save_turbomole()
+                Ret.save_turbomole(supercell=[1, 1, 2])
             if vasp is True:
                 Ret.save_vasp()
             return [True, simm_data]
@@ -90,7 +90,7 @@ def build(cof_name=None, save_format=['cif'], lib='bb_lib', print_result=True):
             if qe is True:
                 Ret.save_qe()
             if json is True:
-                Ret.save_json()
+                Ret.save_json(supercell=[1, 1, 2])
             if xsf is True:
                 Ret.save_xsf()
             if pdb is True:
@@ -160,11 +160,11 @@ def build(cof_name=None, save_format=['cif'], lib='bb_lib', print_result=True):
             return [False, f'{bb1}-{bb2}-{net}-{stacking}']
 
 
-def build_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, cif=True, turbomole=False, vasp=False):
+def build_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=True, cif=False, turbomole=False, vasp=False, json=True):
 
     save_f = []
 
-    for i in [[qe, 'qe'], [xyz, 'xyz'], [cif, 'cif'], [turbomole, 'turbomole'], [vasp, 'vasp']]:
+    for i in [[qe, 'qe'], [xyz, 'xyz'], [cif, 'cif'], [turbomole, 'turbomole'], [vasp, 'vasp'], [json, 'json']]:
         if i[0] is True:
             save_f += [i[1]]
 
