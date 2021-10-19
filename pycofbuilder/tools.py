@@ -7,7 +7,6 @@ Created on Thu Dec 17 11:31:19 2020
 
 import os
 import numpy as np
-from math import ceil
 from scipy.spatial import distance
 try:
     from pymatgen.io.cif import CifParser
@@ -503,9 +502,9 @@ def get_kgrid(cell, distance=0.3):
     '''
     b1, b2, b3 = get_reciprocal_vectors(cell)
     b = np.array([np.linalg.norm(b1), np.linalg.norm(b2), np.linalg.norm(b3)])
-    kx = ceil(b[0]/distance)
-    ky = ceil(b[1]/distance)
-    kz = ceil(b[2]/distance)
+    kx = np.ceil(b[0]/distance)
+    ky = np.ceil(b[1]/distance)
+    kz = np.ceil(b[2]/distance)
 
     return kx, ky, kz
 
