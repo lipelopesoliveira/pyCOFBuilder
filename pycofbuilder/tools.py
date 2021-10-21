@@ -997,12 +997,11 @@ def save_xyz(path, file_name, atom_labels, atom_pos, cell=None):
     temp_file = open(os.path.join(path, file_name + '.xyz'), 'w')
     temp_file.write(f'{len(atom_labels)}\n')
 
-    if len(cell) == 3:
-        cell = cell_to_cellpar(cell)
-    
     if cell is None:
         temp_file.write(f'{file_name}\n')
     else:
+        if len(cell) == 3:
+            cell = cell_to_cellpar(cell)
         temp_file.write(f'{cell[0]}  {cell[1]}  {cell[2]}  {cell[3]}  {cell[4]}  {cell[5]}\n')
 
     for i in range(len(atom_labels)):
