@@ -1238,4 +1238,3 @@ def create_COF_json(name):
                 }
 
     return COF_json
-

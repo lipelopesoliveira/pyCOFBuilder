@@ -11,8 +11,23 @@ from pycofbuilder.building_block import Building_Block
 _ROOT = os.path.abspath(os.path.dirname(__file__))
 
 
-def build(cof_name=None, save_format=['cif'], lib='bb_lib', print_result=True):
-    '''Build a COF with a given name'''
+def build(cof_name=None, save_format=['json'], lib='bb_lib', print_result=True, supercell=[1, 1, 2]):
+    '''Build a COF with a given name
+    
+    Parameters
+    ----------
+    cof_name : str
+        Name of the COF to be build.
+    save_format : list
+        List containg the formats to save the file. 
+        Can be `json`, `cif`, `xyz`, `turbomole`, `vasp`, `xsf`, `pdb`.
+    lib : str
+        Library of building block.
+    print_result : bool
+        Boolean to print in the screen or not the result of the creation.
+    supercell : list
+        List containg the units or repetition for supercell creation. Default: [1,1,2]
+    '''
     bond_atom = Tools.find_bond_atom(cof_name)
 
     qe = False
@@ -53,22 +68,22 @@ def build(cof_name=None, save_format=['cif'], lib='bb_lib', print_result=True):
             simm_data = Ret.create_hcb_structure(
                 bb1, bb2, stack=stacking, bond_atom=bond_atom, print_result=print_result)
             if cif is True:
-                Ret.save_cif(supercell=[1, 1, 2])
+                Ret.save_cif(supercell)
             if xyz is True:
                 if stacking == 'AA':
-                    Ret.save_xyz(supercell=[1, 1, 2])
+                    Ret.save_xyz(supercell)
                 else:
                     Ret.save_xyz()
             if qe is True:
-                Ret.save_qe(supercell=[1, 1, 2])
+                Ret.save_qe(supercell)
             if json is True:
-                Ret.save_json(supercell=[1, 1, 2])
+                Ret.save_json(supercell)
             if xsf is True:
-                Ret.save_xsf(supercell=[1, 1, 2])
+                Ret.save_xsf(supercell)
             if pdb is True:
-                Ret.save_pdb(supercell=[1, 1, 2])
+                Ret.save_pdb(supercell)
             if turbomole is True:
-                Ret.save_turbomole(supercell=[1, 1, 2])
+                Ret.save_turbomole(supercell)
             if vasp is True:
                 Ret.save_vasp()
             return [True, simm_data]
@@ -84,13 +99,13 @@ def build(cof_name=None, save_format=['cif'], lib='bb_lib', print_result=True):
                 Ret.save_cif()
             if xyz is True:
                 if stacking == 'AA':
-                    Ret.save_xyz(supercell=[1, 1, 2])
+                    Ret.save_xyz(supercell)
                 else:
                     Ret.save_xyz()
             if qe is True:
                 Ret.save_qe()
             if json is True:
-                Ret.save_json(supercell=[1, 1, 2])
+                Ret.save_json(supercell)
             if xsf is True:
                 Ret.save_xsf()
             if pdb is True:
@@ -112,13 +127,13 @@ def build(cof_name=None, save_format=['cif'], lib='bb_lib', print_result=True):
                 Ret.save_cif()
             if xyz is True:
                 if stacking == 'AA':
-                    Ret.save_xyz(supercell=[1, 1, 2])
+                    Ret.save_xyz(supercell)
                 else:
                     Ret.save_xyz()
             if qe is True:
                 Ret.save_qe()
             if json is True:
-                Ret.save_json()
+                Ret.save_json(supercell)
             if xsf is True:
                 Ret.save_xsf()
             if pdb is True:
@@ -140,13 +155,13 @@ def build(cof_name=None, save_format=['cif'], lib='bb_lib', print_result=True):
                 Ret.save_cif()
             if xyz is True:
                 if stacking == 'AA':
-                    Ret.save_xyz(supercell=[1, 1, 2])
+                    Ret.save_xyz(supercell)
                 else:
                     Ret.save_xyz()
             if qe is True:
                 Ret.save_qe()
             if json is True:
-                Ret.save_json()
+                Ret.save_json(supercell)
             if xsf is True:
                 Ret.save_xsf()
             if pdb is True:
