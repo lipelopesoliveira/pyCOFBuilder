@@ -132,6 +132,26 @@ where:
 
 Note that every "card" for the building block name is separated by an underline (\_) and every "card" for the COF name is separated by a dash (-). This makes it easy to split the COF name into useful information.    
 
+## Current availavle R Groups
+
+- H 
+- OH
+- O (be carefull because not every buiding block can present this functional group)
+- CH3
+- tBut (Tert butil)
+- OMet
+- OEt
+- NC2H
+- COOH
+- CHO
+- CN
+- F
+- Cl
+- Br
+- NH2
+- NO2
+- SO2H
+
 ## Citation
 
 If you find **pyCOFBuilder** useful in your research please consider citing the following papers:
