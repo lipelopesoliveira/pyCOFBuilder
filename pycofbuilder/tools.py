@@ -592,7 +592,7 @@ def cellpar_to_lammpsbox(a, b, c, alpha, beta, gamma, angle_in_degrees=True):
     lx = a
     xy = b * np.cos(gamma)
     xz = c * np.cos(beta)
-    ly = np.sqrt( b**2 - xz **2)
+    ly = np.sqrt( b**2 - xy **2)
     yz = (b * c * np.cos(alpha) - xy * xz) / ly
     lz = np.sqrt(c**2 - xz**2 - yz**2)
     
