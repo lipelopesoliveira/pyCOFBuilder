@@ -821,7 +821,7 @@ def read_cif(path, file_name):
 
     if os.path.exists(os.path.join(path, file_name + '.cif')):
 
-        temp_file = open(os.path.join(path, file_name), 'r').readlines()
+        temp_file = open(os.path.join(path, file_name + '.cif'), 'r').readlines()
         cell = []
         atom_label = []
         atom_pos = []
