@@ -37,8 +37,7 @@ COF_list = ['C3_TPBZ_NH2_H-C2_BENZ_CHO_H-HCB_A-AA',
             'C3_BENZ_CHO_OH-C2_BENZ_NH2_H-HCB_A-AA',
             'C3_BENZ_CHO_OH-C2_ANTR_NH2_O-HCB_A-AA']
 
-for cof in COF_list:
-    COF.build(cof, supercell=[1,1,1], save_format=['cif'])
+COF.build_COFs_list(COF_list, supercell=[1,1,2], save_format=['cif'])
 
 #COF.build('C3_BENZ_CHO_OH-C2_HDZ_NH2-HCB_A-AA', supercell=[1,1,1])
 #COF.build('C3_BENZ_CHO_H-C2_HDZ_NH2-HCB_A-AA', supercell=[1,1,1])

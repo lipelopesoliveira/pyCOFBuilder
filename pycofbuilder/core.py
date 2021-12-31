@@ -267,6 +267,36 @@ def build_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, c
                 print(i)
     else:
         print('Exiting...')
+        
+def build_COFs_list(cofs_list, save_format=['json'], lib='bb_lib', supercell=[1, 1, 2]):
+
+    failed_list = []
+    sucess_list = []
+
+    val = input(
+        f'{len(cofs_list)} COFs will be created. Do you want to proceed? Type [y] to continue.\n')
+
+    if val == 'y':
+        t_i = time.time()
+        for cof in tqdm(cofs_list):
+            succes, name = build(cof, save_format=save_format, print_result=False, supercell=supercell)
+            if succes is True:
+                sucess_list += [name]
+            if succes is False:
+                failed_list += [name]
+
+        print('                      COF Name                              |    Lattice    | Point Group | N° of symmetry op. |')
+        for s in sucess_list:
+            Tools.print_result(*s)
+
+        print(f'{len(sucess_list)} sucessful. {len(failed_list)} failled ({100*len(sucess_list)/(len(failed_list) + len(sucess_list)):.2f} % success rate)')
+        print(f'Enlapsed time: {time.time() - t_i:.3f} s \n')
+        if len(failed_list) > 0:
+            print('Failed list:')
+            for i in failed_list:
+                print(i)
+    else:
+        print('Exiting...')
 
 
 def create_all_C2(nucleos=None, radicais=None, conectores=None):
