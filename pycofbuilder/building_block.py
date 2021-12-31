@@ -115,6 +115,10 @@ class Building_Block():
         R4_pos = []
         R5_pos = []
         R6_pos = []
+        R7_pos = []
+        R8_pos = []
+        R9_pos = []
+
 
         if 'R' in atom_labels:
             for i in range(len(atom_labels)):
@@ -150,8 +154,23 @@ class Building_Block():
             for i in range(len(atom_labels)):
                 if atom_labels[i] == 'R6':
                     R6_pos += [atom_pos[i]]
+        
+        if 'R7' in atom_labels:
+            for i in range(len(atom_labels)):
+                if atom_labels[i] == 'R7':
+                    R7_pos += [atom_pos[i]]
 
-        return {'R': R_pos, 'R1': R1_pos, 'R2': R2_pos, 'R3': R3_pos, 'R4': R4_pos, 'R5': R5_pos, 'R6': R6_pos}
+        if 'R8' in atom_labels:
+            for i in range(len(atom_labels)):
+                if atom_labels[i] == 'R8':
+                    R8_pos += [atom_pos[i]]
+
+        if 'R9' in atom_labels:
+            for i in range(len(atom_labels)):
+                if atom_labels[i] == 'R9':
+                    R9_pos += [atom_pos[i]]
+
+        return {'R': R_pos, 'R1': R1_pos, 'R2': R2_pos, 'R3': R3_pos, 'R4': R4_pos, 'R5': R5_pos, 'R6': R6_pos, 'R7': R7_pos, 'R8': R8_pos, 'R9': R9_pos,}
 
     def add_X(self, label, pos, X='N'):
 
@@ -279,7 +298,7 @@ class Building_Block():
 
             self.atom_labels = self.atom_labels + n_group_label
 
-    def create_C2_BB(self, nucleo_name='BENZ', conector='CHO', R1='H', R2='H', R3='H', R4='H', R5='H', R6='H'):
+    def create_C2_BB(self, nucleo_name='BENZ', conector='CHO', R1='H', R2='H', R3='H', R4='H', R5='H', R6='H', R7='H', R8='H', R9='H'):
         '''Create a building block with C2 simmetry'''
 
         self.name = f'C2_{nucleo_name}_{conector}'
@@ -290,8 +309,8 @@ class Building_Block():
 
         self.add_connection_group(conector)
 
-        R_list_names = [R1, R2, R3, R4, R5, R6]
-        R_list_labels = ['R1', 'R2', 'R3', 'R4', 'R5', 'R6']
+        R_list_names = [R1, R2, R3, R4, R5, R6, R7, R8, R9]
+        R_list_labels = ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9']
 
         for i in range(len(R_list_names)):
             if R_list_labels[i] in self.atom_labels:
@@ -302,7 +321,7 @@ class Building_Block():
         self.align_to()
         self.calculate_size()
 
-    def create_C3_BB(self, nucleo_name='BENZ', conector='CHO', R1='H', R2='H', R3='H', R4='H', R5='H', R6='H'):
+    def create_C3_BB(self, nucleo_name='BENZ', conector='CHO', R1='H', R2='H', R3='H', R4='H', R5='H', R6='H', R7='H', R8='H', R9='H'):
         '''Create a building block with C3 simmetry'''
 
         self.name = f'C3_{nucleo_name}_{conector}'
@@ -313,8 +332,8 @@ class Building_Block():
 
         self.add_connection_group(conector)
 
-        R_list_names = [R1, R2, R3, R4, R5, R6]
-        R_list_labels = ['R1', 'R2', 'R3', 'R4', 'R5', 'R6']
+        R_list_names = [R1, R2, R3, R4, R5, R6, R7, R8, R9]
+        R_list_labels = ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9']
 
         for i in range(len(R_list_names)):
             if R_list_labels[i] in self.atom_labels:
@@ -325,7 +344,7 @@ class Building_Block():
         self.align_to()
         self.calculate_size()
 
-    def create_C4_BB(self, nucleo_name='BENZ', conector='CHO', R1='H', R2='H', R3='H', R4='H', R5='H', R6='H'):
+    def create_C4_BB(self, nucleo_name='BENZ', conector='CHO', R1='H', R2='H', R3='H', R4='H', R5='H', R6='H', R7='H', R8='H', R9='H'):
         '''Create a building block with C4 simmetry'''
 
         self.name = f'C4_{nucleo_name}_{conector}'
@@ -336,8 +355,8 @@ class Building_Block():
 
         self.add_connection_group(conector)
 
-        R_list_names = [R1, R2, R3, R4, R5, R6]
-        R_list_labels = ['R1', 'R2', 'R3', 'R4', 'R5', 'R6']
+        R_list_names = [R1, R2, R3, R4, R5, R6, R7, R8, R9]
+        R_list_labels = ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9']
 
         for i in range(len(R_list_names)):
             if R_list_labels[i] in self.atom_labels:
@@ -501,7 +520,3 @@ class Building_Block():
         files_list = os.listdir(self.lib_path)
 
         return [i.rstrip('.xyz') for i in files_list if 'C4' == i.split('_')[0] and 'NH2' in i.split('_')[2]]
-
-
-if __name__ == '__main__':
-    main()

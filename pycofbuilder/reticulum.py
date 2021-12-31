@@ -128,6 +128,7 @@ class Reticulum():
         struct = Structure(lattice, final_label, final_pos, coords_are_cartesian=True)
 
         # Remove duplicate atoms and translate the structure to the center of the cell
+        struct.sort(key=str.lower, reverse=True)
         struct.merge_sites(tol=.5, mode='delete')
         struct.translate_sites(range(len(struct.as_dict()['sites'])), [0, 0, 0.5], frac_coords=True, to_unit_cell=True)
 
@@ -362,6 +363,7 @@ class Reticulum():
         struct = Structure(lattice, final_label, final_pos, coords_are_cartesian=True)
 
         # Remove os átomos duplicados
+        struct.sort(reverse=True)
         struct.merge_sites(tol=.5, mode='delete')
         struct.translate_sites(range(len(struct.as_dict()['sites'])), [0, 0, 0.5], frac_coords=True, to_unit_cell=True)
 
