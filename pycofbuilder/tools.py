@@ -1227,7 +1227,8 @@ def create_COF_json(name):
 
     COF_json = {'system':{'description':system_info,
                            'name':name,
-                            'geo_opt':False},
+                            'geo_opt':False,
+                            'execution_times_seconds':{}},
                 'geometry':{'description':geometry_info},
                 'optimization':{'description':optimization_info},
                 'adsorption':{'description':adsorption_info},
