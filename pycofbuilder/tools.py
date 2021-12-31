@@ -568,6 +568,36 @@ def calculate_UnitCells(cell, cutoff):
 
     return SuperCell
 
+def cellpar_to_lammpsbox(a, b, c, alpha, beta, gamma, angle_in_degrees=True):
+    """
+    Return the box parameters lx, ly, lz, xy, xz, yz for LAMMPS data input.
+    Parameters
+    ----------
+    a, b, c : float
+        The lengths of the edges.
+    alpha, gamma, beta : float
+        The angles between the sides.
+    angle_in_degrees : bool
+        True if alpha, beta and gamma are expressed in degrees.
+    Returns
+    -------
+    r : array_like
+        The 1x6 array with the box parameters 'lx', 'ly', 'lz', 'xy', 'xz', 'yz'.
+    """
+    if angle_in_degrees:
+        alpha = alpha*(np.pi/180)
+        beta = beta*(np.pi/180)
+        gamma = gamma*(np.pi/180)
+
+    lx = a
+    xy = b * np.cos(gamma)
+    xz = c * np.cos(beta)
+    ly = np.sqrt( b**2 - xy **2)
+    yz = (b * c * np.cos(alpha) - xy * xz) / ly
+    lz = np.sqrt(c**2 - xz**2 - yz**2)
+    
+    return np.array([lx, ly, lz, xy, xz, yz])
+
 def find_index(element, e_list):
     '''Finds the index of a given element in a list
     ----------
@@ -791,7 +821,7 @@ def read_cif(path, file_name):
 
     if os.path.exists(os.path.join(path, file_name + '.cif')):
 
-        temp_file = open(os.path.join(path, file_name), 'r').readlines()
+        temp_file = open(os.path.join(path, file_name + '.cif'), 'r').readlines()
         cell = []
         atom_label = []
         atom_pos = []
