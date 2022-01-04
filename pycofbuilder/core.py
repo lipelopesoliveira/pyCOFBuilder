@@ -320,7 +320,7 @@ def create_all_C2(nucleos=None, radicais=None, conectores=None):
               'NAPT', 'PYRN', 'TPNY', 'TTPH']
     conectores : list
         List containing the connector groups desired for the creation of blocks. 
-        Ex.: ['NH2', 'CHO', 'B(OH)2', '(OH)2', 'Cl', 'Br', 'NHNH2']
+        Ex.: ['NH2', 'CHO', 'BOH2', 'OH2', 'Cl', 'Br', 'NHNH2']
     radicais : list
         List containing the desired radical groups for the creation of blocks. 
         Ex.: ['CH3', 'CHO', 'CN', 'COOH', 'F', 'H', 'NC2H', 'NH2', 'NO2', 'O', 'OEt', 'OH', 'OMe', 'SO2H', 'tBut']
@@ -364,7 +364,7 @@ def create_all_C3(nucleos=None, radicais=None, conectores=None):
         Ex.: ['BENZ', 'DICZ', 'TPAM', 'TPBZ', 'TPNY', 'TPOB', 'TPTA', 'TPTZ']
     conectores : list
         List containing the connector groups desired for the creation of blocks. 
-        Ex.: ['NH2', 'CHO', 'B(OH)2', '(OH)2', 'Cl', 'Br', 'NHNH2']
+        Ex.: ['NH2', 'CHO', 'BOH2', 'OH2', 'Cl', 'Br', 'NHNH2']
     radicais : list
         List containing the desired radical groups for the creation of blocks.
         Ex.: ['CH3', 'CHO', 'CN', 'COOH', 'F', 'H', 'NC2H', 'NH2', 'NO2', 'O', 'OEt', 'OH', 'OMe', 'SO2H', 'tBut']
@@ -407,7 +407,7 @@ def create_all_C4(nucleos=None, conectores=None, radicais=None):
         Ex.: ['BENZ', 'PHPR', 'PORP', 'PYRN']
     conectores : list
         List containing the connector groups desired for the creation of blocks. 
-        Ex.: ['NH2', 'CHO', 'B(OH)2', '(OH)2', 'Cl', 'Br', 'NHNH2']
+        Ex.: ['NH2', 'CHO', 'BOH2', 'OH2', 'Cl', 'Br', 'NHNH2']
     radicais : list
         List containing the desired radical groups for the creation of blocks. 
         Ex.: ['CH3', 'CHO', 'CN', 'COOH', 'F', 'H', 'NC2H', 'NH2', 'NO2', 'O', 'OEt', 'OH', 'OMe', 'SO2H', 'tBut']

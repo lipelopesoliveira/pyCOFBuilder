@@ -477,31 +477,31 @@ class Building_Block():
 
         files_list = os.listdir(self.lib_path)
 
-        return [i.rstrip('.xyz') for i in files_list if 'C2' == i.split('_')[0] and 'B(OH)2' == i.split('_')[2]]
+        return [i.rstrip('.xyz') for i in files_list if 'C2' == i.split('_')[0] and 'BOH2' == i.split('_')[2]]
 
     def get_tripodal_BOH2(self):
 
         files_list = os.listdir(self.lib_path)
 
-        return [i.rstrip('.xyz') for i in files_list if 'C3' == i.split('_')[0] and 'B(OH)2' == i.split('_')[2]]
+        return [i.rstrip('.xyz') for i in files_list if 'C3' == i.split('_')[0] and 'BOH2' == i.split('_')[2]]
 
     def get_bipodal_OH2(self):
 
         files_list = os.listdir(self.lib_path)
 
-        return [i.rstrip('.xyz') for i in files_list if 'C2' == i.split('_')[0] and '(OH)2' == i.split('_')[2]]
+        return [i.rstrip('.xyz') for i in files_list if 'C2' == i.split('_')[0] and 'OH2' == i.split('_')[2]]
 
     def get_tripodal_OH2(self):
 
         files_list = os.listdir(self.lib_path)
 
-        return [i.rstrip('.xyz') for i in files_list if 'C3' == i.split('_')[0] and '(OH)2' == i.split('_')[2]]
+        return [i.rstrip('.xyz') for i in files_list if 'C3' == i.split('_')[0] and 'OH2' == i.split('_')[2]]
     
     def get_tetrapodal_squared_OH2(self):
 
         files_list = os.listdir(self.lib_path)
 
-        return [i.rstrip('.xyz') for i in files_list if 'C4' == i.split('_')[0] and '(OH)2' == i.split('_')[2]]
+        return [i.rstrip('.xyz') for i in files_list if 'C4' == i.split('_')[0] and 'OH2' == i.split('_')[2]]
 
     def get_tetrapodal_squared_CHO(self):
 
@@ -513,7 +513,7 @@ class Building_Block():
 
         files_list = os.listdir(self.lib_path)
 
-        return [i.rstrip('.xyz') for i in files_list if 'C4' == i.split('_')[0] and 'B(OH)2' == i.split('_')[2]]
+        return [i.rstrip('.xyz') for i in files_list if 'C4' == i.split('_')[0] and 'BOH2' == i.split('_')[2]]
 
     def get_tetrapodal_squared_NH2(self):
 

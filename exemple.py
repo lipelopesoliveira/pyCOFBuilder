@@ -10,19 +10,19 @@ COF_list = ['C3_TPBZ_NH2_H-C2_BENZ_CHO_H-HCB_A-AA',
             'C3_TPTZ_NH2_H-C3_BENZ_CHO_H-HCB-AA',
             'C3_TPBZ_NH2_H-C2_BENZ_CHO_CH3-HCB_A-AA',
             'C3_TPTZ_NH2_H-C2_TTPH_CHO_H-HCB_A-AA',
-            'C3_STAR_(OH)2_H-C2_BENZ_B(OH)2_H-HCB_A-AA',
-            'C3_STAR_(OH)2_H-C2_PYRN_B(OH)2_H-HCB_A-AA',
-            'C3_STAR_(OH)2_H-C2_BPNY_B(OH)2_H-HCB_A-AA',
-            'C3_DBA1_(OH)2_H-C2_BENZ_B(OH)2_H-HCB_A-AA',
-            'C3_DBA2_(OH)2_H-C2_BENZ_B(OH)2_H-HCB_A-AA',
+            'C3_STAR_OH2_H-C2_BENZ_BOH2_H-HCB_A-AA',
+            'C3_STAR_OH2_H-C2_PYRN_BOH2_H-HCB_A-AA',
+            'C3_STAR_OH2_H-C2_BPNY_BOH2_H-HCB_A-AA',
+            'C3_DBA1_OH2_H-C2_BENZ_BOH2_H-HCB_A-AA',
+            'C3_DBA2_OH2_H-C2_BENZ_BOH2_H-HCB_A-AA',
             'C3_BENZ_CHO_OH-C2_BENZ_NH2_H-HCB_A-AA',
             'C3_BENZ_CHO_OH-C2_BPNY_NH2_H-HCB_A-AA',
             'C3_BENZ_CHO_OH-C2_BPNY_NH2_OMe-HCB_A-AA',
             'C3_BENZ_CHO_OH-C3_TPBZ_NH2_H-HCB-AA',
-            'C3_TPNY_(OH)2_H-C2_BENZ_B(OH)2_H-HCB_A-AA',
-            'C3_BENZ_B(OH)2_H-C3_TPNY_(OH)2_H-HCB-AA',
-            'C3_TPBZ_B(OH)2_H-C3_TPNY_(OH)2_H-HCB-AA',
-            'C3_TPNY_(OH)2_H-C2_BPNY_B(OH)2_H-HCB_A-AA',
+            'C3_TPNY_OH2_H-C2_BENZ_BOH2_H-HCB_A-AA',
+            'C3_BENZ_BOH2_H-C3_TPNY_OH2_H-HCB-AA',
+            'C3_TPBZ_BOH2_H-C3_TPNY_OH2_H-HCB-AA',
+            'C3_TPNY_OH2_H-C2_BPNY_BOH2_H-HCB_A-AA',
             'C3_BENZ_CHO_H-C2_BENZ_CONHNH2_OEt-HCB_A-AA',
             'C3_TPBZ_CHO_H-C2_BENZ_CONHNH2_OEt-HCB_A-AA',
             'C3_TPBZ_NH2_H-C2_BENZ_CHO_OH-HCB_A-AA',
@@ -37,7 +37,7 @@ COF_list = ['C3_TPBZ_NH2_H-C2_BENZ_CHO_H-HCB_A-AA',
             'C3_BENZ_CHO_OH-C2_BENZ_NH2_H-HCB_A-AA',
             'C3_BENZ_CHO_OH-C2_ANTR_NH2_O-HCB_A-AA']
 
-COF.build_COFs_list(COF_list, supercell=[1,1,2], save_format=['cif'])
+COF.build_COFs_list(COF_list, supercell=[1,1,2], save_format=['json'])
 
 #COF.build('C3_BENZ_CHO_OH-C2_HDZ_NH2-HCB_A-AA', supercell=[1,1,1])
 #COF.build('C3_BENZ_CHO_H-C2_HDZ_NH2-HCB_A-AA', supercell=[1,1,1])

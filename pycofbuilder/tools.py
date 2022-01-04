@@ -652,7 +652,7 @@ def find_bond_atom(cof_name):
 
     bond_dict = {'NH2':'N',
                  'CONHNH2':'N',
-                 'B(OH)2': 'B',
+                 'BOH2': 'B',
                  'Cl': 'R',
                  'Br':'R'}
 
