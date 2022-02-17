@@ -557,7 +557,7 @@ def calculate_UnitCells(cell, cutoff):
     # Pre-calculate the cross products
     axb = np.cross(CellBox[0], CellBox[1])
     bxc = np.cross(CellBox[1], CellBox[2])
-    cxa = np.cross(CellBox[2], CellBox[1])
+    cxa = np.cross(CellBox[2], CellBox[0])
     
     # Calculates the cell volume
     V = np.dot(np.cross(CellBox[0], CellBox[1]), CellBox[2])
