@@ -953,7 +953,7 @@ def save_pdb(path, file_name, cell, atom_label, atom_pos):
     atom_label : list
         List of strings containing containg the N atom partial charges. 
     atom_pos : list
-        Nx3 array contaning the atoms coordinates.
+        Nx3 array contaning the atoms coordinates in cartesian form.
     """
 
     file_name = file_name.split('.')[0]
