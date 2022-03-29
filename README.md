@@ -145,23 +145,8 @@ Note that every "card" for the building block name is separated by an underline 
 
 ## Current available R Groups
 
-- H 
-- OH
-- O (be carefull because not every buiding block can present this functional group)
-- CH3
-- tBut (Tert butil)
-- OMet
-- OEt
-- NC2H
-- COOH
-- CHO
-- CN
-- F
-- Cl
-- Br
-- NH2
-- NO2
-- SO2H
+![Captura de tela 2022-03-29 160604](https://user-images.githubusercontent.com/33868364/160687866-ef168933-55d7-46b9-a1de-0b15e1c38f0f.png)
+
 
 ## Citation
 
