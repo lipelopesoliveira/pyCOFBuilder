@@ -134,9 +134,9 @@ Note that every "card" for the building block name is separated by an underline 
 
 ## Current available Building Blocks
 
-![Slide2](https://user-images.githubusercontent.com/33868364/160647702-3ec62f94-36f3-49f2-bb3a-d7b1c8d6958e.PNG)
+![Slide2](https://user-images.githubusercontent.com/33868364/160653650-bbe0d3dc-e50b-4062-a256-cfeed1a0f79f.SVG)
 
-![Slide3](https://user-images.githubusercontent.com/33868364/160647726-a54cd253-7c78-41c6-ac16-d48f4a6ee409.PNG)
+![Slide3](https://user-images.githubusercontent.com/33868364/160653655-2d950dd9-6b7d-4bf1-86ed-38439531b6bd.SVG)
 
 ## Current available Connector Groups
 
