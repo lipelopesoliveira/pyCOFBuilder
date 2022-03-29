@@ -132,7 +132,18 @@ where:
 
 Note that every "card" for the building block name is separated by an underline (\_) and every "card" for the COF name is separated by a dash (-). This makes it easy to split the COF name into useful information.    
 
-## Current availavle R Groups
+## Current available Building Blocks
+
+![Slide2](https://user-images.githubusercontent.com/33868364/160647702-3ec62f94-36f3-49f2-bb3a-d7b1c8d6958e.PNG)
+
+![Slide3](https://user-images.githubusercontent.com/33868364/160647726-a54cd253-7c78-41c6-ac16-d48f4a6ee409.PNG)
+
+## Current available Connector Groups
+
+ - NH2
+ - CHO
+
+## Current available R Groups
 
 - H 
 - OH
