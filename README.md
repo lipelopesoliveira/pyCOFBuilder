@@ -134,9 +134,9 @@ Note that every "card" for the building block name is separated by an underline 
 
 ## Current available Building Blocks
 
-![Slide2](https://user-images.githubusercontent.com/33868364/160653650-bbe0d3dc-e50b-4062-a256-cfeed1a0f79f.SVG)
+![Slide2](https://user-images.githubusercontent.com/33868364/160653787-f9161ff8-aaa7-49a8-aec4-77f2255fc0a3.PNG)
+![Slide3](https://user-images.githubusercontent.com/33868364/160653797-6b788593-4772-4703-ab18-6c218bcf0ba4.PNG)
 
-![Slide3](https://user-images.githubusercontent.com/33868364/160653655-2d950dd9-6b7d-4bf1-86ed-38439531b6bd.SVG)
 
 ## Current available Connector Groups
 
@@ -176,15 +176,3 @@ If you find **pyCOFBuilder** useful in your research please consider citing the 
 > *Exploring Machine Learning Strategies for Partial Atomic Charges Prediction  on Covalent Organic Framework*
 > 
 > *Manuscript in preparation.* [DOI](https://doi.org/)
-
-# TO DO
-
-- Implementar novas topologias 2D
-- Implementar novas topologias 3D
-- Adicionar novos grupos R
-- Adicionar novas conexões entre os grupos
-- Implementar topologias 3D
-- Salvar a estrutura final em novos formatos:
-	- Formato proprietário do VMD (script de visualização?)
-- Aceitar SMILES ou SELFIES dos possíveis grupos R
-- Aceitar SMILES ou SELFIES dos possíveis núcleos orgânicos
