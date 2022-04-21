@@ -24,6 +24,9 @@ class Reticulum():
         self.verbosity = verbosity
         self.available_2D_topologies = ['HCB', 'HCB_A', 'SQL', 'SQL_A', 'KGM', 'HGM_A', 'HXL', 'HXL_A', 'KGD', 'KGD_A']
         self.available_3D_topologies = ['dia', 'bor', 'srs', 'pts', 'ctn', 'rra', 'fcc', 'lon', 'stp', 'acs', 'tbo', 'bcu', 'fjh', 'ceq']
+        self.available_stacking = {'HCB': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
+                                   'HCB_A': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2']
+                                   }
         self.available_topologies = self.available_2D_topologies + self.available_3D_topologies
         self.lib_bb = bb_lib
         self.main_path = os.path.join(_ROOT, 'data')
@@ -194,7 +197,7 @@ class Reticulum():
                 A = ion_conv_crystal*(1, 1, 0.5)
 
                 B = ion_conv_crystal*(1, 1, 1.5) + (.01, .01, 0)
-                B = self.translate_inside(B)
+                B = Tools.translate_inside(B)
 
                 AB = np.concatenate((A, B))
                 AB_label = [i[0] for i in labels_conv_crystal]
@@ -218,8 +221,8 @@ class Reticulum():
                 cell = np.array(struct_symm_prim.as_dict()['lattice']['matrix'])*(1, 1, 3)
 
                 A = ion_conv_crystal*(1, 1, 5/3)
-                B = self.translate_inside(ion_conv_crystal*(1, 1, 1) + (2/3, 1/3, 0))
-                C = self.translate_inside(ion_conv_crystal*(1, 1, 1/3) + (4/3, 2/3, 0))
+                B = Tools.translate_inside(ion_conv_crystal*(1, 1, 1) + (2/3, 1/3, 0))
+                C = Tools.translate_inside(ion_conv_crystal*(1, 1, 1/3) + (4/3, 2/3, 0))
 
                 ABC = np.concatenate((A, B, C))
                 ABC_label = [i[0] for i in labels_conv_crystal]
@@ -238,8 +241,8 @@ class Reticulum():
                 cell = np.array(struct_symm_prim['lattice']['matrix'])*(1, 1, 3)
 
                 A = ion_conv_crystal*(1, 1, 5/3)
-                B = self.translate_inside(ion_conv_crystal*(1, 1, 1) + (1/3, 0, 0))
-                C = self.translate_inside(ion_conv_crystal*(1, 1, 1/3) + (2/3, 0, 0))
+                B = Tools.translate_inside(ion_conv_crystal*(1, 1, 1) + (1/3, 0, 0))
+                C = Tools.translate_inside(ion_conv_crystal*(1, 1, 1/3) + (2/3, 0, 0))
 
                 ABC = np.concatenate((A, B, C))
                 ABC_label = [i[0] for i in labels_conv_crystal]
@@ -431,7 +434,7 @@ class Reticulum():
                 A = ion_conv_crystal*(1, 1, 0.5)
 
                 B = ion_conv_crystal*(1, 1, 1.5) + (.1, .1, 0)
-                B = self.translate_inside(B)
+                B = Tools.translate_inside(B)
 
                 AB = np.concatenate((A, B))
                 AB_label = [i[0] for i in labels_conv_crystal]
@@ -455,8 +458,8 @@ class Reticulum():
                 cell = np.array(struct_symm_prim.as_dict()['lattice']['matrix'])*(1, 1, 3)
 
                 A = ion_conv_crystal*(1, 1, 5/3)
-                B = self.translate_inside(ion_conv_crystal*(1, 1, 1) + (2/3, 1/3, 0))
-                C = self.translate_inside(ion_conv_crystal*(1, 1, 1/3) + (4/3, 2/3, 0))
+                B = Tools.translate_inside(ion_conv_crystal*(1, 1, 1) + (2/3, 1/3, 0))
+                C = Tools.translate_inside(ion_conv_crystal*(1, 1, 1/3) + (4/3, 2/3, 0))
 
                 ABC = np.concatenate((A, B, C))
                 ABC_label = [i[0] for i in labels_conv_crystal]
@@ -475,8 +478,8 @@ class Reticulum():
                 cell = np.array(struct_symm_prim.as_dict()['lattice']['matrix'])*(1, 1, 3)
 
                 A = ion_conv_crystal*(1, 1, 5/3)
-                B = self.translate_inside(ion_conv_crystal*(1, 1, 1) + (1/3, 0, 0))
-                C = self.translate_inside(ion_conv_crystal*(1, 1, 1/3) + (2/3, 0, 0))
+                B = Tools.translate_inside(ion_conv_crystal*(1, 1, 1) + (1/3, 0, 0))
+                C = Tools.translate_inside(ion_conv_crystal*(1, 1, 1/3) + (2/3, 0, 0))
 
                 ABC = np.concatenate((A, B, C))
                 ABC_label = [i[0] for i in labels_conv_crystal]
