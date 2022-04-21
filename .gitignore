@@ -2,3 +2,5 @@
 *.pyc
 pycofbuilder/.vscode/settings.json
 .exemple.py.swp
+.ipynb_checkpoints/Untitled-checkpoint.ipynb
+Untitled.ipynb

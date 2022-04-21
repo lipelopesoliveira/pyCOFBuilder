@@ -66,7 +66,7 @@ def build(cof_name=None, save_format=['json'], lib='bb_lib', print_result=True, 
         try:
             Ret = Reticulum(bb_lib=lib)
             simm_data = Ret.create_hcb_structure(
-                bb1, bb2, stack=stacking, bond_atom=bond_atom, print_result=print_result)
+                bb1, bb2, stacking=stacking, bond_atom=bond_atom, print_result=print_result)
             if cif is True:
                 Ret.save_cif(supercell)
             if xyz is True:
@@ -94,7 +94,7 @@ def build(cof_name=None, save_format=['json'], lib='bb_lib', print_result=True, 
         try:
             Ret = Reticulum(bb_lib=lib)
             simm_data = Ret.create_hcb_a_structure(
-                bb1, bb2, stack=stacking, bond_atom=bond_atom, print_result=print_result)
+                bb1, bb2, stacking=stacking, bond_atom=bond_atom, print_result=print_result)
             if cif is True:
                 Ret.save_cif()
             if xyz is True:
@@ -122,7 +122,7 @@ def build(cof_name=None, save_format=['json'], lib='bb_lib', print_result=True, 
         try:
             Ret = Reticulum(bb_lib=lib)
             simm_data = Ret.create_sql_structure(
-                bb1, bb2, stack=stacking, bond_atom=bond_atom, print_result=print_result)
+                bb1, bb2, stacking=stacking, bond_atom=bond_atom, print_result=print_result)
             if cif is True:
                 Ret.save_cif()
             if xyz is True:
@@ -150,7 +150,7 @@ def build(cof_name=None, save_format=['json'], lib='bb_lib', print_result=True, 
         try:
             Ret = Reticulum(bb_lib=lib)
             simm_data = Ret.create_sql_a_structure(
-                bb1, bb2, stack=stacking, bond_atom=bond_atom, print_result=print_result)
+                bb1, bb2, stacking=stacking, bond_atom=bond_atom, print_result=print_result)
             if cif is True:
                 Ret.save_cif()
             if xyz is True:

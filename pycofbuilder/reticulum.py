@@ -216,10 +216,10 @@ class Reticulum():
 
                 # Shift the first sheet to be at 0.25 * c
                 A = ion_conv_crystal * np.array([1, 1, 0.5])
-                
+
                 # Calculates the shift vector in crystal units
-                a_cell, b_cell, c_cell = np.linalg.eig(cell)[0]
-                shift_vector = np.array(shift_vector)/c_cell
+                r = Tools.get_cartesian_to_fractional_matrix(*Tools.cell_to_cellpar(cell))
+                shift_vector = np.dot(r, np.array(shift_vector))
 
                 # Shift the first sheet to be at 0.75 * c and translate by the shift_vector
                 B = ion_conv_crystal * np.array([1, 1, 1.5]) + shift_vector
@@ -331,7 +331,7 @@ class Reticulum():
 
         return [self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op)]
 
-    def create_hcb_a_structure(self, name_bb_a, name_bb_b, stacking='AA', bond_atom='N', c_parameter_base=3.6, print_result=True, slab=10, shift_vector=[1.0,1.0,0], tilt_angle=5):
+    def create_hcb_a_structure(self, name_bb_a, name_bb_b, stacking='AA', bond_atom='N', c_parameter_base=3.6, print_result=True, slab=10, shift_vector=[1,1,0], tilt_angle=5):
 
         self.topology = 'hcb-a'
         self.dimension = 2
@@ -490,10 +490,10 @@ class Reticulum():
 
                 # Shift the first sheet to be at 0.25 * c
                 A = ion_conv_crystal * np.array([1, 1, 0.5])
-                
+
                 # Calculates the shift vector in crystal units
-                a_cell, b_cell, c_cell = np.linalg.eig(cell)[0]
-                shift_vector = np.array(shift_vector)/c_cell
+                r = Tools.get_cartesian_to_fractional_matrix(*Tools.cell_to_cellpar(cell))
+                shift_vector = np.dot(r, np.array(shift_vector))
 
                 # Shift the first sheet to be at 0.75 * c and translate by the shift_vector
                 B = ion_conv_crystal * np.array([1, 1, 1.5]) + shift_vector
