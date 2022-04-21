@@ -22,10 +22,13 @@ class Reticulum():
         _ROOT = os.path.abspath(os.path.dirname(__file__))
 
         self.verbosity = verbosity
-        self.available_2D_topologies = ['HCB', 'HCB_A', 'SQL', 'SQL_A', 'KGM', 'HGM_A', 'HXL', 'HXL_A', 'KGD', 'KGD_A']
+        self.available_2D_topologies = ['HCB', 'HCB_A', 'SQL', 'SQL_A', 'KGM', 'KGM_A', 'HXL', 'HXL_A', 'KGD', 'KGD_A']
         self.available_3D_topologies = ['dia', 'bor', 'srs', 'pts', 'ctn', 'rra', 'fcc', 'lon', 'stp', 'acs', 'tbo', 'bcu', 'fjh', 'ceq']
+
         self.available_stacking = {'HCB': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
-                                   'HCB_A': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2']
+                                   'HCB_A': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
+                                   'SQL':[],
+                                   'SQL_A':[]
                                    }
         self.available_topologies = self.available_2D_topologies + self.available_3D_topologies
         self.lib_bb = bb_lib
@@ -68,16 +71,16 @@ class Reticulum():
             for i in self.available_3D_topologies:
                 print(i.upper())
 
-    def create_hcb_structure(self, name_a, name_b, stack='AA', bond_atom='N', c_cell=3.6, print_result=True):
+    def create_hcb_structure(self, name_bb_a, name_bb_b, staking='AA', bond_atom='N', c_parameter_base=3.6, print_result=True, slab=10, shift_vector=[1,1,0]):
         '''Creates a COF with HCB network'''
 
         self.topology = 'hcb'
         self.dimension = 2
 
-        bb_1 = Building_Block(name_a, self.lib_bb)
-        bb_2 = Building_Block(name_b, self.lib_bb)
+        bb_1 = Building_Block(name_bb_a, self.lib_bb)
+        bb_2 = Building_Block(name_bb_b, self.lib_bb)
 
-        self.name = f'{bb_1.name}-{bb_2.name}-HCB-{stack}'
+        self.name = f'{bb_1.name}-{bb_2.name}-HCB-{staking}'
         self.charge = bb_1.charge + bb_2.charge
         self.chirality = bb_1.chirality or bb_2.chirality
 
@@ -110,7 +113,16 @@ class Reticulum():
         delta_b = abs(max(np.transpose(bb_2.atom_pos)[2])) + abs(min(np.transpose(bb_2.atom_pos)[2]))
 
         # Build the matrix of unitary hexagonal cell
-        lattice = [[a, 0, 0], [-0.5*a, np.sqrt(3)/2*a, 0], [0, 0, c_cell + max([delta_a, delta_b])]]
+        if staking == 'A':
+            c = slab
+        else:
+            c = c_parameter_base + max([delta_a, delta_b])
+
+        # Define the cell lattice
+        lattice = [[a, 0, 0], 
+                   [-0.5*a, np.sqrt(3)/2*a, 0], 
+                   [0, 0, c]]
+
         if self.verbosity is True:
             print('Unitary cell built:', lattice)
 
@@ -135,16 +147,23 @@ class Reticulum():
         struct.merge_sites(tol=.5, mode='delete')
         struct.translate_sites(range(len(struct.as_dict()['sites'])), [0, 0, 0.5], frac_coords=True, to_unit_cell=True)
 
-        # Simetrizes the structure
+        # Simetrizes the structure using pymatgen
         symm = SpacegroupAnalyzer(struct, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
         struct_symm_prim = symm.get_primitive_standard_structure()
 
-        if stack in ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2']:
-            if stack == 'AA':
+        if staking in ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2']:
+            # Create A stacking, a 2D isolated sheet with slab
+            if staking == 'A':
+                self.stacking = 'A'
+                self.symm_structure = struct_symm_prim
+
+            # Create AA staking. By default one sheet per unitary cell is used
+            if staking == 'AA':
                 self.stacking = 'AA'
                 self.symm_structure = struct_symm_prim
 
-            if stack == 'AB1':
+            # Create AB1 staking. 
+            if staking == 'AB1':
                 self.stacking = 'AB1'
                 labels_conv_crystal = np.array([[i['label']] for i in struct_symm_prim.as_dict()['sites']])
                 ion_conv_crystal = np.array([i['xyz'] for i in struct_symm_prim.as_dict()['sites']])
@@ -166,7 +185,8 @@ class Reticulum():
 
                 self.symm_structure = AB_1_symm.get_refined_structure()
 
-            if stack == 'AB2':
+            # Create AB2 stacking
+            if staking == 'AB2':
                 self.stacking = 'AB2'
                 labels_conv_crystal = np.array([[i['label']] for i in struct_symm_prim.as_dict()['sites']])
                 ion_conv_crystal = np.array([i['xyz'] for i in struct_symm_prim.as_dict()['sites']])
@@ -187,34 +207,36 @@ class Reticulum():
 
                 self.symm_structure = AB_2_symm.get_refined_structure()
                 
-
-            if stack == 'AAl':
+            # Create AAl stacking. Hexagonal cell with two sheets per cell shifited by the shift_vector in angstroms. 
+            if staking == 'AAl':
                 self.stacking = 'AAl'
                 labels_conv_crystal = np.array([[i['label']] for i in struct_symm_prim.as_dict()['sites']])
-                ion_conv_crystal = np.array([i['abc'] for i in struct_symm_prim.as_dict()['sites']])
+                ion_conv_crystal = np.array([i['xyz'] for i in struct_symm_prim.as_dict()['sites']])
                 cell = np.array(struct_symm_prim.as_dict()['lattice']['matrix'])*(1, 1, 2)
 
-                A = ion_conv_crystal*(1, 1, 0.5)
+                # Shift the first sheet to be at 0.25 * c
+                A = ion_conv_crystal + np.array([0, 0, 0.25*cell[-1][-1]])
 
-                B = ion_conv_crystal*(1, 1, 1.5) + (.01, .01, 0)
+                # Shift the first sheet to be at 0.75 * c and translate by the shift_vector
+                B = ion_conv_crystal + np.array([0, 0, 0.75*cell[-1][-1]]) + np.array(shift_vector)
                 B = Tools.translate_inside(B)
 
                 AB = np.concatenate((A, B))
                 AB_label = [i[0] for i in labels_conv_crystal]
 
                 lattice = Lattice(cell)
-                AAl_f = Structure(lattice, AB_label+AB_label, AB, coords_are_cartesian=False)
+                AAl_f = Structure(lattice, AB_label+AB_label, AB, coords_are_cartesian=True)
 
                 AAl_f_symm = SpacegroupAnalyzer(AAl_f, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
 
                 self.symm_structure = AAl_f_symm.get_primitive_standard_structure()
 
-            if stack == 'AAt':
+            if staking == 'AAt':
                 self.stacking = 'AAt'
                 self.symm_structure = struct_symm_prim
                 dict_structure = struct_symm_prim.as_dict()
 
-            if stack == 'ABC1':
+            if staking == 'ABC1':
                 self.stacking = 'ABC1'
                 labels_conv_crystal = np.array([[i['label']] for i in struct_symm_prim.as_dict()['sites']])
                 ion_conv_crystal = np.array([i['abc'] for i in struct_symm_prim.as_dict()['sites']])
@@ -234,7 +256,7 @@ class Reticulum():
 
                 self.symm_structure = ABC_f_symm.get_primitive_standard_structure()
 
-            if stack == 'ABC2':
+            if staking == 'ABC2':
                 self.stacking = 'ABC2'
                 labels_conv_crystal = np.array([[i['label']] for i in struct_symm_prim['sites']])
                 ion_conv_crystal = np.array([i['abc'] for i in struct_symm_prim['sites']])
@@ -285,19 +307,19 @@ class Reticulum():
 
         return [self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op)]
 
-    def create_hcb_a_structure(self, name_a, name_b, stack='AA', bond_atom='N', c_cell=3.6, print_result=True):
+    def create_hcb_a_structure(self, name_bb_a, name_bb_b, stacking='AA', bond_atom='N', c_parameter_base=3.6, slab=10, print_result=True):
 
         self.topology = 'hcb-a'
         self.dimension = 2
 
-        bb_triangular = Building_Block(name_a, self.lib_bb, verbosity=self.verbosity)
+        bb_triangular = Building_Block(name_bb_a, self.lib_bb, verbosity=self.verbosity)
 
-        bb_linear = Building_Block(name_b, self.lib_bb, verbosity=self.verbosity)
+        bb_linear = Building_Block(name_bb_b, self.lib_bb, verbosity=self.verbosity)
 
         self.charge = bb_linear.charge + bb_triangular.charge
         self.chirality = bb_linear.chirality or bb_triangular.chirality
 
-        self.name = f'{bb_triangular.name}-{bb_linear.name}-HCB_A-{stack}'
+        self.name = f'{bb_triangular.name}-{bb_linear.name}-HCB_A-{stacking}'
 
         Tools.print_comand(f'Starting the creation of {self.name}', self.verbosity, ['debug', 'high'])
 
@@ -323,8 +345,16 @@ class Reticulum():
         delta_a = abs(max(np.transpose(bb_triangular.atom_pos)[2])) + abs(min(np.transpose(bb_triangular.atom_pos)[2]))
         delta_b = abs(max(np.transpose(bb_linear.atom_pos)[2])) + abs(min(np.transpose(bb_linear.atom_pos)[2]))
 
-        # Constrói a matriz da célula unitária hexagonal
-        lattice = [[a, 0, 0], [-0.5*a, np.sqrt(3)/2*a, 0], [0, 0, c_cell + max([delta_a, delta_b])]]
+        # Build the matrix of unitary hexagonal cell
+        if stacking == 'A':
+            c = slab
+        else:
+            c = c_parameter_base + max([delta_a, delta_b])
+
+        # Define the cell lattice
+        lattice = [[a, 0, 0], 
+                   [-0.5*a, np.sqrt(3)/2*a, 0], 
+                   [0, 0, c]]
 
         if self.verbosity is True:
             print('Unitary cell built:', lattice)
@@ -358,10 +388,6 @@ class Reticulum():
         # Changes the X atoms by the desirede bond_atom
         final_label, final_pos = Tools.change_X_atoms(final_label, final_pos, bond_atom)
 
-        # save_xyz(path, 'teste.xyz', final_label, final_pos)
-        # s = show_XYZ_structure(path, 'teste.xyz')
-        # s.show()
-
         # Cria a estrutura como entidade do pymatgen
         struct = Structure(lattice, final_label, final_pos, coords_are_cartesian=True)
 
@@ -377,12 +403,18 @@ class Reticulum():
         except Exception:
             return None
 
-        if stack in ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2']:
-            if stack == 'AA':
+        if stacking in ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2']:
+            # Create A stacking. The slab is defined by the c_cell parameter
+            if stacking == 'A':
+                self.stacking = 'A'
+                self.symm_structure = struct_symm_prim
+
+            # Create AA staking. By default one sheet per unitary cell is used
+            if stacking == 'AA':
                 self.stacking = 'AA'
                 self.symm_structure = struct_symm_prim
 
-            if stack == 'AB1':
+            if stacking == 'AB1':
                 self.stacking = 'AB1'
                 labels_conv_crystal = np.array([[i['label']] for i in struct_symm_prim.as_dict()['sites']])
                 ion_conv_crystal = np.array([i['xyz'] for i in struct_symm_prim.as_dict()['sites']])
@@ -404,7 +436,7 @@ class Reticulum():
 
                 self.symm_structure = AB_1_symm.get_refined_structure()
 
-            if stack == 'AB2':
+            if stacking == 'AB2':
                 self.stacking = 'AB2'
                 labels_conv_crystal = np.array([[i['label']] for i in struct_symm_prim.as_dict()['sites']])
                 ion_conv_crystal = np.array([i['xyz'] for i in struct_symm_prim.as_dict()['sites']])
@@ -425,7 +457,7 @@ class Reticulum():
 
                 self.symm_structure = AB_2_symm.get_refined_structure()
 
-            if stack == 'AAl':
+            if stacking == 'AAl':
                 self.stacking = 'AAl'
                 labels_conv_crystal = np.array([[i['label']] for i in struct_symm_prim.as_dict()['sites']])
                 ion_conv_crystal = np.array([i['abc'] for i in struct_symm_prim.as_dict()['sites']])
@@ -446,12 +478,12 @@ class Reticulum():
 
                 self.symm_structure = AAl_f_symm.get_refined_structure()
 
-            if stack == 'AAt':
+            if stacking == 'AAt':
                 self.stacking = 'AAt'
                 self.symm_structure = struct_symm_prim
                 dict_structure = struct_symm_prim.as_dict()
 
-            if stack == 'ABC1':
+            if stacking == 'ABC1':
                 self.stacking = 'ABC1'
                 labels_conv_crystal = np.array([[i['label']] for i in struct_symm_prim.as_dict()['sites']])
                 ion_conv_crystal = np.array([i['abc'] for i in struct_symm_prim.as_dict()['sites']])
@@ -471,7 +503,7 @@ class Reticulum():
 
                 self.symm_structure = ABC_f_symm.get_refined_structure()
 
-            if stack == 'ABC2':
+            if stacking == 'ABC2':
                 self.stacking = 'ABC2'
                 labels_conv_crystal = np.array([[i['label']] for i in struct_symm_prim.as_dict()['sites']])
                 ion_conv_crystal = np.array([i['abc'] for i in struct_symm_prim.as_dict()['sites']])
