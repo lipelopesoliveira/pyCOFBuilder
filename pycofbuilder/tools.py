@@ -557,7 +557,7 @@ def calculate_UnitCells(cell, cutoff):
     # Pre-calculate the cross products
     axb = np.cross(CellBox[0], CellBox[1])
     bxc = np.cross(CellBox[1], CellBox[2])
-    cxa = np.cross(CellBox[2], CellBox[1])
+    cxa = np.cross(CellBox[2], CellBox[0])
     
     # Calculates the cell volume
     V = np.dot(np.cross(CellBox[0], CellBox[1]), CellBox[2])
@@ -953,7 +953,7 @@ def save_pdb(path, file_name, cell, atom_label, atom_pos):
     atom_label : list
         List of strings containing containg the N atom partial charges. 
     atom_pos : list
-        Nx3 array contaning the atoms coordinates.
+        Nx3 array contaning the atoms coordinates in cartesian form.
     """
 
     file_name = file_name.split('.')[0]

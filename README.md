@@ -132,25 +132,21 @@ where:
 
 Note that every "card" for the building block name is separated by an underline (\_) and every "card" for the COF name is separated by a dash (-). This makes it easy to split the COF name into useful information.    
 
-## Current availavle R Groups
+## Current available Building Blocks
 
-- H 
-- OH
-- O (be carefull because not every buiding block can present this functional group)
-- CH3
-- tBut (Tert butil)
-- OMet
-- OEt
-- NC2H
-- COOH
-- CHO
-- CN
-- F
-- Cl
-- Br
-- NH2
-- NO2
-- SO2H
+![Slide2](https://user-images.githubusercontent.com/33868364/160653787-f9161ff8-aaa7-49a8-aec4-77f2255fc0a3.PNG)
+![Slide3](https://user-images.githubusercontent.com/33868364/160653797-6b788593-4772-4703-ab18-6c218bcf0ba4.PNG)
+
+
+## Current available Connector Groups
+
+ - NH2
+ - CHO
+
+## Current available R Groups
+
+![Captura de tela 2022-03-29 160604](https://user-images.githubusercontent.com/33868364/160687866-ef168933-55d7-46b9-a1de-0b15e1c38f0f.png)
+
 
 ## Citation
 
@@ -165,15 +161,3 @@ If you find **pyCOFBuilder** useful in your research please consider citing the 
 > *Exploring Machine Learning Strategies for Partial Atomic Charges Prediction  on Covalent Organic Framework*
 > 
 > *Manuscript in preparation.* [DOI](https://doi.org/)
-
-# TO DO
-
-- Implementar novas topologias 2D
-- Implementar novas topologias 3D
-- Adicionar novos grupos R
-- Adicionar novas conexões entre os grupos
-- Implementar topologias 3D
-- Salvar a estrutura final em novos formatos:
-	- Formato proprietário do VMD (script de visualização?)
-- Aceitar SMILES ou SELFIES dos possíveis grupos R
-- Aceitar SMILES ou SELFIES dos possíveis núcleos orgânicos
