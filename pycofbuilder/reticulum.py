@@ -151,8 +151,8 @@ class Reticulum():
         symm = SpacegroupAnalyzer(struct, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
         struct_symm_prim = symm.get_primitive_standard_structure()
 
-        if stacking in ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2']:
-            # Create A stacking, a 2D isolated sheet with slab
+        if stacking in self.available_stacking['HCB']: 
+           # Create A stacking, a 2D isolated sheet with slab
             if stacking == 'A':
                 self.stacking = 'A'
                 self.symm_structure = struct_symm_prim
@@ -427,7 +427,7 @@ class Reticulum():
         except Exception:
             return None
 
-        if stacking in ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2']:
+        if stacking in self.available_stacking['HCB_A']: 
             # Create A stacking. The slab is defined by the c_cell parameter
             if stacking == 'A':
                 self.stacking = 'A'
