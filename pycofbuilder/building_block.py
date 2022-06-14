@@ -35,7 +35,7 @@ class Building_Block():
             self.get_BB()
 
     def get_BB(self):
-        '''Automatically read or creats a buiding block based on its name'''
+        '''Automatically read or create a buiding block based on its name'''
         simm_check, nucleo_check, conector_check, radicals_check = self.check_existence()
 
         if simm_check and nucleo_check and conector_check and radicals_check:
@@ -57,6 +57,9 @@ class Building_Block():
                     self.save()
                 if simmetry == 'C4':
                     self.create_C4_BB(nucleo, conector, radicals[0], radicals[1], radicals[2], radicals[3], radicals[4], radicals[5])
+                    self.save()
+                if simmetry == 'C6':
+                    self.create_C6_BB(nucleo, conector, radicals[0], radicals[1], radicals[2], radicals[3], radicals[4], radicals[5])
                     self.save()
     
     def n_atoms(self):
@@ -366,6 +369,29 @@ class Building_Block():
         self.connectivity =  len([i for i in self.atom_labels if 'X' in i])
         self.align_to()
         self.calculate_size()
+    
+    def create_C6_BB(self, nucleo_name='BENZ', conector='CHO', R1='H', R2='H', R3='H', R4='H', R5='H', R6='H', R7='H', R8='H', R9='H'):
+        '''Create a building block with C4 simmetry'''
+
+        self.name = f'C6_{nucleo_name}_{conector}'
+
+        self.atom_labels, self.atom_pos = Tools.read_gjf_file(os.path.join(self.main_path, 'nucleo', 'C6'), nucleo_name)
+
+        self.centralize_molecule()
+
+        self.add_connection_group(conector)
+
+        R_list_names = [R1, R2, R3, R4, R5, R6, R7, R8, R9]
+        R_list_labels = ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9']
+
+        for i in range(len(R_list_names)):
+            if R_list_labels[i] in self.atom_labels:
+                self.add_R_group(R_list_names[i], R_list_labels[i])
+                self.name += f'_{R_list_names[i]}'
+
+        self.connectivity =  len([i for i in self.atom_labels if 'X' in i])
+        self.align_to()
+        self.calculate_size()
 
     def save(self, extension='xyz'):
 
@@ -388,8 +414,9 @@ class Building_Block():
         C2_list = [i.rstrip('.gjf') for i in os.listdir(os.path.join(self.main_path, 'nucleo', 'C2')) if '.gjf' in i]
         C3_list = [i.rstrip('.gjf') for i in os.listdir(os.path.join(self.main_path, 'nucleo', 'C3')) if '.gjf' in i]
         C4_list = [i.rstrip('.gjf') for i in os.listdir(os.path.join(self.main_path, 'nucleo', 'C4')) if '.gjf' in i]
+        C6_list = [i.rstrip('.gjf') for i in os.listdir(os.path.join(self.main_path, 'nucleo', 'C6')) if '.gjf' in i]
 
-        return C2_list, C3_list, C4_list
+        return C2_list, C3_list, C4_list, C6_list
     
     def get_available_R(self):
 
@@ -417,8 +444,8 @@ class Building_Block():
             conector = name[2]
             radicals = name[3:]
 
-            if simm not in ['C2', 'C3', 'C4']:
-                print('ERROR!: Building Block simmetry must be C2, C3 or C4.')
+            if simm not in ['C2', 'C3', 'C4', 'C6']:
+                print('ERROR!: Building Block simmetry must be C2, C3, C4, or C6.')
                 simm_check = False
 
             if simm == 'C2':
@@ -435,6 +462,11 @@ class Building_Block():
                 list = self.get_available_nucleo()[2]
                 if nucleo not in list:
                     print(f'ERROR!: {nucleo} not available! Available nucleos with C4 simmetry is {list}')
+                    nucleo_check = False
+            if simm == 'C6':
+                list = self.get_available_nucleo()[3]
+                if nucleo not in list:
+                    print(f'ERROR!: {nucleo} not available! Available nucleos with C6 simmetry is {list}')
                     nucleo_check = False
             
             if conector not in self.get_available_conector():
