@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Dec 17 11:31:19 2020
+# Copyright (c) Felipe Lopes de Oliveira
+# Distributed under the terms of the MIT License.
 
-@author: lipel
+"""
+This class implements definitions for Reticulum buiding
 """
 
 import os
