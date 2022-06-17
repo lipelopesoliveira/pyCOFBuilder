@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Dec 17 11:31:19 2020
+# Copyright (c) Felipe Lopes de Oliveira
+# Distributed under the terms of the MIT License.
 
-@author: lipel
+"""
+This class implements definitions for Reticulum buiding
 """
 
 import os
@@ -16,23 +17,84 @@ import pycofbuilder.tools as Tools
 from pycofbuilder.building_block import Building_Block
 
 class Reticulum():
+    """
+    A class used to represent a Reticulum
+
+    ...
+
+    Attributes
+    ----------
+    verbosity : bool
+        control the printing options
+    available_2D_topologies : list
+        List of available 2D topologies
+    available_3D_topologies : list
+        List of available 3D topologies
+    available_topologies : list
+        List of all available topologies
+    
+    available_stacking : list
+        List of available stakings for all 2D topologies
+
+    Methods
+    -------
+    n_atoms()
+        Returns the number of atoms in the unitary cell
+    print_available_topologies()
+        Print all available topologies
+    create_hcb_structure()
+        Creates a COF with HCB network.
+    create_hcb_a_structure()
+        Creates a COF with HCB-A network.
+    create_sql_structure()
+        Creates a COF with SQL network.
+    create_sql_a_structure()
+        Creates a COF with SQL-A network.
+    create_kgd_structure()
+        Creates a COF with KGD network.
+    create_hxl_a_structure()
+        Creates a COF with HXL-A network.
+    create_kgm_structure()
+        Creates a COF with KGM network.
+    create_kgm_a_structure()
+        Creates a COF with KGM-A network.
+    save_cif()
+        Save the structure in .cif format
+    save_json()
+        Save the structure in .json format
+    save_xsf()
+        Save the structure in .xsf format
+    save_pdb()
+        Save the structure in .pdb format
+    save_vasp()
+        Save the structure in .vasp format
+    save_turbomole()
+        Save the structure in .coord format
+    save_xyz()
+        Save the structure in .xyz format
+    save_qe()
+        Save the structure in .in format
+    """
 
     def __init__(self, bb_lib='bb_lib', verbosity=False):
 
         _ROOT = os.path.abspath(os.path.dirname(__file__))
 
         self.verbosity = verbosity
-        self.available_2D_topologies = ['HCB', 'HCB_A', 'SQL', 'SQL_A', 'KGM', 'KGM_A', 'HXL', 'HXL_A', 'KGD', 'KGD_A']
-        self.available_3D_topologies = ['dia', 'bor', 'srs', 'pts', 'ctn', 'rra', 'fcc', 'lon', 'stp', 'acs', 'tbo', 'bcu', 'fjh', 'ceq']
+        self.available_2D_topologies = ['HCB', 'HCB_A', 'SQL', 'SQL_A', 'KGM', 'KGM_A', 'KGD', 'HXL_A'] # Falta adicionar: 'HXL', 'KGD'
+        self.available_3D_topologies = [] # Falta adicionar: ['dia', 'bor', 'srs', 'pts', 'ctn', 'rra', 'fcc', 'lon', 'stp', 'acs', 'tbo', 'bcu', 'fjh', 'ceq']
+        self.available_topologies = self.available_2D_topologies + self.available_3D_topologies
 
         self.available_stacking = {'HCB': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
                                    'HCB_A': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
                                    'SQL':['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
                                    'SQL_A':['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
                                    'KGD': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
-                                   'HXL_A': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2']
+                                   'HXL_A': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
+                                   'KGM': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
+                                   'KGM_A': ['AA', 'AB1x', 'AB1y', 'AB1xy', 'AB2', 'AAl', 'AAt']
                                    }
-        self.available_topologies = self.available_2D_topologies + self.available_3D_topologies
+        
         self.lib_bb = bb_lib
         self.main_path = os.path.join(_ROOT, 'data')
         self.lib_path = os.path.join(self.main_path, bb_lib)
@@ -73,10 +135,56 @@ class Reticulum():
             for i in self.available_3D_topologies:
                 print(i.upper())
 
-    def create_hcb_structure(self, name_bb_a, name_bb_b, stacking='AA', bond_atom='N', c_parameter_base=3.6, print_result=True, slab=10, shift_vector=[1.0,1.0,0], tilt_angle=5):
-        '''Creates a COF with HCB network'''
+################   Net creation methods  ############################
 
-        self.topology = 'hcb'
+    def create_hcb_structure(self, 
+                             name_bb_a : str,
+                             name_bb_b : str,
+                             stacking : str ='AA',
+                             bond_atom : str ='N',
+                             c_parameter_base : float = 3.6,
+                             print_result : bool = True,
+                             slab : float = 10.0,
+                             shift_vector : list = [1.0,1.0,0],
+                             tilt_angle : float = 5.0):
+        """Creates a COF with HCB network.
+
+        The HCB net is composed of two tripodal building blocks.
+
+        Parameters
+        ----------
+        name_bb_a : str, required
+            The 4 letter code for the tripodal Buiding Block A
+        name_bb_b : str, required
+            The 4 letter code for the tripodal Buiding Block B
+        stacking : str, optional
+            The stacking pattern of the COF layers (default is 'AA')
+        bond_atom : str, optional
+            The atom that connect the buiding blocks (default is 'N')
+        c_parameter_base : float, optional
+            The base value for interlayer distance in angstroms (default is 3.6)
+        print_result : bool, optional
+            Parameter for the control for printing the result (default is True)
+        slab : float, optional
+            Default parameter for the interlayer slab (default is 10.0)
+        shift_vector: list, optional
+            Shift vector for the AAl and AAt stakings (defatult is [1.0,1.0,0])
+        tilt_angle: float, optional
+            Tilt angle for the AAt staking in degrees (default is 5.0)
+
+        Returns
+        -------
+        list
+            A list of strings containing:
+                1. the structure name, 
+                2. lattice type, 
+                3. hall symbol of the cristaline structure, 
+                4. space group,
+                5. number of the space group,
+                6. number of operation symmetry
+        """
+
+        self.topology = 'HCB'
         self.dimension = 2
 
         bb_1 = Building_Block(name_bb_a, self.lib_bb)
@@ -153,7 +261,7 @@ class Reticulum():
         symm = SpacegroupAnalyzer(struct, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
         struct_symm_prim = symm.get_primitive_standard_structure()
 
-        if stacking not in self.available_stacking['HCB']:
+        if stacking not in self.available_stacking[self.topology]:
             raise Exception(f"""{stacking} is not in the available stack list for HCB net.
     Available options are: {self.available_stacking['HCB']}""")
 
@@ -331,9 +439,54 @@ class Reticulum():
 
         return [self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op)]
 
-    def create_hcb_a_structure(self, name_bb_a, name_bb_b, stacking='AA', bond_atom='N', c_parameter_base=3.6, print_result=True, slab=10, shift_vector=[1,1,0], tilt_angle=5):
+    def create_hcb_a_structure(self,
+                               name_bb_a: str,
+                               name_bb_b: str,
+                               stacking: str = 'AA',
+                               bond_atom: str = 'N',
+                               c_parameter_base: float = 3.6,
+                               print_result: bool = True,
+                               slab: float = 10.0,
+                               shift_vector: list = [1.0, 1.0, 0],
+                               tilt_angle: float = 5.0):
+        """Creates a COF with HCB-A network.
 
-        self.topology = 'hcb-a'
+        The HCB-A net is composed of one tripodal and one linear building blocks.
+
+        Parameters
+        ----------
+        name_bb_a : str, required
+            The 4 letter code for the tripodal Buiding Block A
+        name_bb_b : str, required
+            The 4 letter code for the linear Buiding Block B
+        stacking : str, optional
+            The stacking pattern of the COF layers (default is 'AA')
+        bond_atom : str, optional
+            The atom that connect the buiding blocks (default is 'N')
+        c_parameter_base : float, optional
+            The base value for interlayer distance in angstroms (default is 3.6)
+        print_result : bool, optional
+            Parameter for the control for printing the result (default is True)
+        slab : float, optional
+            Default parameter for the interlayer slab (default is 10.0)
+        shift_vector: list, optional
+            Shift vector for the AAl and AAt stakings (defatult is [1.0,1.0,0])
+        tilt_angle: float, optional
+            Tilt angle for the AAt staking in degrees (default is 5.0)
+
+        Returns
+        -------
+        list
+            A list of strings containing:
+                1. the structure name, 
+                2. lattice type, 
+                3. hall symbol of the cristaline structure, 
+                4. space group,
+                5. number of the space group,
+                6. number of operation symmetry
+        """
+
+        self.topology = 'HCB_A'
         self.dimension = 2
 
         bb_triangular = Building_Block(name_bb_a, self.lib_bb, verbosity=self.verbosity)
@@ -427,9 +580,9 @@ class Reticulum():
         except Exception:
             return None
 
-        if stacking not in self.available_stacking['HCB_A']:
+        if stacking not in self.available_stacking[self.topology]:
             raise Exception(f"""{stacking} is not in the available stack list for HCB-A net.
-    Available options are: {self.available_stacking['HCB_A']}""")
+    Available options are: {self.available_stacking[self.topology]}""")
 
         # Create A stacking. The slab is defined by the c_cell parameter
         if stacking == 'A':
@@ -601,14 +754,59 @@ class Reticulum():
 
         return [self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op)]
 
-    def create_sql_structure(self, name_a, name_b, stacking='AA', bond_atom='N', c_cell=3.6, print_result=True):
+    def create_sql_structure(self, 
+                             name_bb_a : str,
+                             name_bb_b : str,
+                             stacking : str ='AA',
+                             bond_atom : str ='N',
+                             c_parameter_base : float = 3.6,
+                             print_result : bool = True,
+                             slab : float = 10.0,
+                             shift_vector : list = [1.0,1.0,0],
+                             tilt_angle : float = 5.0):
+        """Creates a COF with SQL network.
 
-        self.topology = 'sql'
+        The SQL net is composed of two tetrapodal building blocks.
+
+        Parameters
+        ----------
+        name_bb_a : str, required
+            The 4 letter code for the tetrapodal Buiding Block A
+        name_bb_b : str, required
+            The 4 letter code for the tetrapodal Buiding Block B
+        stacking : str, optional
+            The stacking pattern of the COF layers (default is 'AA')
+        bond_atom : str, optional
+            The atom that connect the buiding blocks (default is 'N')
+        c_parameter_base : float, optional
+            The base value for interlayer distance in angstroms (default is 3.6)
+        print_result : bool, optional
+            Parameter for the control for printing the result (default is True)
+        slab : float, optional
+            Default parameter for the interlayer slab (default is 10.0)
+        shift_vector: list, optional
+            Shift vector for the AAl and AAt stakings (defatult is [1.0,1.0,0])
+        tilt_angle: float, optional
+            Tilt angle for the AAt staking in degrees (default is 5.0)
+
+        Returns
+        -------
+        list
+            A list of strings containing:
+                1. the structure name, 
+                2. lattice type, 
+                3. hall symbol of the cristaline structure, 
+                4. space group,
+                5. number of the space group,
+                6. number of operation symmetry
+        """
+
+        self.topology = 'SQL'
         self.dimension = 2
 
-        bb_1 = Building_Block(name_a, self.lib_bb, verbosity=self.verbosity)
+        bb_1 = Building_Block(name_bb_a, self.lib_bb, verbosity=self.verbosity)
 
-        bb_2 = Building_Block(name_b, self.lib_bb, verbosity=self.verbosity)
+        bb_2 = Building_Block(name_bb_b, self.lib_bb, verbosity=self.verbosity)
 
         self.charge = bb_1.charge + bb_2.charge
         self.chirality = bb_1.chirality or bb_2.chirality
@@ -616,13 +814,13 @@ class Reticulum():
         self.name = f'{bb_1.name}-{bb_2.name}-SQL-{stacking}'
 
         if self.verbosity is True:
-            print('Starting the creation of a sql net')
+            print('Starting the creation of a SQL net')
 
         if bb_1.connectivity != 4:
-            print(f'Building block A ({name_a}) must present connectivity 4 insted of', bb_1.connectivity)
+            print(f'Building block A ({name_bb_a}) must present connectivity 4 insted of', bb_1.connectivity)
             return None
         if bb_2.connectivity != 4:
-            print(f'Building block B ({name_b}) must present connectivity 4 insted of', bb_2.connectivity)
+            print(f'Building block B ({name_bb_b}) must present connectivity 4 insted of', bb_2.connectivity)
             return None
 
         # Calculates the cell parameter based on the building blocks size
@@ -642,8 +840,14 @@ class Reticulum():
         delta_a = abs(max(np.transpose(bb_1.atom_pos)[2])) + abs(min(np.transpose(bb_1.atom_pos)[2]))
         delta_b = abs(max(np.transpose(bb_2.atom_pos)[2])) + abs(min(np.transpose(bb_2.atom_pos)[2]))
 
+        # Build the matrix of unitary hexagonal cell
+        if stacking == 'A':
+            c = slab
+        else:
+            c = c_parameter_base + max([delta_a, delta_b])
+
         # Constrói a matriz da célula unitária tetragonal
-        lattice = [[a, 0, 0], [0, a, 0], [0, 0, c_cell + max([delta_a, delta_b])]]
+        lattice = [[a, 0, 0], [0, a, 0], [0, 0, c]]
 
         if self.verbosity is True:
             print('Unitary cell built:')
@@ -674,9 +878,14 @@ class Reticulum():
         symm = SpacegroupAnalyzer(struct, symprec=1, angle_tolerance=5.0)
         struct_symm_prim = symm.get_refined_structure()
 
-        if stacking not in self.available_stacking['SQL']:
-            raise Exception(f"""{stacking} is not in the available stack list for SQL net.
-    Available options are: {self.available_stacking['SQL']}""")
+        if stacking not in self.available_stacking[self.topology]:
+                raise Exception(f"""{stacking} is not in the available stack list for HCB net.
+    Available options are: {self.available_stacking[self.topology]}""")
+
+        # Create A stacking, a 2D isolated sheet with slab
+        if stacking == 'A':
+            self.stacking = 'A'
+            self.symm_structure = struct_symm_prim
 
         if stacking == 'AA':
             self.stacking = 'AA'
@@ -750,7 +959,6 @@ class Reticulum():
             cell = struct_symm_prim.as_dict()['lattice']
 
             # Shift the cell by the tilt angle
-            print(cell)
             a_cell = cell['a']
             b_cell = cell['b']
             c_cell = cell['c'] * 2
@@ -837,14 +1045,59 @@ class Reticulum():
 
         return [self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op)]
 
-    def create_sql_a_structure(self, name_a, name_b, stacking='AA', bond_atom='N', c_cell=3.6, print_result=True):
+    def create_sql_a_structure(self,
+                               name_bb_a: str,
+                               name_bb_b: str,
+                               stacking: str = 'AA',
+                               bond_atom: str = 'N',
+                               c_parameter_base: float = 3.6,
+                               print_result: bool = True,
+                               slab: float = 10.0,
+                               shift_vector: list = [1.0, 1.0, 0],
+                               tilt_angle: float = 5.0):
+        """Creates a COF with SQL-A network.
+
+        The SQL-A net is composed of one tetrapodal and one linear building blocks.
+
+        Parameters
+        ----------
+        name_bb_a : str, required
+            The 4 letter code for the tripodal Buiding Block A
+        name_bb_b : str, required
+            The 4 letter code for the linear Buiding Block B
+        stacking : str, optional
+            The stacking pattern of the COF layers (default is 'AA')
+        bond_atom : str, optional
+            The atom that connect the buiding blocks (default is 'N')
+        c_parameter_base : float, optional
+            The base value for interlayer distance in angstroms (default is 3.6)
+        print_result : bool, optional
+            Parameter for the control for printing the result (default is True)
+        slab : float, optional
+            Default parameter for the interlayer slab (default is 10.0)
+        shift_vector: list, optional
+            Shift vector for the AAl and AAt stakings (defatult is [1.0,1.0,0])
+        tilt_angle: float, optional
+            Tilt angle for the AAt staking in degrees (default is 5.0)
+
+        Returns
+        -------
+        list
+            A list of strings containing:
+                1. the structure name, 
+                2. lattice type, 
+                3. hall symbol of the cristaline structure, 
+                4. space group,
+                5. number of the space group,
+                6. number of operation symmetry
+        """
 
         self.topology = 'SQL_A'
         self.dimension = 2
 
-        bb_1 = Building_Block(name_a, self.lib_bb, verbosity=self.verbosity)
+        bb_1 = Building_Block(name_bb_a, self.lib_bb, verbosity=self.verbosity)
 
-        bb_2 = Building_Block(name_b, self.lib_bb, verbosity=self.verbosity)
+        bb_2 = Building_Block(name_bb_b, self.lib_bb, verbosity=self.verbosity)
 
         self.charge = bb_1.charge + bb_2.charge
         self.chirality = bb_1.chirality or bb_2.chirality
@@ -855,10 +1108,10 @@ class Reticulum():
             print('Starting the creation of a sql net')
 
         if bb_1.connectivity != 4:
-            print(f'Building block A ({name_a}) must present connectivity 4 insted of', bb_1.connectivity)
+            print(f'Building block A ({name_bb_a}) must present connectivity 4 insted of', bb_1.connectivity)
             return None
         if bb_2.connectivity != 2:
-            print(f'Building block B ({name_b}) must present connectivity 2 insted of', bb_2.connectivity)
+            print(f'Building block B ({name_bb_b}) must present connectivity 2 insted of', bb_2.connectivity)
             return None
 
         # Calcula o parâmetro de célula com base no tamanho dos blocos de construção
@@ -878,8 +1131,14 @@ class Reticulum():
         delta_a = abs(max(np.transpose(bb_1.atom_pos)[2])) + abs(min(np.transpose(bb_1.atom_pos)[2]))
         delta_b = abs(max(np.transpose(bb_2.atom_pos)[2])) + abs(min(np.transpose(bb_2.atom_pos)[2]))
 
+        # Build the matrix of unitary hexagonal cell
+        if stacking == 'A':
+            c = slab
+        else:
+            c = c_parameter_base + max([delta_a, delta_b])
+
         # Constrói a matriz da célula unitária tetragonal
-        lattice = [[a, 0, 0], [0, a, 0], [0, 0, c_cell + max([delta_a, delta_b])]]
+        lattice = [[a, 0, 0], [0, a, 0], [0, 0, c]]
 
         if self.verbosity is True:
             print('Unitary cell built:')
@@ -926,10 +1185,15 @@ class Reticulum():
         symm = SpacegroupAnalyzer(struct, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
         struct_symm_prim = symm.get_refined_structure()
 
-        if stacking not in self.available_stacking['SQL_A']:
-            raise Exception(f"""{stacking} is not in the available stack list for SQL-A net.
-    Available options are: {self.available_stacking['SQL_A']}""")
+        if stacking not in self.available_stacking[self.topology]:
+                raise Exception(f"""{stacking} is not in the available stack list for HCB net.
+    Available options are: {self.available_stacking[self.topology]}""")
 
+        # Create A stacking, a 2D isolated sheet with slab
+        if stacking == 'A':
+            self.stacking = 'A'
+            self.symm_structure = struct_symm_prim
+            
         if stacking == 'AA':
             self.stacking = 'AA'
             self.symm_structure = struct_symm_prim
@@ -1005,18 +1269,18 @@ class Reticulum():
             print(cell)
             a_cell = cell['a']
             b_cell = cell['b']
-            c_cell = cell['c'] * 2
+            c_parameter_base = cell['c'] * 2
             alpha = cell['alpha'] - tilt_angle
             beta= cell['beta'] - tilt_angle
             gamma = cell['gamma']
 
-            new_cell = Tools.cellpar_to_cell([a_cell, b_cell, c_cell, alpha, beta, gamma])
+            new_cell = Tools.cellpar_to_cell([a_cell, b_cell, c_parameter_base, alpha, beta, gamma])
 
             # Shift the first sheet to be at 0.25 * c
             A = ion_conv_crystal
 
             # Shift the first sheet to be at 0.75 * c and translate by the shift_vector
-            B = ion_conv_crystal + np.array([0, 0, 0.5*c_cell]) + shift_vector
+            B = ion_conv_crystal + np.array([0, 0, 0.5*c_parameter_base]) + shift_vector
 
             AB = np.concatenate((A, B))
             AB_label = [i[0] for i in labels_conv_crystal]
@@ -1088,19 +1352,54 @@ class Reticulum():
             Tools.print_result(self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op))
 
         return [self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op)]
+    
+    def create_kgd_structure(self, 
+                             name_bb_a : str,
+                             name_bb_b : str,
+                             stacking : str ='AA',
+                             bond_atom : str ='N',
+                             c_parameter_base : float = 3.6,
+                             print_result : bool = True,
+                             slab : float = 10.0,
+                             shift_vector : list = [1.0,1.0,0],
+                             tilt_angle : float = 5.0):
 
-    def create_kgd_structure(self,
-                             name_bb_a,
-                             name_bb_b,
-                             stacking='AA',
-                             bond_atom='N',
-                             c_parameter_base=3.6,
-                             print_result=True,
-                             slab=10,
-                             shift_vector=[1, 1, 0],
-                             tilt_angle=5):
+        """Creates a COF with KGD network.
 
-        '''Creates a COF with KGD network'''
+        The KGD net is composed of one hexapodal and one tripodal building blocks.
+
+        Parameters
+        ----------
+        name_bb_a : str, required
+            The 4 letter code for the hexapodal Buiding Block A
+        name_bb_b : str, required
+            The 4 letter code for the tripodal Buiding Block B
+        stacking : str, optional
+            The stacking pattern of the COF layers (default is 'AA')
+        bond_atom : str, optional
+            The atom that connect the buiding blocks (default is 'N')
+        c_parameter_base : float, optional
+            The base value for interlayer distance in angstroms (default is 3.6)
+        print_result : bool, optional
+            Parameter for the control for printing the result (default is True)
+        slab : float, optional
+            Default parameter for the interlayer slab (default is 10.0)
+        shift_vector: list, optional
+            Shift vector for the AAl and AAt stakings (defatult is [1.0,1.0,0])
+        tilt_angle: float, optional
+            Tilt angle for the AAt staking in degrees (default is 5.0)
+
+        Returns
+        -------
+        list
+            A list of strings containing:
+                1. the structure name, 
+                2. lattice type, 
+                3. hall symbol of the cristaline structure, 
+                4. space group,
+                5. number of the space group,
+                6. number of operation symmetry
+        """
 
         self.topology = 'KGD'
         self.dimension = 2
@@ -1369,17 +1668,52 @@ class Reticulum():
         return [self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op)]
 
     def create_hxl_a_structure(self,
-                               name_bb_a,
-                               name_bb_b,
-                               stacking='AA',
-                               bond_atom='N',
-                               c_parameter_base=3.6,
-                               print_result=True,
-                               slab=10,
-                               shift_vector=[1, 1, 0],
-                               tilt_angle=5):
+                               name_bb_a: str,
+                               name_bb_b: str,
+                               stacking: str = 'AA',
+                               bond_atom: str = 'N',
+                               c_parameter_base: float = 3.6,
+                               print_result: bool = True,
+                               slab: float = 10.0,
+                               shift_vector: list = [1.0, 1.0, 0],
+                               tilt_angle: float = 5.0):
 
-        '''Creates a COF with HXL-A network'''
+        """Creates a COF with HXL-A network.
+
+        The HXK-A net is composed of one hexapodal and one linear building blocks.
+
+        Parameters
+        ----------
+        name_bb_a : str, required
+            The 4 letter code for the hexapodal Buiding Block A
+        name_bb_b : str, required
+            The 4 letter code for the linear Buiding Block B
+        stacking : str, optional
+            The stacking pattern of the COF layers (default is 'AA')
+        bond_atom : str, optional
+            The atom that connect the buiding blocks (default is 'N')
+        c_parameter_base : float, optional
+            The base value for interlayer distance in angstroms (default is 3.6)
+        print_result : bool, optional
+            Parameter for the control for printing the result (default is True)
+        slab : float, optional
+            Default parameter for the interlayer slab (default is 10.0)
+        shift_vector: list, optional
+            Shift vector for the AAl and AAt stakings (defatult is [1.0,1.0,0])
+        tilt_angle: float, optional
+            Tilt angle for the AAt staking in degrees (default is 5.0)
+
+        Returns
+        -------
+        list
+            A list of strings containing:
+                1. the structure name, 
+                2. lattice type, 
+                3. hall symbol of the cristaline structure, 
+                4. space group,
+                5. number of the space group,
+                6. number of operation symmetry
+        """
 
         self.topology = 'HXL_A'
         self.dimension = 2
@@ -1649,30 +1983,794 @@ class Reticulum():
             Tools.print_result(self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op))
 
         return self.atom_labels, self.atom_pos, self.lattice
+    
+    def create_kgm_structure(self, 
+                             name_bb_a : str,
+                             name_bb_b : str,
+                             stacking : str ='AA',
+                             bond_atom : str ='N',
+                             c_parameter_base : float = 3.6,
+                             print_result : bool = True,
+                             slab : float = 10.0,
+                             shift_vector : list = [1.0,1.0,0],
+                             tilt_angle : float = 5.0):
 
-################   Save file in different formats  ############################
+        """Creates a COF with KGM network.
 
-    def save_cif(self, supercell=False, path=None):
+        The KGM net is composed of two tetrapodal building blocks.
+
+        Parameters
+        ----------
+        name_bb_a : str, required
+            The 4 letter code for the tetrapodal Buiding Block A
+        name_bb_b : str, required
+            The 4 letter code for the tetrapodal Buiding Block B
+        stacking : str, optional
+            The stacking pattern of the COF layers (default is 'AA')
+        bond_atom : str, optional
+            The atom that connect the buiding blocks (default is 'N')
+        c_parameter_base : float, optional
+            The base value for interlayer distance in angstroms (default is 3.6)
+        print_result : bool, optional
+            Parameter for the control for printing the result (default is True)
+        slab : float, optional
+            Default parameter for the interlayer slab (default is 10.0)
+        shift_vector: list, optional
+            Shift vector for the AAl and AAt stakings (defatult is [1.0,1.0,0])
+        tilt_angle: float, optional
+            Tilt angle for the AAt staking in degrees (default is 5.0)
+
+        Returns
+        -------
+        list
+            A list of strings containing:
+                1. the structure name, 
+                2. lattice type, 
+                3. hall symbol of the cristaline structure, 
+                4. space group,
+                5. number of the space group,
+                6. number of operation symmetry
+        """
+
+        self.topology = 'KGM'
+        self.dimension = 2
+
+        bb_1 = Building_Block(name_bb_a, self.lib_bb)
+        bb_2 = Building_Block(name_bb_b, self.lib_bb)
+
+        self.name = f'{bb_1.name}-{bb_2.name}-KGM-{stacking}'
+        self.charge = bb_1.charge + bb_2.charge
+        self.chirality = bb_1.chirality or bb_2.chirality
+
+        if self.verbosity is True:
+            print('Starting the creation of a KGM net')
+
+        if bb_1.connectivity != 4:
+            print('Building block A must present connectivity 4 insted of', len(bb_1.connectivity))
+            return None
+        if bb_2.connectivity != 4:
+            print('Building block B must present connectivity 4 insted of', len(bb_2.connectivity))
+            return None
+
+        # Calculate the cell parameter based on the size of the building blocks        
+        if self.verbosity:
+            print('BB_A size:', bb_1.size)
+
+        if self.verbosity:
+            print('BB_B size:', bb_2.size)
+
+        size_a = max(bb_1.size)
+        size_b = max(bb_2.size)
+        # Defines the cell parameter a
+        a = 2*(size_a + size_b) # np.cos(np.radians(30))*2*(size_a + size_b)
+
+        if self.verbosity:
+            print('Calculated cell parameter a:', a)
+
+        # Gets the maximum distace in the z axis to create the c parameter
+        delta_a = abs(max(np.transpose(bb_1.atom_pos)[2])) + abs(min(np.transpose(bb_1.atom_pos)[2]))
+        delta_b = abs(max(np.transpose(bb_2.atom_pos)[2])) + abs(min(np.transpose(bb_2.atom_pos)[2]))
+
+        # Build the matrix of unitary hexagonal cell
+        if stacking == 'A':
+            c = slab
+        else:
+            c = c_parameter_base + max([delta_a, delta_b])
+
+        # Define the cell lattice
+        lattice = [[a, 0, 0], 
+                   [-0.5*a, np.sqrt(3)/2*a, 0], 
+                   [0, 0, c]]
+
+        if self.verbosity is True:
+            print('Unitary cell built:', lattice)
+
+        bb1_v1, bb1_v2, bb1_v3, bb1_v4 = bb_1.get_X_points()[1]
+        bb1_lado1, bb1_lado2, bb1_lado3 = (bb1_v1 + bb1_v2) /2, (bb1_v1 + bb1_v3) /2, (bb1_v1 + bb1_v4) /2
+
+        R_matrix = Tools.rotation_matrix_from_vectors(bb1_lado1, np.array([1, 0, 0]))
+
+        bb_1.atom_pos = np.dot(bb_1.atom_pos, np.transpose(R_matrix))
+
+        # Add tbe building block 1 (C4) on the center [1/2, 1/2, 0.0] of the unitary cell (A1 site) 
+        final_pos = np.dot(bb_1.atom_pos, R.from_euler('z', 30, degrees=True).as_matrix()) + np.array([1/4, np.sqrt(3)/4, 0])*a
+        final_label = list(bb_1.atom_labels)
+
+        # Add tbe building block 1 (C4) on [1/2, 0.0, 0.0] of the unitary cell (A2 site) -45
+        final_pos = np.vstack((final_pos, np.dot(bb_1.atom_pos, R.from_euler('z', -90, degrees=True).as_matrix()) + np.array([1/2, 0, 0])*a))
+        final_label += list(bb_1.atom_labels)
+
+        # Add tbe building block 1 (C4) on [0.0, 1/2, 0.0] of the unitary cell (A3 site) 30
+        final_pos = np.vstack((final_pos, np.dot(bb_1.atom_pos, R.from_euler('z', -30, degrees=True).as_matrix()) + np.array([-1/4, np.sqrt(3)/4, 0])*a))
+        final_label += list(bb_1.atom_labels)
+
+        # Changes the X atoms by the desired bond_atom
+        final_label, final_pos = Tools.change_X_atoms(final_label, final_pos, bond_atom)
+
+        # Cria a estrutura como entidade do pymatgen
+        struct = Structure(lattice, final_label, final_pos, coords_are_cartesian=True)
+
+        # Remove os átomos duplicados
+        struct.sort(reverse=True)
+        struct.merge_sites(tol=.7, mode='delete')
+        struct.translate_sites(range(len(struct.as_dict()['sites'])), [0, 0, 0.5], frac_coords=True, to_unit_cell=True)
+        
+        atom_labels = np.array([[i['label']] for i in struct.as_dict()['sites']]).flatten()
+        atom_pos = np.array([i['xyz'] for i in struct.as_dict()['sites']])
+        cell = np.array(struct.as_dict()['lattice']['matrix'])
+        
+        # Change the X atoms by the desired bond_atom
+        final_label, final_pos = Tools.change_X_atoms(final_label, final_pos, bond_atom)
+
+        # Cria a estrutura como entidade do pymatgen
+        struct = Structure(lattice, final_label, final_pos, coords_are_cartesian=True)
+
+        # Remove os átomos duplicados
+        struct.sort(reverse=True)
+        struct.merge_sites(tol=.7, mode='delete')
+        struct.translate_sites(range(len(struct.as_dict()['sites'])), [0, 0, 0.5], frac_coords=True, to_unit_cell=True)
+        
+        atom_labels = np.array([[i['label']] for i in struct.as_dict()['sites']]).flatten()
+        atom_pos = np.array([i['xyz'] for i in struct.as_dict()['sites']])
+        cell = np.array(struct.as_dict()['lattice']['matrix'])
+    
+        # Simetriza a estrutura
+        symm = SpacegroupAnalyzer(struct, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
+        struct_symm_prim = symm.get_refined_structure()
+
+        if stacking not in self.available_stacking[self.topology]:
+                raise Exception(f"""{stacking} is not in the available stack list for HCB net.
+    Available options are: {self.available_stacking[self.topology]}""")
+        
+        # Create A stacking, a 2D isolated sheet with slab
+        if stacking == 'A':
+            self.stacking = 'A'
+            self.symm_structure = struct_symm_prim
+        
+        # Create AA staking. By default one sheet per unitary cell is used
+        if stacking == 'AA':
+            self.stacking = 'AA'
+            self.symm_structure = struct_symm_prim
+
+        if stacking == 'AB1':
+            self.stacking = 'AB1'
+            labels_conv_crystal = np.array([[i['label']] for i in struct_symm_prim.as_dict()['sites']])
+            ion_conv_crystal = np.array([i['abc'] for i in struct_symm_prim.as_dict()['sites']])
+            cell = np.array(struct_symm_prim.as_dict()['lattice']['matrix'])*(1, 1, 2)
+
+            A = ion_conv_crystal*(1, 1, 0.5)
+            B = Tools.translate_inside(ion_conv_crystal*(1, 1, 1.5) + (1/4, 1/4, 0))
+
+            AB = np.concatenate((A, B))
+            AB_label = [i[0] for i in labels_conv_crystal]
+
+            lattice = Lattice(cell)
+            AB_1 = Structure(lattice, AB_label + AB_label, AB, coords_are_cartesian=False)
+            AB_1_symm = SpacegroupAnalyzer(AB_1, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
+
+            self.symm_structure = AB_1_symm.get_refined_structure()
+
+        if stacking == 'AB2':
+            self.stacking = 'AB2'
+            labels_conv_crystal = np.array([[i['label']] for i in struct_symm_prim.as_dict()['sites']])
+            ion_conv_crystal = np.array([i['abc'] for i in struct_symm_prim.as_dict()['sites']])
+            cell = np.array(struct_symm_prim.as_dict()['lattice']['matrix'])*(1, 1, 2)
+
+            A = ion_conv_crystal*(1, 1, 0.5)
+            B = Tools.translate_inside(ion_conv_crystal*(1, 1, 1.5) + (1/2, 0, 0))
+
+            AB = np.concatenate((A, B))
+            AB_label = [i[0] for i in labels_conv_crystal]
+
+            lattice = Lattice(cell)
+            AB_2 = Structure(lattice, AB_label + AB_label, AB, coords_are_cartesian=False)
+            AB_2_symm = SpacegroupAnalyzer(AB_2, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
+
+            self.symm_structure = AB_2_symm.get_refined_structure()
+            
+        # Create AAl stacking. Tetragonal cell with two sheets per cell shifited by the shift_vector in angstroms. 
+        if stacking == 'AAl':
+            self.stacking = 'AAl'
+            labels_conv_crystal = np.array([[i['label']] for i in struct_symm_prim.as_dict()['sites']])
+            ion_conv_crystal = np.array([i['abc'] for i in struct_symm_prim.as_dict()['sites']])
+            cell = np.array(struct_symm_prim.as_dict()['lattice']['matrix'])*(1, 1, 2)
+
+            # Shift the first sheet to be at 0.25 * c
+            A = ion_conv_crystal * np.array([1, 1, 0.5])
+
+            # Calculates the shift vector in crystal units
+            r = Tools.get_cartesian_to_fractional_matrix(*Tools.cell_to_cellpar(cell))
+            shift_vector = np.dot(r, np.array(shift_vector))
+
+            # Shift the first sheet to be at 0.75 * c and translate by the shift_vector
+            B = ion_conv_crystal * np.array([1, 1, 1.5]) + shift_vector
+
+            AB = np.concatenate((A, B))
+            AB_label = [i[0] for i in labels_conv_crystal]
+
+            lattice = Lattice(cell)
+            self.symm_structure = Structure(lattice, AB_label+AB_label, AB, coords_are_cartesian=False)
+
+        # Create AA tilted stacking. Tilted tetragonal cell with two sheets per cell tilted by tilt_angle. 
+        if stacking == 'AAt':
+            self.stacking = 'AAt'
+
+            labels_conv_crystal = np.array([[i['label']] for i in struct_symm_prim.as_dict()['sites']])
+            ion_conv_crystal = np.array([i['xyz'] for i in struct_symm_prim.as_dict()['sites']])
+            cell = struct_symm_prim.as_dict()['lattice']
+
+            # Shift the cell by the tilt angle
+            print(cell)
+            a_cell = cell['a']
+            b_cell = cell['b']
+            c_cell = cell['c'] * 2
+            alpha = cell['alpha'] - tilt_angle
+            beta= cell['beta'] - tilt_angle
+            gamma = cell['gamma']
+
+            new_cell = Tools.cellpar_to_cell([a_cell, b_cell, c_cell, alpha, beta, gamma])
+
+            # Shift the first sheet to be at 0.25 * c
+            A = ion_conv_crystal
+
+            # Shift the first sheet to be at 0.75 * c and translate by the shift_vector
+            B = ion_conv_crystal + np.array([0, 0, 0.5*c_cell]) + shift_vector
+
+            AB = np.concatenate((A, B))
+            AB_label = [i[0] for i in labels_conv_crystal]
+
+            lattice = Lattice(new_cell)
+            self.symm_structure = Structure(lattice, AB_label+AB_label, AB, coords_are_cartesian=True)
+
+        if stacking == 'ABC1':
+            self.stacking = 'ABC1'
+            labels_conv_crystal = np.array([[i['label']] for i in struct_symm_prim.as_dict()['sites']])
+            ion_conv_crystal = np.array([i['abc'] for i in struct_symm_prim.as_dict()['sites']])
+            cell = np.array(struct_symm_prim.as_dict()['lattice']['matrix'])*(1, 1, 3)
+
+            A = ion_conv_crystal*(1, 1, 5/3)
+            B = Tools.translate_inside(ion_conv_crystal*(1, 1, 1) + (2/3, 1/3, 0))
+            C = Tools.translate_inside(ion_conv_crystal*(1, 1, 1/3) + (4/3, 2/3, 0))
+
+            ABC = np.concatenate((A, B, C))
+            ABC_label = [i[0] for i in labels_conv_crystal]
+
+            lattice = Lattice(cell)
+
+            ABC_f = Structure(lattice, ABC_label+ABC_label+ABC_label, ABC, coords_are_cartesian=False)
+            ABC_f_symm = SpacegroupAnalyzer(ABC_f, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
+
+            self.symm_structure = ABC_f_symm.get_refined_structure()
+
+        if stacking == 'ABC2':
+            self.stacking = 'ABC2'
+            labels_conv_crystal = np.array([[i['label']] for i in struct_symm_prim.as_dict()['sites']])
+            ion_conv_crystal = np.array([i['abc'] for i in struct_symm_prim.as_dict()['sites']])
+            cell = np.array(struct_symm_prim.as_dict()['lattice']['matrix'])*(1, 1, 3)
+
+            A = ion_conv_crystal*(1, 1, 5/3)
+            B = Tools.translate_inside(ion_conv_crystal*(1, 1, 1) + (1/3, 0, 0))
+            C = Tools.translate_inside(ion_conv_crystal*(1, 1, 1/3) + (2/3, 0, 0))
+
+            ABC = np.concatenate((A, B, C))
+            ABC_label = [i[0] for i in labels_conv_crystal]
+
+            lattice = Lattice(cell)
+
+            ABC_f = Structure(lattice, ABC_label+ABC_label+ABC_label, ABC, coords_are_cartesian=False)
+            ABC_f_symm = SpacegroupAnalyzer(ABC_f, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
+
+            self.symm_structure = ABC_f_symm.get_refined_structure()
+
+        dict_structure = self.symm_structure.as_dict()
+
+        self.lattice = dict_structure['lattice']['matrix']
+
+        self.atom_labels = [i['label'] for i in dict_structure['sites']]
+        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
+        self.n_atoms = len(self.symm_structure)
+        self.composition = self.symm_structure.formula
+
+        if self.verbosity is True:
+            print(self.symm_structure)
+
+        # Get the simmetry information of the generated structure
+        self.lattice_type = symm.get_lattice_type()
+        self.space_group = symm.get_space_group_symbol()
+        self.space_group_n = symm.get_space_group_number()
+
+        symm_op = symm.get_point_group_operations()
+        self.hall = symm.get_hall()
+
+        if print_result == True:
+            Tools.print_result(self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op))
+
+        return [self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op)]
+    
+    def create_kgm_a_structure(self,
+                               name_bb_a: str,
+                               name_bb_b: str,
+                               stacking: str = 'AA',
+                               bond_atom: str = 'N',
+                               c_parameter_base: float = 3.6,
+                               print_result: bool = True,
+                               slab: float = 10.0,
+                               shift_vector: list = [1.0, 1.0, 0],
+                               tilt_angle: float = 5.0):
+
+        """Creates a COF with KGM-A network.
+
+        The KGM-A net is composed of one tetrapodal and one linear building blocks.
+
+        Parameters
+        ----------
+        name_bb_a : str, required
+            The 4 letter code for the tetrapodal Buiding Block A
+        name_bb_b : str, required
+            The 4 letter code for the linear Buiding Block B
+        stacking : str, optional
+            The stacking pattern of the COF layers (default is 'AA')
+        bond_atom : str, optional
+            The atom that connect the buiding blocks (default is 'N')
+        c_parameter_base : float, optional
+            The base value for interlayer distance in angstroms (default is 3.6)
+        print_result : bool, optional
+            Parameter for the control for printing the result (default is True)
+        slab : float, optional
+            Default parameter for the interlayer slab (default is 10.0)
+        shift_vector: list, optional
+            Shift vector for the AAl and AAt stakings (defatult is [1.0,1.0,0])
+        tilt_angle: float, optional
+            Tilt angle for the AAt staking in degrees (default is 5.0)
+
+        Returns
+        -------
+        list
+            A list of strings containing:
+                1. the structure name, 
+                2. lattice type, 
+                3. hall symbol of the cristaline structure, 
+                4. space group,
+                5. number of the space group,
+                6. number of operation symmetry
+        """
+
+        self.topology = 'KGM_A'
+        self.dimension = 2
+
+        bb_1 = Building_Block(name_bb_a, self.lib_bb)
+        bb_2 = Building_Block(name_bb_b, self.lib_bb)
+
+        self.name = f'{bb_1.name}-{bb_2.name}-KGM_A-{stacking}'
+        self.charge = bb_1.charge + bb_2.charge
+        self.chirality = bb_1.chirality or bb_2.chirality
+
+        if self.verbosity is True:
+            print('Starting the creation of a KGM_A net')
+
+        if bb_1.connectivity != 4:
+            print('Building block A must present connectivity 4 insted of', len(bb_1.connectivity))
+            return None
+        if bb_2.connectivity != 2:
+            print('Building block B must present connectivity 2 insted of', len(bb_2.connectivity))
+            return None
+
+        # Calculate the cell parameter based on the size of the building blocks
+        size_a = max(bb_1.size)
+        if self.verbosity:
+            print('BB_A size:', size_a)
+
+        size_b = max(bb_2.size)
+        if self.verbosity:
+            print('BB_B size:', size_b)
+
+        # Defines the cell parameter a
+        a = 4*(size_a + size_b) # np.cos(np.radians(30))*2*(size_a + size_b)
+
+        if self.verbosity:
+            print('Calculated cell parameter a:', a)
+
+        # Gets the maximum distace in the z axis to create the c parameter
+        delta_a = abs(max(np.transpose(bb_1.atom_pos)[2])) + abs(min(np.transpose(bb_1.atom_pos)[2]))
+        delta_b = abs(max(np.transpose(bb_2.atom_pos)[2])) + abs(min(np.transpose(bb_2.atom_pos)[2]))
+
+        # Build the matrix of unitary hexagonal cell
+        if stacking == 'A':
+            c = max([slab, max([delta_a, delta_b])])
+        else:
+            c = c_parameter_base + max([delta_a, delta_b])
+
+        # Define the cell lattice as an hexagonal cell
+        lattice = [[a, 0, 0], 
+                   [-0.5*a, np.sqrt(3)/2*a, 0], 
+                   [0, 0, c]]
+
+        if self.verbosity is True:
+            print('Unitary cell built:', lattice)
+        
+        bb1_v1, bb1_v2, bb1_v3, bb1_v4 = bb_1.get_X_points()[1]
+        bb1_lado1, bb1_lado2, bb1_lado3 = (bb1_v1 + bb1_v2) /2, (bb1_v1 + bb1_v3) /2, (bb1_v1 + bb1_v4) /2
+
+        R_matrix = Tools.rotation_matrix_from_vectors(bb1_lado1, np.array([1, 0, 0]))
+
+        bb_1.atom_pos = np.dot(bb_1.atom_pos, np.transpose(R_matrix))
+
+        # Add tbe building block 1 (C4) on the center [1/2, 1/2, 1/2] of the unitary cell (A1 site) 
+        final_pos = np.dot(bb_1.atom_pos, R.from_euler('z', 30, degrees=True).as_matrix()) + np.array([1/4, np.sqrt(3)/4, 0])*a
+        final_label = list(bb_1.atom_labels)
+
+        # Add tbe building block 1 (C4) on [1/2, 0.0, 0.0] of the unitary cell (A2 site)
+        final_pos = np.vstack((final_pos, np.dot(bb_1.atom_pos, R.from_euler('z', -90, degrees=True).as_matrix()) + np.array([1/2, 0, 0])*a))
+        final_label += list(bb_1.atom_labels)
+
+        # Add tbe building block 1 (C4) on [0.0, 1/2, 0.0] of the unitary cell (A3 site)
+        final_pos = np.vstack((final_pos, np.dot(bb_1.atom_pos, R.from_euler('z', -30, degrees=True).as_matrix()) + np.array([-1/4, np.sqrt(3)/4, 0])*a))
+        final_label += list(bb_1.atom_labels)
+
+        '''
+        Olde version of the positioning code
+        # Add tbe building block 1 (C4) on the center of the unitary cell (A1 site) 
+        final_pos = np.dot(bb_1.atom_pos, R.from_euler('z', -30, degrees=True).as_matrix()) + np.array([1/4, np.sqrt(3)/4, 0])*a
+        final_label = list(bb_1.atom_labels)
+
+        # Add tbe building block 1 (C4) on [0.5, 0.0, 0.0] of the unitary cell (A2 site)
+        final_pos = np.vstack((final_pos, np.dot(bb_1.atom_pos, R.from_euler('z', -60, degrees=True).as_matrix()) + np.array([1/2, 0, 0])*a))
+        final_label += list(bb_1.atom_labels)
+
+        # Add tbe building block 1 (C4) on [0.0, 0.5, 0.0] of the unitary cell (A3 site)
+        final_pos = np.vstack((final_pos, np.dot(bb_1.atom_pos, R.from_euler('z', 60, degrees=True).as_matrix()) + np.array([-1/4, np.sqrt(3)/4, 0])*a))
+        final_label += list(bb_1.atom_labels)'''
+
+        # Add the building block 2 (C2) on [1/2, 1/4, 0.0] of the unitary cell (B1 site)
+        final_pos = np.vstack((final_pos, np.dot(bb_2.atom_pos, R.from_euler('z', -30, degrees=True).as_matrix()) + np.array([3/8, np.sqrt(3)/8, 0])*a))
+        final_label += list(bb_2.atom_labels)
+
+        # Add the building block 2 (C2) on [1/4, 3/4, 0.0] of the unitary cell (B2 site)
+        final_pos = np.vstack((final_pos, np.dot(bb_2.atom_pos, R.from_euler('z', -30, degrees=True).as_matrix()) + np.array([1/8, 3*np.sqrt(3)/8, 0])*a))
+        final_label += list(bb_2.atom_labels)
+
+        # Add tbe building block 2 (C2) on [3/4, 1/4, 0.0] of the unitary cell (B3 site)
+        final_pos = np.vstack((final_pos, np.dot(bb_2.atom_pos, R.from_euler('z', 30, degrees=True).as_matrix()) + np.array([5/8, np.sqrt(3)/8, 0])*a))
+        final_label += list(bb_2.atom_labels)
+
+        # Add tbe building block 2 (C2) on [1/4, 3/4, 0.0] of the unitary cell (B4 site)
+        final_pos = np.vstack((final_pos, np.dot(bb_2.atom_pos, R.from_euler('z', 30, degrees=True).as_matrix()) + np.array([-1/8, 3*np.sqrt(3)/8, 0])*a))
+        final_label += list(bb_2.atom_labels)
+        
+        # Add tbe building block 2 (C2) on [3/4, 1/2, 0.0] of the unitary cell (B5 site)
+        final_pos = np.vstack((final_pos, np.dot(bb_2.atom_pos, R.from_euler('z', 90, degrees=True).as_matrix()) + np.array([4/8, np.sqrt(3)/4, 0])*a))
+        final_label += list(bb_2.atom_labels)
+
+        # Add tbe building block 2 (C2) on [1/2, 3/4, 0.0] of the unitary cell (B6 site)
+        final_pos = np.vstack((final_pos, np.dot(bb_2.atom_pos, R.from_euler('z', 90, degrees=True).as_matrix()) + np.array([0.0, np.sqrt(3)/4, 0])*a))
+        final_label += list(bb_2.atom_labels)
+
+        # Change the X atoms by the desired bond_atom
+        final_label, final_pos = Tools.change_X_atoms(final_label, final_pos, bond_atom)
+
+        # Creates a pymatgen structure
+        struct = Structure(lattice, final_label, final_pos, coords_are_cartesian=True)
+
+        # Remove dupolicate atoms
+        struct.sort(reverse=True)
+        struct.merge_sites(tol=.7, mode='delete')
+        struct.translate_sites(range(len(struct.as_dict()['sites'])), [0, 0, 0.5], frac_coords=True, to_unit_cell=True)
+
+        if stacking not in self.available_stacking[self.topology]:
+                raise Exception(f"""{stacking} is not in the available stack list for HCB net.
+    Available options are: {self.available_stacking[self.topology]}""")
+
+        # Create A stacking. The slab is defined by the c_cell parameter
+        if stacking == 'A':
+            self.stacking = 'A'
+            symm = SpacegroupAnalyzer(struct, 
+                                      symprec=self.symm_tol, 
+                                      angle_tolerance=self.angle_tol)
+
+            self.symm_structure = symm.get_refined_structure()
+
+        # Create AA staking. By default one sheet per unitary cell is used
+        if stacking == 'AA':
+            self.stacking = 'AA'
+            symm = SpacegroupAnalyzer(struct, 
+                                      symprec=self.symm_tol, 
+                                      angle_tolerance=self.angle_tol)
+
+            self.symm_structure = symm.get_refined_structure()
+
+        if stacking == 'AB1x':
+            self.stacking = 'AB1x'
+            
+            lattice = Lattice(np.array(struct.as_dict()['lattice']['matrix'])*(1, 1, 2))
+
+            A = struct
+            A_labels = np.array([i['label'] for i in A.as_dict()['sites']])
+            A_pos = np.array([i['xyz'] for i in A.as_dict()['sites']])
+
+            B = struct
+            B_labels = np.array([i['label'] for i in B.as_dict()['sites']])
+            B_pos = np.array([i['xyz'] for i in B.as_dict()['sites']])
+            B_pos += np.array([lattice.a*1/2, 0, lattice.c*1/2])
+
+            AB_1 = Structure(lattice, 
+                             np.concatenate((A_labels, B_labels)),
+                             np.concatenate((A_pos, B_pos)), 
+                             coords_are_cartesian=True)
+
+            dict_structure = AB_1.as_dict()
+            
+            self.lattice = dict_structure['lattice']['matrix']
+
+            self.atom_labels = [i['label'] for i in dict_structure['sites']]
+            self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
+
+            symm = SpacegroupAnalyzer(AB_1, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
+
+            self.symm_structure = symm.get_refined_structure()
+
+        if stacking == 'AB1y':
+            self.stacking = 'AB1y'
+            
+            lattice = Lattice(np.array(struct.as_dict()['lattice']['matrix'])*(1, 1, 2))
+
+            A = struct
+            A_labels = np.array([i['label'] for i in A.as_dict()['sites']])
+            A_pos = np.array([i['xyz'] for i in A.as_dict()['sites']])
+
+            B = struct
+            B_labels = np.array([i['label'] for i in B.as_dict()['sites']])
+            B_pos = np.array([i['xyz'] for i in B.as_dict()['sites']])
+            B_pos += np.array([lattice.a*1/4, lattice.b*1/4*np.sqrt(3), lattice.c*1/2])
+
+            AB_1 = Structure(lattice, 
+                             np.concatenate((A_labels, B_labels)),
+                             np.concatenate((A_pos, B_pos)), 
+                             coords_are_cartesian=True)
+
+            dict_structure = AB_1.as_dict()
+            
+            self.lattice = dict_structure['lattice']['matrix']
+
+            self.atom_labels = [i['label'] for i in dict_structure['sites']]
+            self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
+
+            symm = SpacegroupAnalyzer(AB_1, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
+
+            self.symm_structure = symm.get_refined_structure()
+            
+        if stacking == 'AB1xy':
+            self.stacking = 'AB1xy'
+            
+            lattice = Lattice(np.array(struct.as_dict()['lattice']['matrix'])*(1, 1, 2))
+
+            A = struct
+            A_labels = np.array([i['label'] for i in A.as_dict()['sites']])
+            A_pos = np.array([i['xyz'] for i in A.as_dict()['sites']])
+
+            B = struct
+            B_labels = np.array([i['label'] for i in B.as_dict()['sites']])
+            B_pos = np.array([i['xyz'] for i in B.as_dict()['sites']])
+            B_pos += np.array([lattice.a*1/4, -lattice.b*1/4*np.sqrt(3), lattice.c*1/2])
+
+            AB_1 = Structure(lattice, 
+                             np.concatenate((A_labels, B_labels)),
+                             np.concatenate((A_pos, B_pos)), 
+                             coords_are_cartesian=True)
+
+            dict_structure = AB_1.as_dict()
+            
+            self.lattice = dict_structure['lattice']['matrix']
+
+            self.atom_labels = [i['label'] for i in dict_structure['sites']]
+            self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
+
+            symm = SpacegroupAnalyzer(AB_1, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
+
+            self.symm_structure = symm.get_refined_structure()
+        
+        if stacking == 'AB2':
+            self.stacking = 'AB2'
+            
+            lattice = Lattice(np.array(struct.as_dict()['lattice']['matrix'])*(1, 1, 2))
+
+            A = struct
+            A_labels = np.array([i['label'] for i in A.as_dict()['sites']])
+            A_pos = np.array([i['xyz'] for i in A.as_dict()['sites']])
+
+            B = struct
+            B_labels = np.array([i['label'] for i in B.as_dict()['sites']])
+            B_pos = np.array([i['xyz'] for i in B.as_dict()['sites']])
+
+            B_pos += np.array([lattice.a*1/2, 
+                               lattice.b*np.sqrt(3)/8, 
+                               lattice.c*1/2])
+
+            AB_1 = Structure(lattice, 
+                             np.concatenate((A_labels, B_labels)),
+                             np.concatenate((A_pos, B_pos)), 
+                             coords_are_cartesian=True)
+
+            dict_structure = AB_1.as_dict()
+            
+            self.lattice = dict_structure['lattice']['matrix']
+
+            self.atom_labels = [i['label'] for i in dict_structure['sites']]
+            self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
+
+            symm = SpacegroupAnalyzer(AB_1, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
+
+            self.symm_structure = symm.get_refined_structure()
+
+        # Create AAl stacking. Tetragonal cell with two sheets per cell shifited by the shift_vector in angstroms. 
+        if stacking == 'AAl':
+            self.stacking = 'AAl'
+            
+            lattice = Lattice(np.array(struct.as_dict()['lattice']['matrix'])*(1, 1, 2))
+
+            A = struct
+            A_labels = np.array([i['label'] for i in A.as_dict()['sites']])
+            A_pos = np.array([i['xyz'] for i in A.as_dict()['sites']])
+
+            B = struct
+            B_labels = np.array([i['label'] for i in B.as_dict()['sites']])
+            B_pos = np.array([i['xyz'] for i in B.as_dict()['sites']])
+
+            # Calculates the shift vector in crystal units
+            r = Tools.get_cartesian_to_fractional_matrix(*lattice.parameters)
+            shift_vector = np.dot(r, np.array(shift_vector))
+
+            B_pos += np.array([lattice.a, lattice.b*1/2*np.sqrt(3), 1]) * shift_vector
+            B_pos += np.array([0, 0, lattice.c*1/2])
+
+            AB_1 = Structure(lattice, 
+                             np.concatenate((A_labels, B_labels)),
+                             np.concatenate((A_pos, B_pos)), 
+                             coords_are_cartesian=True)
+
+            dict_structure = AB_1.as_dict()
+            
+            self.lattice = dict_structure['lattice']['matrix']
+
+            self.atom_labels = [i['label'] for i in dict_structure['sites']]
+            self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
+
+            symm = SpacegroupAnalyzer(AB_1, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
+
+            self.symm_structure = symm.get_refined_structure()
+
+
+        # Create AA tilted stacking. Tilted tetragonal cell with two sheets per cell tilted by tilt_angle. 
+        if stacking == 'AAt':
+            self.stacking = 'AAt'
+            
+            a_cell = struct.as_dict()['lattice']['a']
+            b_cell = struct.as_dict()['lattice']['b']
+            c_cell = struct.as_dict()['lattice']['c'] * 2
+            alpha = struct.as_dict()['lattice']['alpha'] - tilt_angle
+            beta= struct.as_dict()['lattice']['beta'] - tilt_angle
+            gamma = struct.as_dict()['lattice']['gamma']
+
+            new_cell = Tools.cellpar_to_cell([a_cell, b_cell, c_cell, alpha, beta, gamma])
+
+            lattice = Lattice(new_cell)
+
+            A = struct
+            A_labels = np.array([i['label'] for i in A.as_dict()['sites']])
+            A_pos = np.array([i['xyz'] for i in A.as_dict()['sites']])
+
+            B = struct
+            B_labels = np.array([i['label'] for i in B.as_dict()['sites']])
+            B_pos = np.array([i['xyz'] for i in B.as_dict()['sites']])
+
+            # Calculates the shift vector in crystal units
+            r = Tools.get_cartesian_to_fractional_matrix(*lattice.parameters)
+            shift_vector = np.dot(r, np.array(shift_vector))
+
+            B_pos += np.array([lattice.a, lattice.b*1/2*np.sqrt(3), 1]) * shift_vector
+            B_pos += np.array([0, 0, lattice.c*1/2])
+
+            AB_1 = Structure(lattice, 
+                             np.concatenate((A_labels, B_labels)),
+                             np.concatenate((A_pos, B_pos)), 
+                             coords_are_cartesian=True)
+
+            dict_structure = AB_1.as_dict()
+            
+            self.lattice = dict_structure['lattice']['matrix']
+
+            self.atom_labels = [i['label'] for i in dict_structure['sites']]
+            self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
+
+            symm = SpacegroupAnalyzer(AB_1, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
+
+            self.symm_structure = symm.get_refined_structure()
+
+        dict_structure = self.symm_structure.as_dict()
+
+        self.lattice = dict_structure['lattice']['matrix']
+
+        self.atom_labels = [i['label'] for i in dict_structure['sites']]
+        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
+        self.n_atoms = len(self.symm_structure)
+        self.composition = self.symm_structure.formula
+
+        if self.verbosity is True:
+            print(self.symm_structure)
+
+        # Get the simmetry information of the generated structure
+        self.lattice_type =  symm.get_lattice_type()
+        self.space_group =  symm.get_space_group_symbol()
+        self.space_group_n =  symm.get_space_group_number()
+
+        symm_op =  symm.get_point_group_operations()
+        self.hall =  symm.get_hall()
+
+        if print_result == True:
+            Tools.print_result(self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op))
+
+        return [self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op)]
+
+################   Saving methods  ############################
+
+    def save_cif(self, supercell : tuple = (1, 1, 1), path: str = None):
+        """Save the structure in .cif format
+
+        Parameters
+        ----------
+        supercell : tuple, optional
+            List containing the supercell parameters. 
+            Default  = [1, 1, 1]
+        path : str, optional
+            Path to save the .cif file.        
+        """
 
         if path is not None:
             self.out_path = path
 
         os.makedirs(self.out_path, exist_ok=True)
 
-        if supercell is not False:
-            self.symm_structure.make_supercell([[supercell[0], 0, 0], [0, supercell[1], 0], [0, 0, supercell[2]]])
+        self.symm_structure.make_supercell(supercell)
 
         self.symm_structure.to(filename=os.path.join(self.out_path, self.name + '.cif'))
     
-    def save_json(self, supercell=False, path=None):
+    def save_json(self, supercell : tuple = (1, 1, 1), path: str = None):
+        """Save the structure in .json format
+
+        Parameters
+        ----------
+        supercell : tuple, optional
+            List containing the supercell parameters. 
+            Default  = [1, 1, 1]
+        path : str, optional
+            Path to save the .json file.        
+        """
 
         if path is not None:
             self.out_path = path
         
         os.makedirs(self.out_path, exist_ok=True)
 
-        if supercell is not False:
-            self.symm_structure.make_supercell([[supercell[0], 0, 0], [0, supercell[1], 0], [0, 0, supercell[2]]])
+        self.symm_structure.make_supercell(supercell)
 
         dict_sctructure = self.symm_structure.as_dict()
 
@@ -1688,15 +2786,24 @@ class Reticulum():
 
         Tools.save_json(self.out_path, self.name, [a, b, c, alpha, beta, gamma], atom_labels, atom_pos)
 
-    def save_xsf(self, supercell=False, path=None):
+    def save_xsf(self, supercell : tuple = (1, 1, 1), path: str = None):
+        """Save the structure in XCrysDen .xsf format
+
+        Parameters
+        ----------
+        supercell : tuple, optional
+            List containing the supercell parameters. 
+            Default  = [1, 1, 1]
+        path : str, optional
+            Path to save the .xsf file.        
+        """
 
         if path is not None:
             self.out_path = path
        
         os.makedirs(self.out_path, exist_ok=True)
 
-        if supercell is not False:
-            self.symm_structure.make_supercell([[supercell[0], 0, 0], [0, supercell[1], 0], [0, 0, supercell[2]]])
+        self.symm_structure.make_supercell(supercell)
 
         dict_sctructure = self.symm_structure.as_dict()
 
@@ -1712,15 +2819,23 @@ class Reticulum():
 
         Tools.save_xsf(self.out_path, self.name, [a, b, c, alpha, beta, gamma], atom_labels, atom_pos)
         
-    def save_pdb(self, supercell=False, path=None):
+    def save_pdb(self, supercell : tuple = (1, 1, 1), path: str = None):
+        """Save the structure in .pdb format
 
+        Parameters
+        ----------
+        supercell : tuple, optional
+            List containing the supercell parameters. 
+            Default  = [1, 1, 1]
+        path : str, optional
+            Path to save the .pdb file.        
+        """
         if path is not None:
             self.out_path = path
 
         os.makedirs(self.out_path, exist_ok=True)
 
-        if supercell is not False:
-            self.symm_structure.make_supercell([[supercell[0], 0, 0], [0, supercell[1], 0], [0, 0, supercell[2]]])
+        self.symm_structure.make_supercell(supercell)
 
         dict_sctructure = self.symm_structure.as_dict()
 
@@ -1736,27 +2851,43 @@ class Reticulum():
 
         Tools.save_pdb(self.out_path, self.name, [a, b, c, alpha, beta, gamma], atom_labels, atom_pos)
         
-    def save_vasp(self, supercell=False, path=None):
+    def save_vasp(self, supercell : tuple = (1, 1, 1), path: str = None):
+        """Save the structure in VASP POSCAR .vasp format
 
+        Parameters
+        ----------
+        supercell : tuple, optional
+            List containing the supercell parameters. 
+            Default  = [1, 1, 1]
+        path : str, optional
+            Path to save the .vasp file.        
+        """
         if path is not None:
             self.out_path = path
-        
+
         os.makedirs(self.out_path, exist_ok=True)
 
-        if supercell is not False:
-            self.symm_structure.make_supercell([[supercell[0], 0, 0], [0, supercell[1], 0], [0, 0, supercell[2]]])
+        self.symm_structure.make_supercell(supercell)
 
         self.symm_structure.to(fmt='poscar', filename=os.path.join(self.out_path, self.name + '.vasp'))
 
-    def save_turbomole(self, supercell=[1,1,2], path=None):
+    def save_turbomole(self, supercell : tuple = (1, 1, 1), path: str = None):
+        """Save the structure in Turbomole .coord format
 
+        Parameters
+        ----------
+        supercell : tuple, optional
+            List containing the supercell parameters. 
+            Default  = [1, 1, 1]
+        path : str, optional
+            Path to save the .coord file.        
+        """
         if path is not None:
             self.out_path = path
-        
+
         os.makedirs(self.out_path, exist_ok=True)
 
-        if supercell is not False:
-            self.symm_structure.make_supercell([[supercell[0], 0, 0], [0, supercell[1], 0], [0, 0, supercell[2]]])
+        self.symm_structure.make_supercell(supercell)
 
         dict_sctructure = self.symm_structure.as_dict()
 
@@ -1785,15 +2916,23 @@ class Reticulum():
 
         temp_file.close()
 
-    def save_xyz(self, supercell=False, path=None):
+    def save_xyz(self, supercell : tuple = (1, 1, 1), path: str = None):
+        """Save the structure in .xyz format
 
+        Parameters
+        ----------
+        supercell : tuple, optional
+            List containing the supercell parameters. 
+            Default  = [1, 1, 1]
+        path : str, optional
+            Path to save the .xyz file.        
+        """
         if path is not None:
             self.out_path = path
-        
+
         os.makedirs(self.out_path, exist_ok=True)
 
-        if supercell is not False:
-            self.symm_structure.make_supercell([[supercell[0], 0, 0], [0, supercell[1], 0], [0, 0, supercell[2]]])
+        self.symm_structure.make_supercell(supercell)
 
         dict_sctructure = self.symm_structure.as_dict()
 
@@ -1817,15 +2956,39 @@ class Reticulum():
 
         temp_file.close()
 
-    def save_qe(self, supercell=False, angs=False, path=None, ecut=40, erho=360, k_dist=0.3):
+    def save_qe(self, 
+                supercell : tuple = (1, 1, 1), 
+                path: str = None, 
+                in_angstrom_format : bool = True,
+                ecut : int = 40,
+                erho : int = 360,
+                k_dist : float = 0.3):
+        """Save the structure in QuantumESPRESSO .in format
 
+        Parameters
+        ----------
+        supercell : tuple, optional
+            List containing the supercell parameters. 
+            Default = [1, 1, 1]
+        path : str, optional
+            Path to save the .in file.    
+        in_angstrom_format : bool, optional
+            Save the atomic positions in angstroms insted of crystal coordinates
+            Default = True
+        ecut : int, optional
+            Cutoff for wavefunctions. Default = 40
+        erho : int, optional
+            Cutoff for electronic density. Default = 360
+        k_dist : 0.3, optional
+            Distance of the k-points on the reciprocal space. 
+            Default = 0.3
+        """
         if path is not None:
             self.out_path = path
-        
+
         os.makedirs(self.out_path, exist_ok=True)
 
-        if supercell is not False:
-            self.symm_structure.make_supercell([[supercell[0], 0, 0], [0, supercell[1], 0], [0, 0, supercell[2]]])
+        self.symm_structure.make_supercell(supercell)
 
         dict_sctructure = self.symm_structure.as_dict()
 
@@ -1847,9 +3010,9 @@ class Reticulum():
         ion_conv_crystal = [[i['label']] + i['abc'] for i in dict_sctructure['sites']]
         ion_conv_angstrom = [[i['label']] + i['xyz'] for i in dict_sctructure['sites']]
 
-        if angs is False:
+        if in_angstrom_format is False:
             ion_pos = ion_conv_crystal
-        if angs is True:
+        if in_angstrom_format is True:
             ion_pos = ion_conv_angstrom
 
         out_file = open(os.path.join(self.out_path, self.name + '.in'), 'w', newline='\n')
@@ -2023,7 +3186,7 @@ class Reticulum():
                 out_file.write('\n')
 
         coords_type = 'angstrom'
-        if angs is False:
+        if in_angstrom_format is False:
             coords_type = 'crystal'
         out_file.write(f'ATOMIC_POSITIONS ({coords_type})\n')
 
