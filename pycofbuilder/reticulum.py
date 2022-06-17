@@ -31,10 +31,40 @@ class Reticulum():
     available_3D_topologies : list
         List of available 3D topologies
     available_topologies : list
-        List of all available topologies
-    
+        List of all available topologies    
     available_stacking : list
         List of available stakings for all 2D topologies
+    lib_bb : str
+        String with the name of the folder containing the building block files
+        Default: bb_lib
+    main_path : str 
+        String containing the data folder. 
+        Defailt: os.path.join(_ROOT, 'data')
+    lib_path : str
+        Path for the building block files.
+        Default: os.path.join(self.main_path, bb_lib)
+    out_path : str
+        Path to save the results. 
+        Default: os.path.join(os.getcwd(), 'out')
+    name : str
+        Name of the material
+    topology : str = None
+    dimention : str = None
+    lattice : str = None
+    lattice_sgs : str = None
+    space_group : str = None
+    space_group_n : str = None
+    stacking : str = None
+    mass : str = None
+    composition : str = None
+    charge : int  = 0
+    multiplicity : int = 1
+    chirality : bool = False
+    atom_labels : list = []
+    atom_pos : list = []
+    lattice : list = [[], [], []]
+    symm_tol : float = 0.2
+    angle_tol : float = 0.2
 
     Methods
     -------
