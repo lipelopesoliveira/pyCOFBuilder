@@ -16,6 +16,64 @@ import pycofbuilder.tools as Tools
 from pycofbuilder.building_block import Building_Block
 
 class Reticulum():
+    """
+    A class used to represent a Reticulum
+
+    ...
+
+    Attributes
+    ----------
+    verbosity : bool
+        control the printing options
+    available_2D_topologies : list
+        List of available 2D topologies
+    available_3D_topologies : list
+        List of available 3D topologies
+    available_topologies : list
+        List of all available topologies
+    
+    available_stacking : list
+        List of available stakings for all 2D topologies
+
+    Methods
+    -------
+    n_atoms()
+        Returns the number of atoms in the unitary cell
+    print_available_topologies()
+        Print all available topologies
+    create_hcb_structure()
+        Creates a COF with HCB network.
+    create_hcb_a_structure()
+        Creates a COF with HCB-A network.
+    create_sql_structure()
+        Creates a COF with SQL network.
+    create_sql_a_structure()
+        Creates a COF with SQL-A network.
+    create_kgd_structure()
+        Creates a COF with KGD network.
+    create_hxl_a_structure()
+        Creates a COF with HXL-A network.
+    create_kgm_structure()
+        Creates a COF with KGM network.
+    create_kgm_a_structure()
+        Creates a COF with KGM-A network.
+    save_cif()
+        Save the structure in .cif format
+    save_json()
+        Save the structure in .json format
+    save_xsf()
+        Save the structure in .xsf format
+    save_pdb()
+        Save the structure in .pdb format
+    save_vasp()
+        Save the structure in .vasp format
+    save_turbomole()
+        Save the structure in .coord format
+    save_xyz()
+        Save the structure in .xyz format
+    save_qe()
+        Save the structure in .in format
+    """
 
     def __init__(self, bb_lib='bb_lib', verbosity=False):
 
@@ -24,6 +82,7 @@ class Reticulum():
         self.verbosity = verbosity
         self.available_2D_topologies = ['HCB', 'HCB_A', 'SQL', 'SQL_A', 'KGM', 'KGM_A', 'KGD', 'HXL_A'] # Falta adicionar: 'HXL', 'KGD'
         self.available_3D_topologies = [] # Falta adicionar: ['dia', 'bor', 'srs', 'pts', 'ctn', 'rra', 'fcc', 'lon', 'stp', 'acs', 'tbo', 'bcu', 'fjh', 'ceq']
+        self.available_topologies = self.available_2D_topologies + self.available_3D_topologies
 
         self.available_stacking = {'HCB': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
                                    'HCB_A': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
@@ -34,7 +93,7 @@ class Reticulum():
                                    'KGM': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
                                    'KGM_A': ['AA', 'AB1x', 'AB1y', 'AB1xy', 'AB2', 'AAl', 'AAt']
                                    }
-        self.available_topologies = self.available_2D_topologies + self.available_3D_topologies
+        
         self.lib_bb = bb_lib
         self.main_path = os.path.join(_ROOT, 'data')
         self.lib_path = os.path.join(self.main_path, bb_lib)
@@ -74,6 +133,8 @@ class Reticulum():
             print('Available 3D Topologies:')
             for i in self.available_3D_topologies:
                 print(i.upper())
+
+################   Net creation methods  ############################
 
     def create_hcb_structure(self, 
                              name_bb_a : str,
@@ -1291,7 +1352,6 @@ class Reticulum():
 
         return [self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op)]
     
-  
     def create_kgd_structure(self, 
                              name_bb_a : str,
                              name_bb_b : str,
@@ -2669,29 +2729,47 @@ class Reticulum():
 
         return [self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op)]
 
-################   Save file in different formats  ############################
+################   Saving methods  ############################
 
-    def save_cif(self, supercell=False, path=None):
+    def save_cif(self, supercell : tuple = (1, 1, 1), path: str = None):
+        """Save the structure in .cif format
+
+        Parameters
+        ----------
+        supercell : tuple, optional
+            List containing the supercell parameters. 
+            Default  = [1, 1, 1]
+        path : str, optional
+            Path to save the .cif file.        
+        """
 
         if path is not None:
             self.out_path = path
 
         os.makedirs(self.out_path, exist_ok=True)
 
-        if supercell is not False:
-            self.symm_structure.make_supercell([[supercell[0], 0, 0], [0, supercell[1], 0], [0, 0, supercell[2]]])
+        self.symm_structure.make_supercell(supercell)
 
         self.symm_structure.to(filename=os.path.join(self.out_path, self.name + '.cif'))
     
-    def save_json(self, supercell=False, path=None):
+    def save_json(self, supercell : tuple = (1, 1, 1), path: str = None):
+        """Save the structure in .json format
+
+        Parameters
+        ----------
+        supercell : tuple, optional
+            List containing the supercell parameters. 
+            Default  = [1, 1, 1]
+        path : str, optional
+            Path to save the .json file.        
+        """
 
         if path is not None:
             self.out_path = path
         
         os.makedirs(self.out_path, exist_ok=True)
 
-        if supercell is not False:
-            self.symm_structure.make_supercell([[supercell[0], 0, 0], [0, supercell[1], 0], [0, 0, supercell[2]]])
+        self.symm_structure.make_supercell(supercell)
 
         dict_sctructure = self.symm_structure.as_dict()
 
@@ -2707,15 +2785,24 @@ class Reticulum():
 
         Tools.save_json(self.out_path, self.name, [a, b, c, alpha, beta, gamma], atom_labels, atom_pos)
 
-    def save_xsf(self, supercell=False, path=None):
+    def save_xsf(self, supercell : tuple = (1, 1, 1), path: str = None):
+        """Save the structure in XCrysDen .xsf format
+
+        Parameters
+        ----------
+        supercell : tuple, optional
+            List containing the supercell parameters. 
+            Default  = [1, 1, 1]
+        path : str, optional
+            Path to save the .xsf file.        
+        """
 
         if path is not None:
             self.out_path = path
        
         os.makedirs(self.out_path, exist_ok=True)
 
-        if supercell is not False:
-            self.symm_structure.make_supercell([[supercell[0], 0, 0], [0, supercell[1], 0], [0, 0, supercell[2]]])
+        self.symm_structure.make_supercell(supercell)
 
         dict_sctructure = self.symm_structure.as_dict()
 
@@ -2731,15 +2818,23 @@ class Reticulum():
 
         Tools.save_xsf(self.out_path, self.name, [a, b, c, alpha, beta, gamma], atom_labels, atom_pos)
         
-    def save_pdb(self, supercell=False, path=None):
+    def save_pdb(self, supercell : tuple = (1, 1, 1), path: str = None):
+        """Save the structure in .pdb format
 
+        Parameters
+        ----------
+        supercell : tuple, optional
+            List containing the supercell parameters. 
+            Default  = [1, 1, 1]
+        path : str, optional
+            Path to save the .pdb file.        
+        """
         if path is not None:
             self.out_path = path
 
         os.makedirs(self.out_path, exist_ok=True)
 
-        if supercell is not False:
-            self.symm_structure.make_supercell([[supercell[0], 0, 0], [0, supercell[1], 0], [0, 0, supercell[2]]])
+        self.symm_structure.make_supercell(supercell)
 
         dict_sctructure = self.symm_structure.as_dict()
 
@@ -2755,27 +2850,43 @@ class Reticulum():
 
         Tools.save_pdb(self.out_path, self.name, [a, b, c, alpha, beta, gamma], atom_labels, atom_pos)
         
-    def save_vasp(self, supercell=False, path=None):
+    def save_vasp(self, supercell : tuple = (1, 1, 1), path: str = None):
+        """Save the structure in VASP POSCAR .vasp format
 
+        Parameters
+        ----------
+        supercell : tuple, optional
+            List containing the supercell parameters. 
+            Default  = [1, 1, 1]
+        path : str, optional
+            Path to save the .vasp file.        
+        """
         if path is not None:
             self.out_path = path
-        
+
         os.makedirs(self.out_path, exist_ok=True)
 
-        if supercell is not False:
-            self.symm_structure.make_supercell([[supercell[0], 0, 0], [0, supercell[1], 0], [0, 0, supercell[2]]])
+        self.symm_structure.make_supercell(supercell)
 
         self.symm_structure.to(fmt='poscar', filename=os.path.join(self.out_path, self.name + '.vasp'))
 
-    def save_turbomole(self, supercell=[1,1,2], path=None):
+    def save_turbomole(self, supercell : tuple = (1, 1, 1), path: str = None):
+        """Save the structure in Turbomole .coord format
 
+        Parameters
+        ----------
+        supercell : tuple, optional
+            List containing the supercell parameters. 
+            Default  = [1, 1, 1]
+        path : str, optional
+            Path to save the .coord file.        
+        """
         if path is not None:
             self.out_path = path
-        
+
         os.makedirs(self.out_path, exist_ok=True)
 
-        if supercell is not False:
-            self.symm_structure.make_supercell([[supercell[0], 0, 0], [0, supercell[1], 0], [0, 0, supercell[2]]])
+        self.symm_structure.make_supercell(supercell)
 
         dict_sctructure = self.symm_structure.as_dict()
 
@@ -2804,15 +2915,23 @@ class Reticulum():
 
         temp_file.close()
 
-    def save_xyz(self, supercell=False, path=None):
+    def save_xyz(self, supercell : tuple = (1, 1, 1), path: str = None):
+        """Save the structure in .xyz format
 
+        Parameters
+        ----------
+        supercell : tuple, optional
+            List containing the supercell parameters. 
+            Default  = [1, 1, 1]
+        path : str, optional
+            Path to save the .xyz file.        
+        """
         if path is not None:
             self.out_path = path
-        
+
         os.makedirs(self.out_path, exist_ok=True)
 
-        if supercell is not False:
-            self.symm_structure.make_supercell([[supercell[0], 0, 0], [0, supercell[1], 0], [0, 0, supercell[2]]])
+        self.symm_structure.make_supercell(supercell)
 
         dict_sctructure = self.symm_structure.as_dict()
 
@@ -2836,15 +2955,39 @@ class Reticulum():
 
         temp_file.close()
 
-    def save_qe(self, supercell=False, angs=False, path=None, ecut=40, erho=360, k_dist=0.3):
+    def save_qe(self, 
+                supercell : tuple = (1, 1, 1), 
+                path: str = None, 
+                in_angstrom_format : bool = True,
+                ecut : int = 40,
+                erho : int = 360,
+                k_dist : float = 0.3):
+        """Save the structure in QuantumESPRESSO .in format
 
+        Parameters
+        ----------
+        supercell : tuple, optional
+            List containing the supercell parameters. 
+            Default = [1, 1, 1]
+        path : str, optional
+            Path to save the .in file.    
+        in_angstrom_format : bool, optional
+            Save the atomic positions in angstroms insted of crystal coordinates
+            Default = True
+        ecut : int, optional
+            Cutoff for wavefunctions. Default = 40
+        erho : int, optional
+            Cutoff for electronic density. Default = 360
+        k_dist : 0.3, optional
+            Distance of the k-points on the reciprocal space. 
+            Default = 0.3
+        """
         if path is not None:
             self.out_path = path
-        
+
         os.makedirs(self.out_path, exist_ok=True)
 
-        if supercell is not False:
-            self.symm_structure.make_supercell([[supercell[0], 0, 0], [0, supercell[1], 0], [0, 0, supercell[2]]])
+        self.symm_structure.make_supercell(supercell)
 
         dict_sctructure = self.symm_structure.as_dict()
 
@@ -2866,9 +3009,9 @@ class Reticulum():
         ion_conv_crystal = [[i['label']] + i['abc'] for i in dict_sctructure['sites']]
         ion_conv_angstrom = [[i['label']] + i['xyz'] for i in dict_sctructure['sites']]
 
-        if angs is False:
+        if in_angstrom_format is False:
             ion_pos = ion_conv_crystal
-        if angs is True:
+        if in_angstrom_format is True:
             ion_pos = ion_conv_angstrom
 
         out_file = open(os.path.join(self.out_path, self.name + '.in'), 'w', newline='\n')
@@ -3042,7 +3185,7 @@ class Reticulum():
                 out_file.write('\n')
 
         coords_type = 'angstrom'
-        if angs is False:
+        if in_angstrom_format is False:
             coords_type = 'crystal'
         out_file.write(f'ATOMIC_POSITIONS ({coords_type})\n')
 
