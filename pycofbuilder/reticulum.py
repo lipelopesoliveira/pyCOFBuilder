@@ -111,8 +111,12 @@ class Reticulum():
         _ROOT = os.path.abspath(os.path.dirname(__file__))
 
         self.verbosity = verbosity
-        self.available_2D_topologies = ['HCB', 'HCB_A', 'SQL', 'SQL_A', 'KGM', 'KGM_A', 'KGD', 'HXL_A'] # Falta adicionar: 'HXL', 'KGD'
-        self.available_3D_topologies = [] # Falta adicionar: ['dia', 'bor', 'srs', 'pts', 'ctn', 'rra', 'fcc', 'lon', 'stp', 'acs', 'tbo', 'bcu', 'fjh', 'ceq']
+        
+        # Falta adicionar: 'HXL', 'KGD'
+        self.available_2D_topologies = ['HCB', 'HCB_A', 'SQL', 'SQL_A', 'KGM', 'KGM_A', 'KGD', 'HXL_A'] 
+
+        # Falta adicionar: ['dia', 'bor', 'srs', 'pts', 'ctn', 'rra', 'fcc', 'lon', 'stp', 'acs', 'tbo', 'bcu', 'fjh', 'ceq']
+        self.available_3D_topologies = [] 
         self.available_topologies = self.available_2D_topologies + self.available_3D_topologies
 
         self.available_stacking = {'HCB': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],

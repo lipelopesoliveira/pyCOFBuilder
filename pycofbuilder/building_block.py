@@ -110,70 +110,30 @@ class Building_Block():
         return Q_labels, np.array(Q_pos)
 
     def get_R_points(self, atom_labels, atom_pos):
+        """
+        Get the R points in a molecule
+        """
 
-        R_pos = []
-        R1_pos = []
-        R2_pos = []
-        R3_pos = []
-        R4_pos = []
-        R5_pos = []
-        R6_pos = []
-        R7_pos = []
-        R8_pos = []
-        R9_pos = []
+        # Create a dict with the R points
+        R_dict = {'R': [],
+                 'R1': [],
+                 'R2': [],
+                 'R3': [],
+                 'R4': [],
+                 'R5': [],
+                 'R6': [],
+                 'R7': [], 
+                 'R8': [], 
+                 'R9': []}
 
-
-        if 'R' in atom_labels:
+        # Iterate over the R keys
+        for key in R_dict.keys():
+            # Iterate over the atoms
             for i in range(len(atom_labels)):
-                if atom_labels[i] == 'R':
-                    R_pos += [atom_pos[i]]
+                if atom_labels[i] == key:
+                    R_dict[key] += [atom_pos[i]]
 
-        if 'R1' in atom_labels:
-            for i in range(len(atom_labels)):
-                if atom_labels[i] == 'R1':
-                    R1_pos += [atom_pos[i]]
-
-        if 'R2' in atom_labels:
-            for i in range(len(atom_labels)):
-                if atom_labels[i] == 'R2':
-                    R2_pos += [atom_pos[i]]
-
-        if 'R3' in atom_labels:
-            for i in range(len(atom_labels)):
-                if atom_labels[i] == 'R3':
-                    R3_pos += [atom_pos[i]]
-
-        if 'R4' in atom_labels:
-            for i in range(len(atom_labels)):
-                if atom_labels[i] == 'R4':
-                    R4_pos += [atom_pos[i]]
-
-        if 'R5' in atom_labels:
-            for i in range(len(atom_labels)):
-                if atom_labels[i] == 'R5':
-                    R5_pos += [atom_pos[i]]
-
-        if 'R6' in atom_labels:
-            for i in range(len(atom_labels)):
-                if atom_labels[i] == 'R6':
-                    R6_pos += [atom_pos[i]]
-        
-        if 'R7' in atom_labels:
-            for i in range(len(atom_labels)):
-                if atom_labels[i] == 'R7':
-                    R7_pos += [atom_pos[i]]
-
-        if 'R8' in atom_labels:
-            for i in range(len(atom_labels)):
-                if atom_labels[i] == 'R8':
-                    R8_pos += [atom_pos[i]]
-
-        if 'R9' in atom_labels:
-            for i in range(len(atom_labels)):
-                if atom_labels[i] == 'R9':
-                    R9_pos += [atom_pos[i]]
-
-        return {'R': R_pos, 'R1': R1_pos, 'R2': R2_pos, 'R3': R3_pos, 'R4': R4_pos, 'R5': R5_pos, 'R6': R6_pos, 'R7': R7_pos, 'R8': R8_pos, 'R9': R9_pos,}
+        return R_dict
 
     def add_X(self, label, pos, X='N'):
 
@@ -213,7 +173,10 @@ class Building_Block():
                 self.atom_pos = np.dot(self.atom_pos, np.transpose(R_matrix))
 
     def print_structure(self):
-        '''Print the structurein the form: atom_label     pos_x    pos_y    pos_z'''
+        """
+        Print the structure in the form: 
+        `atom_label     pos_x    pos_y    pos_z`
+                """
 
         for i in range(len(self.atom_labels)):
             print('{:<5s}{:>10.7f}{:>15.7f}{:>15.7f}'.format(self.atom_labels[i], self.atom_pos[i][0], self.atom_pos[i][1], self.atom_pos[i][2]))
@@ -222,8 +185,9 @@ class Building_Block():
         '''Adds the functional group by which the COF will be formed from the building blocks'''
 
         conector_label, conector_pos = Tools.read_gjf_file(os.path.join(self.main_path, 'conector'), conector_name)
-
-        location_Q_struct = self.get_Q_points(self.atom_labels, self.atom_pos)  # Get the position of the Q points in the structure
+        
+        # Get the position of the Q points in the structure
+        location_Q_struct = self.get_Q_points(self.atom_labels, self.atom_pos)  
 
         for i in range(len(location_Q_struct[0])):
             n_conector_label = conector_label.copy()
@@ -324,7 +288,18 @@ class Building_Block():
         self.align_to()
         self.calculate_size()
 
-    def create_C3_BB(self, nucleo_name='BENZ', conector='CHO', R1='H', R2='H', R3='H', R4='H', R5='H', R6='H', R7='H', R8='H', R9='H'):
+    def create_C3_BB(self, 
+                     nucleo_name='BENZ', 
+                     conector='CHO', 
+                     R1='H', 
+                     R2='H', 
+                     R3='H', 
+                     R4='H', 
+                     R5='H', 
+                     R6='H', 
+                     R7='H', 
+                     R8='H', 
+                     R9='H'):
         '''Create a building block with C3 simmetry'''
 
         self.name = f'C3_{nucleo_name}_{conector}'
@@ -347,7 +322,18 @@ class Building_Block():
         self.align_to()
         self.calculate_size()
 
-    def create_C4_BB(self, nucleo_name='BENZ', conector='CHO', R1='H', R2='H', R3='H', R4='H', R5='H', R6='H', R7='H', R8='H', R9='H'):
+    def create_C4_BB(self, 
+                     nucleo_name='BENZ', 
+                     conector='CHO', 
+                     R1='H', 
+                     R2='H', 
+                     R3='H', 
+                     R4='H', 
+                     R5='H', 
+                     R6='H', 
+                     R7='H', 
+                     R8='H', 
+                     R9='H'):
         '''Create a building block with C4 simmetry'''
 
         self.name = f'C4_{nucleo_name}_{conector}'
@@ -370,8 +356,19 @@ class Building_Block():
         self.align_to()
         self.calculate_size()
     
-    def create_C6_BB(self, nucleo_name='BENZ', conector='CHO', R1='H', R2='H', R3='H', R4='H', R5='H', R6='H', R7='H', R8='H', R9='H'):
-        '''Create a building block with C4 simmetry'''
+    def create_C6_BB(self, 
+                     nucleo_name='BENZ', 
+                     conector='CHO', 
+                     R1='H', 
+                     R2='H', 
+                     R3='H', 
+                     R4='H', 
+                     R5='H', 
+                     R6='H', 
+                     R7='H', 
+                     R8='H', 
+                     R9='H'):
+        '''Create a building block with C6 simmetry'''
 
         self.name = f'C6_{nucleo_name}_{conector}'
 
