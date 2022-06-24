@@ -566,12 +566,12 @@ def create_CellBox(A, B, C, alpha, beta, gamma):
 def calculate_UnitCells(cell, cutoff):
     '''
     Calculate the number of unit cell repetitions so that all supercell lengths are larger than
-    twice the interaction potential cut-off radius. 
-    
+    twice the interaction potential cut-off radius.
+
     RASPA considers the perpendicular directions the directions perpendicular to the `ab`, `bc`,
-    and `ca` planes. Thus, the directions depend on who the crystallographic vectors `a`, `b`, 
-    and `c` are and the length in the perpendicular directions would be the projections 
-    of the crystallographic vectors on the vectors `a x b`, `b x c`, and `c x a`. 
+    and `ca` planes. Thus, the directions depend on who the crystallographic vectors `a`, `b`,
+    and `c` are and the length in the perpendicular directions would be the projections
+    of the crystallographic vectors on the vectors `a x b`, `b x c`, and `c x a`.
     (here `x` means cross product)
     ----------
     cell_matrix : array
@@ -579,22 +579,22 @@ def calculate_UnitCells(cell, cutoff):
     Returns
     -------
     SuperCell
-        (3,1) list containg the number of repiting units in `x`, `y`, `z` directions. 
+        (3,1) list containg the number of repiting units in `x`, `y`, `z` directions.
     '''
 
     # Make sure that the cell is in the format of cell matrix
     if len(cell) == 6:
-        CellBox = cellpar_to_cell(cell)
+        cell_box = cellpar_to_cell(cell)
     if len(cell) == 3:
-        CellBox = cell
+        cell_box = cell
 
     # Pre-calculate the cross products
-    axb = np.cross(CellBox[0], CellBox[1])
-    bxc = np.cross(CellBox[1], CellBox[2])
-    cxa = np.cross(CellBox[2], CellBox[0])
+    axb = np.cross(cell_box[0], cell_box[1])
+    bxc = np.cross(cell_box[1], cell_box[2])
+    cxa = np.cross(cell_box[2], cell_box[0])
 
     # Calculates the cell volume
-    V = np.dot(np.cross(CellBox[0], CellBox[1]), CellBox[2])
+    V = np.dot(np.cross(cell_box[0], cell_box[1]), cell_box[2])
 
     # Calculate perpendicular widths
     cx = V / np.linalg.norm(bxc)
@@ -602,9 +602,9 @@ def calculate_UnitCells(cell, cutoff):
     cz = V / np.linalg.norm(axb)
 
     # Calculate UnitCells array
-    SuperCell = np.ceil(2.0 * cutoff / np.array([cx, cy, cz])).astype(int)
+    supercell = np.ceil(2.0 * cutoff / np.array([cx, cy, cz])).astype(int)
 
-    return SuperCell
+    return supercell
 
 def cellpar_to_lammpsbox(a, b, c, alpha, beta, gamma, angle_in_degrees=True):
     """
@@ -633,7 +633,7 @@ def cellpar_to_lammpsbox(a, b, c, alpha, beta, gamma, angle_in_degrees=True):
     ly = np.sqrt( b**2 - xy **2)
     yz = (b * c * np.cos(alpha) - xy * xz) / ly
     lz = np.sqrt(c**2 - xz**2 - yz**2)
-    
+
     return np.array([lx, ly, lz, xy, xz, yz])
 
 def find_index(element, e_list):
