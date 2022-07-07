@@ -316,14 +316,15 @@ def create_all_C2(nucleos=None, radicais=None, conectores=None):
     nucleos : list
         List containing the desired cores for the creation of blocks. 
         Ex.: ['2BPD', '3BPD', 'ANTR', 'BBTZ', 'BENZ', 'BPNY', 'BPYB', 'BTPH',
-              'DBTP', 'DHPI', 'DHSI', 'DPBY', 'DPDA', 'DPEL', 'DPEY', 'HDZ, 
+              'DBTP', 'DHPI', 'DHSI', 'DPBY', 'DPDA', 'DPEL', 'DPEY', 'HDZ,
               'NAPT', 'PYRN', 'TPNY', 'TTPH']
     conectores : list
-        List containing the connector groups desired for the creation of blocks. 
+        List containing the connector groups desired for the creation of blocks.
         Ex.: ['NH2', 'CHO', 'BOH2', 'OH2', 'Cl', 'Br', 'NHNH2']
     radicais : list
-        List containing the desired radical groups for the creation of blocks. 
-        Ex.: ['CH3', 'CHO', 'CN', 'COOH', 'F', 'H', 'NC2H', 'NH2', 'NO2', 'O', 'OEt', 'OH', 'OMe', 'SO2H', 'tBut']
+        List containing the desired radical groups for the creation of blocks.
+        Ex.: ['CH3', 'CHO', 'CN', 'COOH', 'F', 'H', 'NC2H', 'NH2',
+        'NO2', 'O', 'OEt', 'OH', 'OMe', 'SO2H', 'tBut']
     '''
 
     if nucleos == None:
@@ -346,13 +347,15 @@ def create_all_C2(nucleos=None, radicais=None, conectores=None):
 
 
 def create_all_C3(nucleos=None, radicais=None, conectores=None):
-    '''Creates a set of C3 symmetry building block based on your choice of a nucleo, a radical group, and a type of connector group. 
+    '''Creates a set of C3 symmetry building block based on your choice of a nucleo, a radical
+    group, and a type of connector group.
 
-    Be warned that the building blocks created only had one radical group at the position R1. 
+    Be warned that the building blocks created only had one radical group at the position R1.
 
     The creation of blocks with more than one group or in specific positions must be done manually.
 
-    For exemple, the code below will create a `C4` building block based on a `Triphenilene` core with a `NH2` connection group and a `OH` group in the position `R2`:
+    For exemple, the code below will create a `C4` building block based on a `Triphenilene`
+    core with a `NH2` connection group and a `OH` group in the position `R2`:
 
     >>> BB = Building_Block()
 
@@ -363,11 +366,12 @@ def create_all_C3(nucleos=None, radicais=None, conectores=None):
         List containing the desired cores for the creation of blocks. 
         Ex.: ['BENZ', 'DICZ', 'TPAM', 'TPBZ', 'TPNY', 'TPOB', 'TPTA', 'TPTZ']
     conectores : list
-        List containing the connector groups desired for the creation of blocks. 
+        List containing the connector groups desired for the creation of blocks.
         Ex.: ['NH2', 'CHO', 'BOH2', 'OH2', 'Cl', 'Br', 'NHNH2']
     radicais : list
         List containing the desired radical groups for the creation of blocks.
-        Ex.: ['CH3', 'CHO', 'CN', 'COOH', 'F', 'H', 'NC2H', 'NH2', 'NO2', 'O', 'OEt', 'OH', 'OMe', 'SO2H', 'tBut']
+        Ex.: ['CH3', 'CHO', 'CN', 'COOH', 'F', 'H', 'NC2H', 'NH2',
+        'NO2', 'O', 'OEt', 'OH', 'OMe', 'SO2H', 'tBut']
     '''
     if nucleos == None:
         nucleos = [i.rstrip('.gjf') for i in os.listdir(
@@ -389,13 +393,16 @@ def create_all_C3(nucleos=None, radicais=None, conectores=None):
 
 
 def create_all_C4(nucleos=None, conectores=None, radicais=None):
-    '''Creates a set of C4 symmetry building block based on your choice of a core, a radical group, and a type of connector group. 
+    '''
+    Creates a set of C4 symmetry building block based on your choice of a core,W
+    a radical group, and a type of connector group.
 
-    Be warned that the building blocks created only had one radical group at the position R1. 
+    Be warned that the building blocks created only had one radical group at the position R1.
 
     The creation of blocks with more than one group or in specific positions must be done manually.
 
-    For exemple, the code below will create a `C4` building block based on a `Porphirin` core with a `NH2` connection group and a `OH` group in the position `R2`:
+    For exemple, the code below will create a `C4` building block based on a `Porphirin` core with
+    a `NH2` connection group and a `OH` group in the position `R2`:
 
     >>> BB = Building_Block()
 
@@ -403,14 +410,15 @@ def create_all_C4(nucleos=None, conectores=None, radicais=None):
 
     ----------
     nucleos : list
-        List containing the desired cores for the creation of blocks. 
+        List containing the desired cores for the creation of blocks.
         Ex.: ['BENZ', 'PHPR', 'PORP', 'PYRN']
     conectores : list
-        List containing the connector groups desired for the creation of blocks. 
+        List containing the connector groups desired for the creation of blocks.W
         Ex.: ['NH2', 'CHO', 'BOH2', 'OH2', 'Cl', 'Br', 'NHNH2']
     radicais : list
-        List containing the desired radical groups for the creation of blocks. 
-        Ex.: ['CH3', 'CHO', 'CN', 'COOH', 'F', 'H', 'NC2H', 'NH2', 'NO2', 'O', 'OEt', 'OH', 'OMe', 'SO2H', 'tBut']
+        List containing the desired radical groups for the creation of blocks.
+        Ex.: ['CH3', 'CHO', 'CN', 'COOH', 'F', 'H', 'NC2H', 'NH2', 'NO2',
+        'O', 'OEt', 'OH', 'OMe', 'SO2H', 'tBut']
     '''
 
     if nucleos == None:
@@ -448,7 +456,7 @@ def clean_out_dir():
 def clean():
     '''Clean both the building block dir and the out dir'''
     val = input(
-        f'This action will delete all building blocks and COFs created, do you want to proceed? Type [y] to continue.\n')
+        'This action will delete all building blocks and COFs created, do you want to proceed? Type [y] to continue.\n')
     if val == 'y':
         clean_bb_dir()
         clean_out_dir()
