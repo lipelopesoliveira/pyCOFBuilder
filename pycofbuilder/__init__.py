@@ -4,7 +4,7 @@ from pycofbuilder.building_block import Building_Block
 from pycofbuilder.reticulum import Reticulum
 from pycofbuilder.core import *
 
-__version__ = '0.0.1'
+__version__ = '0.0.3'
 __author__ = "Felipe Lopes de Oliveira"
 __license__ = "MIT"
 

@@ -111,10 +111,15 @@ class Reticulum():
         _ROOT = os.path.abspath(os.path.dirname(__file__))
 
         self.verbosity = verbosity
-        self.available_2D_topologies = ['HCB', 'HCB_A', 'SQL', 'SQL_A', 'KGM', 'KGM_A', 'KGD', 'HXL_A'] # Falta adicionar: 'HXL', 'KGD'
-        self.available_3D_topologies = [] # Falta adicionar: ['dia', 'bor', 'srs', 'pts', 'ctn', 'rra', 'fcc', 'lon', 'stp', 'acs', 'tbo', 'bcu', 'fjh', 'ceq']
+
+        # Falta adicionar: 'HXL', 'KGD'
+        self.available_2D_topologies = ['HCB', 'HCB_A', 'SQL', 'SQL_A', 'KGM', 'KGM_A', 'KGD', 'HXL_A']
+
+        # Falta adicionar: ['dia', 'bor', 'srs', 'pts', 'ctn', 'rra', 'fcc', 'lon', 'stp', 'acs', 'tbo', 'bcu', 'fjh', 'ceq']
+        self.available_3D_topologies = [] 
         self.available_topologies = self.available_2D_topologies + self.available_3D_topologies
 
+        # Define available stackings for all 2D topologies
         self.available_stacking = {'HCB': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
                                    'HCB_A': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
                                    'SQL':['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
@@ -124,11 +129,16 @@ class Reticulum():
                                    'KGM': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
                                    'KGM_A': ['AA', 'AB1x', 'AB1y', 'AB1xy', 'AB2', 'AAl', 'AAt']
                                    }
-        
+
+        # Define the main paths for the data and the building block files
         self.lib_bb = bb_lib
         self.main_path = os.path.join(_ROOT, 'data')
         self.lib_path = os.path.join(self.main_path, bb_lib)
+
+        # Define the output paths
         self.out_path = os.path.join(os.getcwd(), 'out')
+
+        # Define the Reticulum properties
         self.name = None
         self.topology = None
         self.dimention = None
@@ -147,11 +157,7 @@ class Reticulum():
         self.lattice = [[], [], []]
         self.symm_tol = 0.2
         self.angle_tol = 0.2
-        self.n_atoms = self.n_atoms()
-
-    def n_atoms(self):
-        ''' Returns the number of atoms in the unitary cell'''
-        return len(self.atom_labels)
+        self.n_atoms = 0
 
     def print_available_topologies(self, dimensionality='all'):
 
@@ -167,7 +173,7 @@ class Reticulum():
 
 ################   Net creation methods  ############################
 
-    def create_hcb_structure(self, 
+    def create_hcb_structure(self,
                              name_bb_a : str,
                              name_bb_b : str,
                              stacking : str ='AA',
@@ -206,9 +212,9 @@ class Reticulum():
         -------
         list
             A list of strings containing:
-                1. the structure name, 
-                2. lattice type, 
-                3. hall symbol of the cristaline structure, 
+                1. the structure name,
+                2. lattice type,
+                3. hall symbol of the cristaline structure,
                 4. space group,
                 5. number of the space group,
                 6. number of operation symmetry
@@ -259,8 +265,8 @@ class Reticulum():
             c = c_parameter_base + max([delta_a, delta_b])
 
         # Define the cell lattice
-        lattice = [[a, 0, 0], 
-                   [-0.5*a, np.sqrt(3)/2*a, 0], 
+        lattice = [[a, 0, 0],
+                   [-0.5*a, np.sqrt(3)/2*a, 0],
                    [0, 0, c]]
 
         if self.verbosity is True:
@@ -285,7 +291,10 @@ class Reticulum():
         # Remove duplicate atoms and translate the structure to the center of the cell
         struct.sort(reverse=True)
         struct.merge_sites(tol=.5, mode='delete')
-        struct.translate_sites(range(len(struct.as_dict()['sites'])), [0, 0, 0.5], frac_coords=True, to_unit_cell=True)
+        struct.translate_sites(range(len(struct.as_dict()['sites'])),
+                               [0, 0, 0.5],
+                               frac_coords=True,
+                               to_unit_cell=True)
 
         # Simetrizes the structure using pymatgen
         symm = SpacegroupAnalyzer(struct, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
@@ -373,7 +382,9 @@ class Reticulum():
             lattice = Lattice(cell)
             self.symm_structure = Structure(lattice, AB_label+AB_label, AB, coords_are_cartesian=False)
 
-        # Create AA tilted stacking. Tilted Hexagonal cell by tilt_angle with two sheets per cell shifited by the shift_vector in angstroms.
+        # Create AA tilted stacking. 
+        # Tilted Hexagonal cell by tilt_angle with two sheets per cell 
+        # shifited by the shift_vector in angstroms.
         if stacking == 'AAt':
             self.stacking = 'AAt'
 
@@ -449,7 +460,7 @@ class Reticulum():
 
         self.atom_labels = [i['label'] for i in dict_structure['sites']]
         self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.n_atoms = len(self.symm_structure)
+        self.get_n_atoms = len(self.symm_structure)
         self.composition = self.symm_structure.formula
 
         if self.verbosity is True:
@@ -465,7 +476,12 @@ class Reticulum():
         self.hall = symm.get_hall()
 
         if print_result == True:
-            Tools.print_result(self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op))
+            Tools.print_result(self.name, 
+                              str(self.lattice_type), 
+                              str(self.hall[0:2]), 
+                              str(self.space_group), 
+                              str(self.space_group_n), 
+                              len(symm_op))
 
         return [self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op)]
 
@@ -601,7 +617,10 @@ class Reticulum():
         # Remove os átomos duplicados
         struct.sort(reverse=True)
         struct.merge_sites(tol=.5, mode='delete')
-        struct.translate_sites(range(len(struct.as_dict()['sites'])), [0, 0, 0.5], frac_coords=True, to_unit_cell=True)
+        struct.translate_sites(range(len(struct.as_dict()['sites'])), 
+                              [0, 0, 0.5], 
+                              frac_coords=True, 
+                              to_unit_cell=True)
 
         # Simetriza a estrutura
         try:
@@ -766,7 +785,7 @@ class Reticulum():
 
         self.atom_labels = [i['label'] for i in dict_structure['sites']]
         self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.n_atoms = len(self.symm_structure)
+        self.get_n_atoms = len(self.symm_structure)
         self.composition = self.symm_structure.formula
 
         Tools.print_comand(self.symm_structure, self.verbosity, ['debug'])
@@ -779,8 +798,13 @@ class Reticulum():
         symm_op = symm.get_point_group_operations()
         self.hall = symm.get_hall()
 
-        if print_result == True:
-            Tools.print_result(self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op))
+        if print_result is True:
+            Tools.print_result(self.name,
+                              str(self.lattice_type),
+                              str(self.hall[0:2]),
+                              str(self.space_group),
+                              str(self.space_group_n),
+                              len(symm_op))
 
         return [self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op)]
 
@@ -823,9 +847,9 @@ class Reticulum():
         -------
         list
             A list of strings containing:
-                1. the structure name, 
-                2. lattice type, 
-                3. hall symbol of the cristaline structure, 
+                1. the structure name,
+                2. lattice type,
+                3. hall symbol of the cristaline structure,
                 4. space group,
                 5. number of the space group,
                 6. number of operation symmetry
@@ -847,10 +871,12 @@ class Reticulum():
             print('Starting the creation of a SQL net')
 
         if bb_1.connectivity != 4:
-            print(f'Building block A ({name_bb_a}) must present connectivity 4 insted of', bb_1.connectivity)
+            print(f'Building block A ({name_bb_a}) must present connectivity 4 insted of',
+                  bb_1.connectivity)
             return None
         if bb_2.connectivity != 4:
-            print(f'Building block B ({name_bb_b}) must present connectivity 4 insted of', bb_2.connectivity)
+            print(f'Building block B ({name_bb_b}) must present connectivity 4 insted of',
+            bb_2.connectivity)
             return None
 
         # Calculates the cell parameter based on the building blocks size
@@ -902,7 +928,10 @@ class Reticulum():
         # Remove os átomos duplicados
         struct.sort(reverse=True)
         struct.merge_sites(tol=.5, mode='delete')
-        struct.translate_sites(range(len(struct.as_dict()['sites'])), [0, 0, 0.5], frac_coords=True, to_unit_cell=True)
+        struct.translate_sites(range(len(struct.as_dict()['sites'])), 
+                               [0, 0, 0.5], 
+                               frac_coords=True, 
+                               to_unit_cell=True)
 
         # Simetriza a estrutura
         symm = SpacegroupAnalyzer(struct, symprec=1, angle_tolerance=5.0)
@@ -952,12 +981,19 @@ class Reticulum():
             AB_label = [i[0] for i in labels_conv_crystal]
 
             lattice = Lattice(cell)
-            AB_2 = Structure(lattice, AB_label + AB_label, AB, coords_are_cartesian=False)
-            AB_2_symm = SpacegroupAnalyzer(AB_2, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
+            AB_2 = Structure(lattice, 
+                             AB_label + AB_label,
+                             AB,
+                             coords_are_cartesian=False)
+
+            AB_2_symm = SpacegroupAnalyzer(AB_2,
+                                           symprec=self.symm_tol,
+                                           angle_tolerance=self.angle_tol)
 
             self.symm_structure = AB_2_symm.get_refined_structure()
 
-        # Create AAl stacking. Tetragonal cell with two sheets per cell shifited by the shift_vector in angstroms. 
+        # Create AAl stacking. Tetragonal cell with two sheets
+        # per cell shifited by the shift_vector in angstroms.
         if stacking == 'AAl':
             self.stacking = 'AAl'
             labels_conv_crystal = np.array([[i['label']] for i in struct_symm_prim.as_dict()['sites']])
@@ -1056,7 +1092,7 @@ class Reticulum():
 
         self.atom_labels = [i['label'] for i in dict_structure['sites']]
         self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.n_atoms = len(self.symm_structure)
+        self.get_n_atoms = len(self.symm_structure)
         self.composition = self.symm_structure.formula
 
         if self.verbosity is True:
@@ -1070,8 +1106,13 @@ class Reticulum():
         symm_op = symm.get_point_group_operations()
         self.hall = symm.get_hall()
 
-        if print_result == True:
-            Tools.print_result(self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op))
+        if print_result is True:
+            Tools.print_result(self.name,
+                              str(self.lattice_type),
+                              str(self.hall[0:2]),
+                              str(self.space_group),
+                              str(self.space_group_n),
+                              len(symm_op))
 
         return [self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op)]
 
@@ -1114,9 +1155,9 @@ class Reticulum():
         -------
         list
             A list of strings containing:
-                1. the structure name, 
-                2. lattice type, 
-                3. hall symbol of the cristaline structure, 
+                1. the structure name,
+                2. lattice type,
+                3. hall symbol of the cristaline structure,
                 4. space group,
                 5. number of the space group,
                 6. number of operation symmetry
@@ -1285,9 +1326,13 @@ class Reticulum():
             AB_label = [i[0] for i in labels_conv_crystal]
 
             lattice = Lattice(cell)
-            self.symm_structure = Structure(lattice, AB_label+AB_label, AB, coords_are_cartesian=False)
+            self.symm_structure = Structure(lattice, 
+                                            AB_label+AB_label, 
+                                            AB, 
+                                            coords_are_cartesian=False)
 
-        # Create AA tilted stacking. Tilted tetragonal cell with two sheets per cell tilted by tilt_angle. 
+        # Create AA tilted stacking. 
+        # Tilted tetragonal cell with two sheets per cell tilted by tilt_angle.
         if stacking == 'AAt':
             self.stacking = 'AAt'
 
@@ -1364,7 +1409,7 @@ class Reticulum():
 
         self.atom_labels = [i['label'] for i in dict_structure['sites']]
         self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.n_atoms = len(self.symm_structure)
+        self.get_n_atoms = len(self.symm_structure)
         self.composition = self.symm_structure.formula
 
         if self.verbosity is True:
@@ -1379,7 +1424,12 @@ class Reticulum():
         self.hall = symm.get_hall()
 
         if print_result == True:
-            Tools.print_result(self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op))
+            Tools.print_result(self.name,
+                              str(self.lattice_type),
+                              str(self.hall[0:2]),
+                              str(self.space_group),
+                              str(self.space_group_n),
+                              len(symm_op))
 
         return [self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op)]
     
@@ -1678,7 +1728,7 @@ class Reticulum():
 
         self.atom_labels = [i['label'] for i in dict_structure['sites']]
         self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.n_atoms = len(self.symm_structure)
+        self.get_n_atoms = len(self.symm_structure)
         self.composition = self.symm_structure.formula
 
         if self.verbosity is True:
@@ -1693,7 +1743,12 @@ class Reticulum():
         self.hall = symm.get_hall()
 
         if print_result == True:
-            Tools.print_result(self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op))
+            Tools.print_result(self.name,
+                               str(self.lattice_type),
+                               str(self.hall[0:2]),
+                               str(self.space_group),
+                               str(self.space_group_n),
+                               len(symm_op))
 
         return [self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op)]
 
@@ -1995,7 +2050,7 @@ class Reticulum():
 
         self.atom_labels = [i['label'] for i in dict_structure['sites']]
         self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.n_atoms = len(self.symm_structure)
+        self.get_n_atoms = len(self.symm_structure)
         self.composition = self.symm_structure.formula
 
         if self.verbosity is True:
@@ -2318,7 +2373,7 @@ class Reticulum():
 
         self.atom_labels = [i['label'] for i in dict_structure['sites']]
         self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.n_atoms = len(self.symm_structure)
+        self.get_n_atoms = len(self.symm_structure)
         self.composition = self.symm_structure.formula
 
         if self.verbosity is True:
@@ -2741,7 +2796,7 @@ class Reticulum():
 
         self.atom_labels = [i['label'] for i in dict_structure['sites']]
         self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.n_atoms = len(self.symm_structure)
+        self.get_n_atoms = len(self.symm_structure)
         self.composition = self.symm_structure.formula
 
         if self.verbosity is True:
@@ -3177,7 +3232,7 @@ class Reticulum():
         elif self.lattice_type == 'triclinic':
             out_file.write('    ibrav =  0\n')
 
-        out_file.write(f'    nat =     {self.n_atoms}\n')
+        out_file.write(f'    nat =     {self.get_n_atoms}\n')
         out_file.write(f'    ntyp =     {len(set(self.atom_labels))}\n')
         out_file.write(f'    ecutwfc = {ecut} \n')
         out_file.write(f'    ecutrho = {erho} \n')
