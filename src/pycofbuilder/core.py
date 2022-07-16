@@ -11,9 +11,15 @@ from pycofbuilder.building_block import Building_Block
 _ROOT = os.path.abspath(os.path.dirname(__file__))
 
 
-def build(cof_name=None, save_format=['json'], lib='bb_lib', print_result=True, supercell=[1, 1, 2]):
+def build(cof_name=None,
+          save_format=['json'],
+          lib='bb_lib',
+          print_result=True,
+          supercell=[1, 1, 2],
+          save_dir=None,
+          verbosity=False):
     '''Build a COF with a given name
-    
+
     Parameters
     ----------
     cof_name : str
@@ -64,7 +70,7 @@ def build(cof_name=None, save_format=['json'], lib='bb_lib', print_result=True, 
 
     if net == 'HCB':
         try:
-            Ret = Reticulum(bb_lib=lib)
+            Ret = Reticulum(bb_lib=lib, save_dir=save_dir, verbosity=verbosity)
             simm_data = Ret.create_hcb_structure(
                 bb1, bb2, stacking=stacking, bond_atom=bond_atom, print_result=print_result)
             if cif is True:
@@ -92,7 +98,7 @@ def build(cof_name=None, save_format=['json'], lib='bb_lib', print_result=True, 
 
     if net == 'HCB_A':
         try:
-            Ret = Reticulum(bb_lib=lib)
+            Ret = Reticulum(bb_lib=lib, save_dir=save_dir, verbosity=verbosity)
             simm_data = Ret.create_hcb_a_structure(
                 bb1, bb2, stacking=stacking, bond_atom=bond_atom, print_result=print_result)
             if cif is True:
@@ -120,7 +126,7 @@ def build(cof_name=None, save_format=['json'], lib='bb_lib', print_result=True, 
 
     if net == 'SQL':
         try:
-            Ret = Reticulum(bb_lib=lib)
+            Ret = Reticulum(bb_lib=lib, save_dir=save_dir, verbosity=verbosity)
             simm_data = Ret.create_sql_structure(
                 bb1, bb2, stacking=stacking, bond_atom=bond_atom, print_result=print_result)
             if cif is True:
@@ -148,7 +154,7 @@ def build(cof_name=None, save_format=['json'], lib='bb_lib', print_result=True, 
 
     if net == 'SQL_A':
         try:
-            Ret = Reticulum(bb_lib=lib)
+            Ret = Reticulum(bb_lib=lib, save_dir=save_dir, verbosity=verbosity)
             simm_data = Ret.create_sql_a_structure(
                 bb1, bb2, stacking=stacking, bond_atom=bond_atom, print_result=print_result)
             if cif is True:
@@ -179,7 +185,12 @@ def build_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, c
 
     save_f = []
 
-    for i in [[qe, 'qe'], [xyz, 'xyz'], [cif, 'cif'], [turbomole, 'turbomole'], [vasp, 'vasp'], [json, 'json']]:
+    for i in [[qe, 'qe'],
+              [xyz, 'xyz'],
+              [cif, 'cif'],
+              [turbomole, 'turbomole'],
+              [vasp, 'vasp'],
+              [json, 'json']]:
         if i[0] is True:
             save_f += [i[1]]
 
