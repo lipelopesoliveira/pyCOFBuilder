@@ -31,20 +31,20 @@ class Reticulum():
     available_3D_topologies : list
         List of available 3D topologies
     available_topologies : list
-        List of all available topologies    
+        List of all available topologies
     available_stacking : list
         List of available stakings for all 2D topologies
     lib_bb : str
         String with the name of the folder containing the building block files
         Default: bb_lib
-    main_path : str 
-        String containing the data folder. 
+    main_path : str
+        String containing the data folder.
         Defailt: os.path.join(_ROOT, 'data')
     lib_path : str
         Path for the building block files.
         Default: os.path.join(self.main_path, bb_lib)
     out_path : str
-        Path to save the results. 
+        Path to save the results.
         Default: os.path.join(os.getcwd(), 'out')
     name : str
         Name of the material
@@ -106,16 +106,15 @@ class Reticulum():
         Save the structure in .in format
     """
 
-    def __init__(self, bb_lib='bb_lib', verbosity=False):
+    def __init__(self, bb_lib='bb_lib', verbosity=False, out_dir=None):
 
         _ROOT = os.path.abspath(os.path.dirname(__file__))
 
         self.verbosity = verbosity
-
         # Falta adicionar: 'HXL', 'KGD'
-        self.available_2D_topologies = ['HCB', 'HCB_A', 'SQL', 'SQL_A', 'KGM', 'KGM_A', 'KGD', 'HXL_A']
-
-        # Falta adicionar: ['dia', 'bor', 'srs', 'pts', 'ctn', 'rra', 'fcc', 'lon', 'stp', 'acs', 'tbo', 'bcu', 'fjh', 'ceq']
+        self.available_2D_topologies = ['HCB', 'HCB_A', 'SQL', 'SQL_A', 'KGM', 'KGM_A', 'KGD', 'HXL_A'] 
+        # Falta adicionar: ['dia', 'bor', 'srs', 'pts', 'ctn', 'rra', 'fcc',
+        # 'lon', 'stp', 'acs', 'tbo', 'bcu', 'fjh', 'ceq']
         self.available_3D_topologies = [] 
         self.available_topologies = self.available_2D_topologies + self.available_3D_topologies
 
@@ -130,15 +129,13 @@ class Reticulum():
                                    'KGM_A': ['AA', 'AB1x', 'AB1y', 'AB1xy', 'AB2', 'AAl', 'AAt']
                                    }
 
-        # Define the main paths for the data and the building block files
         self.lib_bb = bb_lib
         self.main_path = os.path.join(_ROOT, 'data')
         self.lib_path = os.path.join(self.main_path, bb_lib)
-
-        # Define the output paths
-        self.out_path = os.path.join(os.getcwd(), 'out')
-
-        # Define the Reticulum properties
+        if out_dir is None:
+            self.out_path = os.path.join(os.getcwd(), 'out')
+        else:
+            self.out_path = out_dir
         self.name = None
         self.topology = None
         self.dimention = None
@@ -157,9 +154,13 @@ class Reticulum():
         self.lattice = [[], [], []]
         self.symm_tol = 0.2
         self.angle_tol = 0.2
-        self.n_atoms = 0
+        self.n_atoms = self.get_n_atoms()
 
-    def print_available_topologies(self, dimensionality='all'):
+    def get_n_atoms(self):
+        ''' Returns the number of atoms in the unitary cell'''
+        return len(self.atom_labels)
+
+    def get_available_topologies(self, dimensionality='all'):
 
         if dimensionality == 'all' or dimensionality == '2D':
             print('Available 2D Topologies:')
@@ -475,15 +476,20 @@ class Reticulum():
         symm_op = symm.get_point_group_operations()
         self.hall = symm.get_hall()
 
-        if print_result == True:
-            Tools.print_result(self.name, 
-                              str(self.lattice_type), 
-                              str(self.hall[0:2]), 
-                              str(self.space_group), 
-                              str(self.space_group_n), 
-                              len(symm_op))
+        if print_result is True:
+            Tools.print_result(self.name,
+                               str(self.lattice_type),
+                               str(self.hall[0:2]),
+                               str(self.space_group),
+                               str(self.space_group_n),
+                               len(symm_op))
 
-        return [self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op)]
+        return [self.name,
+                str(self.lattice_type),
+                str(self.hall[0:2]),
+                str(self.space_group),
+                str(self.space_group_n),
+                len(symm_op)]
 
     def create_hcb_a_structure(self,
                                name_bb_a: str,
@@ -524,10 +530,10 @@ class Reticulum():
         -------
         list
             A list of strings containing:
-                1. the structure name, 
-                2. lattice type, 
-                3. hall symbol of the cristaline structure, 
-                4. space group,
+                1. the structure name
+                2. lattice type
+                3. hall symbol of the cristaline structure
+                4. space group
                 5. number of the space group,
                 6. number of operation symmetry
         """
@@ -575,8 +581,8 @@ class Reticulum():
             c = c_parameter_base + max([delta_a, delta_b])
 
         # Define the cell lattice
-        lattice = [[a, 0, 0], 
-                   [-0.5*a, np.sqrt(3)/2*a, 0], 
+        lattice = [[a, 0, 0],
+                   [-0.5*a, np.sqrt(3)/2*a, 0],
                    [0, 0, c]]
 
         if self.verbosity is True:
@@ -686,7 +692,8 @@ class Reticulum():
 
             self.symm_structure = AB_2_symm.get_refined_structure()
 
-        # Create AAl stacking. Hexagonal cell with two sheets per cell shifited by the shift_vector in angstroms. 
+        # Create AAl stacking. 
+        # Hexagonal cell with two sheets per cell shifited by the shift_vector in angstroms.
         if stacking == 'AAl':
             self.stacking = 'AAl'
             labels_conv_crystal = np.array([[i['label']] for i in struct_symm_prim.as_dict()['sites']])
@@ -800,13 +807,19 @@ class Reticulum():
 
         if print_result is True:
             Tools.print_result(self.name,
-                              str(self.lattice_type),
-                              str(self.hall[0:2]),
-                              str(self.space_group),
-                              str(self.space_group_n),
-                              len(symm_op))
+                               str(self.lattice_type),
+                               str(self.hall[0:2]),
+                               str(self.space_group),
+                               str(self.space_group_n),
+                               len(symm_op))
 
-        return [self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op)]
+        return [self.name,
+                str(self.lattice_type), 
+                str(self.hall[0:2]),
+                str(self.space_group),
+                str(self.space_group_n),
+                len(symm_op)]
+
 
     def create_sql_structure(self, 
                              name_bb_a : str,
@@ -1108,13 +1121,19 @@ class Reticulum():
 
         if print_result is True:
             Tools.print_result(self.name,
-                              str(self.lattice_type),
-                              str(self.hall[0:2]),
-                              str(self.space_group),
-                              str(self.space_group_n),
-                              len(symm_op))
+                               str(self.lattice_type),
+                               str(self.hall[0:2]),
+                               str(self.space_group),
+                               str(self.space_group_n),
+                               len(symm_op))
 
-        return [self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op)]
+        return [self.name,
+                str(self.lattice_type),
+                str(self.hall[0:2]),
+                str(self.space_group),
+                str(self.space_group_n),
+                len(symm_op)]
+
 
     def create_sql_a_structure(self,
                                name_bb_a: str,
@@ -1423,15 +1442,21 @@ class Reticulum():
         symm_op = symm.get_point_group_operations()
         self.hall = symm.get_hall()
 
-        if print_result == True:
+        if print_result is True:
             Tools.print_result(self.name,
-                              str(self.lattice_type),
-                              str(self.hall[0:2]),
-                              str(self.space_group),
-                              str(self.space_group_n),
-                              len(symm_op))
+                               str(self.lattice_type),
+                               str(self.hall[0:2]),
+                               str(self.space_group),
+                               str(self.space_group_n),
+                               len(symm_op))
 
-        return [self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op)]
+        return [self.name,
+                str(self.lattice_type),
+                str(self.hall[0:2]),
+                str(self.space_group),
+                str(self.space_group_n),
+                len(symm_op)]
+
     
     def create_kgd_structure(self, 
                              name_bb_a : str,
@@ -1742,7 +1767,7 @@ class Reticulum():
         symm_op = symm.get_point_group_operations()
         self.hall = symm.get_hall()
 
-        if print_result == True:
+        if print_result is True:
             Tools.print_result(self.name,
                                str(self.lattice_type),
                                str(self.hall[0:2]),
@@ -1750,7 +1775,13 @@ class Reticulum():
                                str(self.space_group_n),
                                len(symm_op))
 
-        return [self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op)]
+        return [self.name,
+                str(self.lattice_type),
+                str(self.hall[0:2]),
+                str(self.space_group),
+                str(self.space_group_n),
+                len(symm_op)]
+
 
     def create_hxl_a_structure(self,
                                name_bb_a: str,
@@ -2064,10 +2095,21 @@ class Reticulum():
         symm_op = symm.get_point_group_operations()
         self.hall = symm.get_hall()
 
-        if print_result == True:
-            Tools.print_result(self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op))
+        if print_result is True:
+            Tools.print_result(self.name,
+                               str(self.lattice_type),
+                               str(self.hall[0:2]),
+                               str(self.space_group),
+                               str(self.space_group_n),
+                               len(symm_op))
 
-        return self.atom_labels, self.atom_pos, self.lattice
+        return [self.name, 
+                str(self.lattice_type), 
+                str(self.hall[0:2]), 
+                str(self.space_group), 
+                str(self.space_group_n), 
+                len(symm_op)]
+
     
     def create_kgm_structure(self, 
                              name_bb_a : str,
@@ -2387,10 +2429,21 @@ class Reticulum():
         symm_op = symm.get_point_group_operations()
         self.hall = symm.get_hall()
 
-        if print_result == True:
-            Tools.print_result(self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op))
+        if print_result is True:
+            Tools.print_result(self.name,
+                               str(self.lattice_type),
+                               str(self.hall[0:2]),
+                               str(self.space_group),
+                               str(self.space_group_n),
+                               len(symm_op))
 
-        return [self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op)]
+        return [self.name, 
+                str(self.lattice_type), 
+                str(self.hall[0:2]), 
+                str(self.space_group), 
+                str(self.space_group_n), 
+                len(symm_op)]
+
     
     def create_kgm_a_structure(self,
                                name_bb_a: str,
@@ -2810,10 +2863,21 @@ class Reticulum():
         symm_op =  symm.get_point_group_operations()
         self.hall =  symm.get_hall()
 
-        if print_result == True:
-            Tools.print_result(self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op))
+        if print_result is True:
+            Tools.print_result(self.name,
+                               str(self.lattice_type),
+                               str(self.hall[0:2]),
+                               str(self.space_group),
+                               str(self.space_group_n),
+                               len(symm_op))
 
-        return [self.name, str(self.lattice_type), str(self.hall[0:2]), str(self.space_group), str(self.space_group_n), len(symm_op)]
+        return [self.name, 
+                str(self.lattice_type), 
+                str(self.hall[0:2]), 
+                str(self.space_group), 
+                str(self.space_group_n), 
+                len(symm_op)]
+
 
 ################   Saving methods  ############################
 
@@ -2823,10 +2887,10 @@ class Reticulum():
         Parameters
         ----------
         supercell : tuple, optional
-            List containing the supercell parameters. 
+            List containing the supercell parameters.
             Default  = [1, 1, 1]
         path : str, optional
-            Path to save the .cif file.        
+            Path to save the .cif file.    
         """
 
         if path is not None:
@@ -2837,29 +2901,31 @@ class Reticulum():
         self.symm_structure.make_supercell(supercell)
 
         self.symm_structure.to(filename=os.path.join(self.out_path, self.name + '.cif'))
-    
+
     def save_json(self, supercell : tuple = (1, 1, 1), path: str = None):
         """Save the structure in .json format
 
         Parameters
         ----------
         supercell : tuple, optional
-            List containing the supercell parameters. 
+            List containing the supercell parameters.
             Default  = [1, 1, 1]
         path : str, optional
-            Path to save the .json file.        
+            Path to save the .json file.  
         """
 
         if path is not None:
             self.out_path = path
-        
+
         os.makedirs(self.out_path, exist_ok=True)
 
         self.symm_structure.make_supercell(supercell)
 
         dict_sctructure = self.symm_structure.as_dict()
 
-        a, b, c = dict_sctructure['lattice']['a'], dict_sctructure['lattice']['b'], dict_sctructure['lattice']['c']
+        a = dict_sctructure['lattice']['a']
+        b = dict_sctructure['lattice']['b']
+        c = dict_sctructure['lattice']['c']
 
         alpha = round(dict_sctructure['lattice']['alpha'], 3)
         beta = round(dict_sctructure['lattice']['beta'], 3)
@@ -2869,7 +2935,10 @@ class Reticulum():
 
         atom_pos = [i['xyz'] for i in dict_sctructure['sites']]
 
-        Tools.save_json(self.out_path, self.name, [a, b, c, alpha, beta, gamma], atom_labels, atom_pos)
+        Tools.save_json(self.out_path,
+                        self.name,
+                        [a, b, c, alpha, beta, gamma],
+                        atom_labels, atom_pos)
 
     def save_xsf(self, supercell : tuple = (1, 1, 1), path: str = None):
         """Save the structure in XCrysDen .xsf format
@@ -2877,22 +2946,24 @@ class Reticulum():
         Parameters
         ----------
         supercell : tuple, optional
-            List containing the supercell parameters. 
+            List containing the supercell parameters.
             Default  = [1, 1, 1]
         path : str, optional
-            Path to save the .xsf file.        
+            Path to save the .xsf file.
         """
 
         if path is not None:
             self.out_path = path
-       
+
         os.makedirs(self.out_path, exist_ok=True)
 
         self.symm_structure.make_supercell(supercell)
 
         dict_sctructure = self.symm_structure.as_dict()
 
-        a, b, c = dict_sctructure['lattice']['a'], dict_sctructure['lattice']['b'], dict_sctructure['lattice']['c']
+        a = dict_sctructure['lattice']['a']
+        b = dict_sctructure['lattice']['b']
+        c = dict_sctructure['lattice']['c']
 
         alpha = round(dict_sctructure['lattice']['alpha'], 3)
         beta = round(dict_sctructure['lattice']['beta'], 3)
@@ -2902,18 +2973,21 @@ class Reticulum():
 
         atom_pos = [i['xyz'] for i in dict_sctructure['sites']]
 
-        Tools.save_xsf(self.out_path, self.name, [a, b, c, alpha, beta, gamma], atom_labels, atom_pos)
-        
+        Tools.save_xsf(self.out_path,
+                       self.name,
+                       [a, b, c, alpha, beta, gamma],
+                       atom_labels, atom_pos)
+
     def save_pdb(self, supercell : tuple = (1, 1, 1), path: str = None):
         """Save the structure in .pdb format
 
         Parameters
         ----------
         supercell : tuple, optional
-            List containing the supercell parameters. 
+            List containing the supercell parameters.
             Default  = [1, 1, 1]
         path : str, optional
-            Path to save the .pdb file.        
+            Path to save the .pdb file.
         """
         if path is not None:
             self.out_path = path
@@ -3041,9 +3115,9 @@ class Reticulum():
 
         temp_file.close()
 
-    def save_qe(self, 
-                supercell : tuple = (1, 1, 1), 
-                path: str = None, 
+    def save_qe(self,
+                supercell : tuple = (1, 1, 1),
+                path: str = None,
                 in_angstrom_format : bool = True,
                 ecut : int = 40,
                 erho : int = 360,
@@ -3053,10 +3127,10 @@ class Reticulum():
         Parameters
         ----------
         supercell : tuple, optional
-            List containing the supercell parameters. 
+            List containing the supercell parameters.
             Default = [1, 1, 1]
         path : str, optional
-            Path to save the .in file.    
+            Path to save the .in file.
         in_angstrom_format : bool, optional
             Save the atomic positions in angstroms insted of crystal coordinates
             Default = True
@@ -3065,7 +3139,7 @@ class Reticulum():
         erho : int, optional
             Cutoff for electronic density. Default = 360
         k_dist : 0.3, optional
-            Distance of the k-points on the reciprocal space. 
+            Distance of the k-points on the reciprocal space.
             Default = 0.3
         """
         if path is not None:
