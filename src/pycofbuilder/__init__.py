@@ -1,7 +1,6 @@
-__author__ = "Felipe Lopes de Oliveira"
-__license__ = "MIT"
-__version__ = '0.0.3'
+# -*- coding: utf-8 -*-
 
+import os
 import sys
 
 # This code is written for Python 3.
@@ -27,5 +26,10 @@ __all__ = ['Tools',
            'Reticulum'
            ]
 
-import os
 _ROOT = os.path.abspath(os.path.dirname(__file__))
+
+__author__ = "Felipe Lopes de Oliveira"
+__license__ = "MIT"
+__version__ = '0.0.3'
+__email__ = "felipe.lopes@nano.ufrj.br"
+__status__ = "Development"
