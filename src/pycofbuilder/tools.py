@@ -12,7 +12,7 @@ try:
     from pymatgen.io.cif import CifParser
 except Exception:
     print('WARNING: Could no import CifParser from pymatgen the conversion from cif to xyz and COF generation may not work properlly')
-    cif_parser_imported = False
+    CIF_PARSER_IMPORTED = False
 import simplejson
 
 def elements_dict(prop='mass'):
@@ -221,9 +221,9 @@ def elements_dict(prop='mass'):
 
     return out[prop]
 
-def unit_vector(x):
+def unit_vector(vector):
     """Return a unit vector in the same direction as x."""
-    y = np.array(x, dtype='float')
+    y = np.array(vector, dtype='float')
     return y / np.linalg.norm(y)
 
 def angle(v1, v2, unit='degree'):
@@ -259,9 +259,9 @@ def rotation_matrix_from_vectors(vec1, vec2):
     Find the rotation matrix that aligns vec1 to vec2
     ----------
     vec1 : array
-        (3,3) array 
+        (3,3) array
     vec2 : array
-        (3,3) array 
+        (3,3) array
     Returns
     -------
     rotation_matrix : array
@@ -278,7 +278,11 @@ def rotation_matrix_from_vectors(vec1, vec2):
     else:
         return np.identity(3)
 
+
 def translate_inside(matrix):
+    """
+    Translate the matrix to the center of the cell
+    """
     for i in range(len(matrix)):
         for j in range(len(matrix[i])):
             if matrix[i][j] >= 1:
@@ -412,7 +416,13 @@ def cellpar_to_cell(cellpar, ab_normal=(0, 0, 1), a_direction=None):
 
     return cell
 
-def get_fractional_to_cartesian_matrix(a, b, c, alpha, beta, gamma, angle_in_degrees=True):
+def get_fractional_to_cartesian_matrix(cell_a: float,
+                                       cell_b: float,
+                                       cell_c: float,
+                                       alpha: float,
+                                       beta: float,
+                                       gamma: float,
+                                       angle_in_degrees: bool = True):
     """
     Return the transformation matrix that converts fractional coordinates to
     cartesian coordinates.
@@ -426,7 +436,7 @@ def get_fractional_to_cartesian_matrix(a, b, c, alpha, beta, gamma, angle_in_deg
         True if alpha, beta and gamma are expressed in degrees.
     Returns
     -------
-    r : array_like
+    r : ndarray
         The 3x3 rotation matrix. ``V_cart = np.dot(r, V_frac)``.
     """
     if angle_in_degrees:
@@ -440,12 +450,12 @@ def get_fractional_to_cartesian_matrix(a, b, c, alpha, beta, gamma, angle_in_deg
     volume = 1.0 - cosa**2.0 - cosb**2.0 - cosg**2.0 + 2.0 * cosa * cosb * cosg
     volume = np.sqrt(volume)
     r = np.zeros((3, 3))
-    r[0, 0] = a
-    r[0, 1] = b * cosg
-    r[0, 2] = c * cosb
-    r[1, 1] = b * sing
-    r[1, 2] = c * (cosa - cosb * cosg) / sing
-    r[2, 2] = c * volume / sing
+    r[0, 0] = cell_a
+    r[0, 1] = cell_b * cosg
+    r[0, 2] = cell_c * cosb
+    r[1, 1] = cell_b * sing
+    r[1, 2] = cell_c * (cosa - cosb * cosg) / sing
+    r[2, 2] = cell_c * volume / sing
     return r
 
 def get_cartesian_to_fractional_matrix(a, b, c, alpha, beta, gamma, angle_in_degrees=True):
@@ -556,12 +566,12 @@ def create_CellBox(A, B, C, alpha, beta, gamma):
 def calculate_UnitCells(cell, cutoff):
     '''
     Calculate the number of unit cell repetitions so that all supercell lengths are larger than
-    twice the interaction potential cut-off radius. 
-    
+    twice the interaction potential cut-off radius.
+
     RASPA considers the perpendicular directions the directions perpendicular to the `ab`, `bc`,
-    and `ca` planes. Thus, the directions depend on who the crystallographic vectors `a`, `b`, 
-    and `c` are and the length in the perpendicular directions would be the projections 
-    of the crystallographic vectors on the vectors `a x b`, `b x c`, and `c x a`. 
+    and `ca` planes. Thus, the directions depend on who the crystallographic vectors `a`, `b`,
+    and `c` are and the length in the perpendicular directions would be the projections
+    of the crystallographic vectors on the vectors `a x b`, `b x c`, and `c x a`.
     (here `x` means cross product)
     ----------
     cell_matrix : array
@@ -569,22 +579,22 @@ def calculate_UnitCells(cell, cutoff):
     Returns
     -------
     SuperCell
-        (3,1) list containg the number of repiting units in `x`, `y`, `z` directions. 
+        (3,1) list containg the number of repiting units in `x`, `y`, `z` directions.
     '''
 
     # Make sure that the cell is in the format of cell matrix
     if len(cell) == 6:
-        CellBox = cellpar_to_cell(cell)
+        cell_box = cellpar_to_cell(cell)
     if len(cell) == 3:
-        CellBox = cell
-    
+        cell_box = cell
+
     # Pre-calculate the cross products
-    axb = np.cross(CellBox[0], CellBox[1])
-    bxc = np.cross(CellBox[1], CellBox[2])
-    cxa = np.cross(CellBox[2], CellBox[0])
-    
+    axb = np.cross(cell_box[0], cell_box[1])
+    bxc = np.cross(cell_box[1], cell_box[2])
+    cxa = np.cross(cell_box[2], cell_box[0])
+
     # Calculates the cell volume
-    V = np.dot(np.cross(CellBox[0], CellBox[1]), CellBox[2])
+    V = np.dot(np.cross(cell_box[0], cell_box[1]), cell_box[2])
 
     # Calculate perpendicular widths
     cx = V / np.linalg.norm(bxc)
@@ -592,9 +602,9 @@ def calculate_UnitCells(cell, cutoff):
     cz = V / np.linalg.norm(axb)
 
     # Calculate UnitCells array
-    SuperCell = np.ceil(2.0 * cutoff / np.array([cx, cy, cz])).astype(int)
+    supercell = np.ceil(2.0 * cutoff / np.array([cx, cy, cz])).astype(int)
 
-    return SuperCell
+    return supercell
 
 def cellpar_to_lammpsbox(a, b, c, alpha, beta, gamma, angle_in_degrees=True):
     """
@@ -623,7 +633,7 @@ def cellpar_to_lammpsbox(a, b, c, alpha, beta, gamma, angle_in_degrees=True):
     ly = np.sqrt( b**2 - xy **2)
     yz = (b * c * np.cos(alpha) - xy * xz) / ly
     lz = np.sqrt(c**2 - xz**2 - yz**2)
-    
+
     return np.array([lx, ly, lz, xy, xz, yz])
 
 def find_index(element, e_list):
@@ -1098,7 +1108,7 @@ def save_json(path, file_name, cell, atom_labels, atom_pos):
         cell = cellpar_to_cell(cell_par).tolist()
 
     cof_json['system']['geo_opt'] = False
-    
+
     cof_json['geometry']['cell_matrix'] = cell
     cof_json['geometry']['cell_parameters'] = cell_par
     cof_json['geometry']['atom_labels'] = atom_labels
@@ -1106,7 +1116,13 @@ def save_json(path, file_name, cell, atom_labels, atom_pos):
 
     write_json(path, file_name, cof_json)
 
-def save_cif(path, file_name, cell, atom_labels, atom_pos, partial_charges=False, frac_coords=True ):
+def save_cif(path,
+             file_name,
+             cell,
+             atom_labels,
+             atom_pos,
+             partial_charges=False,
+             frac_coords=True ):
     """
     Save a file in format `.cif` on the `path`.
 
@@ -1115,13 +1131,13 @@ def save_cif(path, file_name, cell, atom_labels, atom_pos, partial_charges=False
     path : str
         Path to the file.
     file_name : str
-        Name of the file. Does not neet to contain the `.cif` extention. 
+        Name of the file. Does not neet to contain the `.cif` extention.
     atom_label : list
-        List of strings containing containg the N atom partial charges. 
+        List of strings containing containg the N atom partial charges.
     atom_pos : list
         Nx3 array contaning the atoms coordinates.
     cell : numpy array
-        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters. 
+        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
     """
 
     file_name = file_name.split('.')[0]
@@ -1131,46 +1147,57 @@ def save_cif(path, file_name, cell, atom_labels, atom_pos, partial_charges=False
     if len(cell) == 6:
         a, b, c, alpha, beta, gamma = cell
 
-    r = get_cartesian_to_fractional_matrix(a, b, c, alpha, beta, gamma)
+    cif_text = f"""\
+data_{file_name}
 
-    cif_file = open(os.path.join(path, file_name + '.cif'), 'w')
+_audit_creation_date
+_audit_creation_method pyCOFBuilder
+_audit_author_name  'Felipe Lopes de Oliveira'
 
-    cif_file.write(f'data_{file_name}\n')
-    cif_file.write(f'_chemical_name_common                  \'{file_name}\'\n')
-    cif_file.write(f'_cell_length_a                         {a:>10.6f}\n')
-    cif_file.write(f'_cell_length_b                         {b:>10.6f}\n')
-    cif_file.write(f'_cell_length_c                         {c:>10.6f}\n')
-    cif_file.write(f'_cell_angle_alpha                      {alpha:>6.2f}\n')
-    cif_file.write(f'_cell_angle_beta                       {beta:>6.2f}\n')
-    cif_file.write(f'_cell_angle_gamma                      {gamma:>6.2f}\n')
-    cif_file.write('_space_group_name_H-M_alt              \'P 1\'\n')
-    cif_file.write('_space_group_IT_number                 1\n')
-    cif_file.write('\n')
-    cif_file.write('loop_\n')
-    cif_file.write('_symmetry_equiv_pos_as_xyz\n')
-    cif_file.write('   \'x, y, z\'\n')
-    cif_file.write('\n')
-    cif_file.write('loop_\n')
-    cif_file.write('   _atom_site_label\n')
-    cif_file.write('   _atom_site_type_symbol\n')
-    cif_file.write('   _atom_site_fract_x\n')
-    cif_file.write('   _atom_site_fract_y\n')
-    cif_file.write('   _atom_site_fract_z\n')
+_chemical_name_common                  '{file_name}'
+_cell_length_a                          {a:>10.6f}
+_cell_length_b                          {b:>10.6f}
+_cell_length_c                          {c:>10.6f}
+_cell_angle_alpha                       {alpha:>6.2f}
+_cell_angle_beta                        {beta:>6.2f}
+_cell_angle_gamma                       {gamma:>6.2f}
+_space_group_name_H-M_alt               P 1
+_space_group_IT_number                  1
+
+loop_
+_symmetry_equiv_pos_as_xyz
+   'x, y, z'
+
+loop_
+   _atom_site_label
+   _atom_site_type_symbol
+   _atom_site_fract_x
+   _atom_site_fract_y
+   _atom_site_fract_z
+    """
+
     if partial_charges is not False:
-        cif_file.write('   _atom_site_charge\n')
+        cif_text += '   _atom_site_charge\n'
 
     if frac_coords is False:
-        atom_pos = [np.dot(r, [i[0], i[1], i[2]]) for i in atom_pos]
+        # Convert to fractional coordinates
+        frac_matrix = get_cartesian_to_fractional_matrix(a, b, c, alpha, beta, gamma)
+        atom_pos = [np.dot(frac_matrix, [i[0], i[1], i[2]]) for i in atom_pos]
 
     for i in range(len(atom_pos)):
         u, v, w = atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]
         if partial_charges is not False:
-            cif_file.write(f'{atom_labels[i]}    {atom_labels[i]} {u:>15.9f} {v:>15.9f} {w:>15.9f} {partial_charges[i]:>10.5f}\n')
+            cif_text += f'{atom_labels[i]}    {atom_labels[i]} {u:>15.9f} {v:>15.9f} {w:>15.9f} {partial_charges[i]:>10.5f}\n'
         else:
-            cif_file.write(f'{atom_labels[i]}    {atom_labels[i]} {u:>15.9f} {v:>15.9f} {w:>15.9f}\n')
+            cif_text += f'{atom_labels[i]}    {atom_labels[i]} {u:>15.9f} {v:>15.9f} {w:>15.9f}\n'
 
+    # Write cif_text to file
+    cif_file = open(os.path.join(path, file_name + '.cif'), 'w')
+    cif_file.write(cif_text)
     cif_file.close()
-     
+
+
+
 def convert_json_2_cif(origin_path, file_name, destiny_path, charge_type='None'):
     """
     Convert a file in format `.json` to `.cif`.
@@ -1196,7 +1223,13 @@ def convert_json_2_cif(origin_path, file_name, destiny_path, charge_type='None')
     else:
         partial_charges = False
 
-    save_cif(destiny_path, file_name, cell, atom_labels, atom_pos, partial_charges, frac_coords=False)
+    save_cif(destiny_path,
+            file_name,
+            cell,
+            atom_labels,
+            atom_pos,
+            partial_charges,
+            frac_coords=False)
 
 def convert_gjf_2_xyz(path, file_name):
 
@@ -1218,7 +1251,7 @@ def convert_cif_2_xyz(path, file_name, supercell=[1, 1, 1]):
 
     file_name = file_name.split('.')[0]
 
-    if cif_parser_imported is not False:
+    if CIF_PARSER_IMPORTED is not False:
 
         structure = CifParser(os.path.join(path, file_name + '.cif')).get_structures(primitive=True)[0]
 
@@ -1234,7 +1267,7 @@ def convert_cif_2_xyz(path, file_name, supercell=[1, 1, 1]):
 
         atom_pos = [i['xyz'] for i in dict_sctructure['sites']]
 
-    if cif_parser_imported is False:
+    if CIF_PARSER_IMPORTED is False:
         cell, atom_labels, atom_pos, charges = read_cif(path, file_name)
         a, b, c, alpha, beta, gamma = cell
 
@@ -1258,21 +1291,21 @@ def write_json(path, name, COF_json):
 
     if os.path.exists(path) is not True:
         os.mkdir(path)
-    
+
     save_path = os.path.join(path, name + '.json')
-    
+
     with open(save_path, 'w', encoding='utf-8') as f:
         simplejson.dump(COF_json, f, ensure_ascii=False, separators=(',', ':'), indent=2, ignore_nan=True)
         
 def read_json(path, cof_name):
-    
+
     cof_path = os.path.join(path, cof_name + '.json')
-    
+
     with open(cof_path, 'r') as r:
         json_object = simplejson.loads(r.read())
-    
+
     return json_object
-    
+
 def create_COF_json(name):
 
     system_info = 'Informations about the system such as name, if it is optimized and other relevant information.'
