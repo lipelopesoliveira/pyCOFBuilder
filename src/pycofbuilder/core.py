@@ -10,6 +10,7 @@ from pycofbuilder.building_block import Building_Block
 
 _ROOT = os.path.abspath(os.path.dirname(__file__))
 
+
 def build(cof_name=None,
           save_format=['json'],
           lib='bb_lib',
