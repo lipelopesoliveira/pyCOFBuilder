@@ -116,15 +116,15 @@ class Building_Block():
 
         # Create a dict with the R points
         R_dict = {'R': [],
-                 'R1': [],
-                 'R2': [],
-                 'R3': [],
-                 'R4': [],
-                 'R5': [],
-                 'R6': [],
-                 'R7': [], 
-                 'R8': [], 
-                 'R9': []}
+                  'R1': [],
+                  'R2': [],
+                  'R3': [],
+                  'R4': [],
+                  'R5': [],
+                  'R6': [],
+                  'R7': [],
+                  'R8': [],
+                  'R9': []}
 
         # Iterate over the R keys
         for key in R_dict.keys():
@@ -145,31 +145,32 @@ class Building_Block():
         return label, pos
 
     def calculate_size(self):
-        X_labels, X_pos = self.get_X_points()
+        '''Calculate the size of the building block'''
+        _, X_pos = self.get_X_points()
         self.size = [np.linalg.norm(i) for i in X_pos]
 
     def align_to(self, vec=[0, 1, 0]):
-
-        X_labels, X_pos = self.get_X_points()
+        '''Align the molecule to a given vector'''
+        _, X_pos = self.get_X_points()
         R_matrix = Tools.rotation_matrix_from_vectors(X_pos[0], vec)
 
         self.atom_pos = np.dot(self.atom_pos, np.transpose(R_matrix))
 
     def rotate_to_xy_plane(self):
-
-        X_labels, X_pos = self.get_X_points()
+        '''Rotate the molecule to the xy plane'''
+        _, X_pos = self.get_X_points()
 
         if len(X_pos) == 3:
 
             normal = np.cross(X_pos[0], X_pos[-1])
             if normal[0] != 0 and normal[1] != 0:
-                R_matrix = self.rotation_matrix_from_vectors(normal, [0, 0, 1])
+                R_matrix = Tools.rotation_matrix_from_vectors(normal, [0, 0, 1])
                 self.atom_pos = np.dot(self.atom_pos, np.transpose(R_matrix))
 
         if len(X_pos) == 2:
             normal = np.cross(X_pos[0], self.atom_pos[1])
             if normal[0] != 0 and normal[1] != 0:
-                R_matrix = self.rotation_matrix_from_vectors(normal, [0, 0, 1])
+                R_matrix = Tools.rotation_matrix_from_vectors(normal, [0, 0, 1])
                 self.atom_pos = np.dot(self.atom_pos, np.transpose(R_matrix))
 
     def print_structure(self):
@@ -179,15 +180,19 @@ class Building_Block():
                 """
 
         for i in range(len(self.atom_labels)):
-            print('{:<5s}{:>10.7f}{:>15.7f}{:>15.7f}'.format(self.atom_labels[i], self.atom_pos[i][0], self.atom_pos[i][1], self.atom_pos[i][2]))
+            print('{:<5s}{:>10.7f}{:>15.7f}{:>15.7f}'.format(self.atom_labels[i],
+                                                             self.atom_pos[i][0],
+                                                             self.atom_pos[i][1],
+                                                             self.atom_pos[i][2]))
 
     def add_connection_group(self, conector_name):
         '''Adds the functional group by which the COF will be formed from the building blocks'''
 
-        conector_label, conector_pos = Tools.read_gjf_file(os.path.join(self.main_path, 'conector'), conector_name)
+        conector_label, conector_pos = Tools.read_gjf_file(os.path.join(self.main_path, 'conector'),
+                                                                        conector_name)
         
         # Get the position of the Q points in the structure
-        location_Q_struct = self.get_Q_points(self.atom_labels, self.atom_pos)  
+        location_Q_struct = self.get_Q_points(self.atom_labels, self.atom_pos)
 
         for i in range(len(location_Q_struct[0])):
             n_conector_label = conector_label.copy()
@@ -213,15 +218,15 @@ class Building_Block():
 
             # Delete the "Q" atom position of the conector group and the structure
             n_conector_pos = np.delete(n_conector_pos, Tools.find_index(np.array([0., 0., 0.]), n_conector_pos), axis=0)
-            
+
             self.atom_pos = np.delete(self.atom_pos, Tools.find_index(location_Q_struct[1][i], self.atom_pos), axis=0)
-            
+
             # Rotate and translade the conector group to Q position in the strucutre
             rotated_translated_group = np.dot(n_conector_pos, -np.transpose(Rot_m)) + location_Q_struct[1][i]
 
             # Add the position of conector atoms to the main structure
             self.atom_pos = np.append(self.atom_pos, rotated_translated_group, axis=0)
-            
+
             # Remove the Q atoms from structure
             self.atom_labels.remove('Q')
             n_conector_label.remove('Q')
