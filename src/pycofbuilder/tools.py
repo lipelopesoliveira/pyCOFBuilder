@@ -302,7 +302,13 @@ def get_fractional_to_cartesian_matrix(cell_a: float,
     return r
 
 
-def get_cartesian_to_fractional_matrix(a, b, c, alpha, beta, gamma, angle_in_degrees=True):
+def get_cartesian_to_fractional_matrix(a: float,
+                                       b: float,
+                                       c: float,
+                                       alpha: float,
+                                       beta: float,
+                                       gamma: float,
+                                       angle_in_degrees: bool = True):
     """
     Return the transformation matrix that converts cartesian coordinates to
     fractional coordinates.
@@ -395,7 +401,9 @@ def get_kgrid(cell, distance=0.3):
 
 def create_CellBox(A, B, C, alpha, beta, gamma):
     """Creates the CellBox using the same expression as RASPA."""
+
     tempd = np.cos(alpha) - np.cos(gamma) * np.cos(beta) / np.sin(gamma)
+
     ax = A
     ay = 0
     az = 0
@@ -404,10 +412,12 @@ def create_CellBox(A, B, C, alpha, beta, gamma):
     bz = 0 
     cx = C * np.cos(beta)
     cy = C * tempd
-    cz = C * np.sqrt(1 - np.cos(beta) ** 2 - tempd ** 2 )
-    
-    CellBox = np.array([[ax, ay, az], [bx, by, bz], [cx, cy, cz]])
-    
+    cz = C * np.sqrt(1 - np.cos(beta) ** 2 - tempd ** 2)
+
+    CellBox = np.array([[ax, ay, az], 
+                        [bx, by, bz],
+                        [cx, cy, cz]])
+
     return CellBox
 
 
@@ -455,7 +465,13 @@ def calculate_UnitCells(cell, cutoff):
     return supercell
 
 
-def cellpar_to_lammpsbox(a, b, c, alpha, beta, gamma, angle_in_degrees=True):
+def cellpar_to_lammpsbox(a: float,
+                         b: float,
+                         c: float,
+                         alpha: float,
+                         beta: float,
+                         gamma: float,
+                         angle_in_degrees: bool = True):
     """
     Return the box parameters lx, ly, lz, xy, xz, yz for LAMMPS data input.
     Parameters
