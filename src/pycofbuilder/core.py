@@ -20,7 +20,6 @@ _ROOT = os.path.abspath(os.path.dirname(__file__))
 
 def build(cof_name=None,
           save_format=['json'],
-          lib='bb_lib',
           print_result=True,
           supercell=[1, 1, 2],
           save_dir=None,
@@ -34,8 +33,6 @@ def build(cof_name=None,
     save_format : list
         List containg the formats to save the file. 
         Can be `json`, `cif`, `xyz`, `turbomole`, `vasp`, `xsf`, `pdb`.
-    lib : str
-        Library of building block.
     print_result : bool
         Boolean to print in the screen or not the result of the creation.
     supercell : list
@@ -78,7 +75,7 @@ def build(cof_name=None,
 
     if net == 'HCB':
         try:
-            Ret = Reticulum(bb_lib=lib, out_dir=save_dir, verbosity=verbosity)
+            Ret = Reticulum(out_dir=save_dir, verbosity=verbosity)
             simm_data = Ret.create_hcb_structure(bb1,
                                                  bb2,
                                                  stacking=stacking,
@@ -140,9 +137,12 @@ def build(cof_name=None,
 
     if net == 'SQL':
         try:
-            Ret = Reticulum(bb_lib=lib, out_dir=save_dir, verbosity=verbosity)
-            simm_data = Ret.create_sql_structure(
-                bb1, bb2, stacking=stacking, bond_atom=bond_atom, print_result=print_result)
+            Ret = Reticulum(out_dir=save_dir, verbosity=verbosity)
+            simm_data = Ret.create_sql_structure(bb1,
+                                                 bb2,
+                                                 stacking=stacking,
+                                                 bond_atom=bond_atom,
+                                                 print_result=print_result)
             if cif is True:
                 Ret.save_cif()
             if xyz is True:
@@ -168,9 +168,12 @@ def build(cof_name=None,
 
     if net == 'SQL_A':
         try:
-            Ret = Reticulum(bb_lib=lib, out_dir=save_dir, verbosity=verbosity)
-            simm_data = Ret.create_sql_a_structure(
-                bb1, bb2, stacking=stacking, bond_atom=bond_atom, print_result=print_result)
+            Ret = Reticulum(out_dir=save_dir, verbosity=verbosity)
+            simm_data = Ret.create_sql_a_structure(bb1,
+                                                   bb2,
+                                                   stacking=stacking,
+                                                   bond_atom=bond_atom,
+                                                   print_result=print_result)
             if cif is True:
                 Ret.save_cif()
             if xyz is True:
@@ -195,7 +198,13 @@ def build(cof_name=None,
             return [False, f'{bb1}-{bb2}-{net}-{stacking}']
 
 
-def build_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, cif=True, turbomole=False, vasp=False, json=True):
+def build_all_available_COFs(stacking='AA',
+                             qe=False,
+                             xyz=False,
+                             cif=True,
+                             turbomole=False,
+                             vasp=False,
+                             json=True):
 
     save_f = []
 
@@ -208,7 +217,7 @@ def build_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, c
         if i[0] is True:
             save_f += [i[1]]
 
-    BB = Building_Block(lib=lib)
+    BB = Building_Block()
 
     lista_amina_2 = BB.get_bipodal_NH2()
     lista_amina_3 = BB.get_tripodal_NH2()
@@ -280,11 +289,20 @@ def build_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, c
             if succes is False:
                 failed_list += [name]
 
-        print('                      COF Name                              |    Lattice    | Point Group | N° of symmetry op. |')
+        print('                      COF Name                              ',
+              '    Lattice    ',
+              ' Point Group ',
+              ' N° of symmetry op.',
+              sep='|')
+        print('-'*35)
         for s in sucess_list:
             Tools.print_result(*s)
 
-        print(f'{len(sucess_list)} sucessful. {len(failed_list)} failled ({100*len(sucess_list)/(len(failed_list) + len(sucess_list)):.2f} % success rate)')
+        print('{:i} sucessful. {:i} failled ({:.2f} % success rate)'.format(
+            len(sucess_list),
+            len(failed_list),
+            100*len(sucess_list)/(len(failed_list) + len(sucess_list))))
+
         print(f'Enlapsed time: {time.time() - t_i:.3f} s \n')
         if len(failed_list) > 0:
             print('Failed list:')
@@ -292,8 +310,9 @@ def build_all_available_COFs(lib='bb_lib', stacking='AA', qe=False, xyz=False, c
                 print(i)
     else:
         print('Exiting...')
-        
-def build_COFs_list(cofs_list, save_format=['json'], lib='bb_lib', supercell=[1, 1, 2]):
+
+
+def build_COFs_list(cofs_list, save_format=['json'], supercell=[1, 1, 2]):
 
     failed_list = []
     sucess_list = []
@@ -304,7 +323,10 @@ def build_COFs_list(cofs_list, save_format=['json'], lib='bb_lib', supercell=[1,
     if val == 'y':
         t_i = time.time()
         for cof in tqdm(cofs_list):
-            succes, name = build(cof, save_format=save_format, print_result=False, supercell=supercell)
+            succes, name = build(cof,
+                                 save_format=save_format,
+                                 print_result=False,
+                                 supercell=supercell)
             if succes is True:
                 sucess_list += [name]
             if succes is False:
@@ -325,13 +347,15 @@ def build_COFs_list(cofs_list, save_format=['json'], lib='bb_lib', supercell=[1,
 
 
 def create_all_C2(nucleos=None, radicais=None, conectores=None):
-    '''Creates a set of C2 symmetry building block based on your choice of a nucleo, a radical group, and a type of connector group. 
+    '''Creates a set of C2 symmetry building block based on your choice of a nucleo,
+    a radical group, and a type of connector group.
 
-    Be warned that the building blocks created only had one radical group at the position R1.  
+    Be warned that the building blocks created only had one radical group at the position R1.
 
     The creation of blocks with more than one group or in specific positions must be done manually.
 
-    For exemple, the code below will create a `C2` building block based on a `Antracene` core with a `NH2` connection group and a `OH` group in the position `R2`:
+    For exemple, the code below will create a `C2` building block based on a `Antracene` core
+    with a `NH2` connection group and a `OH` group in the position `R2`:
 
     >>> BB = Building_Block()
 
@@ -465,25 +489,9 @@ def create_all_C4(nucleos=None, conectores=None, radicais=None):
                 print(BB.name, 'created')
                 BB.save()
 
-def clean_bb_dir():
-    # Loop Through all building block files and deleting them one by one
-    for file in glob.glob(os.path.join(_ROOT, 'data', 'bb_lib', '*')):
-        os.remove(file)
-        print(f'Deleted {file}')
-
 
 def clean_out_dir():
     # Loop Through all output files and deleting them one by one
     for file in glob.glob(os.path.join(os.getcwd(), 'out', '*')):
         os.remove(file)
         print(f'Deleted {file}')
-
-def clean():
-    '''Clean both the building block dir and the out dir'''
-    val = input(
-        'This action will delete all building blocks and COFs created, do you want to proceed? Type [y] to continue.\n')
-    if val == 'y':
-        clean_bb_dir()
-        clean_out_dir()
-    else:
-        print(f'{val} pressed. Nothing to be done.')
