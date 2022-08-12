@@ -12,13 +12,17 @@ import pycofbuilder.tools as Tools
 class Building_Block():
 
     def __init__(self, name=None, lib='bb_lib', verbosity=False):
-        
+
         _ROOT = os.path.abspath(os.path.dirname(__file__))
 
         self.name = name
         self.verbosity = verbosity
         self.main_path = os.path.join(_ROOT, 'data')
         self.lib_path = os.path.join(self.main_path, lib)
+        # Check if lib_path exists and try to create it if not
+        if not os.path.exists(self.lib_path):
+            os.makedirs(self.lib_path)
+
         self.connectivity = None
         self.simetry = None
         self.size = 0
@@ -31,7 +35,7 @@ class Building_Block():
         self.atom_labels = None
         self.atom_pos = None
 
-        if self.name != None:
+        if self.name is not None:
             self.get_BB()
 
     def get_BB(self):
@@ -50,18 +54,46 @@ class Building_Block():
                 radicals = BB_name[3:] + ['H']*(6 - len(BB_name[3:]))
 
                 if simmetry == 'C2':
-                    self.create_C2_BB(nucleo, conector, radicals[0], radicals[1], radicals[2], radicals[3], radicals[4], radicals[5])
+                    self.create_C2_BB(nucleo,
+                                      conector,
+                                      radicals[0],
+                                      radicals[1],
+                                      radicals[2],
+                                      radicals[3],
+                                      radicals[4],
+                                      radicals[5])
                     self.save()
                 if simmetry == 'C3':
-                    self.create_C3_BB(nucleo, conector, radicals[0], radicals[1], radicals[2], radicals[3], radicals[4], radicals[5])
+                    self.create_C3_BB(nucleo,
+                                      conector,
+                                      radicals[0],
+                                      radicals[1],
+                                      radicals[2],
+                                      radicals[3],
+                                      radicals[4],
+                                      radicals[5])
                     self.save()
                 if simmetry == 'C4':
-                    self.create_C4_BB(nucleo, conector, radicals[0], radicals[1], radicals[2], radicals[3], radicals[4], radicals[5])
+                    self.create_C4_BB(nucleo,
+                                      conector,
+                                      radicals[0],
+                                      radicals[1],
+                                      radicals[2],
+                                      radicals[3],
+                                      radicals[4],
+                                      radicals[5])
                     self.save()
                 if simmetry == 'C6':
-                    self.create_C6_BB(nucleo, conector, radicals[0], radicals[1], radicals[2], radicals[3], radicals[4], radicals[5])
+                    self.create_C6_BB(nucleo,
+                                      conector,
+                                      radicals[0],
+                                      radicals[1],
+                                      radicals[2],
+                                      radicals[3],
+                                      radicals[4],
+                                      radicals[5])
                     self.save()
-    
+
     def n_atoms(self):
         ''' Returns the number of atoms in the unitary cell'''
         return len(self.atom_labels)
@@ -189,8 +221,8 @@ class Building_Block():
         '''Adds the functional group by which the COF will be formed from the building blocks'''
 
         conector_label, conector_pos = Tools.read_gjf_file(os.path.join(self.main_path, 'conector'),
-                                                                        conector_name)
-        
+                                                           conector_name)
+
         # Get the position of the Q points in the structure
         location_Q_struct = self.get_Q_points(self.atom_labels, self.atom_pos)
 
@@ -247,13 +279,20 @@ class Building_Block():
             # Pega a posição do átomo mais próximo ao R na estrutrua
             close_R_struct = Tools.closest_atom_struc(R_type, location_R_struct[i], self.atom_labels, self.atom_pos)[1]
 
-            pos_R_group = self.get_R_points(n_group_label, n_group_pos)['R']  # Pega a posição de Q no grupo radical
-            close_R_group = Tools.closest_atom('R', pos_R_group[0], n_group_label, n_group_pos)[1]  # Pega a posição do átomo mais próximo a Q no grupo radical
+            # Pega a posição de Q no grupo radical
+            pos_R_group = self.get_R_points(n_group_label, n_group_pos)['R']
 
-            v1 = close_R_struct - location_R_struct[i]  # Cria o vetor R na estrutura
-            v2 = np.array(close_R_group) - np.array(pos_R_group[0])  # Cria o vetor R do grupo
+            # Pega a posição do átomo mais próximo a Q no grupo radical
+            close_R_group = Tools.closest_atom('R', pos_R_group[0], n_group_label, n_group_pos)[1]
 
-            Rot_m = Tools.rotation_matrix_from_vectors(v2, v1)  # Determina a matriz de rotação que alinha V2 com V1
+            # Cria o vetor R na estrutura
+            v1 = close_R_struct - location_R_struct[i]
+
+            # Cria o vetor R do grupo
+            v2 = np.array(close_R_group) - np.array(pos_R_group[0])
+
+            # Determina a matriz de rotação que alinha V2 com V1
+            Rot_m = Tools.rotation_matrix_from_vectors(v2, v1)  
 
             n_group_pos = np.delete(n_group_pos, Tools.find_index(np.array([0.0, 0.0, 0.0]), n_group_pos), axis=0)
 
@@ -293,23 +332,26 @@ class Building_Block():
         self.align_to()
         self.calculate_size()
 
-    def create_C3_BB(self, 
-                     nucleo_name='BENZ', 
-                     conector='CHO', 
-                     R1='H', 
-                     R2='H', 
-                     R3='H', 
-                     R4='H', 
-                     R5='H', 
-                     R6='H', 
-                     R7='H', 
-                     R8='H', 
+    def create_C3_BB(self,
+                     nucleo_name='BENZ',
+                     conector='CHO',
+                     R1='H',
+                     R2='H',
+                     R3='H',
+                     R4='H',
+                     R5='H',
+                     R6='H',
+                     R7='H',
+                     R8='H',
                      R9='H'):
         '''Create a building block with C3 simmetry'''
 
         self.name = f'C3_{nucleo_name}_{conector}'
 
-        self.atom_labels, self.atom_pos = Tools.read_gjf_file(os.path.join(self.main_path, 'nucleo', 'C3'), nucleo_name)
+        self.atom_labels, self.atom_pos = Tools.read_gjf_file(os.path.join(self.main_path,
+                                                                           'nucleo',
+                                                                           'C3'),
+                                                              nucleo_name)
 
         self.centralize_molecule()
 
@@ -327,17 +369,17 @@ class Building_Block():
         self.align_to()
         self.calculate_size()
 
-    def create_C4_BB(self, 
-                     nucleo_name='BENZ', 
-                     conector='CHO', 
-                     R1='H', 
-                     R2='H', 
-                     R3='H', 
-                     R4='H', 
-                     R5='H', 
-                     R6='H', 
-                     R7='H', 
-                     R8='H', 
+    def create_C4_BB(self,
+                     nucleo_name='BENZ',
+                     conector='CHO',
+                     R1='H',
+                     R2='H',
+                     R3='H',
+                     R4='H',
+                     R5='H',
+                     R6='H',
+                     R7='H',
+                     R8='H',
                      R9='H'):
         '''Create a building block with C4 simmetry'''
 
@@ -360,18 +402,18 @@ class Building_Block():
         self.connectivity =  len([i for i in self.atom_labels if 'X' in i])
         self.align_to()
         self.calculate_size()
-    
-    def create_C6_BB(self, 
-                     nucleo_name='BENZ', 
-                     conector='CHO', 
-                     R1='H', 
-                     R2='H', 
-                     R3='H', 
-                     R4='H', 
-                     R5='H', 
-                     R6='H', 
-                     R7='H', 
-                     R8='H', 
+
+    def create_C6_BB(self,
+                     nucleo_name='BENZ',
+                     conector='CHO',
+                     R1='H',
+                     R2='H',
+                     R3='H',
+                     R4='H',
+                     R5='H',
+                     R6='H',
+                     R7='H',
+                     R8='H',
                      R9='H'):
         '''Create a building block with C6 simmetry'''
 
