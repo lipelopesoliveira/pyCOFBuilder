@@ -14,11 +14,11 @@ class Building_Block():
 
     def __init__(self, name=None, verbosity=False, save_dir=False):
 
-        _ROOT = os.path.abspath(os.path.dirname(__file__))
+        _ROOTDIR = os.path.abspath(os.path.dirname(__file__))
 
         self.name = name
         self.verbosity = verbosity
-        self.main_path = os.path.join(_ROOT, 'data')
+        self.main_path = os.path.join(_ROOTDIR, 'data')
         self.connectivity = None
         self.simetry = None
         self.size = 0

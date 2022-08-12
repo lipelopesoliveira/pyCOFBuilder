@@ -108,7 +108,7 @@ class Reticulum():
 
     def __init__(self, verbosity=False, out_dir=None):
 
-        _ROOT = os.path.abspath(os.path.dirname(__file__))
+        _ROOTDIR = os.path.abspath(os.path.dirname(__file__))
 
         self.verbosity = verbosity
         # Falta adicionar: 'HXL', 'KGD'
@@ -129,7 +129,7 @@ class Reticulum():
                                    'KGM_A': ['AA', 'AB1x', 'AB1y', 'AB1xy', 'AB2', 'AAl', 'AAt']
                                    }
 
-        self.main_path = os.path.join(_ROOT, 'data')
+        self.main_path = os.path.join(_ROOTDIR, 'data')
 
         if out_dir is None:
             self.out_path = os.path.join(os.getcwd(), 'out')
@@ -177,15 +177,15 @@ class Reticulum():
 ################   Net creation methods  ############################
 
     def create_hcb_structure(self,
-                             name_bb_a : str,
-                             name_bb_b : str,
-                             stacking : str ='AA',
-                             bond_atom : str ='N',
-                             c_parameter_base : float = 3.6,
-                             print_result : bool = True,
-                             slab : float = 10.0,
-                             shift_vector : list = [1.0,1.0,0],
-                             tilt_angle : float = 5.0):
+                             name_bb_a: str,
+                             name_bb_b: str,
+                             stacking: str = 'AA',
+                             bond_atom: str = 'N',
+                             c_parameter_base: float = 3.6,
+                             print_result: bool = True,
+                             slab: float = 10.0,
+                             shift_vector: list = [1.0 ,1.0 ,0],
+                             tilt_angle: float = 5.0):
         """Creates a COF with HCB network.
 
         The HCB net is composed of two tripodal building blocks.
@@ -285,7 +285,10 @@ class Reticulum():
         final_pos = bb_1.atom_pos
 
         # Rotates and add the building block A to site A2 of unitary cell
-        r_pos_a_2 = np.dot(bb_2.atom_pos, R.from_euler('z', 180, degrees=True).as_matrix()) + np.array([0, np.sqrt(3)/3, 0])*a
+        r_pos_a_2 = np.dot(
+            bb_2.atom_pos, 
+            R.from_euler('z', 180, degrees=True).as_matrix()
+            ) + np.array([0, np.sqrt(3)/3, 0])*a
 
         final_pos = np.vstack((final_pos, r_pos_a_2))
         final_label += bb_2.atom_labels
@@ -341,7 +344,9 @@ class Reticulum():
             B_list = np.arange(len(AB_label)) + len(AB_label)
 
             AB_1.translate_sites(B_list, [2/3, 1/3, 0.5], frac_coords=True, to_unit_cell=True)
-            AB_1_symm = SpacegroupAnalyzer(AB_1, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
+            AB_1_symm = SpacegroupAnalyzer(AB_1, 
+                                           symprec=self.symm_tol, 
+                                           angle_tolerance=self.angle_tol)
 
             self.symm_structure = AB_1_symm.get_refined_structure()
 
@@ -367,7 +372,8 @@ class Reticulum():
 
             self.symm_structure = AB_2_symm.get_refined_structure()
             
-        # Create AAl stacking. Hexagonal cell with two sheets per cell shifited by the shift_vector in angstroms. 
+        # Create AAl stacking. 
+        # Hexagonal cell with two sheets per cell shifited by the shift_vector in angstroms. 
         if stacking == 'AAl':
             self.stacking = 'AAl'
             labels_conv_crystal = np.array([[i['label']] for i in struct_symm_prim.as_dict()['sites']])

@@ -15,7 +15,7 @@ from pycofbuilder.reticulum import Reticulum
 from pycofbuilder.building_block import Building_Block
 
 
-_ROOT = os.path.abspath(os.path.dirname(__file__))
+_ROOTDIR = os.path.abspath(os.path.dirname(__file__))
 
 
 def build(cof_name=None,
@@ -378,13 +378,13 @@ def create_all_C2(nucleos=None, radicais=None, conectores=None):
 
     if nucleos == None:
         nucleos = [i.rstrip('.gjf') for i in os.listdir(
-            os.path.join(_ROOT, 'data', 'nucleo', 'C2'))]
+            os.path.join(_ROOTDIR, 'data', 'nucleo', 'C2'))]
     if radicais == None:
         radicais = [i.rstrip('.gjf') for i in os.listdir(
-            os.path.join(_ROOT, 'data', 'radical'))]
+            os.path.join(_ROOTDIR, 'data', 'radical'))]
     if conectores == None:
         conectores = [i.rstrip('.gjf') for i in os.listdir(
-            os.path.join(_ROOT, 'data', 'conector'))]
+            os.path.join(_ROOTDIR, 'data', 'conector'))]
 
     for n in nucleos:
         for c in conectores:
@@ -424,13 +424,13 @@ def create_all_C3(nucleos=None, radicais=None, conectores=None):
     '''
     if nucleos == None:
         nucleos = [i.rstrip('.gjf') for i in os.listdir(
-            os.path.join(_ROOT, 'data', 'nucleo', 'C3'))]
+            os.path.join(_ROOTDIR, 'data', 'nucleo', 'C3'))]
     if radicais == None:
         radicais = [i.rstrip('.gjf') for i in os.listdir(
-            os.path.join(_ROOT, 'data', 'radical'))]
+            os.path.join(_ROOTDIR, 'data', 'radical'))]
     if conectores == None:
         conectores = [i.rstrip('.gjf') for i in os.listdir(
-            os.path.join(_ROOT, 'data', 'conector'))]
+            os.path.join(_ROOTDIR, 'data', 'conector'))]
 
     for n in nucleos:
         for c in conectores:
@@ -472,13 +472,13 @@ def create_all_C4(nucleos=None, conectores=None, radicais=None):
 
     if nucleos == None:
         nucleos = [i.rstrip('.gjf') for i in os.listdir(
-            os.path.join(_ROOT, 'data', 'nucleo', 'C4'))]
+            os.path.join(_ROOTDIR, 'data', 'nucleo', 'C4'))]
     if radicais == None:
         radicais = [i.rstrip('.gjf') for i in os.listdir(
-            os.path.join(_ROOT, 'data', 'radical'))]
+            os.path.join(_ROOTDIR, 'data', 'radical'))]
     if conectores == None:
         conectores = [i.rstrip('.gjf') for i in os.listdir(
-            os.path.join(_ROOT, 'data', 'conector'))]
+            os.path.join(_ROOTDIR, 'data', 'conector'))]
 
     for n in nucleos:
         for c in conectores:
