@@ -49,7 +49,7 @@ def build(cof_name=None,
     xsf = False
     pdb = False
 
-    if type(save_format) is not list:
+    if isinstance(save_format, str):
         save_format = [save_format]
 
     for i in save_format:
