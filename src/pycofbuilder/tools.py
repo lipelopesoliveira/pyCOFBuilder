@@ -17,7 +17,7 @@ except Exception:
 import simplejson
 
 
-def elements_dict(property='mass'):
+def elements_dict(property='atomic_mass'):
     '''Returns a dictionary containing the elements symbol and its selected property.
     Parameters
     ----------
@@ -43,7 +43,7 @@ def elements_dict(property='mass'):
         A dictionary containing the elements symbol and its respective property.
     '''
 
-    with open(os.path.join(os.path.dirname(__file__), 'elements.json'), 'r') as f:
+    with open(os.path.join(os.path.dirname(__file__), 'data', 'periodic_table.json'), 'r') as f:
         periodic_table = simplejson.load(f)
 
     prop_list = periodic_table['H'].keys()

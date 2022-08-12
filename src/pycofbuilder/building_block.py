@@ -12,18 +12,13 @@ import pycofbuilder.tools as Tools
 
 class Building_Block():
 
-    def __init__(self, name=None, verbosity=False, save_dir):
+    def __init__(self, name=None, verbosity=False, save_dir=False):
 
         _ROOT = os.path.abspath(os.path.dirname(__file__))
 
         self.name = name
         self.verbosity = verbosity
         self.main_path = os.path.join(_ROOT, 'data')
-
-        # Check if save_dir exists and try to create it if not
-        if not os.path.exists(self.save_dir):
-            os.makedirs(self.save_dir)
-
         self.connectivity = None
         self.simetry = None
         self.size = 0
@@ -35,6 +30,11 @@ class Building_Block():
         self.chirality = False
         self.atom_labels = None
         self.atom_pos = None
+
+        # Check if save_dir exists and try to create it if not
+        self.save_dir = save_dir
+        if not os.path.exists(self.save_dir):
+            os.makedirs(self.save_dir)
 
         if self.name is not None:
             self.get_BB()
@@ -48,7 +48,7 @@ class Building_Block():
                 self.read_structure()
 
             else:
-                BB_name  = self.name.split('_')
+                BB_name = self.name.split('_')
                 simmetry = BB_name[0]
                 nucleo = BB_name[1]
                 conector = BB_name[2]

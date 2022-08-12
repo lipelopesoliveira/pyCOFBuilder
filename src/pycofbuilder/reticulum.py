@@ -106,7 +106,7 @@ class Reticulum():
         Save the structure in .in format
     """
 
-    def __init__(self, bb_lib='bb_lib', verbosity=False, out_dir=None):
+    def __init__(self, verbosity=False, out_dir=None):
 
         _ROOT = os.path.abspath(os.path.dirname(__file__))
 
@@ -129,13 +129,15 @@ class Reticulum():
                                    'KGM_A': ['AA', 'AB1x', 'AB1y', 'AB1xy', 'AB2', 'AAl', 'AAt']
                                    }
 
-        self.lib_bb = bb_lib
         self.main_path = os.path.join(_ROOT, 'data')
-        self.lib_path = os.path.join(self.main_path, bb_lib)
+
         if out_dir is None:
             self.out_path = os.path.join(os.getcwd(), 'out')
         else:
             self.out_path = out_dir
+        
+        self.lib_path = os.path.join(self.out_path, 'building_blocks')
+
         self.name = None
         self.topology = None
         self.dimention = None
@@ -224,8 +226,13 @@ class Reticulum():
         self.topology = 'HCB'
         self.dimension = 2
 
-        bb_1 = Building_Block(name_bb_a, self.lib_bb)
-        bb_2 = Building_Block(name_bb_b, self.lib_bb)
+        bb_1 = Building_Block(name_bb_a,
+                              save_dir=self.lib_path,
+                              verbosity=self.verbosity)
+
+        bb_2 = Building_Block(name_bb_b,
+                              save_dir=self.lib_path,
+                              verbosity=self.verbosity)
 
         self.name = f'{bb_1.name}-{bb_2.name}-HCB-{stacking}'
         self.charge = bb_1.charge + bb_2.charge
@@ -541,9 +548,13 @@ class Reticulum():
         self.topology = 'HCB_A'
         self.dimension = 2
 
-        bb_triangular = Building_Block(name_bb_a, self.lib_bb, verbosity=self.verbosity)
+        bb_triangular = Building_Block(name_bb_a,
+                                       save_dir=self.lib_path,
+                                       verbosity=self.verbosity)
 
-        bb_linear = Building_Block(name_bb_b, self.lib_bb, verbosity=self.verbosity)
+        bb_linear = Building_Block(name_bb_b,
+                                   save_dir=self.lib_path,
+                                   verbosity=self.verbosity)
 
         self.charge = bb_linear.charge + bb_triangular.charge
         self.chirality = bb_linear.chirality or bb_triangular.chirality
@@ -871,9 +882,13 @@ class Reticulum():
         self.topology = 'SQL'
         self.dimension = 2
 
-        bb_1 = Building_Block(name_bb_a, self.lib_bb, verbosity=self.verbosity)
+        bb_1 = Building_Block(name_bb_a,
+                              save_dir=self.lib_path,
+                              verbosity=self.verbosity)
 
-        bb_2 = Building_Block(name_bb_b, self.lib_bb, verbosity=self.verbosity)
+        bb_2 = Building_Block(name_bb_b,
+                              save_dir=self.lib_path,
+                              verbosity=self.verbosity)
 
         self.charge = bb_1.charge + bb_2.charge
         self.chirality = bb_1.chirality or bb_2.chirality
@@ -1185,9 +1200,13 @@ class Reticulum():
         self.topology = 'SQL_A'
         self.dimension = 2
 
-        bb_1 = Building_Block(name_bb_a, self.lib_bb, verbosity=self.verbosity)
+        bb_1 = Building_Block(name_bb_a,
+                              save_dir=self.lib_path,
+                              verbosity=self.verbosity)
 
-        bb_2 = Building_Block(name_bb_b, self.lib_bb, verbosity=self.verbosity)
+        bb_2 = Building_Block(name_bb_b,
+                              save_dir=self.lib_path,
+                              verbosity=self.verbosity)
 
         self.charge = bb_1.charge + bb_2.charge
         self.chirality = bb_1.chirality or bb_2.chirality
@@ -1509,8 +1528,13 @@ class Reticulum():
         self.topology = 'KGD'
         self.dimension = 2
 
-        bb_1 = Building_Block(name_bb_a, self.lib_bb)
-        bb_2 = Building_Block(name_bb_b, self.lib_bb)
+        bb_1 = Building_Block(name_bb_a,
+                              save_dir=self.lib_path,
+                              verbosity=self.verbosity)
+
+        bb_2 = Building_Block(name_bb_b,
+                              save_dir=self.lib_path,
+                              verbosity=self.verbosity)
 
         self.name = f'{bb_1.name}-{bb_2.name}-KGD-{stacking}'
         self.charge = bb_1.charge + bb_2.charge
@@ -1834,8 +1858,13 @@ class Reticulum():
         self.topology = 'HXL_A'
         self.dimension = 2
 
-        bb_1 = Building_Block(name_bb_a, self.lib_bb)
-        bb_2 = Building_Block(name_bb_b, self.lib_bb)
+        bb_1 = Building_Block(name_bb_a,
+                              save_dir=self.lib_path,
+                              verbosity=self.verbosity)
+
+        bb_2 = Building_Block(name_bb_b,
+                              save_dir=self.lib_path,
+                              verbosity=self.verbosity)
 
         self.name = f'{bb_1.name}-{bb_2.name}-HXL_A-{stacking}'
         self.charge = bb_1.charge + bb_2.charge
@@ -2162,8 +2191,13 @@ class Reticulum():
         self.topology = 'KGM'
         self.dimension = 2
 
-        bb_1 = Building_Block(name_bb_a, self.lib_bb)
-        bb_2 = Building_Block(name_bb_b, self.lib_bb)
+        bb_1 = Building_Block(name_bb_a,
+                              save_dir=self.lib_path,
+                              verbosity=self.verbosity)
+
+        bb_2 = Building_Block(name_bb_b,
+                              save_dir=self.lib_path,
+                              verbosity=self.verbosity)
 
         self.name = f'{bb_1.name}-{bb_2.name}-KGM-{stacking}'
         self.charge = bb_1.charge + bb_2.charge
@@ -2496,8 +2530,13 @@ class Reticulum():
         self.topology = 'KGM_A'
         self.dimension = 2
 
-        bb_1 = Building_Block(name_bb_a, self.lib_bb)
-        bb_2 = Building_Block(name_bb_b, self.lib_bb)
+        bb_1 = Building_Block(name_bb_a,
+                              save_dir=self.lib_path,
+                              verbosity=self.verbosity)
+
+        bb_2 = Building_Block(name_bb_b,
+                              save_dir=self.lib_path,
+                              verbosity=self.verbosity)
 
         self.name = f'{bb_1.name}-{bb_2.name}-KGM_A-{stacking}'
         self.charge = bb_1.charge + bb_2.charge
