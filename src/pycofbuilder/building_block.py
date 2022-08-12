@@ -208,11 +208,11 @@ class Building_Block():
 
     def print_structure(self):
         """
-        Print the structure in the form: 
+        Print the structure in the form:
         `atom_label     pos_x    pos_y    pos_z`
                 """
 
-        for i in range(len(self.atom_labels)):
+        for i, _ in enumerate(self.atom_labels):
             print('{:<5s}{:>10.7f}{:>15.7f}{:>15.7f}'.format(self.atom_labels[i],
                                                              self.atom_pos[i][0],
                                                              self.atom_pos[i][1],
@@ -268,49 +268,75 @@ class Building_Block():
 
     def add_R_group(self, R_name, R_type):
         '''Adds group R in building blocks'''
-
+        
+        # Read the R group
         group_label, group_pos = Tools.read_gjf_file(os.path.join(self.main_path, 'radical'), R_name)
 
-        location_R_struct = self.get_R_points(self.atom_labels, self.atom_pos)[R_type]  # Pega a posição dos R na estrutura
+        # Get the position of the R points in the structure
+        location_R_struct = self.get_R_points(self.atom_labels, self.atom_pos)[R_type]  
 
-        for i in range(len(location_R_struct)):
+        # Get the position of the R points in the R group
+        for i, _ in enumerate(location_R_struct):
             n_group_label = group_label.copy()
             n_group_pos = group_pos.copy()
 
-            # Pega a posição do átomo mais próximo ao R na estrutrua
-            close_R_struct = Tools.closest_atom_struc(R_type, location_R_struct[i], self.atom_labels, self.atom_pos)[1]
+            # Get the position of the closest atom to R in the structure
+            close_R_struct = Tools.closest_atom_struc(R_type,
+                                                      location_R_struct[i],
+                                                      self.atom_labels,
+                                                      self.atom_pos)[1]
 
-            # Pega a posição de Q no grupo radical
+            # Get the position of R in the R group
             pos_R_group = self.get_R_points(n_group_label, n_group_pos)['R']
 
-            # Pega a posição do átomo mais próximo a Q no grupo radical
+            # Get the position of the closest atom to R in the R group 
             close_R_group = Tools.closest_atom('R', pos_R_group[0], n_group_label, n_group_pos)[1]
 
-            # Cria o vetor R na estrutura
+            # Create the vector R in the structure
             v1 = close_R_struct - location_R_struct[i]
 
-            # Cria o vetor R do grupo
+            # Create the vector R in the R group
             v2 = np.array(close_R_group) - np.array(pos_R_group[0])
 
-            # Determina a matriz de rotação que alinha V2 com V1
+            # Find the rotation matrix that align v2 with v1
             Rot_m = Tools.rotation_matrix_from_vectors(v2, v1)  
 
-            n_group_pos = np.delete(n_group_pos, Tools.find_index(np.array([0.0, 0.0, 0.0]), n_group_pos), axis=0)
+            # Delete the "R" atom position of the R group and the structure
+            n_group_pos = np.delete(n_group_pos, Tools.find_index(np.array([0.0, 0.0, 0.0]), 
+                                                                  n_group_pos),
+                                                                  axis=0)
 
-            # Rotaciona e translada o grupo radical para a posição R
+            # Rotate and translade the R group to R position in the strucutre
             rotated_translated_group = np.dot(n_group_pos, - np.transpose(Rot_m)) + location_R_struct[i]
+            
+            # Remove the R atoms from structure
+            self.atom_pos = np.delete(self.atom_pos, Tools.find_index(location_R_struct[i], 
+                                                                      self.atom_pos), 
+                                                                      axis=0)
 
-            self.atom_pos = np.delete(self.atom_pos, Tools.find_index(location_R_struct[i], self.atom_pos), axis=0)
-
+            # Add the position of rotated atoms to the main structure
             self.atom_pos = np.append(self.atom_pos, rotated_translated_group, axis=0)
 
+            # Remove the R atoms from structure
             self.atom_labels.remove(R_type)
 
+            # Remove the R atoms from R group
             n_group_label.remove('R')
 
             self.atom_labels = self.atom_labels + n_group_label
 
-    def create_C2_BB(self, nucleo_name='BENZ', conector='CHO', R1='H', R2='H', R3='H', R4='H', R5='H', R6='H', R7='H', R8='H', R9='H'):
+    def create_C2_BB(self,
+                     nucleo_name='BENZ',
+                     conector='CHO',
+                     R1='H',
+                     R2='H',
+                     R3='H',
+                     R4='H',
+                     R5='H',
+                     R6='H',
+                     R7='H',
+                     R8='H',
+                     R9='H'):
         '''Create a building block with C2 simmetry'''
 
         self.name = f'C2_{nucleo_name}_{conector}'
@@ -386,7 +412,11 @@ class Building_Block():
 
         self.name = f'C4_{nucleo_name}_{conector}'
 
-        self.atom_labels, self.atom_pos = Tools.read_gjf_file(os.path.join(self.main_path, 'nucleo', 'C4'), nucleo_name)
+        self.atom_labels, self.atom_pos = Tools.read_gjf_file(
+            os.path.join(self.main_path, 
+                         'nucleo',
+                         'C4'),
+            nucleo_name)
 
         self.centralize_molecule()
 
