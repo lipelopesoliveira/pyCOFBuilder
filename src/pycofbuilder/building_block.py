@@ -2,26 +2,27 @@
 """
 Created on Thu Dec 17 11:31:19 2020
 
-@author: lipel
+@author: Felipe Lopes de Oliveira
 """
 
 import os
 import numpy as np
 import pycofbuilder.tools as Tools
 
+
 class Building_Block():
 
-    def __init__(self, name=None, lib='bb_lib', verbosity=False):
+    def __init__(self, name=None, verbosity=False, save_dir):
 
         _ROOT = os.path.abspath(os.path.dirname(__file__))
 
         self.name = name
         self.verbosity = verbosity
         self.main_path = os.path.join(_ROOT, 'data')
-        self.lib_path = os.path.join(self.main_path, lib)
-        # Check if lib_path exists and try to create it if not
-        if not os.path.exists(self.lib_path):
-            os.makedirs(self.lib_path)
+
+        # Check if save_dir exists and try to create it if not
+        if not os.path.exists(self.save_dir):
+            os.makedirs(self.save_dir)
 
         self.connectivity = None
         self.simetry = None
@@ -43,7 +44,7 @@ class Building_Block():
         simm_check, nucleo_check, conector_check, radicals_check = self.check_existence()
 
         if simm_check and nucleo_check and conector_check and radicals_check:
-            if self.name + '.xyz' in os.listdir(self.lib_path):
+            if self.name + '.xyz' in os.listdir(self.save_dir):
                 self.read_structure()
 
             else:
@@ -440,12 +441,12 @@ class Building_Block():
     def save(self, extension='xyz'):
 
         if extension == 'xyz':
-            Tools.save_xyz(self.lib_path, self.name + '.xyz', self.atom_labels, self.atom_pos)
+            Tools.save_xyz(self.save_dir, self.name + '.xyz', self.atom_labels, self.atom_pos)
 
     def read_structure(self):
 
         try:
-            self.atom_labels, self.atom_pos = Tools.read_xyz_file(self.lib_path, self.name)
+            self.atom_labels, self.atom_pos = Tools.read_xyz_file(self.save_dir, self.name)
             self.connectivity = len([i for i in self.atom_labels if 'X' in i])
 
             self.align_to()
@@ -527,72 +528,72 @@ class Building_Block():
 
     def get_bipodal_NH2(self):
 
-        files_list = os.listdir(self.lib_path)
+        files_list = os.listdir(self.save_dir)
 
         return [i.rstrip('.xyz') for i in files_list if 'C2' == i.split('_')[0] and 'NH2' in i.split('_')[2]]
 
     def get_tripodal_NH2(self):
 
-        files_list = os.listdir(self.lib_path)
+        files_list = os.listdir(self.save_dir)
 
         return [i.rstrip('.xyz') for i in files_list if 'C3' == i.split('_')[0] and 'NH2' in i.split('_')[2]]
 
     def get_bipodal_CHO(self):
 
-        files_list = os.listdir(self.lib_path)
+        files_list = os.listdir(self.save_dir)
 
         return [i.rstrip('.xyz') for i in files_list if 'C2' == i.split('_')[0] and 'CHO' == i.split('_')[2]]
 
     def get_tripodal_CHO(self):
 
-        files_list = os.listdir(self.lib_path)
+        files_list = os.listdir(self.save_dir)
 
         return [i.rstrip('.xyz') for i in files_list if 'C3' == i.split('_')[0] and 'CHO' == i.split('_')[2]]
 
     def get_bipodal_BOH2(self):
 
-        files_list = os.listdir(self.lib_path)
+        files_list = os.listdir(self.save_dir)
 
         return [i.rstrip('.xyz') for i in files_list if 'C2' == i.split('_')[0] and 'BOH2' == i.split('_')[2]]
 
     def get_tripodal_BOH2(self):
 
-        files_list = os.listdir(self.lib_path)
+        files_list = os.listdir(self.save_dir)
 
         return [i.rstrip('.xyz') for i in files_list if 'C3' == i.split('_')[0] and 'BOH2' == i.split('_')[2]]
 
     def get_bipodal_OH2(self):
 
-        files_list = os.listdir(self.lib_path)
+        files_list = os.listdir(self.save_dir)
 
         return [i.rstrip('.xyz') for i in files_list if 'C2' == i.split('_')[0] and 'OH2' == i.split('_')[2]]
 
     def get_tripodal_OH2(self):
 
-        files_list = os.listdir(self.lib_path)
+        files_list = os.listdir(self.save_dir)
 
         return [i.rstrip('.xyz') for i in files_list if 'C3' == i.split('_')[0] and 'OH2' == i.split('_')[2]]
     
     def get_tetrapodal_squared_OH2(self):
 
-        files_list = os.listdir(self.lib_path)
+        files_list = os.listdir(self.save_dir)
 
         return [i.rstrip('.xyz') for i in files_list if 'C4' == i.split('_')[0] and 'OH2' == i.split('_')[2]]
 
     def get_tetrapodal_squared_CHO(self):
 
-        files_list = os.listdir(self.lib_path)
+        files_list = os.listdir(self.save_dir)
 
         return [i.rstrip('.xyz') for i in files_list if 'C4' == i.split('_')[0] and 'CHO' == i.split('_')[2]]
 
     def get_tetrapodal_squared_BOH2(self):
 
-        files_list = os.listdir(self.lib_path)
+        files_list = os.listdir(self.save_dir)
 
         return [i.rstrip('.xyz') for i in files_list if 'C4' == i.split('_')[0] and 'BOH2' == i.split('_')[2]]
 
     def get_tetrapodal_squared_NH2(self):
 
-        files_list = os.listdir(self.lib_path)
+        files_list = os.listdir(self.save_dir)
 
         return [i.rstrip('.xyz') for i in files_list if 'C4' == i.split('_')[0] and 'NH2' in i.split('_')[2]]

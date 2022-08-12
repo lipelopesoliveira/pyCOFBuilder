@@ -1,4 +1,10 @@
 # -*- coding: utf-8 -*-
+"""
+Created on Thu Dec 17 11:31:19 2020
+
+@author: Felipe Lopes de Oliveira
+"""
+
 import os
 import glob
 import time
@@ -7,6 +13,7 @@ from tqdm import tqdm
 import pycofbuilder.tools as Tools
 from pycofbuilder.reticulum import Reticulum
 from pycofbuilder.building_block import Building_Block
+
 
 _ROOT = os.path.abspath(os.path.dirname(__file__))
 
