@@ -504,6 +504,7 @@ class Reticulum():
                 str(self.space_group_n),
                 len(symm_op)]
 
+
     def create_hcb_a_structure(self,
                                name_bb_a: str,
                                name_bb_b: str,
@@ -838,16 +839,16 @@ class Reticulum():
                 len(symm_op)]
 
 
-    def create_sql_structure(self, 
-                             name_bb_a : str,
-                             name_bb_b : str,
-                             stacking : str ='AA',
-                             bond_atom : str ='N',
-                             c_parameter_base : float = 3.6,
-                             print_result : bool = True,
-                             slab : float = 10.0,
-                             shift_vector : list = [1.0,1.0,0],
-                             tilt_angle : float = 5.0):
+    def create_sql_structure(self,
+                             name_bb_a: str,
+                             name_bb_b: str,
+                             stacking: str ='AA',
+                             bond_atom: str ='N',
+                             c_parameter_base: float = 3.6,
+                             print_result: bool = True,
+                             slab: float = 10.0,
+                             shift_vector: list = [1.0, 1.0, 0],
+                             tilt_angle: float = 5.0):
         """Creates a COF with SQL network.
 
         The SQL net is composed of two tetrapodal building blocks.
@@ -1482,17 +1483,17 @@ class Reticulum():
                 str(self.space_group_n),
                 len(symm_op)]
 
-    
+
     def create_kgd_structure(self, 
-                             name_bb_a : str,
-                             name_bb_b : str,
-                             stacking : str ='AA',
-                             bond_atom : str ='N',
-                             c_parameter_base : float = 3.6,
-                             print_result : bool = True,
-                             slab : float = 10.0,
-                             shift_vector : list = [1.0,1.0,0],
-                             tilt_angle : float = 5.0):
+                             name_bb_a: str,
+                             name_bb_b: str,
+                             stacking: str ='AA',
+                             bond_atom: str ='N',
+                             c_parameter_base: float = 3.6,
+                             print_result: bool = True,
+                             slab: float = 10.0,
+                             shift_vector: list = [1.0, 1.0, 0],
+                             tilt_angle: float = 5.0):
 
         """Creates a COF with KGD network.
 
@@ -1523,9 +1524,9 @@ class Reticulum():
         -------
         list
             A list of strings containing:
-                1. the structure name, 
-                2. lattice type, 
-                3. hall symbol of the cristaline structure, 
+                1. the structure name,
+                2. lattice type,
+                3. hall symbol of the cristaline structure,
                 4. space group,
                 5. number of the space group,
                 6. number of operation symmetry
@@ -1853,9 +1854,9 @@ class Reticulum():
         -------
         list
             A list of strings containing:
-                1. the structure name, 
-                2. lattice type, 
-                3. hall symbol of the cristaline structure, 
+                1. the structure name,
+                2. lattice type,
+                3. hall symbol of the cristaline structure,
                 4. space group,
                 5. number of the space group,
                 6. number of operation symmetry
@@ -2145,17 +2146,17 @@ class Reticulum():
                 str(self.space_group_n), 
                 len(symm_op)]
 
-    
-    def create_kgm_structure(self, 
-                             name_bb_a : str,
-                             name_bb_b : str,
-                             stacking : str ='AA',
-                             bond_atom : str ='N',
-                             c_parameter_base : float = 3.6,
-                             print_result : bool = True,
-                             slab : float = 10.0,
-                             shift_vector : list = [1.0,1.0,0],
-                             tilt_angle : float = 5.0):
+
+    def create_kgm_structure(self,
+                             name_bb_a: str,
+                             name_bb_b: str,
+                             stacking: str ='AA',
+                             bond_atom: str ='N',
+                             c_parameter_base: float = 3.6,
+                             print_result: bool = True,
+                             slab: float = 10.0,
+                             shift_vector: list = [1.0, 1.0, 0],
+                             tilt_angle: float = 5.0):
 
         """Creates a COF with KGM network.
 
@@ -2186,9 +2187,9 @@ class Reticulum():
         -------
         list
             A list of strings containing:
-                1. the structure name, 
-                2. lattice type, 
-                3. hall symbol of the cristaline structure, 
+                1. the structure name,
+                2. lattice type,
+                3. hall symbol of the cristaline structure,
                 4. space group,
                 5. number of the space group,
                 6. number of operation symmetry
@@ -2525,9 +2526,9 @@ class Reticulum():
         -------
         list
             A list of strings containing:
-                1. the structure name, 
-                2. lattice type, 
-                3. hall symbol of the cristaline structure, 
+                1. the structure name,
+                2. lattice type,
+                3. hall symbol of the cristaline structure,
                 4. space group,
                 5. number of the space group,
                 6. number of operation symmetry
@@ -2584,8 +2585,8 @@ class Reticulum():
             c = c_parameter_base + max([delta_a, delta_b])
 
         # Define the cell lattice as an hexagonal cell
-        lattice = [[a, 0, 0], 
-                   [-0.5*a, np.sqrt(3)/2*a, 0], 
+        lattice = [[a, 0, 0],
+                   [-0.5*a, np.sqrt(3)/2*a, 0],
                    [0, 0, c]]
 
         if self.verbosity is True:
@@ -2657,17 +2658,20 @@ class Reticulum():
         # Remove dupolicate atoms
         struct.sort(reverse=True)
         struct.merge_sites(tol=.7, mode='delete')
-        struct.translate_sites(range(len(struct.as_dict()['sites'])), [0, 0, 0.5], frac_coords=True, to_unit_cell=True)
+        struct.translate_sites(range(len(struct.as_dict()['sites'])),
+                               [0, 0, 0.5], 
+                               frac_coords=True, 
+                               to_unit_cell=True)
 
         if stacking not in self.available_stacking[self.topology]:
                 raise Exception(f"""{stacking} is not in the available stack list for HCB net.
-    Available options are: {self.available_stacking[self.topology]}""")
+        Available options are: {self.available_stacking[self.topology]}""")
 
         # Create A stacking. The slab is defined by the c_cell parameter
         if stacking == 'A':
             self.stacking = 'A'
-            symm = SpacegroupAnalyzer(struct, 
-                                      symprec=self.symm_tol, 
+            symm = SpacegroupAnalyzer(struct,
+                                      symprec=self.symm_tol,
                                       angle_tolerance=self.angle_tol)
 
             self.symm_structure = symm.get_refined_structure()
@@ -2676,14 +2680,14 @@ class Reticulum():
         if stacking == 'AA':
             self.stacking = 'AA'
             symm = SpacegroupAnalyzer(struct, 
-                                      symprec=self.symm_tol, 
+                                      symprec=self.symm_tol,
                                       angle_tolerance=self.angle_tol)
 
             self.symm_structure = symm.get_refined_structure()
 
         if stacking == 'AB1x':
             self.stacking = 'AB1x'
-            
+
             lattice = Lattice(np.array(struct.as_dict()['lattice']['matrix'])*(1, 1, 2))
 
             A = struct
@@ -2697,11 +2701,11 @@ class Reticulum():
 
             AB_1 = Structure(lattice, 
                              np.concatenate((A_labels, B_labels)),
-                             np.concatenate((A_pos, B_pos)), 
+                             np.concatenate((A_pos, B_pos)),
                              coords_are_cartesian=True)
 
             dict_structure = AB_1.as_dict()
-            
+
             self.lattice = dict_structure['lattice']['matrix']
 
             self.atom_labels = [i['label'] for i in dict_structure['sites']]
@@ -2713,7 +2717,7 @@ class Reticulum():
 
         if stacking == 'AB1y':
             self.stacking = 'AB1y'
-            
+
             lattice = Lattice(np.array(struct.as_dict()['lattice']['matrix'])*(1, 1, 2))
 
             A = struct
@@ -2731,7 +2735,7 @@ class Reticulum():
                              coords_are_cartesian=True)
 
             dict_structure = AB_1.as_dict()
-            
+
             self.lattice = dict_structure['lattice']['matrix']
 
             self.atom_labels = [i['label'] for i in dict_structure['sites']]
@@ -2740,10 +2744,10 @@ class Reticulum():
             symm = SpacegroupAnalyzer(AB_1, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
 
             self.symm_structure = symm.get_refined_structure()
-            
+
         if stacking == 'AB1xy':
             self.stacking = 'AB1xy'
-            
+
             lattice = Lattice(np.array(struct.as_dict()['lattice']['matrix'])*(1, 1, 2))
 
             A = struct
@@ -2761,7 +2765,7 @@ class Reticulum():
                              coords_are_cartesian=True)
 
             dict_structure = AB_1.as_dict()
-            
+
             self.lattice = dict_structure['lattice']['matrix']
 
             self.atom_labels = [i['label'] for i in dict_structure['sites']]
@@ -2770,10 +2774,10 @@ class Reticulum():
             symm = SpacegroupAnalyzer(AB_1, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
 
             self.symm_structure = symm.get_refined_structure()
-        
+
         if stacking == 'AB2':
             self.stacking = 'AB2'
-            
+
             lattice = Lattice(np.array(struct.as_dict()['lattice']['matrix'])*(1, 1, 2))
 
             A = struct
@@ -2794,7 +2798,7 @@ class Reticulum():
                              coords_are_cartesian=True)
 
             dict_structure = AB_1.as_dict()
-            
+
             self.lattice = dict_structure['lattice']['matrix']
 
             self.atom_labels = [i['label'] for i in dict_structure['sites']]
@@ -2804,10 +2808,11 @@ class Reticulum():
 
             self.symm_structure = symm.get_refined_structure()
 
-        # Create AAl stacking. Tetragonal cell with two sheets per cell shifited by the shift_vector in angstroms. 
+        # Create AAl stacking.
+        # Tetragonal cell with two sheets per cell shifited by the shift_vector in angstroms. 
         if stacking == 'AAl':
             self.stacking = 'AAl'
-            
+
             lattice = Lattice(np.array(struct.as_dict()['lattice']['matrix'])*(1, 1, 2))
 
             A = struct
@@ -2831,7 +2836,7 @@ class Reticulum():
                              coords_are_cartesian=True)
 
             dict_structure = AB_1.as_dict()
-            
+
             self.lattice = dict_structure['lattice']['matrix']
 
             self.atom_labels = [i['label'] for i in dict_structure['sites']]
@@ -2841,11 +2846,10 @@ class Reticulum():
 
             self.symm_structure = symm.get_refined_structure()
 
-
         # Create AA tilted stacking. Tilted tetragonal cell with two sheets per cell tilted by tilt_angle. 
         if stacking == 'AAt':
             self.stacking = 'AAt'
-            
+
             a_cell = struct.as_dict()['lattice']['a']
             b_cell = struct.as_dict()['lattice']['b']
             c_cell = struct.as_dict()['lattice']['c'] * 2
@@ -2878,7 +2882,7 @@ class Reticulum():
                              coords_are_cartesian=True)
 
             dict_structure = AB_1.as_dict()
-            
+
             self.lattice = dict_structure['lattice']['matrix']
 
             self.atom_labels = [i['label'] for i in dict_structure['sites']]
@@ -2916,11 +2920,11 @@ class Reticulum():
                                str(self.space_group_n),
                                len(symm_op))
 
-        return [self.name, 
-                str(self.lattice_type), 
-                str(self.hall[0:2]), 
-                str(self.space_group), 
-                str(self.space_group_n), 
+        return [self.name,
+                str(self.lattice_type),
+                str(self.hall[0:2]),
+                str(self.space_group),
+                str(self.space_group_n),
                 len(symm_op)]
 
 
@@ -2935,7 +2939,7 @@ class Reticulum():
             List containing the supercell parameters.
             Default  = [1, 1, 1]
         path : str, optional
-            Path to save the .cif file.    
+            Path to save the .cif file.
         """
 
         if path is not None:
@@ -2956,7 +2960,7 @@ class Reticulum():
             List containing the supercell parameters.
             Default  = [1, 1, 1]
         path : str, optional
-            Path to save the .json file.  
+            Path to save the .json file.
         """
 
         if path is not None:
@@ -3043,8 +3047,9 @@ class Reticulum():
 
         dict_sctructure = self.symm_structure.as_dict()
 
-        a, b, c = dict_sctructure['lattice']['a'], dict_sctructure['lattice']['b'], dict_sctructure['lattice']['c']
-
+        a = dict_sctructure['lattice']['a'] 
+        b = dict_sctructure['lattice']['b'] 
+        c = dict_sctructure['lattice']['c']
         alpha = round(dict_sctructure['lattice']['alpha'], 3)
         beta = round(dict_sctructure['lattice']['beta'], 3)
         gamma = round(dict_sctructure['lattice']['gamma'], 3)
@@ -3054,7 +3059,8 @@ class Reticulum():
         atom_pos = [i['xyz'] for i in dict_sctructure['sites']]
 
         Tools.save_pdb(self.out_path, self.name, [a, b, c, alpha, beta, gamma], atom_labels, atom_pos)
-        
+
+
     def save_vasp(self, supercell : tuple = (1, 1, 1), path: str = None):
         """Save the structure in VASP POSCAR .vasp format
 
@@ -3073,7 +3079,8 @@ class Reticulum():
 
         self.symm_structure.make_supercell(supercell)
 
-        self.symm_structure.to(fmt='poscar', filename=os.path.join(self.out_path, self.name + '.vasp'))
+        file_name = os.path.join(self.out_path, self.name + '.vasp')
+        self.symm_structure.to(fmt='poscar', filename=file_name)
 
     def save_turbomole(self, supercell : tuple = (1, 1, 1), path: str = None):
         """Save the structure in Turbomole .coord format
@@ -3095,7 +3102,9 @@ class Reticulum():
 
         dict_sctructure = self.symm_structure.as_dict()
 
-        a, b, c = dict_sctructure['lattice']['a'], dict_sctructure['lattice']['b'], dict_sctructure['lattice']['c']
+        a = dict_sctructure['lattice']['a'] 
+        b = dict_sctructure['lattice']['b'] 
+        c = dict_sctructure['lattice']['c']
 
         alpha = round(dict_sctructure['lattice']['alpha'], 3)
         beta = round(dict_sctructure['lattice']['beta'], 3)
@@ -3109,7 +3118,10 @@ class Reticulum():
         temp_file.write('$coord angs\n')
 
         for i in range(len(atom_labels)):
-            temp_file.write('{:>15.7f}{:>15.7f}{:>15.7f}   {:<5s}\n'.format(atom_pos[i][0], atom_pos[i][1], atom_pos[i][2], atom_labels[i]))
+            temp_file.write('{:>15.7f}{:>15.7f}{:>15.7f}   {:<5s}\n'.format(atom_pos[i][0], 
+                                                                            atom_pos[i][1],
+                                                                            atom_pos[i][2],
+                                                                            atom_labels[i]))
 
         temp_file.write('$periodic 3\n')
         temp_file.write('$cell\n')
@@ -3140,7 +3152,9 @@ class Reticulum():
 
         dict_sctructure = self.symm_structure.as_dict()
 
-        a, b, c = dict_sctructure['lattice']['a'], dict_sctructure['lattice']['b'], dict_sctructure['lattice']['c']
+        a = dict_sctructure['lattice']['a'] 
+        b = dict_sctructure['lattice']['b'] 
+        c = dict_sctructure['lattice']['c']
 
         alpha = round(dict_sctructure['lattice']['alpha'], 3)
         beta = round(dict_sctructure['lattice']['beta'], 3)
@@ -3156,7 +3170,10 @@ class Reticulum():
         temp_file.write(f'{a}  {b}  {c}  {alpha}  {beta}  {gamma}\n')
 
         for i in range(len(atom_labels)):
-            temp_file.write('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(atom_labels[i], atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]))
+            temp_file.write('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(atom_labels[i], 
+                                                                         atom_pos[i][0], 
+                                                                         atom_pos[i][1], 
+                                                                         atom_pos[i][2]))
 
         temp_file.close()
 
@@ -3395,7 +3412,10 @@ class Reticulum():
         out_file.write(f'ATOMIC_POSITIONS ({coords_type})\n')
 
         for atom in ion_pos:
-            out_file.write('{:<5s}{:>15.9f}{:>15.9f}{:>15.9f}\n'.format(atom[0], atom[1], atom[2], atom[3]))
+            out_file.write('{:<5s}{:>15.9f}{:>15.9f}{:>15.9f}\n'.format(atom[0], 
+                                                                        atom[1], 
+                                                                        atom[2], 
+                                                                        atom[3]))
 
         out_file.write('K_POINTS automatic\n')
         out_file.write(f'   {kx} {ky} {kz}  1 1 1\n')
