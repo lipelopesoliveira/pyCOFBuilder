@@ -392,9 +392,9 @@ def get_kgrid(cell, distance=0.3):
     '''
     b1, b2, b3 = get_reciprocal_vectors(cell)
     b = np.array([np.linalg.norm(b1), np.linalg.norm(b2), np.linalg.norm(b3)])
-    kx = np.ceil(b[0]/distance)
-    ky = np.ceil(b[1]/distance)
-    kz = np.ceil(b[2]/distance)
+    kx = np.ceil(b[0]/distance).astype(int)
+    ky = np.ceil(b[1]/distance).astype(int)
+    kz = np.ceil(b[2]/distance).astype(int)
 
     return kx, ky, kz
 

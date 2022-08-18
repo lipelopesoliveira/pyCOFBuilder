@@ -40,162 +40,57 @@ def build(cof_name=None,
     '''
     bond_atom = Tools.find_bond_atom(cof_name)
 
-    qe = False
-    xyz = False
-    cif = False
-    turbomole = False
-    vasp = False
-    json = False
-    xsf = False
-    pdb = False
-
     if isinstance(save_format, str):
         save_format = [save_format]
 
-    for i in save_format:
-        if i == 'qe':
-            qe = True
-        if i == 'xyz':
-            xyz = True
-        if i == 'cif':
-            cif = True
-        if i == 'turbomole':
-            turbomole = True
-        if i == 'vasp':
-            vasp = True
-        if i == 'json':
-            json = True
-        if i == 'xsf':
-            xsf = True
-        if i == 'pdb':
-            pdb = True
+    Ret = Reticulum(out_dir=save_dir, verbosity=verbosity)
+
+    save_dict = {'qe': Ret.save_qe,
+                 'xyz': Ret.save_xyz,
+                 'cif': Ret.save_cif,
+                 'turbomole': Ret.save_turbomole,
+                 'vasp': Ret.save_vasp,
+                 'json': Ret.save_json,
+                 'xsf': Ret.save_xsf,
+                 'pdb': Ret.save_pdb
+                 }
+
+    # Check if save_format elements is in save_dict
+    error_msg = f'Save format not recognized. Available formats: {list(save_dict.keys())}'
+    assert all([i in save_dict for i in save_format]), error_msg
+
+    net_build_dict = {'HCB': Ret.create_hcb_structure,
+                      'HCB_A': Ret.create_hcb_a_structure,
+                      'SQL': Ret.create_sql_structure,
+                      'SQL_A': Ret.create_sql_a_structure,
+                      'KGM': Ret.create_kgm_structure,
+                      'KGM_A': Ret.create_kgm_a_structure,
+                      'KGD': Ret.create_kgd_structure,
+                      'HXL_A': Ret.create_hxl_a_structure}
 
     bb1, bb2, net, stacking = cof_name.split('-')
-    print(bb1, bb2, net, stacking, bond_atom)
 
-    if net == 'HCB':
-        try:
-            Ret = Reticulum(out_dir=save_dir, verbosity=verbosity)
-            simm_data = Ret.create_hcb_structure(bb1,
-                                                 bb2,
-                                                 stacking=stacking,
-                                                 bond_atom=bond_atom,
-                                                 print_result=print_result)
-            if cif is True:
-                Ret.save_cif(supercell)
-            if xyz is True:
-                if stacking == 'AA':
-                    Ret.save_xyz(supercell)
-                else:
-                    Ret.save_xyz()
-            if qe is True:
-                Ret.save_qe(supercell)
-            if json is True:
-                Ret.save_json(supercell)
-            if xsf is True:
-                Ret.save_xsf(supercell)
-            if pdb is True:
-                Ret.save_pdb(supercell)
-            if turbomole is True:
-                Ret.save_turbomole(supercell)
-            if vasp is True:
-                Ret.save_vasp()
-            return [True, simm_data]
-        except Exception:
-            return [False, f'{bb1}-{bb2}-{net}-{stacking}']
+    # Check if net is in net_build_dict
+    error_msg = f'Net not recognized. Available nets: {list(net_build_dict.keys())}'
+    assert net in net_build_dict, error_msg
 
-    if net == 'HCB_A':
-        try:
-            Ret = Reticulum(out_dir=save_dir, verbosity=verbosity)
-            simm_data = Ret.create_hcb_a_structure(bb1,
-                                                   bb2,
-                                                   stacking=stacking,
-                                                   bond_atom=bond_atom,
-                                                   print_result=print_result)
-            if cif is True:
-                Ret.save_cif()
-            if xyz is True:
-                if stacking == 'AA':
-                    Ret.save_xyz(supercell)
-                else:
-                    Ret.save_xyz()
-            if qe is True:
-                Ret.save_qe()
-            if json is True:
-                Ret.save_json(supercell)
-            if xsf is True:
-                Ret.save_xsf()
-            if pdb is True:
-                Ret.save_pdb()
-            if turbomole is True:
-                Ret.save_turbomole()
-            if vasp is True:
-                Ret.save_vasp()
-            return [True, simm_data]
-        except Exception:
-            return [False, f'{bb1}-{bb2}-{net}-{stacking}']
+    # Try to build the net
+    try:
+        simm_data = net_build_dict[net](bb1,
+                                        bb2,
+                                        stacking=stacking,
+                                        bond_atom=bond_atom,
+                                        print_result=print_result)
 
-    if net == 'SQL':
-        try:
-            Ret = Reticulum(out_dir=save_dir, verbosity=verbosity)
-            simm_data = Ret.create_sql_structure(bb1,
-                                                 bb2,
-                                                 stacking=stacking,
-                                                 bond_atom=bond_atom,
-                                                 print_result=print_result)
-            if cif is True:
-                Ret.save_cif()
-            if xyz is True:
-                if stacking == 'AA':
-                    Ret.save_xyz(supercell)
-                else:
-                    Ret.save_xyz()
-            if qe is True:
-                Ret.save_qe()
-            if json is True:
-                Ret.save_json(supercell)
-            if xsf is True:
-                Ret.save_xsf()
-            if pdb is True:
-                Ret.save_pdb()
-            if turbomole is True:
-                Ret.save_turbomole()
-            if vasp is True:
-                Ret.save_vasp()
-            return [True, simm_data]
-        except Exception:
-            return [False, f'{bb1}-{bb2}-{net}-{stacking}']
+        # Save in all formats requesteds
+        for i in save_format:
+            save_dict[i](supercell)
 
-    if net == 'SQL_A':
-        try:
-            Ret = Reticulum(out_dir=save_dir, verbosity=verbosity)
-            simm_data = Ret.create_sql_a_structure(bb1,
-                                                   bb2,
-                                                   stacking=stacking,
-                                                   bond_atom=bond_atom,
-                                                   print_result=print_result)
-            if cif is True:
-                Ret.save_cif()
-            if xyz is True:
-                if stacking == 'AA':
-                    Ret.save_xyz(supercell)
-                else:
-                    Ret.save_xyz()
-            if qe is True:
-                Ret.save_qe()
-            if json is True:
-                Ret.save_json(supercell)
-            if xsf is True:
-                Ret.save_xsf()
-            if pdb is True:
-                Ret.save_pdb()
-            if turbomole is True:
-                Ret.save_turbomole()
-            if vasp is True:
-                Ret.save_vasp()
-            return [True, simm_data]
-        except Exception:
-            return [False, f'{bb1}-{bb2}-{net}-{stacking}']
+        return [True, simm_data]
+
+    except Exception as exept:
+        print(exept)
+        return [False, f'{bb1}-{bb2}-{net}-{stacking}']
 
 
 def build_all_available_COFs(stacking='AA',

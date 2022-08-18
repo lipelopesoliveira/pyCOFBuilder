@@ -112,10 +112,15 @@ class Reticulum():
 
         self.verbosity = verbosity
         # Falta adicionar: 'HXL', 'KGD'
-        self.available_2D_topologies = ['HCB', 'HCB_A', 'SQL', 'SQL_A', 'KGM', 'KGM_A', 'KGD', 'HXL_A'] 
+        self.available_2D_topologies = ['HCB', 'HCB_A',
+                                        'SQL', 'SQL_A',
+                                        'KGM', 'KGM_A',
+                                        'KGD',
+                                        'HXL_A']
+
         # Falta adicionar: ['dia', 'bor', 'srs', 'pts', 'ctn', 'rra', 'fcc',
         # 'lon', 'stp', 'acs', 'tbo', 'bcu', 'fjh', 'ceq']
-        self.available_3D_topologies = [] 
+        self.available_3D_topologies = ['DIA', 'BOR'] # Temporary
         self.available_topologies = self.available_2D_topologies + self.available_3D_topologies
 
         # Define available stackings for all 2D topologies
@@ -126,7 +131,9 @@ class Reticulum():
                                    'KGD': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
                                    'HXL_A': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
                                    'KGM': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
-                                   'KGM_A': ['AA', 'AB1x', 'AB1y', 'AB1xy', 'AB2', 'AAl', 'AAt']
+                                   'KGM_A': ['AA', 'AB1x', 'AB1y', 'AB1xy', 'AB2', 'AAl', 'AAt'],
+                                   'DIA': [1, 2, 3, 4], # Temporary
+                                   'BOR': [5, 8, 6, 7] # Temporary
                                    }
 
         self.main_path = os.path.join(_ROOTDIR, 'data')
@@ -474,7 +481,7 @@ class Reticulum():
 
         self.atom_labels = [i['label'] for i in dict_structure['sites']]
         self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.get_n_atoms = len(self.symm_structure)
+        self.n_atoms = len(self.symm_structure)
         self.composition = self.symm_structure.formula
 
         if self.verbosity is True:
@@ -810,7 +817,7 @@ class Reticulum():
 
         self.atom_labels = [i['label'] for i in dict_structure['sites']]
         self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.get_n_atoms = len(self.symm_structure)
+        self.n_atoms = len(self.symm_structure)
         self.composition = self.symm_structure.formula
 
         Tools.print_comand(self.symm_structure, self.verbosity, ['debug'])
@@ -1127,7 +1134,7 @@ class Reticulum():
 
         self.atom_labels = [i['label'] for i in dict_structure['sites']]
         self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.get_n_atoms = len(self.symm_structure)
+        self.n_atoms = len(self.symm_structure)
         self.composition = self.symm_structure.formula
 
         if self.verbosity is True:
@@ -1454,7 +1461,7 @@ class Reticulum():
 
         self.atom_labels = [i['label'] for i in dict_structure['sites']]
         self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.get_n_atoms = len(self.symm_structure)
+        self.n_atoms = len(self.symm_structure)
         self.composition = self.symm_structure.formula
 
         if self.verbosity is True:
@@ -1784,7 +1791,7 @@ class Reticulum():
 
         self.atom_labels = [i['label'] for i in dict_structure['sites']]
         self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.get_n_atoms = len(self.symm_structure)
+        self.n_atoms = len(self.symm_structure)
         self.composition = self.symm_structure.formula
 
         if self.verbosity is True:
@@ -2117,7 +2124,7 @@ class Reticulum():
 
         self.atom_labels = [i['label'] for i in dict_structure['sites']]
         self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.get_n_atoms = len(self.symm_structure)
+        self.n_atoms = len(self.symm_structure)
         self.composition = self.symm_structure.formula
 
         if self.verbosity is True:
@@ -2456,7 +2463,7 @@ class Reticulum():
 
         self.atom_labels = [i['label'] for i in dict_structure['sites']]
         self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.get_n_atoms = len(self.symm_structure)
+        self.n_atoms = len(self.symm_structure)
         self.composition = self.symm_structure.formula
 
         if self.verbosity is True:
@@ -2898,7 +2905,7 @@ class Reticulum():
 
         self.atom_labels = [i['label'] for i in dict_structure['sites']]
         self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.get_n_atoms = len(self.symm_structure)
+        self.n_atoms = len(self.symm_structure)
         self.composition = self.symm_structure.formula
 
         if self.verbosity is True:
@@ -3368,7 +3375,7 @@ class Reticulum():
         elif self.lattice_type == 'triclinic':
             out_file.write('    ibrav =  0\n')
 
-        out_file.write(f'    nat =     {self.get_n_atoms}\n')
+        out_file.write(f'    nat =     {self.n_atoms}\n')
         out_file.write(f'    ntyp =     {len(set(self.atom_labels))}\n')
         out_file.write(f'    ecutwfc = {ecut} \n')
         out_file.write(f'    ecutrho = {erho} \n')
@@ -3412,9 +3419,9 @@ class Reticulum():
         out_file.write(f'ATOMIC_POSITIONS ({coords_type})\n')
 
         for atom in ion_pos:
-            out_file.write('{:<5s}{:>15.9f}{:>15.9f}{:>15.9f}\n'.format(atom[0], 
-                                                                        atom[1], 
-                                                                        atom[2], 
+            out_file.write('{:<5s}{:>15.9f}{:>15.9f}{:>15.9f}\n'.format(atom[0],
+                                                                        atom[1],
+                                                                        atom[2],
                                                                         atom[3]))
 
         out_file.write('K_POINTS automatic\n')
