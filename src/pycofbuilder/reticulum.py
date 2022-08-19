@@ -132,8 +132,8 @@ class Reticulum():
                                    'HXL_A': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
                                    'KGM': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
                                    'KGM_A': ['AA', 'AB1x', 'AB1y', 'AB1xy', 'AB2', 'AAl', 'AAt'],
-                                   'DIA': [1, 2, 3, 4], # Temporary
-                                   'BOR': [5, 8, 6, 7] # Temporary
+                                   'DIA': [1, 2, 3, 4],  # Temporary
+                                   'BOR': [5, 8, 6, 7]  # Temporary
                                    }
 
         self.main_path = os.path.join(_ROOTDIR, 'data')
@@ -142,7 +142,7 @@ class Reticulum():
             self.out_path = os.path.join(os.getcwd(), 'out')
         else:
             self.out_path = out_dir
-        
+
         self.lib_path = os.path.join(self.out_path, 'building_blocks')
 
         self.name = None

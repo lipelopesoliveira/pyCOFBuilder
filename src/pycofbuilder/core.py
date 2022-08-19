@@ -19,9 +19,9 @@ _ROOTDIR = os.path.abspath(os.path.dirname(__file__))
 
 
 def build(cof_name=None,
-          save_format=['json'],
+          save_format='json',
           print_result=True,
-          supercell=[1, 1, 2],
+          supercell=[1, 1, 1],
           save_dir=None,
           verbosity=False):
     '''Build a COF with a given name
@@ -31,12 +31,17 @@ def build(cof_name=None,
     cof_name : str
         Name of the COF to be build.
     save_format : list
-        List containg the formats to save the file. 
+        List containg the formats to save the file.
         Can be `json`, `cif`, `xyz`, `turbomole`, `vasp`, `xsf`, `pdb`.
     print_result : bool
         Boolean to print in the screen or not the result of the creation.
     supercell : list
-        List containg the units or repetition for supercell creation. Default: [1,1,2]
+        List containg the units or repetition for supercell creation.
+        Default: [1,1,1]
+    save_dir : str
+        Path to the directory where the file will be saved.
+    verbosity : bool
+        Boolean to print in the screen or not the result of the creation.
     '''
     bond_atom = Tools.find_bond_atom(cof_name)
 
@@ -88,29 +93,24 @@ def build(cof_name=None,
 
         return [True, simm_data]
 
-    except Exception as exept:
-        print(exept)
+    except Exception as exception:
+        print(exception)
         return [False, f'{bb1}-{bb2}-{net}-{stacking}']
 
 
 def build_all_available_COFs(stacking='AA',
-                             qe=False,
-                             xyz=False,
-                             cif=True,
-                             turbomole=False,
-                             vasp=False,
-                             json=True):
+                             save_format='cif'):
+    '''Build all available COFs in the out directory.
 
-    save_f = []
-
-    for i in [[qe, 'qe'],
-              [xyz, 'xyz'],
-              [cif, 'cif'],
-              [turbomole, 'turbomole'],
-              [vasp, 'vasp'],
-              [json, 'json']]:
-        if i[0] is True:
-            save_f += [i[1]]
+    Parameters
+    ----------
+    stacking : str
+        Stacking type.
+        Default: 'AA'
+    save_format : str
+        Format to save the file.
+        Default: 'cif'
+    '''
 
     BB = Building_Block()
 
@@ -178,7 +178,9 @@ def build_all_available_COFs(stacking='AA',
     if val == 'y':
         t_i = time.time()
         for cof in tqdm(cofs_list):
-            succes, name = build(cof, save_format=save_f, print_result=False)
+            succes, name = build(cof, 
+                                 save_format=save_format, 
+                                 print_result=False)
             if succes is True:
                 sucess_list += [name]
             if succes is False:
@@ -207,7 +209,7 @@ def build_all_available_COFs(stacking='AA',
         print('Exiting...')
 
 
-def build_COFs_list(cofs_list, save_format=['json'], supercell=[1, 1, 2]):
+def build_COFs_list(cofs_list, save_format='cif', supercell=[1, 1, 1]):
 
     failed_list = []
     sucess_list = []
@@ -258,7 +260,7 @@ def create_all_C2(nucleos=None, radicais=None, conectores=None):
 
     ----------
     nucleos : list
-        List containing the desired cores for the creation of blocks. 
+        List containing the desired cores for the creation of blocks.
         Ex.: ['2BPD', '3BPD', 'ANTR', 'BBTZ', 'BENZ', 'BPNY', 'BPYB', 'BTPH',
               'DBTP', 'DHPI', 'DHSI', 'DPBY', 'DPDA', 'DPEL', 'DPEY', 'HDZ,
               'NAPT', 'PYRN', 'TPNY', 'TTPH']
@@ -271,13 +273,13 @@ def create_all_C2(nucleos=None, radicais=None, conectores=None):
         'NO2', 'O', 'OEt', 'OH', 'OMe', 'SO2H', 'tBut']
     '''
 
-    if nucleos == None:
+    if nucleos is None:
         nucleos = [i.rstrip('.gjf') for i in os.listdir(
             os.path.join(_ROOTDIR, 'data', 'nucleo', 'C2'))]
-    if radicais == None:
+    if radicais is None:
         radicais = [i.rstrip('.gjf') for i in os.listdir(
             os.path.join(_ROOTDIR, 'data', 'radical'))]
-    if conectores == None:
+    if conectores is None:
         conectores = [i.rstrip('.gjf') for i in os.listdir(
             os.path.join(_ROOTDIR, 'data', 'conector'))]
 
@@ -317,13 +319,13 @@ def create_all_C3(nucleos=None, radicais=None, conectores=None):
         Ex.: ['CH3', 'CHO', 'CN', 'COOH', 'F', 'H', 'NC2H', 'NH2',
         'NO2', 'O', 'OEt', 'OH', 'OMe', 'SO2H', 'tBut']
     '''
-    if nucleos == None:
+    if nucleos is None:
         nucleos = [i.rstrip('.gjf') for i in os.listdir(
             os.path.join(_ROOTDIR, 'data', 'nucleo', 'C3'))]
-    if radicais == None:
+    if radicais is None:
         radicais = [i.rstrip('.gjf') for i in os.listdir(
             os.path.join(_ROOTDIR, 'data', 'radical'))]
-    if conectores == None:
+    if conectores is None:
         conectores = [i.rstrip('.gjf') for i in os.listdir(
             os.path.join(_ROOTDIR, 'data', 'conector'))]
 
@@ -365,13 +367,13 @@ def create_all_C4(nucleos=None, conectores=None, radicais=None):
         'O', 'OEt', 'OH', 'OMe', 'SO2H', 'tBut']
     '''
 
-    if nucleos == None:
+    if nucleos is None:
         nucleos = [i.rstrip('.gjf') for i in os.listdir(
             os.path.join(_ROOTDIR, 'data', 'nucleo', 'C4'))]
-    if radicais == None:
+    if radicais is None:
         radicais = [i.rstrip('.gjf') for i in os.listdir(
             os.path.join(_ROOTDIR, 'data', 'radical'))]
-    if conectores == None:
+    if conectores is None:
         conectores = [i.rstrip('.gjf') for i in os.listdir(
             os.path.join(_ROOTDIR, 'data', 'conector'))]
 
