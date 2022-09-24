@@ -161,8 +161,8 @@ class Reticulum():
         self.atom_labels = []
         self.atom_pos = []
         self.lattice = [[], [], []]
-        self.symm_tol = 0.2
-        self.angle_tol = 0.2
+        self.symm_tol = 0.1
+        self.angle_tol = 0.1
         self.n_atoms = self.get_n_atoms()
 
     def get_n_atoms(self):
