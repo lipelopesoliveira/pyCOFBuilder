@@ -98,118 +98,7 @@ def build(cof_name=None,
         return [False, f'{bb1}-{bb2}-{net}-{stacking}']
 
 
-def build_all_available_COFs(stacking='AA',
-                             save_format='cif'):
-    '''Build all available COFs in the out directory.
-
-    Parameters
-    ----------
-    stacking : str
-        Stacking type.
-        Default: 'AA'
-    save_format : str
-        Format to save the file.
-        Default: 'cif'
-    '''
-
-    BB = Building_Block()
-
-    lista_amina_2 = BB.get_bipodal_NH2()
-    lista_amina_3 = BB.get_tripodal_NH2()
-    lista_amina_4 = BB.get_tetrapodal_squared_NH2()
-    lista_oh_2 = BB.get_bipodal_OH2()
-    lista_oh_3 = BB.get_tripodal_OH2()
-    lista_oh_4 = BB.get_tetrapodal_squared_OH2()
-    lista_aldeido_2 = BB.get_bipodal_CHO()
-    lista_aldeido_3 = BB.get_tripodal_CHO()
-    lista_aldeido_4 = BB.get_tetrapodal_squared_CHO()
-    lista_b_2 = BB.get_bipodal_BOH2()
-    lista_b_3 = BB.get_tripodal_BOH2()
-    lista_b_4 = BB.get_tetrapodal_squared_BOH2()
-
-    cofs_list = []
-
-    failed_list = []
-    sucess_list = []
-
-    for file_a in lista_aldeido_3:
-        for file_b in lista_amina_2:
-            cofs_list += [f'{file_a}-{file_b}-HCB_A-{stacking}']
-
-    for file_a in lista_aldeido_4:
-        for file_b in lista_amina_2:
-            cofs_list += [f'{file_a}-{file_b}-SQL_A-{stacking}']
-
-    for file_a in lista_aldeido_3:
-        for file_b in lista_amina_3:
-            cofs_list += [f'{file_a}-{file_b}-HCB-{stacking}']
-
-    for file_a in lista_amina_3:
-        for file_b in lista_aldeido_2:
-            cofs_list += [f'{file_a}-{file_b}-HCB_A-{stacking}']
-
-    for file_a in lista_amina_4:
-        for file_b in lista_aldeido_2:
-            cofs_list += [f'{file_a}-{file_b}-SQL_A-{stacking}']
-
-    for file_a in lista_b_3:
-        for file_b in lista_oh_2:
-            cofs_list += [f'{file_a}-{file_b}-HCB_A-{stacking}']
-
-    for file_a in lista_b_3:
-        for file_b in lista_oh_3:
-            cofs_list += [f'{file_a}-{file_b}-HCB-{stacking}']
-
-    for file_a in lista_oh_3:
-        for file_b in lista_b_2:
-            cofs_list += [f'{file_a}-{file_b}-HCB_A-{stacking}']
-
-    for file_a in lista_oh_4:
-        for file_b in lista_b_2:
-            cofs_list += [f'{file_a}-{file_b}-SQL_A-{stacking}']
-
-    for file_a in lista_b_4:
-        for file_b in lista_oh_2:
-            cofs_list += [f'{file_a}-{file_b}-SQL_A-{stacking}']
-
-    val = input(
-        f'{len(cofs_list)} COFs will be created. Do you want to proceed? Type [y] to continue.\n')
-
-    if val == 'y':
-        t_i = time.time()
-        for cof in tqdm(cofs_list):
-            succes, name = build(cof, 
-                                 save_format=save_format, 
-                                 print_result=False)
-            if succes is True:
-                sucess_list += [name]
-            if succes is False:
-                failed_list += [name]
-
-        print('                      COF Name                              ',
-              '    Lattice    ',
-              ' Point Group ',
-              ' N° of symmetry op.',
-              sep='|')
-        print('-'*35)
-        for s in sucess_list:
-            Tools.print_result(*s)
-
-        print('{:i} sucessful. {:i} failled ({:.2f} % success rate)'.format(
-            len(sucess_list),
-            len(failed_list),
-            100*len(sucess_list)/(len(failed_list) + len(sucess_list))))
-
-        print(f'Enlapsed time: {time.time() - t_i:.3f} s \n')
-        if len(failed_list) > 0:
-            print('Failed list:')
-            for i in failed_list:
-                print(i)
-    else:
-        print('Exiting...')
-
-
-def build_COFs_list(cofs_list, save_format='cif', supercell=[1, 1, 1]):
+def build_COFs_list(cofs_list, save_format='cif', supercell=[1, 1, 1], save_dir='.', print_result=False):
 
     failed_list = []
     sucess_list = []
@@ -222,7 +111,8 @@ def build_COFs_list(cofs_list, save_format='cif', supercell=[1, 1, 1]):
         for cof in tqdm(cofs_list):
             succes, name = build(cof,
                                  save_format=save_format,
-                                 print_result=False,
+                                 print_result=print_result,
+                                 save_dir=save_dir,
                                  supercell=supercell)
             if succes is True:
                 sucess_list += [name]
@@ -385,6 +275,117 @@ def create_all_C4(nucleos=None, conectores=None, radicais=None):
                 BB.create_C4_BB(n, c, r)
                 print(BB.name, 'created')
                 BB.save()
+
+
+def build_all_available_COFs(stacking='AA',
+                             save_format='cif'):
+    '''Build all available COFs in the out directory.
+
+    Parameters
+    ----------
+    stacking : str
+        Stacking type.
+        Default: 'AA'
+    save_format : str
+        Format to save the file.
+        Default: 'cif'
+    '''
+
+    BB = Building_Block()
+
+    lista_amina_2 = BB.get_bipodal_NH2()
+    lista_amina_3 = BB.get_tripodal_NH2()
+    lista_amina_4 = BB.get_tetrapodal_squared_NH2()
+    lista_oh_2 = BB.get_bipodal_OH2()
+    lista_oh_3 = BB.get_tripodal_OH2()
+    lista_oh_4 = BB.get_tetrapodal_squared_OH2()
+    lista_aldeido_2 = BB.get_bipodal_CHO()
+    lista_aldeido_3 = BB.get_tripodal_CHO()
+    lista_aldeido_4 = BB.get_tetrapodal_squared_CHO()
+    lista_b_2 = BB.get_bipodal_BOH2()
+    lista_b_3 = BB.get_tripodal_BOH2()
+    lista_b_4 = BB.get_tetrapodal_squared_BOH2()
+
+    cofs_list = []
+
+    failed_list = []
+    sucess_list = []
+
+    for file_a in lista_aldeido_3:
+        for file_b in lista_amina_2:
+            cofs_list += [f'{file_a}-{file_b}-HCB_A-{stacking}']
+
+    for file_a in lista_aldeido_4:
+        for file_b in lista_amina_2:
+            cofs_list += [f'{file_a}-{file_b}-SQL_A-{stacking}']
+
+    for file_a in lista_aldeido_3:
+        for file_b in lista_amina_3:
+            cofs_list += [f'{file_a}-{file_b}-HCB-{stacking}']
+
+    for file_a in lista_amina_3:
+        for file_b in lista_aldeido_2:
+            cofs_list += [f'{file_a}-{file_b}-HCB_A-{stacking}']
+
+    for file_a in lista_amina_4:
+        for file_b in lista_aldeido_2:
+            cofs_list += [f'{file_a}-{file_b}-SQL_A-{stacking}']
+
+    for file_a in lista_b_3:
+        for file_b in lista_oh_2:
+            cofs_list += [f'{file_a}-{file_b}-HCB_A-{stacking}']
+
+    for file_a in lista_b_3:
+        for file_b in lista_oh_3:
+            cofs_list += [f'{file_a}-{file_b}-HCB-{stacking}']
+
+    for file_a in lista_oh_3:
+        for file_b in lista_b_2:
+            cofs_list += [f'{file_a}-{file_b}-HCB_A-{stacking}']
+
+    for file_a in lista_oh_4:
+        for file_b in lista_b_2:
+            cofs_list += [f'{file_a}-{file_b}-SQL_A-{stacking}']
+
+    for file_a in lista_b_4:
+        for file_b in lista_oh_2:
+            cofs_list += [f'{file_a}-{file_b}-SQL_A-{stacking}']
+
+    val = input(
+        f'{len(cofs_list)} COFs will be created. Do you want to proceed? Type [y] to continue.\n')
+
+    if val == 'y':
+        t_i = time.time()
+        for cof in tqdm(cofs_list):
+            succes, name = build(cof, 
+                                 save_format=save_format, 
+                                 print_result=False)
+            if succes is True:
+                sucess_list += [name]
+            if succes is False:
+                failed_list += [name]
+
+        print('                      COF Name                              ',
+              '    Lattice    ',
+              ' Point Group ',
+              ' N° of symmetry op.',
+              sep='|')
+        print('-'*35)
+        for s in sucess_list:
+            Tools.print_result(*s)
+
+        print('{:i} sucessful. {:i} failled ({:.2f} % success rate)'.format(
+            len(sucess_list),
+            len(failed_list),
+            100*len(sucess_list)/(len(failed_list) + len(sucess_list))))
+
+        print(f'Enlapsed time: {time.time() - t_i:.3f} s \n')
+        if len(failed_list) > 0:
+            print('Failed list:')
+            for i in failed_list:
+                print(i)
+    else:
+        print('Exiting...')
 
 
 def clean_out_dir():
