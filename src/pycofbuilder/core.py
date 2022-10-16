@@ -99,6 +99,23 @@ def build(cof_name=None,
 
 
 def build_COFs_list(cofs_list, save_format='cif', supercell=[1, 1, 1], save_dir='.', print_result=False):
+    '''Build all the COF structures with a given name on a list
+
+    Parameters
+    ----------
+    cofs_list : str
+        List with the names of the COFs to be build.
+    save_format : list
+        List containg the formats to save the file.
+        Can be `json`, `cif`, `xyz`, `turbomole`, `vasp`, `xsf`, `pdb`.
+    print_result : bool
+        Boolean to print in the screen or not the result of the creation.
+    supercell : list
+        List containg the units or repetition for supercell creation.
+        Default: [1,1,1]
+    save_dir : str
+        Path to the directory where the file will be saved.
+    '''
 
     failed_list = []
     sucess_list = []
