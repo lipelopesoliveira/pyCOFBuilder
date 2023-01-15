@@ -1098,7 +1098,7 @@ def save_qe(out_path,
     celldm3 = c/a
     celldm4 = angle(cell[0], cell[1], unit='cos')
     celldm5 = angle(cell[0], cell[2], unit='cos')
-    cellcm6 = angle(cell[1], cell[2], unit='cos')
+    celldm6 = angle(cell[1], cell[2], unit='cos')
 
     kx, ky, kz = get_kgrid(cellpar_to_cell(cell), k_dist)
 
@@ -1238,6 +1238,7 @@ def save_qe(out_path,
         out_file.write(f'    celldm(2) =   {celldm2:.8f}\n')
         out_file.write(f'    celldm(3) =   {celldm3:.8f}\n')
         out_file.write(f'    celldm(5) =   {celldm5:.8f}\n')
+        out_file.write(f'    celldm(6) =   {celldm6:.8f}\n')
 
     elif lattice_type == 'triclinic':
         out_file.write('    ibrav =  0\n')
