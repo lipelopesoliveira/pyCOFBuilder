@@ -5,7 +5,7 @@ import sys
 
 # This code is written for Python 3.
 if sys.version_info[0] != 3:
-    raise Exception("pyCOFBuilder requires Python 3.")
+    raise Exception("Sorry byt pyCOFBuilder requires Python 3.")
     sys.exit(1)
 
 # Import tools class

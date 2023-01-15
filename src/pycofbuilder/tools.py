@@ -293,19 +293,23 @@ def get_fractional_to_cartesian_matrix(cell_a: float,
         alpha = np.deg2rad(alpha)
         beta = np.deg2rad(beta)
         gamma = np.deg2rad(gamma)
+
     cosa = np.cos(alpha)
     cosb = np.cos(beta)
     cosg = np.cos(gamma)
     sing = np.sin(gamma)
-    volume = 1.0 - cosa**2.0 - cosb**2.0 - cosg**2.0 + 2.0 * cosa * cosb * cosg
-    volume = np.sqrt(volume)
+
+    volume = np.sqrt(1.0 - cosa**2.0 - cosb**2.0 - cosg**2.0 + 2.0 * cosa * cosb * cosg)
+
     r = np.zeros((3, 3))
+
     r[0, 0] = cell_a
     r[0, 1] = cell_b * cosg
     r[0, 2] = cell_c * cosb
     r[1, 1] = cell_b * sing
     r[1, 2] = cell_c * (cosa - cosb * cosg) / sing
     r[2, 2] = cell_c * volume / sing
+
     return r
 
 
@@ -336,19 +340,23 @@ def get_cartesian_to_fractional_matrix(a: float,
         alpha = np.deg2rad(alpha)
         beta = np.deg2rad(beta)
         gamma = np.deg2rad(gamma)
+
     cosa = np.cos(alpha)
     cosb = np.cos(beta)
     cosg = np.cos(gamma)
     sing = np.sin(gamma)
-    volume = 1.0 - cosa**2.0 - cosb**2.0 - cosg**2.0 + 2.0 * cosa * cosb * cosg
-    volume = np.sqrt(volume)
+
+    volume = np.sqrt(1.0 - cosa**2.0 - cosb**2.0 - cosg**2.0 + 2.0 * cosa * cosb * cosg)
+
     r = np.zeros((3, 3))
+
     r[0, 0] = 1.0 / a
     r[0, 1] = -cosg / (a * sing)
     r[0, 2] = (cosa * cosg - cosb) / (a * volume * sing)
     r[1, 1] = 1.0 / (b * sing)
     r[1, 2] = (cosb * cosg - cosa) / (b * volume * sing)
     r[2, 2] = sing / (c * volume)
+
     return r
 
 
@@ -373,9 +381,10 @@ def get_reciprocal_vectors(cell):
         v1, v2, v3 = cellpar_to_cell(cell)
 
     vol = np.dot(v1, np.cross(v2, v3))
-    b1 = 2*np.pi*np.cross(v2, v3)/vol
-    b2 = 2*np.pi*np.cross(v3, v1)/vol
-    b3 = 2*np.pi*np.cross(v1, v2)/vol
+
+    b1 = 2 * np.pi * np.cross(v2, v3) / vol
+    b2 = 2 * np.pi * np.cross(v3, v1) / vol
+    b3 = 2 * np.pi * np.cross(v1, v2) / vol
 
     return b1, b2, b3
 
@@ -397,8 +406,11 @@ def get_kgrid(cell, distance=0.3):
     kz : int
         Number of points in the z direction on reciprocal space
     '''
+
     b1, b2, b3 = get_reciprocal_vectors(cell)
+
     b = np.array([np.linalg.norm(b1), np.linalg.norm(b2), np.linalg.norm(b3)])
+
     kx = np.ceil(b[0]/distance).astype(int)
     ky = np.ceil(b[1]/distance).astype(int)
     kz = np.ceil(b[2]/distance).astype(int)
@@ -443,7 +455,7 @@ def calculate_UnitCells(cell, cutoff):
         (3,3) cell vectors or (6,1)
     Returns
     -------
-    SuperCell
+    superCell
         (3,1) list containg the number of repiting units in `x`, `y`, `z` directions.
     '''
 
@@ -502,9 +514,9 @@ def cellpar_to_lammpsbox(a: float,
     lx = a
     xy = b * np.cos(gamma)
     xz = c * np.cos(beta)
-    ly = np.sqrt(b**2 - xy **2)
+    ly = np.sqrt(b ** 2 - xy ** 2)
     yz = (b * c * np.cos(alpha) - xy * xz) / ly
-    lz = np.sqrt(c**2 - xz**2 - yz**2)
+    lz = np.sqrt(c ** 2 - xz ** 2 - yz ** 2)
 
     return np.array([lx, ly, lz, xy, xz, yz])
 
@@ -573,6 +585,7 @@ def find_bond_atom(cof_name):
 
 
 def closest_atom(label_1, pos_1, labels, pos):
+    '''Finds the closest atom to a given atom'''
 
     list_labels = []
     list_pos = []
@@ -584,10 +597,16 @@ def closest_atom(label_1, pos_1, labels, pos):
 
     closest_index = distance.cdist([pos_1], list_pos).argmin()
 
-    return list_labels[closest_index], list_pos[closest_index], np.linalg.norm(pos_1 - list_pos[closest_index])
+    closest_label = list_labels[closest_index]
+    closest_position = list_pos[closest_index]
+    euclidian_distance = np.linalg.norm(pos_1 - list_pos[closest_index])
+
+    return closest_label, closest_position, euclidian_distance
 
 
 def closest_atom_struc(label_1, pos_1, labels, pos):
+    '''Finds the closest atom on the structure to a given atom'''
+
     list_labels = []
     list_pos = []
     for i in range(len(labels)):
@@ -595,9 +614,14 @@ def closest_atom_struc(label_1, pos_1, labels, pos):
             if 'C' in labels[i]:
                 list_labels += [labels[i]]
                 list_pos += [pos[i]]
+
     closest_index = distance.cdist([pos_1], list_pos).argmin()
 
-    return list_labels[closest_index], list_pos[closest_index], np.linalg.norm(pos_1-list_pos[closest_index])
+    closet_label = list_labels[closest_index]
+    closet_position = list_pos[closest_index]
+    euclidian_distance = np.linalg.norm(pos_1 - list_pos[closest_index])
+
+    return closet_label, closet_position, euclidian_distance
 
 
 def print_result(name, lattice, hall, space_group, space_number, symm_op):
@@ -614,8 +638,7 @@ def print_comand(text, verbose, match):
     if verbose in match:
         print(text)
 
-############# Reads and save files #####################
-
+# ------------------------- Reads and save files ----------------------------- #
 
 def save_csv(path, file_name, data, delimiter=',', head=False):
     """
@@ -636,12 +659,13 @@ def save_csv(path, file_name, data, delimiter=',', head=False):
     """
 
     # Remove the extention if exists
-    file_name = file_name.split('.')[0] 
+    file_name = file_name.split('.')[0]
     file_name = os.path.join(path, file_name + '.csv')
 
     file_temp = open(file_name, 'w')
     if head is not False:
         file_temp.write(head)
+
     for i in range(len(data)):
         file_temp.write(delimiter.join([str(j) for j in data[i]]) + '\n')
 
@@ -801,11 +825,11 @@ def save_xsf(path, file_name, cell, atom_label, atom_pos):
     path : str
         Path to the file.
     file_name : str
-        Name of the file. Does not neet to contain the `.xsf` extention. 
+        Name of the file. Does not neet to contain the `.xsf` extention.
     cell : numpy array
-        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters. 
+        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
     atom_label : list
-        List of strings containing containg the N atom label. 
+        List of strings containing containg the N atom label.
     atom_pos : list
         Nx3 array contaning the atoms coordinates.
     """
@@ -826,7 +850,10 @@ def save_xsf(path, file_name, cell, atom_label, atom_pos):
     xsf_file.write(f'           {len(atom_pos)}           1\n')
 
     for i in range(len(atom_pos)):
-        xsf_file.write(f'{atom_label[i]}        {atom_pos[i][0]:>5.9f}    {atom_pos[i][1]:>5.9f}    {atom_pos[i][2]:>5.9f}\n')
+        xsf_file.write('{:3s}        {:>5.9f}    {:>5.9f}    {:>5.9f}\n'.format(atom_label[i],
+                                                                                atom_pos[i][0],
+                                                                                atom_pos[i][1],
+                                                                                atom_pos[i][2]))
 
     xsf_file.close()
 
@@ -859,14 +886,30 @@ def save_pqr(path, file_name, cell, atom_label, atom_pos, partial_charges=False)
     pqr_file = open(os.path.join(path, file_name + '.pqr'), 'w')
     pqr_file.write(f'TITLE       {file_name}  \n')
     pqr_file.write('REMARK   4\n')
-    pqr_file.write(f'CRYST1{cell[0]:>9.3f}{cell[1]:>9.3f}{cell[2]:>9.3f}{cell[3]:>7.2f}{cell[4]:>7.2f}{cell[5]:>7.2f} P1\n')
+    pqr_file.write('CRYST1{:>9.3f}{:>9.3f}{:>9.3f}{:>7.2f}{:>7.2f}{:>7.2f} P1\n'.format(cell[0],
+                                                                                        cell[1],
+                                                                                        cell[2],
+                                                                                        cell[3],
+                                                                                        cell[4],
+                                                                                        cell[5]))
 
     if partial_charges is not False:
         for i in range(len(atom_pos)):
-            pqr_file.write(f'ATOM   {i+1:>4} {atom_label[i]:>2}   MOL A   0    {atom_pos[i][0]:>8.3f}{atom_pos[i][1]:>8.3f}{atom_pos[i][2]:>8.3f}{partial_charges:>8.5f}                {atom_label[i]}\n')
+            pqr_file.write('ATOM   {:>4} {:>2}   MOL A   0    {:>8.3f}{:>8.3f}{:>8.3f}{:>8.5f}                {}\n'.format(i + 1, 
+                                                                                                                           atom_label[i],
+                                                                                                                           atom_pos[i][0],
+                                                                                                                           atom_pos[i][1],
+                                                                                                                           atom_pos[i][2],
+                                                                                                                           partial_charges[i],
+                                                                                                                           atom_label[i]))
     if partial_charges is False:
         for i in range(len(atom_pos)):
-            pqr_file.write(f'ATOM   {i+1:>4} {atom_label[i]:>2}   MOL A   0    {atom_pos[i][0]:>8.3f}{atom_pos[i][1]:>8.3f}{atom_pos[i][2]:>8.3f}                {atom_label[i]}\n')
+            pqr_file.write('ATOM   {:>4} {:>2}   MOL A   0    {:>8.3f}{:>8.3f}{:>8.3f}                {}\n'.format(i + 1, 
+                                                                                                                   atom_label[i],
+                                                                                                                   atom_pos[i][0],
+                                                                                                                   atom_pos[i][1],
+                                                                                                                   atom_pos[i][2],
+                                                                                                                   atom_label[i]))
 
     pqr_file.close()
 
@@ -897,10 +940,20 @@ def save_pdb(path, file_name, cell, atom_label, atom_pos):
     pdb_file = open(os.path.join(path, file_name + '.pdb'), 'w')
     pdb_file.write(f'TITLE       {file_name}  \n')
     pdb_file.write('REMARK   pyCOFBuilder\n')
-    pdb_file.write(f'CRYST1{cell[0]:>9.3f}{cell[1]:>9.3f}{cell[2]:>9.3f}{cell[3]:>7.2f}{cell[4]:>7.2f}{cell[5]:>7.2f} P1\n')
+    pdb_file.write('CRYST1{:>9.3f}{:>9.3f}{:>9.3f}{:>7.2f}{:>7.2f}{:>7.2f} P1\n'.format(cell[0],
+                                                                                        cell[1],
+                                                                                        cell[2],
+                                                                                        cell[3],
+                                                                                        cell[4],
+                                                                                        cell[5]))
 
     for i in range(len(atom_pos)):
-        pdb_file.write(f'ATOM   {i+1:>4} {atom_label[i]:>2}   MOL          {atom_pos[i][0]:>8.3f}{atom_pos[i][1]:>8.3f}{atom_pos[i][2]:>8.3f}  1.00  0.00           {atom_label[i]}\n')
+        pdb_file.write('ATOM   {:>4} {:>2}   MOL          {:>8.3f}{:>8.3f}{:>8.3f}  1.00  0.00           {}\n'.format(i+1,
+                                                                                                                      atom_label[i],
+                                                                                                                      atom_pos[i][0],
+                                                                                                                      atom_pos[i][1],
+                                                                                                                      atom_pos[i][2],
+                                                                                                                      atom_label[i]))
 
     pdb_file.close()
 
@@ -1015,7 +1068,10 @@ def save_qe(out_path,
     struct.merge_sites(tol=.5, mode='delete')
 
     # Translate the atoms to the unit cell
-    struct.translate_sites(range(len(struct.as_dict()['sites'])), [0, 0, 0.5], frac_coords=True, to_unit_cell=True)
+    struct.translate_sites(range(len(struct.as_dict()['sites'])),
+                           [0, 0, 0.5],
+                           frac_coords=True,
+                           to_unit_cell=True)
 
     # Simetriza a estrutura
     symm = SpacegroupAnalyzer(struct, symprec=1, angle_tolerance=5.0)
@@ -1025,7 +1081,9 @@ def save_qe(out_path,
     hall = symm.get_hall()
 
     if supercell is not False:
-        struct_symm_prim.make_supercell([[supercell[0], 0, 0], [0, supercell[1], 0], [0, 0, supercell[2]]])
+        struct_symm_prim.make_supercell([[supercell[0], 0, 0],
+                                        [0, supercell[1], 0],
+                                        [0, 0, supercell[2]]])
 
     dict_sctructure = struct_symm_prim.as_dict()
 
@@ -1295,7 +1353,7 @@ def save_json(path, file_name, cell, atom_labels, atom_pos):
 
     if len(cell) == 3:
         cell_par = cell_to_cellpar(np.array(cell)).tolist()
-        cell_par =  [round(i, 10) for i in cell_par]
+        cell_par = [round(i, 10) for i in cell_par]
 
     if len(cell) == 6:
         cell_par = cell
@@ -1382,9 +1440,18 @@ loop_
     for i in range(len(atom_pos)):
         u, v, w = atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]
         if partial_charges is not False:
-            cif_text += f'{atom_labels[i]}    {atom_labels[i]} {u:>15.9f} {v:>15.9f} {w:>15.9f} {partial_charges[i]:>10.5f}\n'
+            cif_text += '{}    {} {:>15.9f} {:>15.9f} {:>15.9f} {:>10.5f}\n'.format(atom_labels[i],
+                                                                                    atom_labels[i],
+                                                                                    u,
+                                                                                    v,
+                                                                                    w,
+                                                                                    partial_charges[i])
         else:
-            cif_text += f'{atom_labels[i]}    {atom_labels[i]} {u:>15.9f} {v:>15.9f} {w:>15.9f}\n'
+            cif_text += '{}    {} {:>15.9f} {:>15.9f} {:>15.9f}\n'.format(atom_labels[i],
+                                                                          atom_labels[i],
+                                                                          u,
+                                                                          v,
+                                                                          w)
 
     # Write cif_text to file
     cif_file = open(os.path.join(path, file_name + '.cif'), 'w')
@@ -1455,7 +1522,11 @@ def convert_cif_2_xyz(path, file_name, supercell=[1, 1, 1]):
         structure.make_supercell([[supercell[0], 0, 0], [0, supercell[1], 0], [0, 0, supercell[2]]])
 
         dict_sctructure = structure.as_dict()
-        a, b, c = dict_sctructure['lattice']['a'], dict_sctructure['lattice']['b'], dict_sctructure['lattice']['c']
+
+        a, b, c = dict_sctructure['lattice']['a']
+        b = dict_sctructure['lattice']['b']
+        c = dict_sctructure['lattice']['c']
+
         alpha = round(dict_sctructure['lattice']['alpha'])
         beta = round(dict_sctructure['lattice']['beta'])
         gamma = round(dict_sctructure['lattice']['gamma'])
@@ -1474,11 +1545,14 @@ def convert_cif_2_xyz(path, file_name, supercell=[1, 1, 1]):
     temp_file.write(f'{a}  {b}  {c}  {alpha}  {beta}  {gamma}\n')
 
     for i in range(len(atom_labels)):
-        temp_file.write('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(atom_labels[i], atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]))
+        temp_file.write('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(atom_labels[i],
+                                                                     atom_pos[i][0],
+                                                                     atom_pos[i][1],
+                                                                     atom_pos[i][2]))
 
     temp_file.close()
 
-########################### JSON related ##########################  
+# ---------------------------- JSON related -------------------------------- #  
 
 def write_json(path, name, COF_json):
 
@@ -1490,7 +1564,12 @@ def write_json(path, name, COF_json):
     save_path = os.path.join(path, name + '.json')
 
     with open(save_path, 'w', encoding='utf-8') as f:
-        simplejson.dump(COF_json, f, ensure_ascii=False, separators=(',', ':'), indent=2, ignore_nan=True)
+        simplejson.dump(COF_json,
+                        f,
+                        ensure_ascii=False,
+                        separators=(',', ':'),
+                        indent=2,
+                        ignore_nan=True)
 
 
 def read_json(path, cof_name):
@@ -1513,16 +1592,16 @@ def create_COF_json(name):
     spectrum_info = 'Information about spectra simulation like DRX, FTIR, ssNMR, UV-VIS, Band dispersion, Phonon dispersion...'
     experimental_info = 'Experimental data DRX, FTIR, ssNMR, UV-VIS...'
 
-    COF_json = {'system':{'description': system_info,
-                          'name': name,
-                          'geo_opt': False,
-                          'execution_times_seconds': {}},
-                'geometry':{'description':geometry_info},
-                'optimization':{'description':optimization_info},
-                'adsorption':{'description':adsorption_info},
-                'textural':{'description':textural_info},
-                'spectrum':{'description':spectrum_info},
-                'experimental':{'description':experimental_info}
+    COF_json = {'system': {'description': system_info,
+                           'name': name,
+                           'geo_opt': False,
+                           'execution_times_seconds': {}},
+                'geometry': {'description': geometry_info},
+                'optimization': {'description': optimization_info},
+                'adsorption': {'description': adsorption_info},
+                'textural': {'description': textural_info},
+                'spectrum': {'description': spectrum_info},
+                'experimental': {'description': experimental_info}
                 }
 
     return COF_json
