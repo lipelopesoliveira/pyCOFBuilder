@@ -9,8 +9,10 @@ This class implements definitions for Reticulum buiding
 import os
 import numpy as np
 
+# Import pymatgen
 from pymatgen.core import Lattice, Structure
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
+
 from scipy.spatial.transform import Rotation as R
 
 import pycofbuilder.tools as Tools
@@ -1075,7 +1077,9 @@ class Reticulum():
 
         # Adiciona o bloco 2 no sítio B1 da célula unitária
         final_pos = np.vstack((final_pos,
-                               np.dot(bb_2.atom_pos, R.from_euler('z', 45, degrees=True).as_matrix()) + np.array([0.5, 0.5, 0])*a)
+                               np.dot(
+                                bb_2.atom_pos, R.from_euler('z', 45, degrees=True).as_matrix()
+                                ) + np.array([0.5, 0.5, 0])*a)
                               )
         final_label += bb_2.atom_labels
 
@@ -1824,7 +1828,6 @@ class Reticulum():
         final_label = list(bb_1.atom_labels)
 
         # Add tbe building block 2 (C3) on [0.5, 0.0, 0.0] of the unitary cell (B1 site)
-        #final_pos = np.dot(bb_2.atom_pos, R.from_euler('z', -180, degrees=True).as_matrix()) + np.array([0, 0.57735027, 0])*a
         final_pos = np.vstack((final_pos, np.dot(bb_2.atom_pos, R.from_euler(
             'z', -180, degrees=True).as_matrix()) + np.array([0, 0.57735027, 0])*a))
         final_label += list(bb_2.atom_labels)
@@ -1925,7 +1928,8 @@ class Reticulum():
 
             self.symm_structure = symm.get_refined_structure()
 
-        # Create AAl stacking. Hexagonal cell with two sheets per cell shifited by the shift_vector in angstroms.
+        # Create AAl stacking.
+        # Hexagonal cell with two sheets per cell shifited by the shift_vector in angstroms.
         if stacking == 'AAl':
             self.stacking = 'AAl'
             labels_conv_crystal = np.array(
@@ -1955,7 +1959,8 @@ class Reticulum():
             self.symm_structure = symm.get_refined_structure()
 
         # Create AA tilted stacking.
-        # Tilted Hexagonal cell by tilt_angle with two sheets per cell shifited by the shift_vector in angstroms.
+        # Tilted Hexagonal cell by tilt_angle with two sheets per cell shifited by 
+        # the shift_vector in angstroms.
         if stacking == 'AAt':
             self.stacking = 'AAt'
 
@@ -2297,7 +2302,8 @@ class Reticulum():
 
             self.symm_structure = symm.get_refined_structure()
 
-        # Create AAl stacking. Hexagonal cell with two sheets per cell shifited by the shift_vector in angstroms.
+        # Create AAl stacking. 
+        # Hexagonal cell with two sheets per cell shifited by the shift_vector in angstroms.
         if stacking == 'AAl':
             self.stacking = 'AAl'
             labels_conv_crystal = np.array(
@@ -2327,7 +2333,8 @@ class Reticulum():
             self.symm_structure = symm.get_refined_structure()
 
         # Create AA tilted stacking.
-        # Tilted Hexagonal cell by tilt_angle with two sheets per cell shifited by the shift_vector in angstroms.
+        # Tilted Hexagonal cell by tilt_angle with two sheets per cell 
+        # shifited by the shift_vector in angstroms.
         if stacking == 'AAt':
             self.stacking = 'AAt'
 
@@ -2559,7 +2566,7 @@ class Reticulum():
             print('Unitary cell built:', lattice)
 
         bb1_v1, bb1_v2, bb1_v3, bb1_v4 = bb_1.get_X_points()[1]
-        bb1_lado1, bb1_lado2, bb1_lado3 = (
+        bb1_lado1, _, _ = (
             bb1_v1 + bb1_v2) / 2, (bb1_v1 + bb1_v3) / 2, (bb1_v1 + bb1_v4) / 2
 
         R_matrix = Tools.rotation_matrix_from_vectors(
@@ -2596,9 +2603,9 @@ class Reticulum():
         struct.translate_sites(range(len(struct.as_dict()['sites'])), [
                                0, 0, 0.5], frac_coords=True, to_unit_cell=True)
 
-        atom_labels = np.array([[i['label']]
-                               for i in struct.as_dict()['sites']]).flatten()
-        atom_pos = np.array([i['xyz'] for i in struct.as_dict()['sites']])
+        #atom_labels = np.array([[i['label']]
+        #                       for i in struct.as_dict()['sites']]).flatten()
+        #atom_pos = np.array([i['xyz'] for i in struct.as_dict()['sites']])
         cell = np.array(struct.as_dict()['lattice']['matrix'])
 
         # Change the X atoms by the desired bond_atom
@@ -2615,9 +2622,9 @@ class Reticulum():
         struct.translate_sites(range(len(struct.as_dict()['sites'])), [
                                0, 0, 0.5], frac_coords=True, to_unit_cell=True)
 
-        atom_labels = np.array([[i['label']]
-                               for i in struct.as_dict()['sites']]).flatten()
-        atom_pos = np.array([i['xyz'] for i in struct.as_dict()['sites']])
+        #atom_labels = np.array([[i['label']]
+        #                       for i in struct.as_dict()['sites']]).flatten()
+        #atom_pos = np.array([i['xyz'] for i in struct.as_dict()['sites']])
         cell = np.array(struct.as_dict()['lattice']['matrix'])
 
         # Simetriza a estrutura
@@ -2687,7 +2694,8 @@ class Reticulum():
 
             self.symm_structure = AB_2_symm.get_refined_structure()
 
-        # Create AAl stacking. Tetragonal cell with two sheets per cell shifited by the shift_vector in angstroms.
+        # Create AAl stacking. 
+        # Tetragonal cell with two sheets per cell shifited by the shift_vector in angstroms.
         if stacking == 'AAl':
             self.stacking = 'AAl'
             labels_conv_crystal = np.array(
@@ -2715,7 +2723,8 @@ class Reticulum():
             self.symm_structure = Structure(
                 lattice, AB_label+AB_label, AB, coords_are_cartesian=False)
 
-        # Create AA tilted stacking. Tilted tetragonal cell with two sheets per cell tilted by tilt_angle.
+        # Create AA tilted stacking. 
+        # Tilted tetragonal cell with two sheets per cell tilted by tilt_angle.
         if stacking == 'AAt':
             self.stacking = 'AAt'
 
@@ -2949,7 +2958,7 @@ class Reticulum():
             print('Unitary cell built:', lattice)
 
         bb1_v1, bb1_v2, bb1_v3, bb1_v4 = bb_1.get_X_points()[1]
-        bb1_lado1, bb1_lado2, bb1_lado3 = (
+        bb1_lado1, _, _ = (
             bb1_v1 + bb1_v2) / 2, (bb1_v1 + bb1_v3) / 2, (bb1_v1 + bb1_v4) / 2
 
         R_matrix = Tools.rotation_matrix_from_vectors(
@@ -2973,7 +2982,7 @@ class Reticulum():
         final_label += list(bb_1.atom_labels)
 
         '''
-        Olde version of the positioning code
+        Older version of the positioning code
         # Add tbe building block 1 (C4) on the center of the unitary cell (A1 site) 
         final_pos = np.dot(bb_1.atom_pos, R.from_euler('z', -30, degrees=True).as_matrix()) + np.array([1/4, np.sqrt(3)/4, 0])*a
         final_label = list(bb_1.atom_labels)
@@ -3228,7 +3237,8 @@ class Reticulum():
 
             self.symm_structure = symm.get_refined_structure()
 
-        # Create AA tilted stacking. Tilted tetragonal cell with two sheets per cell tilted by tilt_angle.
+        # Create AA tilted stacking.
+        # Tilted tetragonal cell with two sheets per cell tilted by tilt_angle.
         if stacking == 'AAt':
             self.stacking = 'AAt'
 
@@ -3312,8 +3322,7 @@ class Reticulum():
                 str(self.space_group_n),
                 len(symm_op)]
 
-
-################   Saving methods  ############################
+# ----------------   Saving methods  ---------------- #
 
     def save_cif(self, supercell: tuple = (1, 1, 1), path: str = None):
         """Save the structure in .cif format
@@ -3453,10 +3462,10 @@ class Reticulum():
         Parameters
         ----------
         supercell : tuple, optional
-            List containing the supercell parameters. 
+            List containing the supercell parameters.
             Default  = [1, 1, 1]
         path : str, optional
-            Path to save the .vasp file.        
+            Path to save the .vasp file.
         """
         if path is not None:
             self.out_path = path
@@ -3474,10 +3483,10 @@ class Reticulum():
         Parameters
         ----------
         supercell : tuple, optional
-            List containing the supercell parameters. 
+            List containing the supercell parameters.
             Default  = [1, 1, 1]
         path : str, optional
-            Path to save the .coord file.        
+            Path to save the .coord file.
         """
         if path is not None:
             self.out_path = path
@@ -3525,10 +3534,10 @@ class Reticulum():
         Parameters
         ----------
         supercell : tuple, optional
-            List containing the supercell parameters. 
+            List containing the supercell parameters.
             Default  = [1, 1, 1]
         path : str, optional
-            Path to save the .xyz file.        
+            Path to save the .xyz file.
         """
         if path is not None:
             self.out_path = path
@@ -3611,7 +3620,7 @@ class Reticulum():
         celldm3 = c/a
         celldm4 = Tools.angle(cell[0], cell[1], unit='cos')
         celldm5 = Tools.angle(cell[0], cell[2], unit='cos')
-        cellcm6 = Tools.angle(cell[1], cell[2], unit='cos')
+        celldm6 = Tools.angle(cell[1], cell[2], unit='cos')
 
         kx, ky, kz = Tools.get_kgrid(Tools.cellpar_to_cell(cell), k_dist)
 
@@ -3756,6 +3765,7 @@ class Reticulum():
             out_file.write(f'    celldm(2) =   {celldm2:.8f}\n')
             out_file.write(f'    celldm(3) =   {celldm3:.8f}\n')
             out_file.write(f'    celldm(5) =   {celldm5:.8f}\n')
+            out_file.write(f'    celldm(6) =   {celldm6:.8f}\n')
 
         elif self.lattice_type == 'triclinic':
             out_file.write('    ibrav =  0\n')
