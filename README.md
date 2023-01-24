@@ -135,8 +135,9 @@ Note that every "card" for the building block name is separated by an underline 
 
 ## Current available Building Blocks
 
-![Slide2](https://user-images.githubusercontent.com/33868364/160653787-f9161ff8-aaa7-49a8-aec4-77f2255fc0a3.PNG)
-![Slide3](https://user-images.githubusercontent.com/33868364/160653797-6b788593-4772-4703-ab18-6c218bcf0ba4.PNG)
+![Bipodal](https://github.com/lipelopesoliveira/pyCOFBuilder/blob/master/docs/BB_C2.png)
+![Tripodal](https://github.com/lipelopesoliveira/pyCOFBuilder/blob/master/docs/BB_C3.png)
+![Tetrapodal_2D](https://github.com/lipelopesoliveira/pyCOFBuilder/blob/master/docs/BB_C4.png)
 
 ## Current available Connector Groups
 
@@ -145,7 +146,7 @@ Note that every "card" for the building block name is separated by an underline 
 
 ## Current available R Groups
 
-![Captura de tela 2022-03-29 160604](https://user-images.githubusercontent.com/33868364/160687866-ef168933-55d7-46b9-a1de-0b15e1c38f0f.png)
+![R_groups](https://github.com/lipelopesoliveira/pyCOFBuilder/blob/master/docs/R_GROUPS.png)
 
 ## Citation
 
