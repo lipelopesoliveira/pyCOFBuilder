@@ -2,7 +2,7 @@
 
 ![puCOFBuilder](docs/header.png)
 
-**pyCOFBuilder** is a simple and powerful python package to automatically assembly COF structures with specifics building blocks, topologies, and functionalizations. The project was developed to address the need for generation of COFs structures in a high-throughput style, based on a nomenclature tha allows direct sctructural feature interpretation from a simple name.
+**pyCOFBuilder** is a simple and powerful python package to automatically assembly COF structures with specifics building blocks, topologies, and functionalizations. The project was developed to address the need for generation of COFs structures in a high-throughput style, based on a nomenclature tha allows direct sctructural feature interpretation from a simple name. The package uses[pymatgen](https://pymatgen.org/) to create the structures. The package is still under development, but it is already possible to create a large number of COFs structures.
 
 Learn more at [ToNano&Beyond](https://tonanoandbeyondblog.wordpress.com/)
 
@@ -22,6 +22,7 @@ pip install pycofbuilder
 2. numpy >= 1.2
 3. scipy >= 1.6.3
 4. simplejson
+5. tqdm
 
 The Python dependencies are most easily satisfied using a conda
 ([anaconda](https://www.anaconda.com/distribution)/[miniconda](https://docs.conda.io/en/latest/miniconda.html))
@@ -80,7 +81,7 @@ COF.build_all_available_COFs()
 
 You should see this output, where the code will calculate how many COFs will be created and ask for confirmation. Once you type `y` to confirm, a progress bar will indicate the creation of the structures as well as the estimated time for concluding the task. After the creation, the code will print some information about the COFs created, how many of the structures were created successfully, and the elapsed time.
 
-``` python
+```python
 >>> 20 COFs will be created. Do you want to proceed? Type [y] to continue.
 y
                       COF Name                              |    Lattice    | Point Group | N° of symmetry op. |
@@ -155,8 +156,9 @@ Note that every "card" for the building block name is separated by an underline 
 
 ## Current available Building Blocks
 
-![Slide2](https://user-images.githubusercontent.com/33868364/160653787-f9161ff8-aaa7-49a8-aec4-77f2255fc0a3.PNG)
-![Slide3](https://user-images.githubusercontent.com/33868364/160653797-6b788593-4772-4703-ab18-6c218bcf0ba4.PNG)
+![Bipodal](https://github.com/lipelopesoliveira/pyCOFBuilder/blob/master/docs/BB_C2.png)
+![Tripodal](https://github.com/lipelopesoliveira/pyCOFBuilder/blob/master/docs/BB_C3.png)
+![Tetrapodal_2D](https://github.com/lipelopesoliveira/pyCOFBuilder/blob/master/docs/BB_C4.png)
 
 ## Current available Connector Groups
 
@@ -165,7 +167,7 @@ Note that every "card" for the building block name is separated by an underline 
 
 ## Current available R Groups
 
-![Captura de tela 2022-03-29 160604](https://user-images.githubusercontent.com/33868364/160687866-ef168933-55d7-46b9-a1de-0b15e1c38f0f.png)
+![R_groups](https://github.com/lipelopesoliveira/pyCOFBuilder/blob/master/docs/R_GROUPS.png)
 
 ## Citation
 
