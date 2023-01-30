@@ -84,7 +84,7 @@ def angle(v1, v2, unit='degree'):
     Returns
     -------
     angle : float
-        Angle in the selected unit. 
+        Angle in the selected unit.
     """
     unit_vector1 = unit_vector(v1)
     unit_vector2 = unit_vector(v2)
@@ -390,7 +390,7 @@ def get_reciprocal_vectors(cell):
 
 
 def get_kgrid(cell, distance=0.3):
-    '''Get the k-points grid in the reciprocal space with a given distance for a 
+    '''Get the k-points grid in the reciprocal space with a given distance for a
     cell given in cell parameters of cell vectors.
     ----------
     cell : array
@@ -549,7 +549,7 @@ def change_X_atoms(atom_labels, atom_pos, bond_atom):
     ----------
     labels : list
         List containing the processed atom labels
-    pos : list 
+    pos : list
         List containing the processed atom position
     '''
     label, pos = [], []
@@ -566,7 +566,7 @@ def change_X_atoms(atom_labels, atom_pos, bond_atom):
 
 
 def find_bond_atom(cof_name):
-    '''Finds the type of atom that the program heve 
+    '''Finds the type of atom that the program heve
     to substitute X based on the building blocks'''
 
     bb1, bb2, net, stacking = cof_name.split('-')
@@ -639,6 +639,7 @@ def print_comand(text, verbose, match):
         print(text)
 
 # ------------------------- Reads and save files ----------------------------- #
+
 
 def save_csv(path, file_name, data, delimiter=',', head=False):
     """
@@ -895,7 +896,7 @@ def save_pqr(path, file_name, cell, atom_label, atom_pos, partial_charges=False)
 
     if partial_charges is not False:
         for i in range(len(atom_pos)):
-            pqr_file.write('ATOM   {:>4} {:>2}   MOL A   0    {:>8.3f}{:>8.3f}{:>8.3f}{:>8.5f}                {}\n'.format(i + 1, 
+            pqr_file.write('ATOM   {:>4} {:>2}   MOL A   0    {:>8.3f}{:>8.3f}{:>8.3f}{:>8.5f}                {}\n'.format(i + 1,
                                                                                                                            atom_label[i],
                                                                                                                            atom_pos[i][0],
                                                                                                                            atom_pos[i][1],
@@ -967,11 +968,11 @@ def save_gjf(path, file_name, atom_labels, atom_pos, text='opt pm6'):
     path : str
         Path to the file.
     file_name : str
-        Name of the file. Does not neet to contain the `.gjf` extention. 
+        Name of the file. Does not neet to contain the `.gjf` extention.
     cell : numpy array
-        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters. 
+        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
     atom_label : list
-        List of strings containing containg the N atom partial charges. 
+        List of strings containing containg the N atom partial charges.
     atom_pos : list
         Nx3 array contaning the atoms coordinates.
     text : str
@@ -1310,7 +1311,7 @@ def convert_cif_2_qe(out_path, file_name):
     out_path : str
         Path to the file.
     file_name : str
-        Name of the file. Does not neet to contain the `.cif` extention. 
+        Name of the file. Does not neet to contain the `.cif` extention.
     """
 
     cell, atom_labels, atom_pos, _ = read_cif(out_path, file_name, has_charges=False)
@@ -1339,13 +1340,13 @@ def save_json(path, file_name, cell, atom_labels, atom_pos):
     path : str
         Path to the file.
     file_name : str
-        Name of the file. Does not neet to contain the `.cif` extention. 
+        Name of the file. Does not neet to contain the `.cif` extention.
     atom_label : list
-        List of strings containing containg the N atom partial charges. 
+        List of strings containing containg the N atom partial charges.
     atom_pos : list
         Nx3 array contaning the atoms coordinates.
     cell : numpy array
-        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters. 
+        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
     """
 
     file_name = file_name.split('.')[0]
@@ -1376,7 +1377,7 @@ def save_cif(path,
              atom_labels,
              atom_pos,
              partial_charges=False,
-             frac_coords=True ):
+             frac_coords=True):
     """
     Save a file in format `.cif` on the `path`.
 
@@ -1441,18 +1442,20 @@ loop_
     for i in range(len(atom_pos)):
         u, v, w = atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]
         if partial_charges is not False:
-            cif_text += '{}    {} {:>15.9f} {:>15.9f} {:>15.9f} {:>10.5f}\n'.format(atom_labels[i],
-                                                                                    atom_labels[i],
-                                                                                    u,
-                                                                                    v,
-                                                                                    w,
-                                                                                    partial_charges[i])
+            cif_text += '{}    {} {:>15.9f} {:>15.9f} {:>15.9f} {:>10.5f}\n'.format(
+                atom_labels[i],
+                atom_labels[i],
+                u,
+                v,
+                w,
+                partial_charges[i])
         else:
-            cif_text += '{}    {} {:>15.9f} {:>15.9f} {:>15.9f}\n'.format(atom_labels[i],
-                                                                          atom_labels[i],
-                                                                          u,
-                                                                          v,
-                                                                          w)
+            cif_text += '{}    {} {:>15.9f} {:>15.9f} {:>15.9f}\n'.format(
+                atom_labels[i],
+                atom_labels[i],
+                u,
+                v,
+                w)
 
     # Write cif_text to file
     cif_file = open(os.path.join(path, file_name + '.cif'), 'w')
@@ -1469,7 +1472,7 @@ def convert_json_2_cif(origin_path, file_name, destiny_path, charge_type='None')
     origin_path : str
         Path to the '.json' file.
     file_name : str
-        Name of the file. Does not neet to contain the `.json` extention. 
+        Name of the file. Does not neet to contain the `.json` extention.
     destiny_path : str
         path where the `.cif` file will be saved.
     """
@@ -1518,9 +1521,13 @@ def convert_cif_2_xyz(path, file_name, supercell=[1, 1, 1]):
 
     if CIF_PARSER_IMPORTED is not False:
 
-        structure = CifParser(os.path.join(path, file_name + '.cif')).get_structures(primitive=True)[0]
+        structure = CifParser(
+            os.path.join(path, file_name + '.cif')
+            ).get_structures(primitive=True)[0]
 
-        structure.make_supercell([[supercell[0], 0, 0], [0, supercell[1], 0], [0, 0, supercell[2]]])
+        structure.make_supercell([[supercell[0], 0, 0],
+                                  [0, supercell[1], 0],
+                                  [0, 0, supercell[2]]])
 
         dict_sctructure = structure.as_dict()
 
@@ -1553,7 +1560,8 @@ def convert_cif_2_xyz(path, file_name, supercell=[1, 1, 1]):
 
     temp_file.close()
 
-# ---------------------------- JSON related -------------------------------- #  
+# ---------------------------- JSON related -------------------------------- #
+
 
 def write_json(path, name, COF_json):
 
@@ -1585,12 +1593,23 @@ def read_json(path, cof_name):
 
 def create_COF_json(name):
 
-    system_info = 'Informations about the system such as name, if it is optimized and other relevant information.'
-    geometry_info = 'Informations about the geometry: cell parameters, cell matrix, atomic positions, partial charges, bond orders, simmetry information'
-    optimization_info = 'Information about the optimization process such as level of calculations, optimization schema and optimization steps.'
+    system_info = 'Informations about the system such as name, if it is optimized and other \
+        relevant information.'
+
+    geometry_info = 'Informations about the geometry: cell parameters, cell matrix, \
+    atomic positions, partial charges, bond orders, simmetry information'
+
+    optimization_info = 'Information about the optimization process such as level \
+        of calculations, optimization schema and optimization steps.'
+
     adsorption_info = 'Information about the adsorption simulation experiments on RASPA2'
-    textural_info = 'Information about the textural calculations of the structure such as specific area, pore volume, void fraction.'
-    spectrum_info = 'Information about spectra simulation like DRX, FTIR, ssNMR, UV-VIS, Band dispersion, Phonon dispersion...'
+
+    textural_info = 'Information about the textural calculations of the structure such \
+        as specific area, pore volume, void fraction.'
+
+    spectrum_info = 'Information about spectra simulation like DRX, FTIR, ssNMR, UV-VIS,\
+         Band dispersion, Phonon dispersion...'
+
     experimental_info = 'Experimental data DRX, FTIR, ssNMR, UV-VIS...'
 
     COF_json = {'system': {'description': system_info,

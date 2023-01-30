@@ -52,7 +52,7 @@ class Building_Block():
                 simmetry = BB_name[0]
                 nucleo = BB_name[1]
                 conector = BB_name[2]
-                radicals = BB_name[3:] + ['H']*(6 - len(BB_name[3:]))
+                radicals = BB_name[3:] + ['H'] * (6 - len(BB_name[3:]))
 
                 if simmetry == 'C2':
                     self.create_C2_BB(nucleo,
@@ -221,8 +221,9 @@ class Building_Block():
     def add_connection_group(self, conector_name):
         '''Adds the functional group by which the COF will be formed from the building blocks'''
 
-        conector_label, conector_pos = Tools.read_gjf_file(os.path.join(self.main_path, 'conector'),
-                                                           conector_name)
+        conector_label, conector_pos = Tools.read_gjf_file(
+            os.path.join(self.main_path, 'conector'),
+            conector_name)
 
         # Get the position of the Q points in the structure
         location_Q_struct = self.get_Q_points(self.atom_labels, self.atom_pos)
@@ -233,29 +234,46 @@ class Building_Block():
 
             try:
                 # Get the position of the closest atom to Q in the structure
-                close_Q_struct = Tools.closest_atom('Q', location_Q_struct[1][i], self.atom_labels, self.atom_pos)[1]
+                close_Q_struct = Tools.closest_atom('Q',
+                                                    location_Q_struct[1][i],
+                                                    self.atom_labels,
+                                                    self.atom_pos)[1]
             except Exception:
-                # Set the closest position to origin, for building blocks as HDZ that only has two atoms
+                # Set the closest position to origin for building blocks as HDZ
                 close_Q_struct = [0, 0, 0]
 
             # Get the position of Q in the conection group
-            location_Q_connector = self.get_Q_points(n_conector_label, n_conector_pos)  
+            location_Q_connector = self.get_Q_points(n_conector_label, n_conector_pos)
 
             # Get the position of the closest atom to Q in the conection group
-            close_Q_connector = Tools.closest_atom('Q', location_Q_connector[1][0], n_conector_label, n_conector_pos)[1]
+            close_Q_connector = Tools.closest_atom('Q',
+                                                   location_Q_connector[1][0],
+                                                   n_conector_label,
+                                                   n_conector_pos)[1]
 
-            v1 = close_Q_struct - location_Q_struct[1][i]  # Create the vector Q in the structure
-            v2 = np.array(close_Q_connector) - np.array(location_Q_connector[1][0])  # Create the vector Q in the conector
+            # Create the vector Q in the structure
+            v1 = close_Q_struct - location_Q_struct[1][i]
+            # Create the vector Q in the conector
+            v2 = np.array(close_Q_connector) - np.array(location_Q_connector[1][0])
 
-            Rot_m = Tools.rotation_matrix_from_vectors(v2, v1)  # Find the rotation matrix that align v2 with v1
+            # Find the rotation matrix that align v2 with v1
+            Rot_m = Tools.rotation_matrix_from_vectors(v2, v1)
 
             # Delete the "Q" atom position of the conector group and the structure
-            n_conector_pos = np.delete(n_conector_pos, Tools.find_index(np.array([0., 0., 0.]), n_conector_pos), axis=0)
+            n_conector_pos = np.delete(
+                n_conector_pos,
+                Tools.find_index(np.array([0., 0., 0.]), n_conector_pos),
+                axis=0)
 
-            self.atom_pos = np.delete(self.atom_pos, Tools.find_index(location_Q_struct[1][i], self.atom_pos), axis=0)
+            self.atom_pos = np.delete(
+                self.atom_pos,
+                Tools.find_index(location_Q_struct[1][i], self.atom_pos),
+                axis=0)
 
             # Rotate and translade the conector group to Q position in the strucutre
-            rotated_translated_group = np.dot(n_conector_pos, -np.transpose(Rot_m)) + location_Q_struct[1][i]
+            rotated_translated_group = np.dot(
+                n_conector_pos,
+                -np.transpose(Rot_m)) + location_Q_struct[1][i]
 
             # Add the position of conector atoms to the main structure
             self.atom_pos = np.append(self.atom_pos, rotated_translated_group, axis=0)
@@ -268,12 +286,14 @@ class Building_Block():
 
     def add_R_group(self, R_name, R_type):
         '''Adds group R in building blocks'''
-        
+
         # Read the R group
-        group_label, group_pos = Tools.read_gjf_file(os.path.join(self.main_path, 'radical'), R_name)
+        group_label, group_pos = Tools.read_gjf_file(
+            os.path.join(self.main_path, 'radical'),
+            R_name)
 
         # Get the position of the R points in the structure
-        location_R_struct = self.get_R_points(self.atom_labels, self.atom_pos)[R_type]  
+        location_R_struct = self.get_R_points(self.atom_labels, self.atom_pos)[R_type]
 
         # Get the position of the R points in the R group
         for i, _ in enumerate(location_R_struct):
@@ -289,7 +309,7 @@ class Building_Block():
             # Get the position of R in the R group
             pos_R_group = self.get_R_points(n_group_label, n_group_pos)['R']
 
-            # Get the position of the closest atom to R in the R group 
+            # Get the position of the closest atom to R in the R group
             close_R_group = Tools.closest_atom('R', pos_R_group[0], n_group_label, n_group_pos)[1]
 
             # Create the vector R in the structure
@@ -299,20 +319,25 @@ class Building_Block():
             v2 = np.array(close_R_group) - np.array(pos_R_group[0])
 
             # Find the rotation matrix that align v2 with v1
-            Rot_m = Tools.rotation_matrix_from_vectors(v2, v1)  
+            Rot_m = Tools.rotation_matrix_from_vectors(v2, v1)
 
             # Delete the "R" atom position of the R group and the structure
-            n_group_pos = np.delete(n_group_pos, Tools.find_index(np.array([0.0, 0.0, 0.0]), 
-                                                                  n_group_pos),
-                                                                  axis=0)
+            n_group_pos = np.delete(
+                n_group_pos,
+                Tools.find_index(np.array([0.0, 0.0, 0.0]), n_group_pos),
+                axis=0)
 
             # Rotate and translade the R group to R position in the strucutre
-            rotated_translated_group = np.dot(n_group_pos, - np.transpose(Rot_m)) + location_R_struct[i]
-            
+            rotated_translated_group = np.dot(
+                n_group_pos,
+                -np.transpose(Rot_m)
+                ) + location_R_struct[i]
+
             # Remove the R atoms from structure
-            self.atom_pos = np.delete(self.atom_pos, Tools.find_index(location_R_struct[i], 
-                                                                      self.atom_pos), 
-                                                                      axis=0)
+            self.atom_pos = np.delete(
+                self.atom_pos,
+                Tools.find_index(location_R_struct[i], self.atom_pos),
+                axis=0)
 
             # Add the position of rotated atoms to the main structure
             self.atom_pos = np.append(self.atom_pos, rotated_translated_group, axis=0)
@@ -341,7 +366,9 @@ class Building_Block():
 
         self.name = f'C2_{nucleo_name}_{conector}'
 
-        self.atom_labels, self.atom_pos = Tools.read_gjf_file(os.path.join(self.main_path, 'nucleo', 'C2'), nucleo_name)
+        self.atom_labels, self.atom_pos = Tools.read_gjf_file(
+            os.path.join(self.main_path, 'nucleo', 'C2'),
+            nucleo_name)
 
         self.centralize_molecule()
 
@@ -392,7 +419,7 @@ class Building_Block():
                 self.add_R_group(R_list_names[i], R_list_labels[i])
                 self.name += f'_{R_list_names[i]}'
 
-        self.connectivity =  len([i for i in self.atom_labels if 'X' in i])
+        self.connectivity = len([i for i in self.atom_labels if 'X' in i])
         self.align_to()
         self.calculate_size()
 
@@ -413,9 +440,7 @@ class Building_Block():
         self.name = f'C4_{nucleo_name}_{conector}'
 
         self.atom_labels, self.atom_pos = Tools.read_gjf_file(
-            os.path.join(self.main_path, 
-                         'nucleo',
-                         'C4'),
+            os.path.join(self.main_path, 'nucleo', 'C4'),
             nucleo_name)
 
         self.centralize_molecule()
@@ -430,7 +455,7 @@ class Building_Block():
                 self.add_R_group(R_list_names[i], R_list_labels[i])
                 self.name += f'_{R_list_names[i]}'
 
-        self.connectivity =  len([i for i in self.atom_labels if 'X' in i])
+        self.connectivity = len([i for i in self.atom_labels if 'X' in i])
         self.align_to()
         self.calculate_size()
 
@@ -450,7 +475,9 @@ class Building_Block():
 
         self.name = f'C6_{nucleo_name}_{conector}'
 
-        self.atom_labels, self.atom_pos = Tools.read_gjf_file(os.path.join(self.main_path, 'nucleo', 'C6'), nucleo_name)
+        self.atom_labels, self.atom_pos = Tools.read_gjf_file(
+            os.path.join(self.main_path, 'nucleo', 'C6'),
+            nucleo_name)
 
         self.centralize_molecule()
 
@@ -464,7 +491,7 @@ class Building_Block():
                 self.add_R_group(R_list_names[i], R_list_labels[i])
                 self.name += f'_{R_list_names[i]}'
 
-        self.connectivity =  len([i for i in self.atom_labels if 'X' in i])
+        self.connectivity = len([i for i in self.atom_labels if 'X' in i])
         self.align_to()
         self.calculate_size()
 
@@ -483,27 +510,36 @@ class Building_Block():
             self.calculate_size()
         except Exception:
             None
-        
-    def get_available_nucleo(self):
 
-        C2_list = [i.rstrip('.gjf') for i in os.listdir(os.path.join(self.main_path, 'nucleo', 'C2')) if '.gjf' in i]
-        C3_list = [i.rstrip('.gjf') for i in os.listdir(os.path.join(self.main_path, 'nucleo', 'C3')) if '.gjf' in i]
-        C4_list = [i.rstrip('.gjf') for i in os.listdir(os.path.join(self.main_path, 'nucleo', 'C4')) if '.gjf' in i]
-        C6_list = [i.rstrip('.gjf') for i in os.listdir(os.path.join(self.main_path, 'nucleo', 'C6')) if '.gjf' in i]
+    def get_available_nucleo(self):
+        '''Get the list of available nucleos'''
+        C2_PATH = os.path.join(self.main_path, 'nucleo', 'C2')
+        C2_list = [i.rstrip('.gjf') for i in os.listdir(C2_PATH) if '.gjf' in i]
+
+        C3_PATH = os.path.join(self.main_path, 'nucleo', 'C3')
+        C3_list = [i.rstrip('.gjf') for i in os.listdir(C3_PATH) if '.gjf' in i]
+
+        C4_PATH = os.path.join(self.main_path, 'nucleo', 'C4')
+        C4_list = [i.rstrip('.gjf') for i in os.listdir(C4_PATH) if '.gjf' in i]
+
+        C6_PATH = os.path.join(self.main_path, 'nucleo', 'C6')
+        C6_list = [i.rstrip('.gjf') for i in os.listdir(C6_PATH) if '.gjf' in i]
 
         return C2_list, C3_list, C4_list, C6_list
-    
-    def get_available_R(self):
 
-        R_list = [i.rstrip('.gjf') for i in os.listdir(os.path.join(self.main_path, 'radical')) if '.gjf' in i]
+    def get_available_R(self):
+        '''Get the list of available radicals'''
+        R_PATH = os.path.join(self.main_path, 'radical')
+        R_list = [i.rstrip('.gjf') for i in os.listdir(R_PATH) if '.gjf' in i]
 
         return R_list
 
     def get_available_conector(self):
+        '''Get the list of available conectores'''
+        C_PATH = os.path.join(self.main_path, 'conector')
+        C_list = [i.rstrip('.gjf') for i in os.listdir(C_PATH) if '.gjf' in i]
 
-        c_list = [i.rstrip('.gjf') for i in os.listdir(os.path.join(self.main_path, 'conector')) if '.gjf' in i]
-
-        return c_list
+        return C_list
 
     def check_existence(self):
 
@@ -512,7 +548,7 @@ class Building_Block():
         conector_check = True
         radicals_check = True
 
-        if self.name != None:
+        if self.name is not None:
             name = self.name.split('_')
             simm = name[0]
             nucleo = name[1]
@@ -526,32 +562,41 @@ class Building_Block():
             if simm == 'C2':
                 list = self.get_available_nucleo()[0]
                 if nucleo not in list:
-                    print(f'ERROR!: {nucleo} not available! Available nucleos with C2 simmetry is {list}')
+                    print(f'ERROR!: {nucleo} not available!')
+                    print(f'Available nucleos with C2 simmetry is {list}')
                     nucleo_check = False
+
             if simm == 'C3':
                 list = self.get_available_nucleo()[1]
                 if nucleo not in list:
-                    print(f'ERROR!: {nucleo} not available! Available nucleos with C3 simmetry is {list}')
+                    print(f'ERROR!: {nucleo} not available!')
+                    print(f'Available nucleos with C3 simmetry is {list}')
                     nucleo_check = False
+
             if simm == 'C4':
                 list = self.get_available_nucleo()[2]
                 if nucleo not in list:
-                    print(f'ERROR!: {nucleo} not available! Available nucleos with C4 simmetry is {list}')
+                    print(f'ERROR!: {nucleo} not available!')
+                    print(f'Available nucleos with C4 simmetry is {list}')
                     nucleo_check = False
+
             if simm == 'C6':
                 list = self.get_available_nucleo()[3]
                 if nucleo not in list:
-                    print(f'ERROR!: {nucleo} not available! Available nucleos with C6 simmetry is {list}')
+                    print(f'ERROR!: {nucleo} not available!')
+                    print(f'Available nucleos with C6 simmetry is {list}')
                     nucleo_check = False
-            
+
             if conector not in self.get_available_conector():
-                print(f'ERROR! {conector} is not a available conector. Available list: {self.get_available_conector()}')
+                print(f'ERROR! {conector} is not a available conector.')
+                print(f'Available list: {self.get_available_conector()}')
                 conector_check = False
 
             radicals_list = self.get_available_R()
             for rad in radicals:
                 if rad not in radicals_list:
-                    print(f'ERROR! Radical {rad} is not a available radical: Available list{radicals_list}')
+                    print(f'ERROR! Radical {rad} is not a available.')
+                    print(f'Available list: {radicals_list}')
                     radicals_check = False
 
         return simm_check, nucleo_check, conector_check, radicals_check

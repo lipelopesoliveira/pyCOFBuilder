@@ -1959,7 +1959,7 @@ class Reticulum():
             self.symm_structure = symm.get_refined_structure()
 
         # Create AA tilted stacking.
-        # Tilted Hexagonal cell by tilt_angle with two sheets per cell shifited by 
+        # Tilted Hexagonal cell by tilt_angle with two sheets per cell shifited by
         # the shift_vector in angstroms.
         if stacking == 'AAt':
             self.stacking = 'AAt'
@@ -2302,7 +2302,7 @@ class Reticulum():
 
             self.symm_structure = symm.get_refined_structure()
 
-        # Create AAl stacking. 
+        # Create AAl stacking.
         # Hexagonal cell with two sheets per cell shifited by the shift_vector in angstroms.
         if stacking == 'AAl':
             self.stacking = 'AAl'
@@ -2333,7 +2333,7 @@ class Reticulum():
             self.symm_structure = symm.get_refined_structure()
 
         # Create AA tilted stacking.
-        # Tilted Hexagonal cell by tilt_angle with two sheets per cell 
+        # Tilted Hexagonal cell by tilt_angle with two sheets per cell
         # shifited by the shift_vector in angstroms.
         if stacking == 'AAt':
             self.stacking = 'AAt'
@@ -2603,9 +2603,9 @@ class Reticulum():
         struct.translate_sites(range(len(struct.as_dict()['sites'])), [
                                0, 0, 0.5], frac_coords=True, to_unit_cell=True)
 
-        #atom_labels = np.array([[i['label']]
+        # atom_labels = np.array([[i['label']]
         #                       for i in struct.as_dict()['sites']]).flatten()
-        #atom_pos = np.array([i['xyz'] for i in struct.as_dict()['sites']])
+        # atom_pos = np.array([i['xyz'] for i in struct.as_dict()['sites']])
         cell = np.array(struct.as_dict()['lattice']['matrix'])
 
         # Change the X atoms by the desired bond_atom
@@ -2622,9 +2622,9 @@ class Reticulum():
         struct.translate_sites(range(len(struct.as_dict()['sites'])), [
                                0, 0, 0.5], frac_coords=True, to_unit_cell=True)
 
-        #atom_labels = np.array([[i['label']]
+        # atom_labels = np.array([[i['label']]
         #                       for i in struct.as_dict()['sites']]).flatten()
-        #atom_pos = np.array([i['xyz'] for i in struct.as_dict()['sites']])
+        # atom_pos = np.array([i['xyz'] for i in struct.as_dict()['sites']])
         cell = np.array(struct.as_dict()['lattice']['matrix'])
 
         # Simetriza a estrutura
@@ -2694,7 +2694,7 @@ class Reticulum():
 
             self.symm_structure = AB_2_symm.get_refined_structure()
 
-        # Create AAl stacking. 
+        # Create AAl stacking.
         # Tetragonal cell with two sheets per cell shifited by the shift_vector in angstroms.
         if stacking == 'AAl':
             self.stacking = 'AAl'
@@ -2723,7 +2723,7 @@ class Reticulum():
             self.symm_structure = Structure(
                 lattice, AB_label+AB_label, AB, coords_are_cartesian=False)
 
-        # Create AA tilted stacking. 
+        # Create AA tilted stacking.
         # Tilted tetragonal cell with two sheets per cell tilted by tilt_angle.
         if stacking == 'AAt':
             self.stacking = 'AAt'
@@ -2983,16 +2983,19 @@ class Reticulum():
 
         '''
         Older version of the positioning code
-        # Add tbe building block 1 (C4) on the center of the unitary cell (A1 site) 
-        final_pos = np.dot(bb_1.atom_pos, R.from_euler('z', -30, degrees=True).as_matrix()) + np.array([1/4, np.sqrt(3)/4, 0])*a
+        # Add tbe building block 1 (C4) on the center of the unitary cell (A1 site)
+        final_pos = np.dot(bb_1.atom_pos, R.from_euler('z', -30, degrees=True).as_matrix())
+         + np.array([1/4, np.sqrt(3)/4, 0])*a
         final_label = list(bb_1.atom_labels)
 
         # Add tbe building block 1 (C4) on [0.5, 0.0, 0.0] of the unitary cell (A2 site)
-        final_pos = np.vstack((final_pos, np.dot(bb_1.atom_pos, R.from_euler('z', -60, degrees=True).as_matrix()) + np.array([1/2, 0, 0])*a))
+        final_pos = np.vstack((final_pos, np.dot(bb_1.atom_pos,
+        R.from_euler('z', -60, degrees=True).as_matrix()) + np.array([1/2, 0, 0])*a))
         final_label += list(bb_1.atom_labels)
 
         # Add tbe building block 1 (C4) on [0.0, 0.5, 0.0] of the unitary cell (A3 site)
-        final_pos = np.vstack((final_pos, np.dot(bb_1.atom_pos, R.from_euler('z', 60, degrees=True).as_matrix()) + np.array([-1/4, np.sqrt(3)/4, 0])*a))
+        final_pos = np.vstack((final_pos, np.dot(bb_1.atom_pos,
+        R.from_euler('z', 60, degrees=True).as_matrix()) + np.array([-1/4, np.sqrt(3)/4, 0])*a))
         final_label += list(bb_1.atom_labels)'''
 
         # Add the building block 2 (C2) on [1/2, 1/4, 0.0] of the unitary cell (B1 site)

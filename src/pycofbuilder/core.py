@@ -98,7 +98,11 @@ def build(cof_name=None,
         return [False, f'{bb1}-{bb2}-{net}-{stacking}']
 
 
-def build_COFs_list(cofs_list, save_format='cif', supercell=[1, 1, 1], save_dir='.', print_result=False):
+def build_COFs_list(cofs_list,
+                    save_format='cif',
+                    supercell=[1, 1, 1],
+                    save_dir='.',
+                    print_result=False):
     '''Build all the COF structures with a given name on a list
 
     Parameters
@@ -140,7 +144,12 @@ def build_COFs_list(cofs_list, save_format='cif', supercell=[1, 1, 1], save_dir=
         for s in sucess_list:
             Tools.print_result(*s)
 
-        print(f'{len(sucess_list)} sucessful. {len(failed_list)} failled ({100*len(sucess_list)/(len(failed_list) + len(sucess_list)):.2f} % success rate)')
+        print('{} sucessful. {} failled ({:.2f} % success rate)'.format(
+            len(sucess_list),
+            len(failed_list),
+            100*len(sucess_list)/(len(failed_list) + len(sucess_list))
+            )
+            )
         print(f'Enlapsed time: {time.time() - t_i:.3f} s \n')
         if len(failed_list) > 0:
             print('Failed list:')
@@ -216,7 +225,7 @@ def create_all_C3(nucleos=None, radicais=None, conectores=None):
 
     ----------
     nucleos : list
-        List containing the desired cores for the creation of blocks. 
+        List containing the desired cores for the creation of blocks.
         Ex.: ['BENZ', 'DICZ', 'TPAM', 'TPBZ', 'TPNY', 'TPOB', 'TPTA', 'TPTZ']
     conectores : list
         List containing the connector groups desired for the creation of blocks.
@@ -374,8 +383,8 @@ def build_all_available_COFs(stacking='AA',
     if val == 'y':
         t_i = time.time()
         for cof in tqdm(cofs_list):
-            succes, name = build(cof, 
-                                 save_format=save_format, 
+            succes, name = build(cof,
+                                 save_format=save_format,
                                  print_result=False)
             if succes is True:
                 sucess_list += [name]
