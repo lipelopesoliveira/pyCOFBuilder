@@ -302,18 +302,18 @@ class Reticulum():
         # Rotates and add the building block A to site A2 of unitary cell
         r_pos_a_2 = np.dot(
             bb_2.atom_pos,
-            R.from_euler('z', 180, degrees=True).as_matrix()) + np.array([0, np.sqrt(3)/3, 0])*a
+            R.from_euler('z', 180, degrees=True).as_matrix())
+        
+        r_pos_a_2 += np.array([0, np.sqrt(3)/3, 0])*a
 
         final_pos = np.vstack((final_pos, r_pos_a_2))
         final_label += bb_2.atom_labels
 
         # Changes the X atoms by the desirede bond_atom
-        final_label, final_pos = Tools.change_X_atoms(
-            final_label, final_pos, bond_atom)
+        final_label, final_pos = Tools.change_X_atoms(final_label, final_pos, bond_atom)
 
         # Creates the COF as a pymatgen structure
-        struct = Structure(lattice, final_label, final_pos,
-                           coords_are_cartesian=True)
+        struct = Structure(lattice, final_label, final_pos, coords_are_cartesian=True)
 
         # Remove duplicate atoms and translate the structure to the center of the cell
         struct.sort(reverse=True)
@@ -324,8 +324,7 @@ class Reticulum():
                                to_unit_cell=True)
 
         # Simetrizes the structure using pymatgen
-        symm = SpacegroupAnalyzer(
-            struct, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
+        symm = SpacegroupAnalyzer(struct, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
         struct_symm_prim = symm.get_primitive_standard_structure()
 
         if stacking not in self.available_stacking[self.topology]:
@@ -1078,8 +1077,9 @@ class Reticulum():
         # Adiciona o bloco 2 no sítio B1 da célula unitária
         final_pos = np.vstack((final_pos,
                                np.dot(
-                                bb_2.atom_pos, R.from_euler('z', 45, degrees=True).as_matrix()
-                                ) + np.array([0.5, 0.5, 0])*a)
+                                   bb_2.atom_pos, R.from_euler(
+                                       'z', 45, degrees=True).as_matrix()
+                               ) + np.array([0.5, 0.5, 0])*a)
                               )
         final_label += bb_2.atom_labels
 
@@ -3579,7 +3579,6 @@ class Reticulum():
     def save_qe(self,
                 supercell: tuple = (1, 1, 1),
                 path: str = None,
-                in_angstrom_format: bool = True,
                 ecut: int = 40,
                 erho: int = 360,
                 k_dist: float = 0.3):
@@ -3592,9 +3591,6 @@ class Reticulum():
             Default = [1, 1, 1]
         path : str, optional
             Path to save the .in file.
-        in_angstrom_format : bool, optional
-            Save the atomic positions in angstroms insted of crystal coordinates
-            Default = True
         ecut : int, optional
             Cutoff for wavefunctions. Default = 40
         erho : int, optional
@@ -3603,230 +3599,17 @@ class Reticulum():
             Distance of the k-points on the reciprocal space.
             Default = 0.3
         """
-        if path is not None:
-            self.out_path = path
-
-        os.makedirs(self.out_path, exist_ok=True)
-
-        self.symm_structure.make_supercell(supercell)
 
         dict_sctructure = self.symm_structure.as_dict()
 
         cell = dict_sctructure['lattice']['matrix']
+        atom_pos = [[i['label']] + i['xyz'] for i in dict_sctructure['sites']]
 
-        a = dict_sctructure['lattice']['a']
-        b = dict_sctructure['lattice']['b']
-        c = dict_sctructure['lattice']['c']
-
-        celldm1 = a*1.8897259886  # 1 angstrom = 1.8897259886 bohr
-        celldm2 = b/a
-        celldm3 = c/a
-        celldm4 = Tools.angle(cell[0], cell[1], unit='cos')
-        celldm5 = Tools.angle(cell[0], cell[2], unit='cos')
-        celldm6 = Tools.angle(cell[1], cell[2], unit='cos')
-
-        kx, ky, kz = Tools.get_kgrid(Tools.cellpar_to_cell(cell), k_dist)
-
-        ion_conv_crystal = [[i['label']] + i['abc']
-                            for i in dict_sctructure['sites']]
-        ion_conv_angstrom = [[i['label']] + i['xyz']
-                             for i in dict_sctructure['sites']]
-
-        if in_angstrom_format is False:
-            ion_pos = ion_conv_crystal
-        if in_angstrom_format is True:
-            ion_pos = ion_conv_angstrom
-
-        out_file = open(os.path.join(
-            self.out_path, self.name + '.in'), 'w', newline='\n')
-
-        out_file.write('#!/bin/sh\n')
-        out_file.write('\n')
-        out_file.write('#PBS -l walltime=100:00:00\n')
-        out_file.write('#PBS -l select=2:ncpus=48:mpiprocs=48\n')
-        out_file.write(f'#PBS -N {self.name}\n')
-        out_file.write('#PBS -m bea \n')
-        out_file.write('#PBS -j oe\n')
-        out_file.write('#PBS -V\n')
-        out_file.write('\n')
-        out_file.write('cd ${PBS_O_WORKDIR}\n')
-        out_file.write('\n')
-        out_file.write('module load intel/2018.4\n')
-        out_file.write('\n')
-        out_file.write('PSEUDO_DIR=\"/home/users/lipelopes/pseudo\"\n')
-        out_file.write(
-            'CMD_PW="mpirun -np 96 /home/users/lipelopes/qe-6.4/bin/pw.x -nk 2"\n')
-        out_file.write(f'PREFIX=\'{self.name}\'\n')
-        out_file.write('CALC=\'vc-relax\'\n')
-        out_file.write(
-            f'SCRATCH_DIR=\'/scratch/31081a/lipelopes/{self.name}/\'\n')
-        out_file.write('\n')
-        out_file.write('cat>$PREFIX.$CALC.in<<EOF\n')
-
-        out_file.write(' &control\n')
-        out_file.write('    calculation = \'$CALC\' ,\n')
-        out_file.write('    restart_mode = \'from_scratch\' ,\n')
-        out_file.write('    wf_collect = .false. ,\n')
-        out_file.write('    outdir = \'$SCRATCH_DIR\' ,\n')
-        out_file.write('    pseudo_dir = \'$PSEUDO_DIR\' ,\n')
-        out_file.write('    prefix = \'$PREFIX\' ,\n')
-        out_file.write('    verbosity =\'high\' ,\n')
-        out_file.write('    tstress = .true. ,\n')
-        out_file.write('    tprnfor = .true. ,\n')
-        out_file.write('    etot_conv_thr = 1.0d-4 ,\n')
-        out_file.write('    forc_conv_thr = 1.0d-5 ,\n')
-        out_file.write('    nstep=1000 ,\n')
-        out_file.write(' / \n')
-
-        out_file.write(' &system\n')
-
-        if self.lattice_type == 'cubic' and 'P' in self.hall:
-            out_file.write('    ibrav =   1\n')
-            out_file.write(f'    celldm(1) =   {celldm1:.8f}\n')
-
-        elif self.lattice_type == 'cubic' and 'F' in self.hall:
-            out_file.write('    ibrav =   2\n')
-            out_file.write(f'    celldm(1) =   {celldm1:.8f}\n')
-
-        elif self.lattice_type == 'cubic' and 'I' in self.hall:
-            out_file.write('    ibrav =   3\n')
-            out_file.write(f'    celldm(1) =   {celldm1:.8f}\n')
-
-        elif self.lattice_type == 'hexagonal':
-            out_file.write('    ibrav =   4\n')
-            out_file.write(f'    celldm(1) =   {celldm1:.8f}\n')
-            out_file.write(f'    celldm(3) =   {celldm3:.8f}\n')
-
-        elif self.lattice_type == 'trigonal' and 'P' in self.hall:
-            out_file.write('    ibrav =   4\n')
-            out_file.write(f'    celldm(1) =   {celldm1:.8f}\n')
-            out_file.write(f'    celldm(3) =   {celldm3:.8f}\n')
-
-        elif self.lattice_type == 'trigonal' and 'R' in self.hall:
-            out_file.write('    ibrav =   5\n')
-            out_file.write(f'    celldm(1) =   {celldm1:.8f}\n')
-            out_file.write(f'    celldm(3) =   {celldm3:.8f}\n')
-
-        elif self.lattice_type == 'tetragonal' and 'P' in self.hall:
-            out_file.write('    ibrav =   6\n')
-            out_file.write(f'    celldm(1) =   {celldm1:.8f}\n')
-            out_file.write(f'    celldm(3) =   {celldm3:.8f}\n')
-
-        elif self.lattice_type == 'tetragonal' and 'I' in self.hall:
-            out_file.write('    ibrav =   7\n')
-            out_file.write(f'    celldm(1) =   {celldm1:.8f}\n')
-            out_file.write(f'    celldm(3) =   {celldm3:.8f}\n')
-
-        elif self.lattice_type == 'orthorhombic' and 'P' in self.hall:
-            out_file.write('    ibrav =   8\n')
-            out_file.write(f'    celldm(1) =   {celldm1:.8f}\n')
-            out_file.write(f'    celldm(2) =   {celldm2:.8f}\n')
-            out_file.write(f'    celldm(3) =   {celldm3:.8f}\n')
-
-        elif self.lattice_type == 'orthorhombic' and 'C' or 'A' in self.hall:
-            out_file.write('    ibrav =   9\n')
-            out_file.write(f'    celldm(1) =   {celldm1:.8f}\n')
-            out_file.write(f'    celldm(2) =   {celldm2:.8f}\n')
-            out_file.write(f'    celldm(3) =   {celldm3:.8f}\n')
-
-        elif self.lattice_type == 'orthorhombic' and 'F' in self.hall:
-            out_file.write('    ibrav =   10\n')
-            out_file.write(f'    celldm(1) =   {celldm1:.8f}\n')
-            out_file.write(f'    celldm(2) =   {celldm2:.8f}\n')
-            out_file.write(f'    celldm(3) =   {celldm3:.8f}\n')
-
-        elif self.lattice_type == 'orthorhombic' and 'I' in self.hall:
-            out_file.write('    ibrav =   11\n')
-            out_file.write(f'    celldm(1) =   {celldm1:.8f}\n')
-            out_file.write(f'    celldm(2) =   {celldm2:.8f}\n')
-            out_file.write(f'    celldm(3) =   {celldm3:.8f}\n')
-
-        elif self.lattice_type == 'monoclinic' and round(c, 2) > round(b, 2) and 'P' in self.hall:
-            out_file.write('    ibrav =   12\n')
-            out_file.write(f'    celldm(1) =   {celldm1:.8f}\n')
-            out_file.write(f'    celldm(2) =   {celldm2:.8f}\n')
-            out_file.write(f'    celldm(3) =   {celldm3:.8f}\n')
-            out_file.write(f'    celldm(4) =   {celldm4:.8f}\n')
-
-        elif self.lattice_type == 'monoclinic' and round(b, 2) > round(c, 2) and 'P' in self.hall:
-            out_file.write('    ibrav =  -12\n')
-            out_file.write(f'    celldm(1) =   {celldm1:.8f}\n')
-            out_file.write(f'    celldm(2) =   {celldm2:.8f}\n')
-            out_file.write(f'    celldm(3) =   {celldm3:.8f}\n')
-            out_file.write(f'    celldm(5) =   {celldm5:.8f}\n')
-
-        elif self.lattice_type == 'monoclinic' and round(c, 2) > round(b, 2) and 'C' in self.hall:
-            out_file.write('    ibrav =  13\n')
-            out_file.write(f'    celldm(1) =   {celldm1:.8f}\n')
-            out_file.write(f'    celldm(2) =   {celldm2:.8f}\n')
-            out_file.write(f'    celldm(3) =   {celldm3:.8f}\n')
-            out_file.write(f'    celldm(5) =   {celldm4:.8f}\n')
-
-        elif self.lattice_type == 'monoclinic' and round(b, 2) > round(c, 2) and 'C' in self.hall:
-            out_file.write('    ibrav =  -13\n')
-            out_file.write(f'    celldm(1) =   {celldm1:.8f}\n')
-            out_file.write(f'    celldm(2) =   {celldm2:.8f}\n')
-            out_file.write(f'    celldm(3) =   {celldm3:.8f}\n')
-            out_file.write(f'    celldm(5) =   {celldm5:.8f}\n')
-            out_file.write(f'    celldm(6) =   {celldm6:.8f}\n')
-
-        elif self.lattice_type == 'triclinic':
-            out_file.write('    ibrav =  0\n')
-
-        out_file.write(f'    nat =     {self.n_atoms}\n')
-        out_file.write(f'    ntyp =     {len(set(self.atom_labels))}\n')
-        out_file.write(f'    ecutwfc = {ecut} \n')
-        out_file.write(f'    ecutrho = {erho} \n')
-        out_file.write('    !occupations=\'smearing\' , \n')
-        out_file.write('    !degauss=0.001 , \n')
-        out_file.write('    !smearing=\'gaussian\' , \n')
-        out_file.write('    vdw_corr=\'grimme-d3\' , \n')
-        out_file.write(' / \n')
-        out_file.write(' &electrons\n')
-        out_file.write('    conv_thr =  1.0D-8 ,\n')
-        out_file.write('    electron_maxstep = 100 ,\n')
-        out_file.write('    mixing_beta = 0.3 ,\n')
-        out_file.write(' / \n')
-
-        out_file.write(' &IONS\n')
-        out_file.write('    ion_dynamics = \'bfgs\'\n')
-        out_file.write(' / \n')
-
-        out_file.write(' &CELL\n')
-        out_file.write('    cell_dynamics = \'bfgs\'\n')
-        if self.lattice_type == 'triclinic':
-            out_file.write('    cell_dofree = \'all\'\n')
-        else:
-            out_file.write('    cell_dofree = \'ibrav\'\n')
-        out_file.write(' / \n')
-
-        out_file.write('ATOMIC_SPECIES\n')
-        for atom in set(self.atom_labels):
-            out_file.write(
-                f' {atom}   {Tools.elements_dict()[atom]:.4f}  {atom}.PSEUDO.UPF\n')
-        out_file.write('\n')
-
-        if self.lattice_type == 'triclinic':
-            out_file.write('CELL_PARAMETERS (angstrom) \n')
-            for v in cell:
-                out_file.write(f'{v[0]:.9f}      {v[0]:.9f}      {v[0]:.9f}\n')
-                out_file.write('\n')
-
-        coords_type = 'angstrom'
-        if in_angstrom_format is False:
-            coords_type = 'crystal'
-        out_file.write(f'ATOMIC_POSITIONS ({coords_type})\n')
-
-        for atom in ion_pos:
-            out_file.write('{:<5s}{:>15.9f}{:>15.9f}{:>15.9f}\n'.format(atom[0],
-                                                                        atom[1],
-                                                                        atom[2],
-                                                                        atom[3]))
-
-        out_file.write('K_POINTS automatic\n')
-        out_file.write(f'   {kx} {ky} {kz}  1 1 1\n')
-
-        out_file.write('EOF\n')
-        out_file.write('$CMD_PW < $PREFIX.$CALC.in > $PREFIX.$CALC.out')
-
-        out_file.close()
+        Tools.save_qe(out_path=self.out_path,
+                      name=self.name,
+                      lattice=cell,
+                      atom_labels=self.atom_labels,
+                      atom_pos=atom_pos,
+                      coords_are_cartesian=True,
+                      supercell=supercell,
+                      )
