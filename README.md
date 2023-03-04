@@ -28,6 +28,10 @@ The Python dependencies are most easily satisfied using a conda
 ([anaconda](https://www.anaconda.com/distribution)/[miniconda](https://docs.conda.io/en/latest/miniconda.html))
 installation by running
 
+```Shell
+conda env create --file environment.yml
+```
+
 ## Basic Usage
 
 To create a specific COF, like `C3_BENZ_CHO_OH-C2_HDZ_NH2-HCB_A-AA`:
