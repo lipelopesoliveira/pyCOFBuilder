@@ -117,7 +117,15 @@ class Building_Block():
         ''' Returns the number of atoms in the unitary cell'''
         return len(self.atom_labels)
 
-    def centralize_molecule(self, by_X=False):
+    def print_structure(self):
+        """
+        Print the structure in xyz format:
+        `atom_label     pos_x    pos_y    pos_z`
+        """
+
+        print(self._structure_as_string())
+
+    def _centralize_molecule(self, by_X=False):
         ''' Centralize the molecule on its geometrical center'''
 
         transposed = np.transpose(self.atom_pos)
@@ -233,14 +241,6 @@ class Building_Block():
                                                                           self.atom_pos[i][2])
 
         return struct_string
-
-    def print_structure(self):
-        """
-        Print the structure in xyz format:
-        `atom_label     pos_x    pos_y    pos_z`
-        """
-
-        print(self._structure_as_string())
 
     def _add_connection_group(self, conector_name):
         '''Adds the functional group by which the COF will be formed from the building blocks'''
@@ -415,7 +415,7 @@ class Building_Block():
         self.atom_pos = chem_json['atoms']['coords']['3d']
         self.composition = chem_json['formula']
 
-        self.centralize_molecule()
+        self._centralize_molecule()
 
         self._add_connection_group(conector)
 
