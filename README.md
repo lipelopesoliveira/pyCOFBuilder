@@ -65,7 +65,6 @@ Ret.save_cif([1, 1, 2])
 
 This code will create a COF with the name `C3_BENZ_CHO_OH-C2_DBPL_NH2_CH3_H_H_H-HCB_A-AA` and save it in the current directory. The code will print out some information about the structure created.
 
-
 ## Creating multiple COFs
 
 You can also create multiple building blocks and then construct all available COFs from the connection of those blocks.

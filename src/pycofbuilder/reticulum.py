@@ -169,6 +169,12 @@ class Reticulum():
         self.angle_tol = 0.1
         self.n_atoms = self.get_n_atoms()
 
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return self.name
+
     def get_n_atoms(self):
         ''' Returns the number of atoms in the unitary cell'''
         return len(self.atom_labels)
@@ -303,7 +309,7 @@ class Reticulum():
         r_pos_a_2 = np.dot(
             bb_2.atom_pos,
             R.from_euler('z', 180, degrees=True).as_matrix())
-        
+
         r_pos_a_2 += np.array([0, np.sqrt(3)/3, 0])*a
 
         final_pos = np.vstack((final_pos, r_pos_a_2))
