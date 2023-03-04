@@ -72,7 +72,7 @@ class Building_Block():
 
         self.create_BB_structure(self.simmetry,
                                  self.nucleo,
-                                 self.conector, 
+                                 self.conector,
                                  *self.radicals)
         if self.save_bb:
             self.save()
