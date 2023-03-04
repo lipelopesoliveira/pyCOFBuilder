@@ -1,0 +1,17 @@
+name: pycofbuilder
+channels:
+  - conda-forge
+dependencies:
+  - jupyter
+  - jupyterlab
+  - matplotlib
+  - numpy
+  - pandas
+  - panel
+  - pip
+  - python
+  - pymatgen
+  - glob
+  - tqdm
+  - scipy
+  - simplejson

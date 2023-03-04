@@ -30,6 +30,7 @@ class Building_Block():
         self.chirality = False
         self.atom_labels = None
         self.atom_pos = None
+        self.smiles = None
 
         # Check if save_dir exists and try to create it if not
         self.save_dir = save_dir
@@ -543,9 +544,9 @@ class Building_Block():
 
     def check_existence(self):
 
-        simm_check = True
-        nucleo_check = True
-        conector_check = True
+        simm_check = False
+        nucleo_check = False
+        conector_check = False
         radicals_check = True
 
         if self.name is not None:
@@ -555,42 +556,25 @@ class Building_Block():
             conector = name[2]
             radicals = name[3:]
 
-            if simm not in ['C2', 'C3', 'C4', 'C6']:
+            s_list = ['C2', 'C3', 'C4', 'C6']
+
+            BB_dict = {s: self.get_available_nucleo()[i] for i, s in enumerate(s_list)}
+
+            if simm not in s_list:
                 print('ERROR!: Building Block simmetry must be C2, C3, C4, or C6.')
                 simm_check = False
 
-            if simm == 'C2':
-                list = self.get_available_nucleo()[0]
-                if nucleo not in list:
-                    print(f'ERROR!: {nucleo} not available!')
-                    print(f'Available nucleos with C2 simmetry is {list}')
-                    nucleo_check = False
+            if nucleo in BB_dict[simm]:
+                nucleo_check = True
+            else:
+                print(f'ERROR!: {nucleo} not available!')
+                print(f'Available nucleos with {simm} simmetry are {BB_dict[simm]}')
 
-            if simm == 'C3':
-                list = self.get_available_nucleo()[1]
-                if nucleo not in list:
-                    print(f'ERROR!: {nucleo} not available!')
-                    print(f'Available nucleos with C3 simmetry is {list}')
-                    nucleo_check = False
-
-            if simm == 'C4':
-                list = self.get_available_nucleo()[2]
-                if nucleo not in list:
-                    print(f'ERROR!: {nucleo} not available!')
-                    print(f'Available nucleos with C4 simmetry is {list}')
-                    nucleo_check = False
-
-            if simm == 'C6':
-                list = self.get_available_nucleo()[3]
-                if nucleo not in list:
-                    print(f'ERROR!: {nucleo} not available!')
-                    print(f'Available nucleos with C6 simmetry is {list}')
-                    nucleo_check = False
-
-            if conector not in self.get_available_conector():
+            if conector in self.get_available_conector():
+                conector_check = True
+            else:
                 print(f'ERROR! {conector} is not a available conector.')
                 print(f'Available list: {self.get_available_conector()}')
-                conector_check = False
 
             radicals_list = self.get_available_R()
             for rad in radicals:
