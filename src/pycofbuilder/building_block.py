@@ -57,14 +57,7 @@ class Building_Block():
             conector = BB_name[2]
             radicals = BB_name[3:] + ['H'] * (9 - len(BB_name[3:]))
 
-            create_BB_dict = {
-                'C2': self.create_C2_BB,
-                'C3': self.create_C3_BB,
-                'C4': self.create_C4_BB,
-                'C6': self.create_C6_BB
-                }
-
-            create_BB_dict[simmetry](nucleo, conector, *radicals)
+            self.create_BB_structure(simmetry, nucleo, conector, *radicals)
             self.save()
 
     def n_atoms(self):
@@ -211,7 +204,7 @@ class Building_Block():
                                                     self.atom_labels,
                                                     self.atom_pos)[1]
             except Exception:
-                # Set the closest position to origin for building blocks as HDZ
+                # Set the closest position to origin for building blocks as HDZN
                 close_Q_struct = [0, 0, 0]
 
             # Get the position of Q in the conection group
@@ -322,62 +315,32 @@ class Building_Block():
 
             self.atom_labels = self.atom_labels + n_group_label
 
-    def create_C2_BB(self,
-                     nucleo_name='BENZ',
-                     conector='CHO',
-                     R1='H',
-                     R2='H',
-                     R3='H',
-                     R4='H',
-                     R5='H',
-                     R6='H',
-                     R7='H',
-                     R8='H',
-                     R9='H'):
-        '''Create a building block with C2 simmetry'''
+    def create_BB_structure(self,
+                            simmetry='C2',
+                            nucleo_name='BENZ',
+                            conector='CHO',
+                            R1='H',
+                            R2='H',
+                            R3='H',
+                            R4='H',
+                            R5='H',
+                            R6='H',
+                            R7='H',
+                            R8='H',
+                            R9='H'):
+        '''Create a building block'''
 
-        self.name = f'C2_{nucleo_name}_{conector}'
+        self.name = f'{simmetry}_{nucleo_name}_{conector}'
 
-        self.atom_labels, self.atom_pos = Tools.read_gjf_file(
-            os.path.join(self.main_path, 'nucleo', 'C2'),
-            nucleo_name)
+        chem_json = Tools.read_json(
+            os.path.join(self.main_path, 'nucleo', simmetry),
+            nucleo_name
+            )
 
-        self.centralize_molecule()
+        self.smiles = chem_json['xsmiles']
 
-        self.add_connection_group(conector)
-
-        R_list_names = [R1, R2, R3, R4, R5, R6, R7, R8, R9]
-        R_list_labels = ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9']
-
-        for i in range(len(R_list_names)):
-            if R_list_labels[i] in self.atom_labels:
-                self.add_R_group(R_list_names[i], R_list_labels[i])
-                self.name += f'_{R_list_names[i]}'
-
-        self.connectivity = len([i for i in self.atom_labels if 'X' in i])
-        self.align_to()
-        self.calculate_size()
-
-    def create_C3_BB(self,
-                     nucleo_name='BENZ',
-                     conector='CHO',
-                     R1='H',
-                     R2='H',
-                     R3='H',
-                     R4='H',
-                     R5='H',
-                     R6='H',
-                     R7='H',
-                     R8='H',
-                     R9='H'):
-        '''Create a building block with C3 simmetry'''
-
-        self.name = f'C3_{nucleo_name}_{conector}'
-
-        self.atom_labels, self.atom_pos = Tools.read_gjf_file(os.path.join(self.main_path,
-                                                                           'nucleo',
-                                                                           'C3'),
-                                                              nucleo_name)
+        self.atom_labels = chem_json['atoms']['elements']['elementType']
+        self.atom_pos = chem_json['atoms']['coords']['3d']
 
         self.centralize_molecule()
 
@@ -395,77 +358,6 @@ class Building_Block():
         self.align_to()
         self.calculate_size()
 
-    def create_C4_BB(self,
-                     nucleo_name='BENZ',
-                     conector='CHO',
-                     R1='H',
-                     R2='H',
-                     R3='H',
-                     R4='H',
-                     R5='H',
-                     R6='H',
-                     R7='H',
-                     R8='H',
-                     R9='H'):
-        '''Create a building block with C4 simmetry'''
-
-        self.name = f'C4_{nucleo_name}_{conector}'
-
-        self.atom_labels, self.atom_pos = Tools.read_gjf_file(
-            os.path.join(self.main_path, 'nucleo', 'C4'),
-            nucleo_name)
-
-        self.centralize_molecule()
-
-        self.add_connection_group(conector)
-
-        R_list_names = [R1, R2, R3, R4, R5, R6, R7, R8, R9]
-        R_list_labels = ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9']
-
-        for i in range(len(R_list_names)):
-            if R_list_labels[i] in self.atom_labels:
-                self.add_R_group(R_list_names[i], R_list_labels[i])
-                self.name += f'_{R_list_names[i]}'
-
-        self.connectivity = len([i for i in self.atom_labels if 'X' in i])
-        self.align_to()
-        self.calculate_size()
-
-    def create_C6_BB(self,
-                     nucleo_name='BENZ',
-                     conector='CHO',
-                     R1='H',
-                     R2='H',
-                     R3='H',
-                     R4='H',
-                     R5='H',
-                     R6='H',
-                     R7='H',
-                     R8='H',
-                     R9='H'):
-        '''Create a building block with C6 simmetry'''
-
-        self.name = f'C6_{nucleo_name}_{conector}'
-
-        self.atom_labels, self.atom_pos = Tools.read_gjf_file(
-            os.path.join(self.main_path, 'nucleo', 'C6'),
-            nucleo_name)
-
-        self.centralize_molecule()
-
-        self.add_connection_group(conector)
-
-        R_list_names = [R1, R2, R3, R4, R5, R6, R7, R8, R9]
-        R_list_labels = ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9']
-
-        for i in range(len(R_list_names)):
-            if R_list_labels[i] in self.atom_labels:
-                self.add_R_group(R_list_names[i], R_list_labels[i])
-                self.name += f'_{R_list_names[i]}'
-
-        self.connectivity = len([i for i in self.atom_labels if 'X' in i])
-        self.align_to()
-        self.calculate_size()
 
     def save(self, extension='xyz'):
 

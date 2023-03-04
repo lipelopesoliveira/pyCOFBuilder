@@ -1581,9 +1581,9 @@ def write_json(path, name, COF_json):
                         ignore_nan=True)
 
 
-def read_json(path, cof_name):
+def read_json(path, name):
 
-    cof_path = os.path.join(path, cof_name + '.json')
+    cof_path = os.path.join(path, name + '.json')
 
     with open(cof_path, 'r') as r:
         json_object = simplejson.loads(r.read())
