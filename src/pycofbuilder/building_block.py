@@ -44,57 +44,28 @@ class Building_Block():
         '''Automatically read or create a buiding block based on its name'''
         simm_check, nucleo_check, conector_check, radicals_check = self.check_existence()
 
-        if simm_check and nucleo_check and conector_check and radicals_check:
-            if self.name + '.xyz' in os.listdir(self.save_dir):
-                self.read_structure()
+        error_msg = f"COF name is invalid! {self.check_existence()}"
+        assert all([simm_check, nucleo_check, conector_check, radicals_check]), error_msg 
 
-            else:
-                BB_name = self.name.split('_')
-                simmetry = BB_name[0]
-                nucleo = BB_name[1]
-                conector = BB_name[2]
-                radicals = BB_name[3:] + ['H'] * (6 - len(BB_name[3:]))
+        if self.name + '.xyz' in os.listdir(self.save_dir):
+            self.read_structure()
 
-                if simmetry == 'C2':
-                    self.create_C2_BB(nucleo,
-                                      conector,
-                                      radicals[0],
-                                      radicals[1],
-                                      radicals[2],
-                                      radicals[3],
-                                      radicals[4],
-                                      radicals[5])
-                    self.save()
-                if simmetry == 'C3':
-                    self.create_C3_BB(nucleo,
-                                      conector,
-                                      radicals[0],
-                                      radicals[1],
-                                      radicals[2],
-                                      radicals[3],
-                                      radicals[4],
-                                      radicals[5])
-                    self.save()
-                if simmetry == 'C4':
-                    self.create_C4_BB(nucleo,
-                                      conector,
-                                      radicals[0],
-                                      radicals[1],
-                                      radicals[2],
-                                      radicals[3],
-                                      radicals[4],
-                                      radicals[5])
-                    self.save()
-                if simmetry == 'C6':
-                    self.create_C6_BB(nucleo,
-                                      conector,
-                                      radicals[0],
-                                      radicals[1],
-                                      radicals[2],
-                                      radicals[3],
-                                      radicals[4],
-                                      radicals[5])
-                    self.save()
+        else:
+            BB_name = self.name.split('_')
+            simmetry = BB_name[0]
+            nucleo = BB_name[1]
+            conector = BB_name[2]
+            radicals = BB_name[3:] + ['H'] * (9 - len(BB_name[3:]))
+
+            create_BB_dict = {
+                'C2': self.create_C2_BB,
+                'C3': self.create_C3_BB,
+                'C4': self.create_C4_BB,
+                'C6': self.create_C6_BB
+                }
+
+            create_BB_dict[simmetry](nucleo, conector, *radicals)
+            self.save()
 
     def n_atoms(self):
         ''' Returns the number of atoms in the unitary cell'''
@@ -510,7 +481,7 @@ class Building_Block():
             self.align_to()
             self.calculate_size()
         except Exception:
-            None
+            print('Error reading the structure!')
 
     def get_available_nucleo(self):
         '''Get the list of available nucleos'''
@@ -560,7 +531,9 @@ class Building_Block():
 
             BB_dict = {s: self.get_available_nucleo()[i] for i, s in enumerate(s_list)}
 
-            if simm not in s_list:
+            if simm in s_list:
+                simm_check = True
+            else:
                 print('ERROR!: Building Block simmetry must be C2, C3, C4, or C6.')
                 simm_check = False
 
