@@ -1,0 +1,30 @@
+{
+  "name": "keto",
+  "code": "O",
+  "smiles": "[R]=O",
+  "xsmiles": "[*]=O",
+  "xsmiles_label": "|$R;$|",
+  "formula": "R1O1",
+  "atoms": {
+    "elements": {
+      "elementType": [
+        "O",
+        "R"
+      ]
+    },
+    "coords": {
+      "3d": [
+        [
+          0.33475,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ]
+    }
+  }
+}

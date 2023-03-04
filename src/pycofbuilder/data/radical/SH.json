@@ -1,0 +1,36 @@
+{
+  "name": "thyol",
+  "code": "SH",
+  "smiles": "[R]S",
+  "xsmiles": "[*]S",
+  "xsmiles_label": "|$R;$|",
+  "formula": "H1R1S1",
+  "atoms": {
+    "elements": {
+      "elementType": [
+        "R",
+        "S",
+        "H"
+      ]
+    },
+    "coords": {
+      "3d": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.43,
+          0.0,
+          0.0
+        ],
+        [
+          0.93564026,
+          0.88708817,
+          0.0
+        ]
+      ]
+    }
+  }
+}

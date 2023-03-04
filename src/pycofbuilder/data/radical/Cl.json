@@ -1,0 +1,30 @@
+{
+  "name": "chlorine",
+  "code": "Cl",
+  "smiles": "[R]Cl",
+  "xsmiles": "[*]Cl",
+  "xsmiles_label": "|$R;$|",
+  "formula": "R1Cl1",
+  "atoms": {
+    "elements": {
+      "elementType": [
+        "Cl",
+        "R"
+      ]
+    },
+    "coords": {
+      "3d": [
+        [
+          0.73475,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ]
+    }
+  }
+}

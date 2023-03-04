@@ -1,0 +1,36 @@
+{
+  "name": "cyano",
+  "code": "CN",
+  "smiles": "[R]C#N",
+  "xsmiles": "[*]C#N",
+  "xsmiles_label": "|$R;;$|",
+  "formula": "R1N1C1",
+  "atoms": {
+    "elements": {
+      "elementType": [
+        "R",
+        "C",
+        "N"
+      ]
+    },
+    "coords": {
+      "3d": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.43389,
+          0.0,
+          0.0
+        ],
+        [
+          1.59042,
+          0.0,
+          0.0
+        ]
+      ]
+    }
+  }
+}

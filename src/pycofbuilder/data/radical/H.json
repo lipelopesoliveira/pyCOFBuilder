@@ -1,0 +1,30 @@
+{
+  "name": "hydrogen",
+  "code": "H",
+  "smiles": "[R][H]",
+  "xsmiles": "[*][H]",
+  "xsmiles_label": "|$R;$|",
+  "formula": "H1R1",
+  "atoms": {
+    "elements": {
+      "elementType": [
+        "H",
+        "R"
+      ]
+    },
+    "coords": {
+      "3d": [
+        [
+          0.0992,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ]
+    }
+  }
+}
