@@ -241,7 +241,7 @@ class Building_Block():
         print(self._structure_as_string())
 
     def _add_connection_group(self, conector_name):
-        '''Adds the functional group by which the COF will be formed from the building blocks'''          
+        '''Adds the functional group by which the COF will be formed from the building blocks'''
 
         conector_chem_json = Tools.read_json(
             os.path.join(self.main_path, 'conector'),
@@ -316,7 +316,7 @@ class Building_Block():
     def _add_R_group(self, R_name, R_type):
         '''Adds group R in building blocks'''
 
-        # Read the R group   
+        # Read the R group
         R_chem_json = Tools.read_json(
             os.path.join(self.main_path, 'radical'),
             R_name)
