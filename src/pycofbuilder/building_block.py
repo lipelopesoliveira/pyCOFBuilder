@@ -438,7 +438,10 @@ class Building_Block():
     def save(self, extension='xyz'):
 
         if extension == 'xyz':
-            Tools.save_xyz(self.save_dir, self.name + '.xyz', self.atom_labels, self.atom_pos)
+            Tools.save_xyz(path=self.save_dir,
+                           file_name=self.name + '.xyz',
+                           atom_labels=self.atom_labels,
+                           atom_pos=self.atom_pos)
 
     def get_available_core(self):
         '''Get the list of available cores'''

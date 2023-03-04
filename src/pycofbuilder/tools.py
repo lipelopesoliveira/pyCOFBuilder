@@ -817,7 +817,12 @@ def read_cif(path, file_name):
         return None
 
 
-def save_xsf(path, file_name, cell, atom_label, atom_pos):
+def save_xsf(path: str = None,
+             file_name: str = None,
+             cell: np.ndarray = np.eye(3),
+             atom_labels: list = None,
+             atom_pos: list = None,
+             frac_coords: bool = False):
     """
     Save a file in format `.xsf` on the `path`.
 
@@ -840,6 +845,11 @@ def save_xsf(path, file_name, cell, atom_label, atom_pos):
     if len(cell) == 6:
         cell = cellpar_to_cell(cell)
 
+    if frac_coords:
+        # Convert to fractional coordinates
+        frac_matrix = get_fractional_to_cartesian_matrix(*cell_to_cellpar(cell))
+        atom_pos = [np.dot(frac_matrix, [i[0], i[1], i[2]]) for i in atom_pos]
+
     xsf_file = open(os.path.join(path, file_name + '.xsf'), 'w')
     xsf_file.write(' CRYSTAL\n')
     xsf_file.write('  PRIMVEC\n')
@@ -851,7 +861,7 @@ def save_xsf(path, file_name, cell, atom_label, atom_pos):
     xsf_file.write(f'           {len(atom_pos)}           1\n')
 
     for i in range(len(atom_pos)):
-        xsf_file.write('{:3s}        {:>5.9f}    {:>5.9f}    {:>5.9f}\n'.format(atom_label[i],
+        xsf_file.write('{:3s}        {:>5.9f}    {:>5.9f}    {:>5.9f}\n'.format(atom_labels[i],
                                                                                 atom_pos[i][0],
                                                                                 atom_pos[i][1],
                                                                                 atom_pos[i][2]))
@@ -859,7 +869,13 @@ def save_xsf(path, file_name, cell, atom_label, atom_pos):
     xsf_file.close()
 
 
-def save_pqr(path, file_name, cell, atom_label, atom_pos, partial_charges=False):
+def save_pqr(path: str = None,
+             file_name: str = None,
+             cell: np.ndarray = np.eye(3),
+             atom_labels: list = None,
+             atom_pos: list = None,
+             partial_charges: list = None,
+             frac_coords: bool = False):
     """
     Save a file in format `.pqr` on the `path`.
 
@@ -884,6 +900,11 @@ def save_pqr(path, file_name, cell, atom_label, atom_pos, partial_charges=False)
     if len(cell) == 3:
         cell = cell_to_cellpar(cell)
 
+    if frac_coords:
+        # Convert to fractional coordinates
+        frac_matrix = get_fractional_to_cartesian_matrix(*cell)
+        atom_pos = [np.dot(frac_matrix, [i[0], i[1], i[2]]) for i in atom_pos]
+
     pqr_file = open(os.path.join(path, file_name + '.pqr'), 'w')
     pqr_file.write(f'TITLE       {file_name}  \n')
     pqr_file.write('REMARK   4\n')
@@ -897,25 +918,30 @@ def save_pqr(path, file_name, cell, atom_label, atom_pos, partial_charges=False)
     if partial_charges is not False:
         for i in range(len(atom_pos)):
             pqr_file.write('ATOM   {:>4} {:>2}   MOL A   0    {:>8.3f}{:>8.3f}{:>8.3f}{:>8.5f}                {}\n'.format(i + 1,
-                                                                                                                           atom_label[i],
+                                                                                                                           atom_labels[i],
                                                                                                                            atom_pos[i][0],
                                                                                                                            atom_pos[i][1],
                                                                                                                            atom_pos[i][2],
                                                                                                                            partial_charges[i],
-                                                                                                                           atom_label[i]))
+                                                                                                                           atom_labels[i]))
     if partial_charges is False:
         for i in range(len(atom_pos)):
             pqr_file.write('ATOM   {:>4} {:>2}   MOL A   0    {:>8.3f}{:>8.3f}{:>8.3f}                {}\n'.format(i + 1, 
-                                                                                                                   atom_label[i],
+                                                                                                                   atom_labels[i],
                                                                                                                    atom_pos[i][0],
                                                                                                                    atom_pos[i][1],
                                                                                                                    atom_pos[i][2],
-                                                                                                                   atom_label[i]))
+                                                                                                                   atom_labels[i]))
 
     pqr_file.close()
 
 
-def save_pdb(path, file_name, cell, atom_label, atom_pos):
+def save_pdb(path: str = None,
+             file_name: str = None,
+             cell: np.ndarray = np.eye(3),
+             atom_labels: list = None,
+             atom_pos: list = None,
+             frac_coords: bool = False):
     """
     Save a file in format `.pdb` on the `path`.
 
@@ -938,6 +964,11 @@ def save_pdb(path, file_name, cell, atom_label, atom_pos):
     if len(cell) == 3:
         cell = cell_to_cellpar(cell)
 
+    if frac_coords:
+        # Convert to fractional coordinates
+        frac_matrix = get_fractional_to_cartesian_matrix(*cell)
+        atom_pos = [np.dot(frac_matrix, [i[0], i[1], i[2]]) for i in atom_pos]
+
     pdb_file = open(os.path.join(path, file_name + '.pdb'), 'w')
     pdb_file.write(f'TITLE       {file_name}  \n')
     pdb_file.write('REMARK   pyCOFBuilder\n')
@@ -950,16 +981,23 @@ def save_pdb(path, file_name, cell, atom_label, atom_pos):
 
     for i in range(len(atom_pos)):
         pdb_file.write('ATOM   {:>4} {:>2}   MOL          {:>8.3f}{:>8.3f}{:>8.3f}  1.00  0.00           {}\n'.format(i+1,
-                                                                                                                      atom_label[i],
+                                                                                                                      atom_labels[i],
                                                                                                                       atom_pos[i][0],
                                                                                                                       atom_pos[i][1],
                                                                                                                       atom_pos[i][2],
-                                                                                                                      atom_label[i]))
+                                                                                                                      atom_labels[i]))
 
     pdb_file.close()
 
 
-def save_gjf(path, file_name, atom_labels, atom_pos, text='opt pm6'):
+def save_gjf(path: str = None,
+             file_name: str = None,
+             cell: np.ndarray = np.eye(3),
+             atom_labels: list = None,
+             atom_pos: list = None,
+             frac_coords: bool = False,
+             text: str = 'opt pm6'):
+
     """
     Save a file in format `.gjf` on the `path`.
 
@@ -979,6 +1017,14 @@ def save_gjf(path, file_name, atom_labels, atom_pos, text='opt pm6'):
         Parameters for Gaussian calculations.
     """
 
+    if cell.shape == 6:
+        cell = cellpar_to_cell(cell)
+
+    if frac_coords:
+        # Convert to fractional coordinates
+        frac_matrix = get_fractional_to_cartesian_matrix(*cell_to_cellpar(cell))
+        atom_pos = [np.dot(frac_matrix, [i[0], i[1], i[2]]) for i in atom_pos]
+
     file_name = file_name.split('.')[0]
 
     temp_file = open(os.path.join(path, file_name), 'w')
@@ -994,13 +1040,21 @@ def save_gjf(path, file_name, atom_labels, atom_pos, text='opt pm6'):
                                                                      atom_pos[i][0],
                                                                      atom_pos[i][1],
                                                                      atom_pos[i][2]))
+    if cell is not None:
+        for i in range(len(cell)):
+            temp_file.write('Tv {:>15.7f} {:>15.7f} {:>15.7f}'.format(*cell[i]))
 
     temp_file.write('\n')
     temp_file.write('\n')
     temp_file.close()
 
 
-def save_xyz(path, file_name, atom_labels, atom_pos, cell=None):
+def save_xyz(path: str = None,
+             file_name: str = None,
+             cell: np.ndarray = np.eye(3),
+             atom_labels: list = None,
+             atom_pos: list = None,
+             frac_coords: bool = False):
     """
     Save a file in format `.xyz` on the `path`.
 
@@ -1018,6 +1072,14 @@ def save_xyz(path, file_name, atom_labels, atom_pos, cell=None):
         Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
     """
 
+    if cell.shape == (3,3):
+        cell = cell_to_cellpar(cell)
+
+    if frac_coords:
+        # Convert to fractional coordinates
+        frac_matrix = get_fractional_to_cartesian_matrix(cell)
+        atom_pos = [np.dot(frac_matrix, [i[0], i[1], i[2]]) for i in atom_pos]
+
     file_name = file_name.split('.')[0]
 
     temp_file = open(os.path.join(path, file_name + '.xyz'), 'w')
@@ -1026,8 +1088,6 @@ def save_xyz(path, file_name, atom_labels, atom_pos, cell=None):
     if cell is None:
         temp_file.write(f'{file_name}\n')
     else:
-        if len(cell) == 3:
-            cell = cell_to_cellpar(cell)
         temp_file.write(f'{cell[0]}  {cell[1]}  {cell[2]}  {cell[3]}  {cell[4]}  {cell[5]}\n')
 
     for i in range(len(atom_labels)):
@@ -1039,267 +1099,221 @@ def save_xyz(path, file_name, atom_labels, atom_pos, cell=None):
     temp_file.close()
 
 
-def save_qe(out_path,
-            name,
-            lattice,
-            atom_labels,
-            atom_pos,
-            coords_are_cartesian=False,
-            supercell=False,
-            angs=False,
-            ecut=40,
-            erho=360,
-            k_dist=0.3):
+def save_turbomole(path: str = None,
+                   file_name: str = None,
+                   cell: np.ndarray = np.eye(3),
+                   atom_labels: list = None,
+                   atom_pos: list = None,
+                   frac_coords: bool = False):
+    """Save the structure in Turbomole .coord format
 
-    # Try to create the out_path folder
-    os.makedirs(out_path, exist_ok=True)
+    Parameters
+    ----------
+    path : str
+        Path to the file.
+    file_name : str
+        Name of the file. Does not neet to contain the `.coord` extention.
+    cell : numpy array
+        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
+    atom_label : list
+        List of strings containing containg the N atom partial charges.
+    atom_pos : list
+        Nx3 array contaning the atoms coordinates.
+    """
 
-    # Check if the lattice is a matrix or a list of cell parameters
-    if len(lattice) == 6:
-        lattice = cellpar_to_cell(lattice)
+    if cell.shape == (3, 3):
+        cell = cell_to_cellpar(cell)
 
-    # Cria a estrutura como entidade do pymatgen
-    struct = Structure(lattice,
-                       atom_labels,
-                       atom_pos,
-                       coords_are_cartesian=coords_are_cartesian)
+    if frac_coords:
+        # Convert to fractional coordinates
+        frac_matrix = get_fractional_to_cartesian_matrix(*cell)
+        atom_pos = [np.dot(frac_matrix, [i[0], i[1], i[2]]) for i in atom_pos]
 
-    # Remove duplicate atoms
-    struct.sort(reverse=True)
-    struct.merge_sites(tol=.5, mode='delete')
+    with open(os.path.join(path, file_name + '.coord'), 'w') as temp_file:
+        temp_file.write('$coord angs\n')
 
-    # Translate the atoms to the unit cell
-    struct.translate_sites(range(len(struct.as_dict()['sites'])),
-                           [0, 0, 0.5],
-                           frac_coords=True,
-                           to_unit_cell=True)
+        for i in range(len(atom_labels)):
+            temp_file.write('{:>15.7f}{:>15.7f}{:>15.7f}   {:<5s}\n'.format(atom_pos[i][0],
+                                                                            atom_pos[i][1],
+                                                                            atom_pos[i][2],
+                                                                            atom_labels[i]))
 
-    # Simetriza a estrutura
-    symm = SpacegroupAnalyzer(struct, symprec=1, angle_tolerance=5.0)
-    struct_symm_prim = symm.get_refined_structure()
+        temp_file.write('$periodic 3\n')
+        temp_file.write('$cell\n')
+        temp_file.write('{}  {}  {}  {}  {}  {}\n'.format(*cell))
+        temp_file.write('$opt\n')
+        temp_file.write('   engine=inertial\n')
+        temp_file.write('$end\n')
 
-    lattice_type = symm.get_lattice_type()
-    hall = symm.get_hall()
 
-    if supercell is not False:
-        struct_symm_prim.make_supercell([[supercell[0], 0, 0],
-                                        [0, supercell[1], 0],
-                                        [0, 0, supercell[2]]])
+def save_vasp(path: str = None,
+              file_name: str = None,
+              cell: np.ndarray = np.eye(3),
+              atom_labels: list = None,
+              atom_pos: list = None,
+              frac_coords: bool = False):
+    """Save the structure in VASP .vasp format
 
-    dict_sctructure = struct_symm_prim.as_dict()
+    Parameters
+    ----------
+    path : str
+        Path to the file.
+    file_name : str
+        Name of the file. Does not neet to contain the `.vasp` extention.
+    cell : numpy array
+        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
+    atom_label : list
+        List of strings containing containg the N atom partial charges.
+    atom_pos : list
+        Nx3 array contaning the atoms coordinates.
+    coords_are_cartesian : bool
+        If True, the coordinates are in cartesian coordinates.
+    """
 
-    cell = dict_sctructure['lattice']['matrix']
+    if cell.shape == 6:
+        cell = cellpar_to_cell(cell)
 
-    a = dict_sctructure['lattice']['a']
-    b = dict_sctructure['lattice']['b']
-    c = dict_sctructure['lattice']['c']
+    unique_atoms = []
+    for i in atom_labels:
+        if i not in unique_atoms:
+            unique_atoms.append(i)
 
-    celldm1 = a*1.8897259886  # 1 angstrom = 1.8897259886 bohr
-    celldm2 = b/a
-    celldm3 = c/a
-    celldm4 = angle(cell[0], cell[1], unit='cos')
-    celldm5 = angle(cell[0], cell[2], unit='cos')
-    celldm6 = angle(cell[1], cell[2], unit='cos')
+    composition_dict = {i: atom_labels.count(i) for i in unique_atoms}
 
-    kx, ky, kz = get_kgrid(cellpar_to_cell(cell), k_dist)
+    with open(os.path.join(path, file_name + '.vasp'), 'w') as temp_file:
+        temp_file.write(f'{file_name}\n')
+        temp_file.write('1.0\n')
 
-    ion_conv_crystal = [[i['label']] + i['abc'] for i in dict_sctructure['sites']]
-    ion_conv_angstrom = [[i['label']] + i['xyz'] for i in dict_sctructure['sites']]
+        for i in range(3):
+            temp_file.write('{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(cell[i][0],
+                                                                   cell[i][1],
+                                                                   cell[i][2]))
 
-    if angs is False:
-        ion_pos = ion_conv_crystal
-    if angs is True:
-        ion_pos = ion_conv_angstrom
+        temp_file.write(' '.join(composition_dict.keys()) + '\n')
+        temp_file.write(' '.join([str(i) for i in composition_dict.values()]) + '\n')
 
-    out_file = open(os.path.join(out_path, name + '.in'), 'w', newline='\n')
+        if frac_coords:
+            temp_file.write('Direct\n')
+        else:
+            temp_file.write('Cartesian\n')
 
-    out_file.write('#!/bin/sh\n')
-    out_file.write('\n')
-    out_file.write('#PBS -l walltime=100:00:00\n')
-    out_file.write('#PBS -l select=2:ncpus=48:mpiprocs=48\n')
-    out_file.write(f'#PBS -N {name}\n')
-    out_file.write('#PBS -m bea \n')
-    out_file.write('#PBS -j oe\n')
-    out_file.write('#PBS -V\n')
-    out_file.write('\n')
-    out_file.write('cd ${PBS_O_WORKDIR}\n')
-    out_file.write('\n')
-    out_file.write('module load intel/2018.4\n')
-    out_file.write('\n')
-    out_file.write('PSEUDO_DIR=\"/home/users/lipelopes/pseudo\"\n')
-    out_file.write('CMD_PW="mpirun -np 96 /home/users/lipelopes/qe-6.4/bin/pw.x -nk 2"\n')
-    out_file.write(f'PREFIX=\'{name}\'\n')
-    out_file.write('CALC=\'vc-relax\'\n')
-    out_file.write(f'SCRATCH_DIR=\'/scratch/31081a/lipelopes/{name}/\'\n')
-    out_file.write('\n')
-    out_file.write('cat>$PREFIX.$CALC.in<<EOF\n')
+        for i in range(len(atom_labels)):
+            temp_file.write('{:>15.7f}{:>15.7f}{:>15.7f}   {:<5s}\n'.format(atom_pos[i][0],
+                                                                            atom_pos[i][1],
+                                                                            atom_pos[i][2],
+                                                                            atom_labels[i]))
 
-    out_file.write(' &control\n')
-    out_file.write('    calculation = \'$CALC\' ,\n')
-    out_file.write('    restart_mode = \'from_scratch\' ,\n')
-    out_file.write('    wf_collect = .false. ,\n')
-    out_file.write('    outdir = \'$SCRATCH_DIR\' ,\n')
-    out_file.write('    pseudo_dir = \'$PSEUDO_DIR\' ,\n')
-    out_file.write('    prefix = \'$PREFIX\' ,\n')
-    out_file.write('    verbosity =\'high\' ,\n')
-    out_file.write('    tstress = .true. ,\n')
-    out_file.write('    tprnfor = .true. ,\n')
-    out_file.write('    etot_conv_thr = 1.0d-4 ,\n')
-    out_file.write('    forc_conv_thr = 1.0d-5 ,\n')
-    out_file.write('    nstep=1000 ,\n')
-    out_file.write(' / \n')
 
-    out_file.write(' &system\n')
+def save_qe(path: str = None,
+            file_name: str = None,
+            cell: np.ndarray = np.eye(3),
+            atom_labels: list = None,
+            atom_pos: list = None,
+            frac_coords: bool = False,
+            param_dict: dict = None):
+    '''
+    Save the structure in Quantum Espresso .pwscf format
+    '''
 
-    if lattice_type == 'cubic' and 'P' in hall:
-        out_file.write('    ibrav =   1\n')
-        out_file.write(f'    celldm(1) =   {celldm1:.8f}\n')
-
-    elif lattice_type == 'cubic' and 'F' in hall:
-        out_file.write('    ibrav =   2\n')
-        out_file.write(f'    celldm(1) =   {celldm1:.8f}\n')
-
-    elif lattice_type == 'cubic' and 'I' in hall:
-        out_file.write('    ibrav =   3\n')
-        out_file.write(f'    celldm(1) =   {celldm1:.8f}\n')
-
-    elif lattice_type == 'hexagonal':
-        out_file.write('    ibrav =   4\n')
-        out_file.write(f'    celldm(1) =   {celldm1:.8f}\n')
-        out_file.write(f'    celldm(3) =   {celldm3:.8f}\n')
-
-    elif lattice_type == 'trigonal' and 'P' in hall:
-        out_file.write('    ibrav =   4\n')
-        out_file.write(f'    celldm(1) =   {celldm1:.8f}\n')
-        out_file.write(f'    celldm(3) =   {celldm3:.8f}\n')
-
-    elif lattice_type == 'trigonal' and 'R' in hall:
-        out_file.write('    ibrav =   5\n')
-        out_file.write(f'    celldm(1) =   {celldm1:.8f}\n')
-        out_file.write(f'    celldm(3) =   {celldm3:.8f}\n')
-
-    elif lattice_type == 'tetragonal' and 'P' in hall:
-        out_file.write('    ibrav =   6\n')
-        out_file.write(f'    celldm(1) =   {celldm1:.8f}\n')
-        out_file.write(f'    celldm(3) =   {celldm3:.8f}\n')
-
-    elif lattice_type == 'tetragonal' and 'I' in hall:
-        out_file.write('    ibrav =   7\n')
-        out_file.write(f'    celldm(1) =   {celldm1:.8f}\n')
-        out_file.write(f'    celldm(3) =   {celldm3:.8f}\n')
-
-    elif lattice_type == 'orthorhombic' and 'P' in hall:
-        out_file.write('    ibrav =   8\n')
-        out_file.write(f'    celldm(1) =   {celldm1:.8f}\n')
-        out_file.write(f'    celldm(2) =   {celldm2:.8f}\n')
-        out_file.write(f'    celldm(3) =   {celldm3:.8f}\n')
-
-    elif lattice_type == 'orthorhombic' and 'C' or 'A' in hall:
-        out_file.write('    ibrav =   9\n')
-        out_file.write(f'    celldm(1) =   {celldm1:.8f}\n')
-        out_file.write(f'    celldm(2) =   {celldm2:.8f}\n')
-        out_file.write(f'    celldm(3) =   {celldm3:.8f}\n')
-
-    elif lattice_type == 'orthorhombic' and 'F' in hall:
-        out_file.write('    ibrav =   10\n')
-        out_file.write(f'    celldm(1) =   {celldm1:.8f}\n')
-        out_file.write(f'    celldm(2) =   {celldm2:.8f}\n')
-        out_file.write(f'    celldm(3) =   {celldm3:.8f}\n')
-
-    elif lattice_type == 'orthorhombic' and 'I' in hall:
-        out_file.write('    ibrav =   11\n')
-        out_file.write(f'    celldm(1) =   {celldm1:.8f}\n')
-        out_file.write(f'    celldm(2) =   {celldm2:.8f}\n')
-        out_file.write(f'    celldm(3) =   {celldm3:.8f}\n')
-
-    elif lattice_type == 'monoclinic' and round(c, 2) > round(b, 2) and 'P' in hall:
-        out_file.write('    ibrav =   12\n')
-        out_file.write(f'    celldm(1) =   {celldm1:.8f}\n')
-        out_file.write(f'    celldm(2) =   {celldm2:.8f}\n')
-        out_file.write(f'    celldm(3) =   {celldm3:.8f}\n')
-        out_file.write(f'    celldm(4) =   {celldm4:.8f}\n')
-
-    elif lattice_type == 'monoclinic' and round(b, 2) > round(c, 2) and 'P' in hall:
-        out_file.write('    ibrav =  -12\n')
-        out_file.write(f'    celldm(1) =   {celldm1:.8f}\n')
-        out_file.write(f'    celldm(2) =   {celldm2:.8f}\n')
-        out_file.write(f'    celldm(3) =   {celldm3:.8f}\n')
-        out_file.write(f'    celldm(5) =   {celldm5:.8f}\n')
-
-    elif lattice_type == 'monoclinic' and round(c, 2) > round(b, 2) and 'C' in hall:
-        out_file.write('    ibrav =  13\n')
-        out_file.write(f'    celldm(1) =   {celldm1:.8f}\n')
-        out_file.write(f'    celldm(2) =   {celldm2:.8f}\n')
-        out_file.write(f'    celldm(3) =   {celldm3:.8f}\n')
-        out_file.write(f'    celldm(5) =   {celldm4:.8f}\n')
-
-    elif lattice_type == 'monoclinic' and round(b, 2) > round(c, 2) and 'C' in hall:
-        out_file.write('    ibrav =  -13\n')
-        out_file.write(f'    celldm(1) =   {celldm1:.8f}\n')
-        out_file.write(f'    celldm(2) =   {celldm2:.8f}\n')
-        out_file.write(f'    celldm(3) =   {celldm3:.8f}\n')
-        out_file.write(f'    celldm(5) =   {celldm5:.8f}\n')
-        out_file.write(f'    celldm(6) =   {celldm6:.8f}\n')
-
-    elif lattice_type == 'triclinic':
-        out_file.write('    ibrav =  0\n')
-
-    out_file.write(f'    nat =     {len(atom_labels)}\n')
-    out_file.write(f'    ntyp =     {len(set(atom_labels))}\n')
-    out_file.write(f'    ecutwfc = {ecut} \n')
-    out_file.write(f'    ecutrho = {erho} \n')
-    out_file.write('    !occupations=\'smearing\' , \n')
-    out_file.write('    !degauss=0.001 , \n')
-    out_file.write('    !smearing=\'gaussian\' , \n')
-    out_file.write('    vdw_corr=\'grimme-d3\' , \n')
-    out_file.write(' / \n')
-    out_file.write(' &electrons\n')
-    out_file.write('    conv_thr =  1.0D-8 ,\n')
-    out_file.write('    electron_maxstep = 100 ,\n')
-    out_file.write('    mixing_beta = 0.3 ,\n')
-    out_file.write(' / \n')
-
-    out_file.write(' &IONS\n')
-    out_file.write('    ion_dynamics = \'bfgs\'\n')
-    out_file.write(' / \n')
-
-    out_file.write(' &CELL\n')
-    out_file.write('    cell_dynamics = \'bfgs\'\n')
-    if lattice_type == 'triclinic':
-        out_file.write('    cell_dofree = \'all\'\n')
+    if len(cell) == 6:
+        cell_matrix = cellpar_to_cell(cell)
     else:
-        out_file.write('    cell_dofree = \'ibrav\'\n')
-    out_file.write(' / \n')
+        cell_matrix = cell
 
-    out_file.write('ATOMIC_SPECIES\n')
-    for atom in set(atom_labels):
-        out_file.write(f' {atom}   {elements_dict()[atom]:.4f}  {atom}.PSEUDO.UPF\n')
-    out_file.write('\n')
+    if param_dict is None:
+        param_dict = {'ecutwfc': 40,
+                      'ecutrho': 360,
+                      'kspacing': 0.3}
 
-    if lattice_type == 'triclinic':
-        out_file.write('CELL_PARAMETERS (angstrom) \n')
-        for v in cell:
-            out_file.write(f'{v[0]:.9f}      {v[0]:.9f}      {v[0]:.9f}\n')
-            out_file.write('\n')
+    kx, ky, kz = get_kgrid(cell_matrix, param_dict['kspacing'])
 
-    coords_type = 'angstrom'
-    if angs is False:
-        coords_type = 'crystal'
-    out_file.write(f'ATOMIC_POSITIONS ({coords_type})\n')
+    control_dict = {'calculation': "'vc-relax'",
+                    'restart_mode': "'from_scratch'",
+                    'wf_collect': '.true.',
+                    'pseudo_dir': "'$PSEUDO_DIR'",
+                    'outdir': "'./'",
+                    'prefix': f"'{file_name}'",
+                    'verbosity': "'high'",
+                    'tstress': '.true.',
+                    'tprnfor': '.true.',
+                    'etot_conv_thr': '1.0d-5',
+                    'forc_conv_thr': '1.0d-6',
+                    'nstep': 1000}
 
-    for atom in ion_pos:
-        out_file.write('{:<5s}{:>15.9f}{:>15.9f}{:>15.9f}\n'.format(atom[0],
-                                                                    atom[1],
-                                                                    atom[2],
-                                                                    atom[3]))
+    system_dict = {'ibrav': 0,
+                   'nat': len(atom_labels),
+                   'ntyp': len(set(atom_labels)),
+                   'ecutwfc': param_dict['ecutwfc'],
+                   'ecutrho': param_dict['ecutrho'],
+                   'vdw_corr': "'grimme-d3'",
+                   'occupations': "'smearing'"}
 
-    out_file.write('K_POINTS automatic\n')
-    out_file.write(f'   {kx} {ky} {kz}  1 1 1\n')
+    if 'smearing' in system_dict:
+        system_dict['degauss'] = system_dict['smearing']['degauss']
+        system_dict['smearing'] = system_dict['smearing']['smearing']
+        system_dict['occupations'] = system_dict['smearing']['occupations']
 
-    out_file.write('EOF\n')
-    out_file.write('$CMD_PW < $PREFIX.$CALC.in > $PREFIX.$CALC.out')
+    electrons_dict = {'conv_thr': 1.0e-9,
+                      'electron_maxstep': 100,
+                      'mixing_beta': 0.3}
 
-    out_file.close()
+    ions_dict = {'ion_dynamics': "'bfgs'"}
+
+    cell_dict = {'cell_dynamics': "'bfgs'",
+                 'cell_dofree': "'all'"}
+
+    with open(os.path.join(path, file_name + '.pwscf'), 'w') as f:
+        f.write('&control\n')
+        for key in control_dict:
+            f.write(f'  {key} = {control_dict[key]}\n')
+        f.write('/\n\n')
+
+        f.write('&system\n')
+        for key in system_dict:
+            f.write(f'  {key} = {system_dict[key]}\n')
+        f.write('/\n\n')
+
+        f.write('&electrons\n')
+        for key in electrons_dict:
+            f.write(f'  {key} = {electrons_dict[key]}\n')
+        f.write('/\n\n')
+
+        f.write('&ions\n')
+        for key in ions_dict:
+            f.write(f'  {key} = {ions_dict[key]}\n')
+        f.write('/\n\n')
+
+        f.write('&cell\n')
+        for key in cell_dict:
+            f.write(f'  {key} = {cell_dict[key]}\n')
+        f.write('/\n\n')
+
+        f.write('ATOMIC_SPECIES\n')
+        for atom in set(atom_labels):
+            f.write(f' {atom}   {elements_dict()[atom]:.4f}  {atom}.PSEUDO.UPF\n')
+        f.write('\n')
+
+        f.write('CELL_PARAMETERS (angstrom) \n')
+        for v in cell_matrix:
+            f.write(f'{v[0]:>15.9f}      {v[1]:>15.9f}      {v[2]:>15.9f}\n')
+        f.write('\n')
+
+        if frac_coords:
+            coords_type = 'crystal'
+        else:
+            coords_type = 'angstrom'
+
+        f.write(f'ATOMIC_POSITIONS ({coords_type})\n')
+
+        for i, atom in enumerate(atom_pos):
+            f.write('{:<5s}{:>15.9f}{:>15.9f}{:>15.9f}\n'.format(atom_labels[i],
+                                                                 atom[0],
+                                                                 atom[1],
+                                                                 atom[2]))
+
+        f.write('\n')
+        f.write('K_POINTS automatic\n')
+        f.write(f' {kx} {ky} {kz} 1 1 1\n')
 
 
 def convert_cif_2_qe(out_path, file_name):
@@ -1331,7 +1345,7 @@ def convert_cif_2_qe(out_path, file_name):
             k_dist=0.3)
 
 
-def save_json(path, file_name, cell, atom_labels, atom_pos):
+def save_json(path, file_name, cell, atom_labels, atom_pos, frac_coords=False):
     """
     Save a file in format `.json` on the `path`.
 
@@ -1355,18 +1369,18 @@ def save_json(path, file_name, cell, atom_labels, atom_pos):
 
     if len(cell) == 3:
         cell_par = cell_to_cellpar(np.array(cell)).tolist()
-        cell_par = [round(i, 10) for i in cell_par]
+        cell_matrix = np.array(cell).astype(float).tolist()
 
     if len(cell) == 6:
-        cell_par = cell
-        cell = cellpar_to_cell(cell_par).tolist()
+        cell_par = np.array(cell).astype(float).tolist()
+        cell_matrix = cellpar_to_cell(cell_par).tolist()
 
     cof_json['system']['geo_opt'] = False
 
-    cof_json['geometry']['cell_matrix'] = cell
+    cof_json['geometry']['cell_matrix'] = cell_matrix
     cof_json['geometry']['cell_parameters'] = cell_par
-    cof_json['geometry']['atom_labels'] = atom_labels
-    cof_json['geometry']['atom_pos'] = atom_pos
+    cof_json['geometry']['atom_labels'] = list(atom_labels)
+    cof_json['geometry']['atom_pos'] = list(atom_pos)
 
     write_json(path, file_name, cof_json)
 
@@ -1377,7 +1391,7 @@ def save_cif(path,
              atom_labels,
              atom_pos,
              partial_charges=False,
-             frac_coords=True):
+             frac_coords=False):
     """
     Save a file in format `.cif` on the `path`.
 
@@ -1429,7 +1443,7 @@ loop_
    _atom_site_fract_x
    _atom_site_fract_y
    _atom_site_fract_z
-    """
+"""
 
     if partial_charges is not False:
         cif_text += '   _atom_site_charge\n'

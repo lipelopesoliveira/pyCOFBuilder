@@ -138,7 +138,7 @@ class Reticulum():
         self.chirality = False
         self.atom_labels = []
         self.atom_pos = []
-        self.lattice = [[], [], []]
+        self.lattice = np.eye(3)
         self.symm_tol = 0.1
         self.angle_tol = 0.1
         self.n_atoms = self.get_n_atoms()
@@ -278,11 +278,48 @@ class Reticulum():
 
         return result
 
+    def save(self, save_format: list = ['cif'], supercell: list = [1, 1, 1]):
+        '''
+        Save the structure in a specif file format.
+
+        Parameters
+        ----------
+        save_format : list, optional
+            The file format to be saved
+            Can be `json`, `cif`, `xyz`, `turbomole`, `vasp`, `xsf`, `pdb`, `qe`.
+            Default: ['cif']
+        supercell : list, optional
+            The supercell to be used to save the structure.
+            Default: [1,1,1]
+        '''
+        save_dict = {
+            'json': Tools.save_json,
+            'cif': Tools.save_cif,
+            'xyz': Tools.save_xyz,
+            'turbomole': Tools.save_turbomole,
+            'vasp': Tools.save_vasp,
+            'xsf': Tools.save_xsf,
+            'pdb': Tools.save_pdb,
+            'qe': Tools.save_qe
+         }
+
+        self.symm_structure.make_supercell(supercell)
+
+        file_format_error = f'Format must be one of the following: {save_dict.keys()}'
+        assert all([i in save_dict.keys() for i in save_format]), file_format_error
+
+        for i in save_format:
+            save_dict[i](path=self.out_path,
+                         file_name=self.name,
+                         cell=self.lattice,
+                         atom_labels=self.atom_labels,
+                         atom_pos=self.atom_pos)
+
 # --------------- Net creation methods -------------------------- #
 
     def create_hcb_structure(self,
-                             name_bb_a: str,
-                             name_bb_b: str,
+                             BB1,
+                             BB2,
                              stacking: str = 'AA',
                              bond_atom: str = 'N',
                              c_parameter_base: float = 3.6,
@@ -327,52 +364,40 @@ class Reticulum():
                 6. number of operation symmetry
         """
 
+        connectivity_error = 'Building block A must present connectivity {}'
+        assert BB1.connectivity == 3, connectivity_error.format(3)
+        assert BB2.connectivity == 3, connectivity_error.format(3)
+
         self.topology = 'HCB'
         self.dimension = 2
 
-        bb_1 = Building_Block(name_bb_a,
-                              save_dir=self.lib_path,
-                              verbosity=self.verbosity)
+        self.charge = BB1.charge + BB2.charge
+        self.chirality = BB1.chirality or BB2.chirality
 
-        bb_2 = Building_Block(name_bb_b,
-                              save_dir=self.lib_path,
-                              verbosity=self.verbosity)
+        self.name = f'{BB1.name}-{BB2.name}-HCB-{stacking}'
 
-        self.name = f'{bb_1.name}-{bb_2.name}-HCB-{stacking}'
-        self.charge = bb_1.charge + bb_2.charge
-        self.chirality = bb_1.chirality or bb_2.chirality
+        self.charge = BB1.charge + BB2.charge
+        self.chirality = BB1.chirality or BB2.chirality
 
-        if self.verbosity is True:
-            print('Starting the creation of a hcb net')
+        Tools.print_comand(f'Starting the creation of {self.name}',
+                           self.verbosity,
+                           ['debug', 'high'])
 
-        if bb_1.connectivity != 3:
-            print('Building block A must present connectivity 3 insted of',
-                  len(bb_1.connectivity))
-            return None
-        if bb_2.connectivity != 3:
-            print('Building block B must present connectivity 3 insted of',
-                  len(bb_2.connectivity))
-            return None
+        # Calculates the cell parameters based on building blocks size
+        size_a = BB1.size
+        size_b = BB2.size
 
-        # Calculate the cell parameter based on the size of the building blocks
-        size_a = bb_1.size
-        if self.verbosity:
-            print('BB_A size:', size_a)
-        size_b = bb_2.size
-        if self.verbosity:
-            print('BB_B size:', size_b)
+        Tools.print_comand(f'BB_A size: {size_a}', self.verbosity, ['debug'])
+        Tools.print_comand(f'BB_B size: {size_b}', self.verbosity, ['debug'])
 
-        # Defines the cell parameter a
+        # Define cell parameter a
         a = np.cos(np.radians(30))*2*(size_a[0] + size_b[0])
 
-        if self.verbosity:
-            print('Calculated cell parameter a:', a)
+        Tools.print_comand(f'Calculated cell parameter a: {a}', self.verbosity, ['debug'])
 
         # Gets the maximum distace in the z axis to create the c parameter
-        delta_a = abs(max(np.transpose(bb_1.atom_pos)[
-                      2])) + abs(min(np.transpose(bb_1.atom_pos)[2]))
-        delta_b = abs(max(np.transpose(bb_2.atom_pos)[
-                      2])) + abs(min(np.transpose(bb_2.atom_pos)[2]))
+        delta_a = abs(max(np.transpose(BB1.atom_pos)[2])) + abs(min(np.transpose(BB1.atom_pos)[2]))
+        delta_b = abs(max(np.transpose(BB2.atom_pos)[2])) + abs(min(np.transpose(BB2.atom_pos)[2]))
 
         # Build the matrix of unitary hexagonal cell
         if stacking == 'A':
@@ -381,26 +406,25 @@ class Reticulum():
             c = c_parameter_base + max([delta_a, delta_b])
 
         # Define the cell lattice
-        lattice = [[a, 0, 0],
-                   [-0.5*a, np.sqrt(3)/2*a, 0],
-                   [0, 0, c]]
+        lattice = np.array([
+            [a, 0, 0],
+            [-0.5*a, np.sqrt(3)/2*a, 0],
+            [0, 0, c]
+            ]).astype(float)
 
-        if self.verbosity is True:
-            print('Unitary cell built:', lattice)
+        Tools.print_comand(f'Unitary cell built: {lattice}', self.verbosity, ['debug'])
 
         # Adds the building block A in the origin of the unitary cell (A1 site)
-        final_label = bb_1.atom_labels
-        final_pos = bb_1.atom_pos
+        final_label = BB1.atom_labels
+        final_pos = BB1.atom_pos
 
         # Rotates and add the building block A to site A2 of unitary cell
-        r_pos_a_2 = np.dot(
-            bb_2.atom_pos,
-            R.from_euler('z', 180, degrees=True).as_matrix())
+        r_pos_a_2 = np.dot(BB2.atom_pos, R.from_euler('z', 180, degrees=True).as_matrix())
 
         r_pos_a_2 += np.array([0, np.sqrt(3)/3, 0])*a
 
         final_pos = np.vstack((final_pos, r_pos_a_2))
-        final_label += bb_2.atom_labels
+        final_label += BB2.atom_labels
 
         # Changes the X atoms by the desirede bond_atom
         final_label, final_pos = Tools.change_X_atoms(final_label, final_pos, bond_atom)
@@ -419,10 +443,6 @@ class Reticulum():
         # Simetrizes the structure using pymatgen
         symm = SpacegroupAnalyzer(struct, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
         struct_symm_prim = symm.get_primitive_standard_structure()
-
-        if stacking not in self.available_stacking[self.topology]:
-            raise Exception(f"""{stacking} is not in the available stack list for HCB net.
-    Available options are: {self.available_stacking['HCB']}""")
 
         # Create A stacking, a 2D isolated sheet with slab
         if stacking == 'A':
@@ -625,7 +645,7 @@ class Reticulum():
 
         dict_structure = self.symm_structure.as_dict()
 
-        self.lattice = dict_structure['lattice']['matrix']
+        self.lattice = np.array(dict_structure['lattice']['matrix']).astype(float)
 
         self.atom_labels = [i['label'] for i in dict_structure['sites']]
         self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
@@ -658,7 +678,6 @@ class Reticulum():
                 str(self.space_group),
                 str(self.space_group_n),
                 len(symm_op)]
-
 
     def create_hcb_a_structure(self,
                                BB1: str,
@@ -1005,7 +1024,7 @@ class Reticulum():
 
         dict_structure = self.symm_structure.as_dict()
 
-        self.lattice = dict_structure['lattice']['matrix']
+        self.lattice = np.array(dict_structure['lattice']['matrix']).astype(float)
 
         self.atom_labels = [i['label'] for i in dict_structure['sites']]
         self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
@@ -1377,7 +1396,7 @@ class Reticulum():
 
         dict_structure = self.symm_structure.as_dict()
 
-        self.lattice = dict_structure['lattice']['matrix']
+        self.lattice = np.array(dict_structure['lattice']['matrix']).astype(float)
 
         self.atom_labels = [i['label'] for i in dict_structure['sites']]
         self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
@@ -1757,7 +1776,7 @@ class Reticulum():
 
         dict_structure = self.symm_structure.as_dict()
 
-        self.lattice = dict_structure['lattice']['matrix']
+        self.lattice = np.array(dict_structure['lattice']['matrix']).astype(float)
 
         self.atom_labels = [i['label'] for i in dict_structure['sites']]
         self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
@@ -2126,7 +2145,7 @@ class Reticulum():
 
         dict_structure = self.symm_structure.as_dict()
 
-        self.lattice = dict_structure['lattice']['matrix']
+        self.lattice = np.array(dict_structure['lattice']['matrix']).astype(float)
 
         self.atom_labels = [i['label'] for i in dict_structure['sites']]
         self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
@@ -2500,7 +2519,7 @@ class Reticulum():
 
         dict_structure = self.symm_structure.as_dict()
 
-        self.lattice = dict_structure['lattice']['matrix']
+        self.lattice = np.array(dict_structure['lattice']['matrix']).astype(float)
 
         self.atom_labels = [i['label'] for i in dict_structure['sites']]
         self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
@@ -2892,7 +2911,7 @@ class Reticulum():
 
         dict_structure = self.symm_structure.as_dict()
 
-        self.lattice = dict_structure['lattice']['matrix']
+        self.lattice = np.array(dict_structure['lattice']['matrix']).astype(float)
 
         self.atom_labels = [i['label'] for i in dict_structure['sites']]
         self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
@@ -3165,7 +3184,7 @@ class Reticulum():
 
             dict_structure = AB_1.as_dict()
 
-            self.lattice = dict_structure['lattice']['matrix']
+            self.lattice = np.array(dict_structure['lattice']['matrix']).astype(float)
 
             self.atom_labels = [i['label'] for i in dict_structure['sites']]
             self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
@@ -3198,7 +3217,7 @@ class Reticulum():
 
             dict_structure = AB_1.as_dict()
 
-            self.lattice = dict_structure['lattice']['matrix']
+            self.lattice = np.array(dict_structure['lattice']['matrix']).astype(float)
 
             self.atom_labels = [i['label'] for i in dict_structure['sites']]
             self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
@@ -3231,7 +3250,7 @@ class Reticulum():
 
             dict_structure = AB_1.as_dict()
 
-            self.lattice = dict_structure['lattice']['matrix']
+            self.lattice = np.array(dict_structure['lattice']['matrix']).astype(float)
 
             self.atom_labels = [i['label'] for i in dict_structure['sites']]
             self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
@@ -3266,7 +3285,7 @@ class Reticulum():
 
             dict_structure = AB_1.as_dict()
 
-            self.lattice = dict_structure['lattice']['matrix']
+            self.lattice = np.array(dict_structure['lattice']['matrix']).astype(float)
 
             self.atom_labels = [i['label'] for i in dict_structure['sites']]
             self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
@@ -3307,7 +3326,7 @@ class Reticulum():
 
             dict_structure = AB_1.as_dict()
 
-            self.lattice = dict_structure['lattice']['matrix']
+            self.lattice = np.array(dict_structure['lattice']['matrix']).astype(float)
 
             self.atom_labels = [i['label'] for i in dict_structure['sites']]
             self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
@@ -3357,7 +3376,7 @@ class Reticulum():
 
             dict_structure = AB_1.as_dict()
 
-            self.lattice = dict_structure['lattice']['matrix']
+            self.lattice = np.array(dict_structure['lattice']['matrix']).astype(float)
 
             self.atom_labels = [i['label'] for i in dict_structure['sites']]
             self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
@@ -3369,7 +3388,7 @@ class Reticulum():
 
         dict_structure = self.symm_structure.as_dict()
 
-        self.lattice = dict_structure['lattice']['matrix']
+        self.lattice = np.array(dict_structure['lattice']['matrix']).astype(float)
 
         self.atom_labels = [i['label'] for i in dict_structure['sites']]
         self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
