@@ -191,6 +191,93 @@ class Reticulum():
             for i in self.available_3D_topologies:
                 print(i.upper())
 
+    def check_name_concistency(self, FrameworkName):
+        """Checks if the name is in the correct format."""
+
+        string_error = 'FrameworkName must be in the format: BB1_BB2_Net_Stacking'
+        assert isinstance(FrameworkName, str), string_error
+
+        name_error = 'FrameworkName must be in the format: BB1_BB2_Net_Stacking'
+        assert len(FrameworkName.split('-')) == 4, name_error
+
+        BB1_name, BB2_name, Net, Stacking = FrameworkName.split('-')
+
+        net_error = f'Net must be one of the following: {self.available_topologies}'
+        assert Net in self.available_topologies, net_error
+
+        stacking_error = f'Stacking must be one of the following: {self.available_stacking[Net]}'
+        assert Stacking in self.available_stacking[Net], stacking_error
+
+        return BB1_name, BB2_name, Net, Stacking
+
+    def from_name(self, FrameworkName, **kwargs):
+        """Creates a COF from a given FrameworkName.
+
+        Parameters
+        ----------
+        FrameworkName : str, required
+            The name of the COF to be created
+
+        Returns
+        -------
+        COF
+            The COF object
+        """
+        BB1_name, BB2_name, Net, Stacking = self.check_name_concistency(FrameworkName)
+
+        BB1 = Building_Block(name=BB1_name, save_dir=self.out_path)
+        BB2 = Building_Block(name=BB2_name, save_dir=self.out_path)
+
+        net_build_dict = {
+            'HCB': self.create_hcb_structure,
+            'HCB_A': self.create_hcb_a_structure,
+            'SQL': self.create_sql_structure,
+            'SQL_A': self.create_sql_a_structure,
+            'KGM': self.create_kgm_structure,
+            'KGM_A': self.create_kgm_a_structure,
+            'KGD': self.create_kgd_structure,
+            'HXL_A': self.create_hxl_a_structure
+            }
+
+        result = net_build_dict[Net](BB1, BB2, stacking=Stacking, **kwargs)
+
+        return result
+
+    def from_building_blocks(self, BB1, BB2, Net, Stacking, **kwargs):
+        """Creates a COF from the building blocks.
+
+        Parameters
+        ----------
+        BB1 : BuildingBlock, required
+            The first building block
+        BB2 : BuildingBlock, required
+            The second building block
+        Net : str, required
+            The network of the COF
+        Stacking : str, required
+            The stacking of the COF
+
+        Returns
+        -------
+        COF
+            The COF object
+        """
+
+        net_build_dict = {
+            'HCB': self.create_hcb_structure,
+            'HCB_A': self.create_hcb_a_structure,
+            'SQL': self.create_sql_structure,
+            'SQL_A': self.create_sql_a_structure,
+            'KGM': self.create_kgm_structure,
+            'KGM_A': self.create_kgm_a_structure,
+            'KGD': self.create_kgd_structure,
+            'HXL_A': self.create_hxl_a_structure
+            }
+
+        result = net_build_dict[Net](BB1, BB2, stacking=Stacking, **kwargs)
+
+        return result
+
 # --------------- Net creation methods -------------------------- #
 
     def create_hcb_structure(self,
@@ -572,9 +659,10 @@ class Reticulum():
                 str(self.space_group_n),
                 len(symm_op)]
 
+
     def create_hcb_a_structure(self,
-                               name_bb_a: str,
-                               name_bb_b: str,
+                               BB1: str,
+                               BB2: str,
                                stacking: str = 'AA',
                                bond_atom: str = 'N',
                                c_parameter_base: float = 3.6,
@@ -618,55 +706,39 @@ class Reticulum():
                 5. number of the space group,
                 6. number of operation symmetry
         """
+        connectivity_error = 'Building block A must present connectivity 3'
+        assert BB1.connectivity == 3, connectivity_error
+
+        connectivity_error = 'Building block B must present connectivity 2'
+        assert BB2.connectivity == 2, connectivity_error
 
         self.topology = 'HCB_A'
         self.dimension = 2
 
-        bb_triangular = Building_Block(name_bb_a,
-                                       save_dir=self.lib_path,
-                                       verbosity=self.verbosity)
+        self.charge = BB2.charge + BB1.charge
+        self.chirality = BB2.chirality or BB1.chirality
 
-        bb_linear = Building_Block(name_bb_b,
-                                   save_dir=self.lib_path,
-                                   verbosity=self.verbosity)
-
-        self.charge = bb_linear.charge + bb_triangular.charge
-        self.chirality = bb_linear.chirality or bb_triangular.chirality
-
-        self.name = f'{bb_triangular.name}-{bb_linear.name}-HCB_A-{stacking}'
+        self.name = f'{BB1.name}-{BB2.name}-HCB_A-{stacking}'
 
         Tools.print_comand(f'Starting the creation of {self.name}',
                            self.verbosity,
                            ['debug', 'high'])
 
-        if bb_triangular.connectivity != 3:
-            print('Building block A must present connectivity 3 insted of',
-                  bb_triangular.connectivity)
-
-            return None
-        if bb_linear.connectivity != 2:
-            print('Building block B must present connectivity 2 insted of',
-                  bb_linear.connectivity)
-
-            return None
-
-        # Calcula o parâmetro de célula com base no tamanho dos blocos de construção
-        size_a = bb_triangular.size
-        size_b = bb_linear.size
+        # Calculates the cell parameters based on building blocks size
+        size_a = BB1.size
+        size_b = BB2.size
 
         Tools.print_comand(f'BB_A size: {size_a}', self.verbosity, ['debug'])
         Tools.print_comand(f'BB_B size: {size_b}', self.verbosity, ['debug'])
-
+        
+        # Define cell parameter a
         a = 2*np.cos(np.radians(30))*2*(size_a[0] + size_b[0])
 
-        Tools.print_comand(
-            f'Calculated cell parameter a: {a}', self.verbosity, ['debug'])
+        Tools.print_comand(f'Calculated cell parameter a: {a}', self.verbosity, ['debug'])
 
         # Mede o valor do delta c dos blocos de construção
-        delta_a = abs(max(np.transpose(bb_triangular.atom_pos)[
-                      2])) + abs(min(np.transpose(bb_triangular.atom_pos)[2]))
-        delta_b = abs(max(np.transpose(bb_linear.atom_pos)[
-                      2])) + abs(min(np.transpose(bb_linear.atom_pos)[2]))
+        delta_a = abs(max(np.transpose(BB1.atom_pos)[2])) + abs(min(np.transpose(BB1.atom_pos)[2]))
+        delta_b = abs(max(np.transpose(BB2.atom_pos)[2])) + abs(min(np.transpose(BB2.atom_pos)[2]))
 
         # Build the matrix of unitary hexagonal cell
         if stacking == 'A':
@@ -675,69 +747,69 @@ class Reticulum():
             c = c_parameter_base + max([delta_a, delta_b])
 
         # Define the cell lattice
-        lattice = [[a, 0, 0],
-                   [-0.5*a, np.sqrt(3)/2*a, 0],
-                   [0, 0, c]]
+        lattice = np.array([
+            [a, 0.0, 0.0],
+            [-0.5*a, np.sqrt(3)/2*a, 0.0],
+            [0.0, 0.0, c]]
+            ).astype(float)
 
-        if self.verbosity is True:
-            print('Unitary cell built:', lattice)
+        Tools.print_comand(f'Unitary cell built: {lattice}', self.verbosity, ['debug'])
 
-        # Adiciona o bloco A na origem da célula unitária (sítio A1)
-        final_label = bb_triangular.atom_labels
-        final_pos = bb_triangular.atom_pos
+        # Ad BB1 to the oring of unitary cell (Site A1)
+        final_label = BB1.atom_labels
+        final_pos = BB1.atom_pos
 
-        # Rotaciona o bloco A e adiciona no sítio A2 da célula unitária
-        r_pos_a_1 = np.dot(bb_triangular.atom_pos, R.from_euler(
-            'z', 180, degrees=True).as_matrix()) + np.array([0, np.sqrt(3)/3, 0])*a
+        # Rotate BB1 and translate it to the A2 site
+        R_Matrix = R.from_euler('z', 180, degrees=True).as_matrix()
+        rotated_pos_a_1 = np.dot(BB1.atom_pos, R_Matrix) + np.array([0, np.sqrt(3)/3, 0])*a
 
-        final_pos = np.vstack((final_pos, r_pos_a_1))
-        final_label += bb_triangular.atom_labels
+        # Add BB1 to the structure
+        final_pos = np.vstack((final_pos, rotated_pos_a_1))
+        final_label += BB1.atom_labels
 
-        # Adiciona o bloco B no sítio B1 da célula unitária
-        final_pos = np.vstack(
-            (final_pos, bb_linear.atom_pos + np.array([0, np.sqrt(3)/6, 0])*a))
-        final_label += bb_linear.atom_labels
+        # Translate BB2 to B1 site and add to the structure 
+        final_pos = np.vstack((final_pos, BB2.atom_pos + np.array([0, np.sqrt(3)/6, 0])*a))
+        final_label += BB2.atom_labels
 
-        # Rotaciona o bloco B e o adiciona no sítio B2 da célula unitária
-        r_pos_b_1 = np.dot(bb_linear.atom_pos, R.from_euler(
-            'z', 120, degrees=True).as_matrix()) + np.array([-1/4, 5*np.sqrt(3)/12, 0])*a
+        # Rotate and translate BB2 tp B2 site
+        R_Matrix = R.from_euler('z', 120, degrees=True).as_matrix()
+        r_pos_b_1 = np.dot(BB2.atom_pos, R_Matrix) + np.array([-1/4, 5*np.sqrt(3)/12, 0])*a
 
+        # Add BB2 to the structure
         final_pos = np.vstack((final_pos, r_pos_b_1))
-        final_label += bb_linear.atom_labels
+        final_label += BB2.atom_labels
 
-        # Rotaciona o bloco B e o adiciona no sítio B3 da célula unitária
-        r_pos_b_2 = np.dot(bb_linear.atom_pos, R.from_euler(
-            'z', 240, degrees=True).as_matrix()) + np.array([1/4, 5*np.sqrt(3)/12, 0])*a
+        # Rotate BB2 and translate it to B3 site
+        R_Matrix = R.from_euler('z', 240, degrees=True).as_matrix()
+        r_pos_b_2 = np.dot(BB2.atom_pos, R_Matrix) + np.array([1/4, 5*np.sqrt(3)/12, 0])*a
 
+        # Add BB2 to the structure
         final_pos = np.vstack((final_pos, r_pos_b_2))
-        final_label += bb_linear.atom_labels
+        final_label += BB2.atom_labels
 
         # Changes the X atoms by the desirede bond_atom
-        final_label, final_pos = Tools.change_X_atoms(
-            final_label, final_pos, bond_atom)
+        final_label, final_pos = Tools.change_X_atoms(final_label, final_pos, bond_atom)
 
-        # Cria a estrutura como entidade do pymatgen
-        struct = Structure(lattice, final_label, final_pos,
-                           coords_are_cartesian=True)
-
-        # Remove os átomos duplicados
+        # Creates the structure as a PyMatGen object
+        struct = Structure(lattice, final_label, final_pos, coords_are_cartesian=True)
         struct.sort(reverse=True)
+
+        # Remove duplicated atoms
         struct.merge_sites(tol=.5, mode='delete')
+
+        # Translates the structure to the center of the cell
         struct.translate_sites(range(len(struct.as_dict()['sites'])),
                                [0, 0, 0.5],
                                frac_coords=True,
                                to_unit_cell=True)
 
-        # Simetriza a estrutura
+        # Symmetrize the structure
         try:
             symm = SpacegroupAnalyzer(struct, symprec=0.3, angle_tolerance=3.0)
             struct_symm_prim = symm.get_refined_structure()
         except Exception:
+            print('Error in the symmetry analysis')
             return None
-
-        if stacking not in self.available_stacking[self.topology]:
-            raise Exception(f"""{stacking} is not in the available stack list for HCB-A net.
-    Available options are: {self.available_stacking[self.topology]}""")
 
         # Create A stacking. The slab is defined by the c_cell parameter
         if stacking == 'A':
@@ -752,11 +824,12 @@ class Reticulum():
         if stacking == 'AB1':
             self.stacking = 'AB1'
             labels_conv_crystal = np.array(
-                [[i['label']] for i in struct_symm_prim.as_dict()['sites']])
+                [[i['label']] for i in struct_symm_prim.as_dict()['sites']]
+                )
             ion_conv_crystal = np.array(
-                [i['xyz'] for i in struct_symm_prim.as_dict()['sites']])
-            cell = np.array(struct_symm_prim.as_dict()[
-                            'lattice']['matrix'])*(1, 1, 2)
+                [i['xyz'] for i in struct_symm_prim.as_dict()['sites']]
+                )
+            cell = np.array(struct_symm_prim.as_dict()['lattice']['matrix'])*(1, 1, 2)
 
             A = ion_conv_crystal
             B = ion_conv_crystal
@@ -765,15 +838,13 @@ class Reticulum():
             AB_label = [i[0] for i in labels_conv_crystal]
 
             lattice = Lattice(cell)
-            AB_1 = Structure(lattice, AB_label + AB_label,
-                             AB, coords_are_cartesian=True)
+            AB_1 = Structure(lattice, AB_label + AB_label, AB, coords_are_cartesian=True)
 
             B_list = np.arange(len(AB_label)) + len(AB_label)
 
-            AB_1.translate_sites(
-                B_list, [2/3, 1/3, 0.5], frac_coords=True, to_unit_cell=True)
-            AB_1_symm = SpacegroupAnalyzer(
-                AB_1, symprec=0.05, angle_tolerance=.5)
+            AB_1.translate_sites(B_list, [2/3, 1/3, 0.5], frac_coords=True, to_unit_cell=True)
+
+            AB_1_symm = SpacegroupAnalyzer(AB_1, symprec=0.05, angle_tolerance=.5)
 
             self.symm_structure = AB_1_symm.get_refined_structure()
 
