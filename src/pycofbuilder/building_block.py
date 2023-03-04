@@ -28,7 +28,9 @@ class Building_Block():
         self.atom_labels = None
         self.atom_pos = None
         self.smiles = None
-
+        self.charge = 0
+        self.multiplicity = 1
+        self.chirality = None
         self.symmetry = None
         self.core = None
         self.conector = None
@@ -323,7 +325,6 @@ class Building_Block():
 
         r_smiles = R_chem_json['smiles'].replace('[R]', '')
         self.smiles = self.smiles.replace(f'[{R_type}]', r_smiles)
-        print(r_smiles)
 
         group_label = R_chem_json['atoms']['elements']['elementType']
         group_pos = np.array(R_chem_json['atoms']['coords']['3d']).astype(float)
@@ -404,7 +405,7 @@ class Building_Block():
         self.name = f'{symmetry}_{core_name}_{conector}'
 
         chem_json = Tools.read_json(
-            os.path.join(self.main_path, 'nucleo', symmetry),
+            os.path.join(self.main_path, 'core', symmetry),
             core_name
             )
 
@@ -441,16 +442,16 @@ class Building_Block():
 
     def get_available_core(self):
         '''Get the list of available cores'''
-        C2_PATH = os.path.join(self.main_path, 'nucleo', 'C2')
+        C2_PATH = os.path.join(self.main_path, 'core', 'C2')
         C2_list = [i.rstrip('.gjf') for i in os.listdir(C2_PATH) if '.gjf' in i]
 
-        C3_PATH = os.path.join(self.main_path, 'nucleo', 'C3')
+        C3_PATH = os.path.join(self.main_path, 'core', 'C3')
         C3_list = [i.rstrip('.gjf') for i in os.listdir(C3_PATH) if '.gjf' in i]
 
-        C4_PATH = os.path.join(self.main_path, 'nucleo', 'C4')
+        C4_PATH = os.path.join(self.main_path, 'core', 'C4')
         C4_list = [i.rstrip('.gjf') for i in os.listdir(C4_PATH) if '.gjf' in i]
 
-        C6_PATH = os.path.join(self.main_path, 'nucleo', 'C6')
+        C6_PATH = os.path.join(self.main_path, 'core', 'C6')
         C6_list = [i.rstrip('.gjf') for i in os.listdir(C6_PATH) if '.gjf' in i]
 
         return C2_list, C3_list, C4_list, C6_list

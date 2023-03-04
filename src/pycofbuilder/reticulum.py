@@ -114,32 +114,6 @@ class Reticulum():
         _ROOTDIR = os.path.abspath(os.path.dirname(__file__))
 
         self.verbosity = verbosity
-        # Falta adicionar: 'HXL', 'KGD'
-        self.available_2D_topologies = ['HCB', 'HCB_A',
-                                        'SQL', 'SQL_A',
-                                        'KGM', 'KGM_A',
-                                        'KGD',
-                                        'HXL_A']
-
-        # Falta adicionar: ['dia', 'bor', 'srs', 'pts', 'ctn', 'rra', 'fcc',
-        # 'lon', 'stp', 'acs', 'tbo', 'bcu', 'fjh', 'ceq']
-        self.available_3D_topologies = ['DIA', 'BOR']  # Temporary
-        self.available_topologies = self.available_2D_topologies + \
-            self.available_3D_topologies
-
-        # Define available stackings for all 2D topologies
-        self.available_stacking = {'HCB': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
-                                   'HCB_A': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
-                                   'SQL': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
-                                   'SQL_A': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
-                                   'KGD': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
-                                   'HXL_A': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
-                                   'KGM': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
-                                   'KGM_A': ['AA', 'AB1x', 'AB1y', 'AB1xy', 'AB2', 'AAl', 'AAt'],
-                                   'DIA': [1, 2, 3, 4],  # Temporary
-                                   'BOR': [5, 8, 6, 7]  # Temporary
-                                   }
-
         self.main_path = os.path.join(_ROOTDIR, 'data')
 
         if out_dir is None:
@@ -168,6 +142,32 @@ class Reticulum():
         self.symm_tol = 0.1
         self.angle_tol = 0.1
         self.n_atoms = self.get_n_atoms()
+
+        # Falta adicionar: 'HXL', 'KGD_A'
+        self.available_2D_topologies = ['HCB', 'HCB_A',
+                                        'SQL', 'SQL_A',
+                                        'KGM', 'KGM_A',
+                                        'KGD',
+                                        'HXL_A']
+
+        # Falta adicionar: ['dia', 'bor', 'srs', 'pts', 'ctn', 'rra', 'fcc',
+        # 'lon', 'stp', 'acs', 'tbo', 'bcu', 'fjh', 'ceq']
+        self.available_3D_topologies = ['DIA', 'BOR']  # Temporary
+        self.available_topologies = self.available_2D_topologies + \
+            self.available_3D_topologies
+
+        # Define available stackings for all 2D topologies
+        self.available_stacking = {'HCB': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
+                                   'HCB_A': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
+                                   'SQL': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
+                                   'SQL_A': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
+                                   'KGD': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
+                                   'HXL_A': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
+                                   'KGM': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
+                                   'KGM_A': ['AA', 'AB1x', 'AB1y', 'AB1xy', 'AB2', 'AAl', 'AAt'],
+                                   'DIA': [1, 2, 3, 4],  # Temporary
+                                   'BOR': [5, 8, 6, 7]  # Temporary
+                                   }
 
     def __str__(self):
         return self.name
