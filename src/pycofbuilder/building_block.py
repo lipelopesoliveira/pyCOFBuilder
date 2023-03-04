@@ -12,13 +12,15 @@ import pycofbuilder.tools as Tools
 
 class Building_Block():
 
-    def __init__(self, name=None, verbosity=False, save_dir=False):
+    def __init__(self, name=None, verbosity=False, save_dir=False, save_bb=True):
 
         _ROOTDIR = os.path.abspath(os.path.dirname(__file__))
 
         self.name = name
         self.verbosity = verbosity
         self.main_path = os.path.join(_ROOTDIR, 'data')
+        self.save_dir = save_dir
+        self.save_bb = save_bb
         self.connectivity = None
         self.simetry = None
         self.size = 0
@@ -32,33 +34,76 @@ class Building_Block():
         self.atom_pos = None
         self.smiles = None
 
+        self.simmetry = None
+        self.nucleo = None
+        self.conector = None
+        self.radicals = None
+
+        self.available_symmetry = ['C2', 'C3', 'C4', 'C6']
+
         # Check if save_dir exists and try to create it if not
-        self.save_dir = save_dir
-        if not os.path.exists(self.save_dir):
-            os.makedirs(self.save_dir)
+        os.makedirs(self.save_dir, exist_ok=True)
 
+        # If a name is provided create building block from this name
         if self.name is not None:
-            self.get_BB()
+            self.from_name(self.name)
 
-    def get_BB(self):
+    def from_name(self, name):
         '''Automatically read or create a buiding block based on its name'''
-        simm_check, nucleo_check, conector_check, radicals_check = self.check_existence()
 
-        error_msg = f"COF name is invalid! {self.check_existence()}"
-        assert all([simm_check, nucleo_check, conector_check, radicals_check]), error_msg 
+        # Check the existence of the building block files
+        simm_check, nucleo_check, conector_check, radicals_check = self.check_existence(name)
 
-        if self.name + '.xyz' in os.listdir(self.save_dir):
-            self.read_structure()
+        error_msg = "COF name is invalid! S: {}, N: {}, C: {}, R:{}".format(simm_check,
+                                                                            nucleo_check,
+                                                                            conector_check,
+                                                                            radicals_check)
 
-        else:
-            BB_name = self.name.split('_')
-            simmetry = BB_name[0]
-            nucleo = BB_name[1]
-            conector = BB_name[2]
-            radicals = BB_name[3:] + ['H'] * (9 - len(BB_name[3:]))
+        assert all([simm_check, nucleo_check, conector_check, radicals_check]), error_msg
 
-            self.create_BB_structure(simmetry, nucleo, conector, *radicals)
+        # Make the BB name global
+        self.name = name
+
+        BB_name = self.name.split('_')
+        self.simmetry = BB_name[0]
+        self.nucleo = BB_name[1]
+        self.conector = BB_name[2]
+        self.radicals = BB_name[3:] + ['H'] * (9 - len(BB_name[3:]))
+
+        self.create_BB_structure(self.simmetry,
+                                 self.nucleo,
+                                 self.conector, 
+                                 *self.radicals)
+        if self.save_bb:
             self.save()
+
+    def from_structure(self, path, file_name):
+        '''
+        Read the building block structure from a xyz file
+        '''
+
+        # Try to read the xyz file
+        try:
+            self.name = file_name.split('.')[0]
+
+            self.atom_labels, self.atom_pos = Tools.read_xyz_file(path, file_name)
+            self.connectivity = len([i for i in self.atom_labels if 'X' in i])
+
+            self.align_to()
+            self.calculate_size()
+
+        except Exception:
+            print('Error reading the structure!')
+
+        # Try to decompose the building block nomenclature
+        try:
+            BB_name = self.name.split('_')
+            self.simmetry = BB_name[0]
+            self.nucleo = BB_name[1]
+            self.conector = BB_name[2]
+            self.radicals = BB_name[3:] + ['H'] * (9 - len(BB_name[3:]))
+        except Exception:
+            print('Error on the definition of the BB nomenclature.')
 
     def n_atoms(self):
         ''' Returns the number of atoms in the unitary cell'''
@@ -358,22 +403,10 @@ class Building_Block():
         self.align_to()
         self.calculate_size()
 
-
     def save(self, extension='xyz'):
 
         if extension == 'xyz':
             Tools.save_xyz(self.save_dir, self.name + '.xyz', self.atom_labels, self.atom_pos)
-
-    def read_structure(self):
-
-        try:
-            self.atom_labels, self.atom_pos = Tools.read_xyz_file(self.save_dir, self.name)
-            self.connectivity = len([i for i in self.atom_labels if 'X' in i])
-
-            self.align_to()
-            self.calculate_size()
-        except Exception:
-            print('Error reading the structure!')
 
     def get_available_nucleo(self):
         '''Get the list of available nucleos'''
@@ -405,48 +438,45 @@ class Building_Block():
 
         return C_list
 
-    def check_existence(self):
+    def check_existence(self, name):
 
         simm_check = False
         nucleo_check = False
         conector_check = False
         radicals_check = True
 
-        if self.name is not None:
-            name = self.name.split('_')
-            simm = name[0]
-            nucleo = name[1]
-            conector = name[2]
-            radicals = name[3:]
+        name = name.split('_')
+        simm = name[0]
+        nucleo = name[1]
+        conector = name[2]
+        radicals = name[3:]
 
-            s_list = ['C2', 'C3', 'C4', 'C6']
+        BB_dict = {s: self.get_available_nucleo()[i] for i, s in enumerate(self.available_symmetry)}
 
-            BB_dict = {s: self.get_available_nucleo()[i] for i, s in enumerate(s_list)}
+        if simm in self.available_symmetry:
+            simm_check = True
+        else:
+            print('ERROR!: Building Block simmetry must be C2, C3, C4, or C6.')
+            simm_check = False
 
-            if simm in s_list:
-                simm_check = True
-            else:
-                print('ERROR!: Building Block simmetry must be C2, C3, C4, or C6.')
-                simm_check = False
+        if nucleo in BB_dict[simm]:
+            nucleo_check = True
+        else:
+            print(f'ERROR!: {nucleo} not available!')
+            print(f'Available nucleos with {simm} simmetry are {BB_dict[simm]}')
 
-            if nucleo in BB_dict[simm]:
-                nucleo_check = True
-            else:
-                print(f'ERROR!: {nucleo} not available!')
-                print(f'Available nucleos with {simm} simmetry are {BB_dict[simm]}')
+        if conector in self.get_available_conector():
+            conector_check = True
+        else:
+            print(f'ERROR! {conector} is not a available conector.')
+            print(f'Available list: {self.get_available_conector()}')
 
-            if conector in self.get_available_conector():
-                conector_check = True
-            else:
-                print(f'ERROR! {conector} is not a available conector.')
-                print(f'Available list: {self.get_available_conector()}')
-
-            radicals_list = self.get_available_R()
-            for rad in radicals:
-                if rad not in radicals_list:
-                    print(f'ERROR! Radical {rad} is not a available.')
-                    print(f'Available list: {radicals_list}')
-                    radicals_check = False
+        radicals_list = self.get_available_R()
+        for rad in radicals:
+            if rad not in radicals_list:
+                print(f'ERROR! Radical {rad} is not a available.')
+                print(f'Available list: {radicals_list}')
+                radicals_check = False
 
         return simm_check, nucleo_check, conector_check, radicals_check
 
@@ -454,70 +484,82 @@ class Building_Block():
 
         files_list = os.listdir(self.save_dir)
 
-        return [i.rstrip('.xyz') for i in files_list if 'C2' == i.split('_')[0] and 'NH2' in i.split('_')[2]]
+        return [i.rstrip('.xyz') for i in files_list if 'C2' == i.split('_')[0]
+                and 'NH2' in i.split('_')[2]]
 
     def get_tripodal_NH2(self):
 
         files_list = os.listdir(self.save_dir)
 
-        return [i.rstrip('.xyz') for i in files_list if 'C3' == i.split('_')[0] and 'NH2' in i.split('_')[2]]
+        return [i.rstrip('.xyz') for i in files_list if 'C3' == i.split('_')[0]
+                and 'NH2' in i.split('_')[2]]
 
     def get_bipodal_CHO(self):
 
         files_list = os.listdir(self.save_dir)
 
-        return [i.rstrip('.xyz') for i in files_list if 'C2' == i.split('_')[0] and 'CHO' == i.split('_')[2]]
+        return [i.rstrip('.xyz') for i in files_list if 'C2' == i.split('_')[0]
+                and 'CHO' == i.split('_')[2]]
 
     def get_tripodal_CHO(self):
 
         files_list = os.listdir(self.save_dir)
 
-        return [i.rstrip('.xyz') for i in files_list if 'C3' == i.split('_')[0] and 'CHO' == i.split('_')[2]]
+        return [i.rstrip('.xyz') for i in files_list if 'C3' == i.split('_')[0]
+                and 'CHO' == i.split('_')[2]]
 
     def get_bipodal_BOH2(self):
 
         files_list = os.listdir(self.save_dir)
 
-        return [i.rstrip('.xyz') for i in files_list if 'C2' == i.split('_')[0] and 'BOH2' == i.split('_')[2]]
+        return [i.rstrip('.xyz') for i in files_list if 'C2' == i.split('_')[0]
+                and 'BOH2' == i.split('_')[2]]
 
     def get_tripodal_BOH2(self):
 
         files_list = os.listdir(self.save_dir)
 
-        return [i.rstrip('.xyz') for i in files_list if 'C3' == i.split('_')[0] and 'BOH2' == i.split('_')[2]]
+        return [i.rstrip('.xyz') for i in files_list if 'C3' == i.split('_')[0]
+                and 'BOH2' == i.split('_')[2]]
 
     def get_bipodal_OH2(self):
 
         files_list = os.listdir(self.save_dir)
 
-        return [i.rstrip('.xyz') for i in files_list if 'C2' == i.split('_')[0] and 'OH2' == i.split('_')[2]]
+        return [i.rstrip('.xyz') for i in files_list if 'C2' == i.split('_')[0]
+                and 'OH2' == i.split('_')[2]]
 
     def get_tripodal_OH2(self):
 
         files_list = os.listdir(self.save_dir)
 
-        return [i.rstrip('.xyz') for i in files_list if 'C3' == i.split('_')[0] and 'OH2' == i.split('_')[2]]
-    
+        return [i.rstrip('.xyz') for i in files_list if 'C3' == i.split('_')[0]
+                and 'OH2' == i.split('_')[2]]
+
     def get_tetrapodal_squared_OH2(self):
 
         files_list = os.listdir(self.save_dir)
 
-        return [i.rstrip('.xyz') for i in files_list if 'C4' == i.split('_')[0] and 'OH2' == i.split('_')[2]]
+        return [i.rstrip('.xyz') for i in files_list if 'C4' == i.split('_')[0]
+                and 'OH2' == i.split('_')[2]]
 
     def get_tetrapodal_squared_CHO(self):
 
         files_list = os.listdir(self.save_dir)
 
-        return [i.rstrip('.xyz') for i in files_list if 'C4' == i.split('_')[0] and 'CHO' == i.split('_')[2]]
+        return [i.rstrip('.xyz') for i in files_list if 'C4' == i.split('_')[0]
+                and 'CHO' == i.split('_')[2]]
 
     def get_tetrapodal_squared_BOH2(self):
 
         files_list = os.listdir(self.save_dir)
 
-        return [i.rstrip('.xyz') for i in files_list if 'C4' == i.split('_')[0] and 'BOH2' == i.split('_')[2]]
+        return [i.rstrip('.xyz') for i in files_list if 'C4' == i.split('_')[0]
+                and 'BOH2' == i.split('_')[2]]
 
     def get_tetrapodal_squared_NH2(self):
 
         files_list = os.listdir(self.save_dir)
 
-        return [i.rstrip('.xyz') for i in files_list if 'C4' == i.split('_')[0] and 'NH2' in i.split('_')[2]]
+        return [i.rstrip('.xyz') for i in files_list if 'C4' == i.split('_')[0]
+                and 'NH2' in i.split('_')[2]]
