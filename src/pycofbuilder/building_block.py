@@ -22,58 +22,63 @@ class Building_Block():
         self.save_dir = save_dir
         self.save_bb = save_bb
         self.connectivity = None
-        self.simetry = None
         self.size = 0
         self.mass = None
         self.composition = None
-        self.charge = 0
-        self.multiplicity = 1
-        self.polarity = 0
-        self.chirality = False
         self.atom_labels = None
         self.atom_pos = None
         self.smiles = None
 
-        self.simmetry = None
-        self.nucleo = None
+        self.symmetry = None
+        self.core = None
         self.conector = None
         self.radicals = None
 
         self.available_symmetry = ['C2', 'C3', 'C4', 'C6']
 
         # Check if save_dir exists and try to create it if not
-        os.makedirs(self.save_dir, exist_ok=True)
+        if self.save_dir is not False:
+            os.makedirs(self.save_dir, exist_ok=True)
 
         # If a name is provided create building block from this name
         if self.name is not None:
             self.from_name(self.name)
 
+    def __str__(self):
+        return self._structure_as_string()
+
+    def __repr__(self):
+        return 'BuildingBlock({}, {}, {}, {})'.format(self.symmetry,
+                                                      self.core,
+                                                      self.conector,
+                                                      self.radicals)
+
     def from_name(self, name):
         '''Automatically read or create a buiding block based on its name'''
 
         # Check the existence of the building block files
-        simm_check, nucleo_check, conector_check, radicals_check = self.check_existence(name)
+        symm_check, core_check, conector_check, radicals_check = self.check_existence(name)
 
-        error_msg = "COF name is invalid! S: {}, N: {}, C: {}, R:{}".format(simm_check,
-                                                                            nucleo_check,
+        error_msg = "COF name is invalid! S: {}, N: {}, C: {}, R:{}".format(symm_check,
+                                                                            core_check,
                                                                             conector_check,
                                                                             radicals_check)
 
-        assert all([simm_check, nucleo_check, conector_check, radicals_check]), error_msg
+        assert all([symm_check, core_check, conector_check, radicals_check]), error_msg
 
         # Make the BB name global
         self.name = name
 
         BB_name = self.name.split('_')
-        self.simmetry = BB_name[0]
-        self.nucleo = BB_name[1]
+        self.symmetry = BB_name[0]
+        self.core = BB_name[1]
         self.conector = BB_name[2]
-        self.radicals = BB_name[3:] + ['H'] * (9 - len(BB_name[3:]))
+        possible_radicals = BB_name[3:] + ['H'] * (9 - len(BB_name[3:]))
 
-        self.create_BB_structure(self.simmetry,
-                                 self.nucleo,
-                                 self.conector,
-                                 *self.radicals)
+        self._create_BB_structure(self.symmetry,
+                                  self.core,
+                                  self.conector,
+                                  *possible_radicals)
         if self.save_bb:
             self.save()
 
@@ -89,8 +94,8 @@ class Building_Block():
             self.atom_labels, self.atom_pos = Tools.read_xyz_file(path, file_name)
             self.connectivity = len([i for i in self.atom_labels if 'X' in i])
 
-            self.align_to()
-            self.calculate_size()
+            self._align_to()
+            self._calculate_size()
 
         except Exception:
             print('Error reading the structure!')
@@ -98,10 +103,11 @@ class Building_Block():
         # Try to decompose the building block nomenclature
         try:
             BB_name = self.name.split('_')
-            self.simmetry = BB_name[0]
-            self.nucleo = BB_name[1]
+            self.symmetry = BB_name[0]
+            self.core = BB_name[1]
             self.conector = BB_name[2]
-            self.radicals = BB_name[3:] + ['H'] * (9 - len(BB_name[3:]))
+            self.radicals = BB_name[3:]
+
         except Exception:
             print('Error on the definition of the BB nomenclature.')
 
@@ -114,7 +120,7 @@ class Building_Block():
 
         transposed = np.transpose(self.atom_pos)
         if by_X is True:
-            x_transposed = np.transpose(self.get_X_points()[1])
+            x_transposed = np.transpose(self._get_X_points()[1])
         if by_X is False:
             x_transposed = transposed
         cm_x = transposed[0] - np.average(x_transposed[0])
@@ -124,7 +130,7 @@ class Building_Block():
         self.atom_pos = np.transpose([cm_x, cm_y, cm_z])
         return np.transpose([cm_x, cm_y, cm_z])
 
-    def get_X_points(self):
+    def _get_X_points(self):
         '''Get the X points in a molecule'''
 
         if 'X' in self.atom_labels:
@@ -140,7 +146,7 @@ class Building_Block():
             print('No X ponts could be found!')
             return self.atom_labels, self.atom_pos
 
-    def get_Q_points(self, atom_labels, atom_pos):
+    def _get_Q_points(self, atom_labels, atom_pos):
         '''Get the Q points in a molecule'''
 
         Q_labels, Q_pos = [], []
@@ -152,7 +158,7 @@ class Building_Block():
 
         return Q_labels, np.array(Q_pos)
 
-    def get_R_points(self, atom_labels, atom_pos):
+    def _get_R_points(self, atom_labels, atom_pos):
         """
         Get the R points in a molecule
         """
@@ -178,7 +184,7 @@ class Building_Block():
 
         return R_dict
 
-    def add_X(self, label, pos, X='N'):
+    def _add_X(self, label, pos, X='N'):
 
         label, pos = label, pos
 
@@ -187,21 +193,21 @@ class Building_Block():
                 label[i] = X
         return label, pos
 
-    def calculate_size(self):
+    def _calculate_size(self):
         '''Calculate the size of the building block'''
-        _, X_pos = self.get_X_points()
+        _, X_pos = self._get_X_points()
         self.size = [np.linalg.norm(i) for i in X_pos]
 
-    def align_to(self, vec=[0, 1, 0]):
+    def _align_to(self, vec=[0, 1, 0]):
         '''Align the molecule to a given vector'''
-        _, X_pos = self.get_X_points()
+        _, X_pos = self._get_X_points()
         R_matrix = Tools.rotation_matrix_from_vectors(X_pos[0], vec)
 
         self.atom_pos = np.dot(self.atom_pos, np.transpose(R_matrix))
 
-    def rotate_to_xy_plane(self):
+    def _rotate_to_xy_plane(self):
         '''Rotate the molecule to the xy plane'''
-        _, X_pos = self.get_X_points()
+        _, X_pos = self._get_X_points()
 
         if len(X_pos) == 3:
 
@@ -216,29 +222,42 @@ class Building_Block():
                 R_matrix = Tools.rotation_matrix_from_vectors(normal, [0, 0, 1])
                 self.atom_pos = np.dot(self.atom_pos, np.transpose(R_matrix))
 
+    def _structure_as_string(self):
+        struct_string = ''
+        for i, _ in enumerate(self.atom_labels):
+            struct_string += '{:<5s}{:>10.7f}{:>15.7f}{:>15.7f}\n'.format(self.atom_labels[i],
+                                                                          self.atom_pos[i][0],
+                                                                          self.atom_pos[i][1],
+                                                                          self.atom_pos[i][2])
+
+        return struct_string
+
     def print_structure(self):
         """
-        Print the structure in the form:
+        Print the structure in xyz format:
         `atom_label     pos_x    pos_y    pos_z`
-                """
+        """
 
-        for i, _ in enumerate(self.atom_labels):
-            print('{:<5s}{:>10.7f}{:>15.7f}{:>15.7f}'.format(self.atom_labels[i],
-                                                             self.atom_pos[i][0],
-                                                             self.atom_pos[i][1],
-                                                             self.atom_pos[i][2]))
+        print(self._structure_as_string())
 
-    def add_connection_group(self, conector_name):
-        '''Adds the functional group by which the COF will be formed from the building blocks'''
+    def _add_connection_group(self, conector_name):
+        '''Adds the functional group by which the COF will be formed from the building blocks'''          
 
-        conector_label, conector_pos = Tools.read_gjf_file(
+        conector_chem_json = Tools.read_json(
             os.path.join(self.main_path, 'conector'),
             conector_name)
 
+        conector_smiles = conector_chem_json['smiles'].replace('[Q]', '')
+        self.smiles = self.smiles.replace('[Q]', f'({conector_smiles})')
+
+        conector_label = conector_chem_json['atoms']['elements']['elementType']
+        conector_pos = conector_chem_json['atoms']['coords']['3d']
+
         # Get the position of the Q points in the structure
-        location_Q_struct = self.get_Q_points(self.atom_labels, self.atom_pos)
+        location_Q_struct = self._get_Q_points(self.atom_labels, self.atom_pos)
 
         for i in range(len(location_Q_struct[0])):
+
             n_conector_label = conector_label.copy()
             n_conector_pos = conector_pos.copy()
 
@@ -253,7 +272,7 @@ class Building_Block():
                 close_Q_struct = [0, 0, 0]
 
             # Get the position of Q in the conection group
-            location_Q_connector = self.get_Q_points(n_conector_label, n_conector_pos)
+            location_Q_connector = self._get_Q_points(n_conector_label, n_conector_pos)
 
             # Get the position of the closest atom to Q in the conection group
             close_Q_connector = Tools.closest_atom('Q',
@@ -294,16 +313,23 @@ class Building_Block():
 
             self.atom_labels = self.atom_labels + n_conector_label
 
-    def add_R_group(self, R_name, R_type):
+    def _add_R_group(self, R_name, R_type):
         '''Adds group R in building blocks'''
 
-        # Read the R group
-        group_label, group_pos = Tools.read_gjf_file(
+        # Read the R group   
+        R_chem_json = Tools.read_json(
             os.path.join(self.main_path, 'radical'),
             R_name)
 
+        r_smiles = R_chem_json['smiles'].replace('[R]', '')
+        self.smiles = self.smiles.replace(f'[{R_type}]', r_smiles)
+        print(r_smiles)
+
+        group_label = R_chem_json['atoms']['elements']['elementType']
+        group_pos = np.array(R_chem_json['atoms']['coords']['3d']).astype(float)
+
         # Get the position of the R points in the structure
-        location_R_struct = self.get_R_points(self.atom_labels, self.atom_pos)[R_type]
+        location_R_struct = self._get_R_points(self.atom_labels, self.atom_pos)[R_type]
 
         # Get the position of the R points in the R group
         for i, _ in enumerate(location_R_struct):
@@ -317,7 +343,7 @@ class Building_Block():
                                                       self.atom_pos)[1]
 
             # Get the position of R in the R group
-            pos_R_group = self.get_R_points(n_group_label, n_group_pos)['R']
+            pos_R_group = self._get_R_points(n_group_label, n_group_pos)['R']
 
             # Get the position of the closest atom to R in the R group
             close_R_group = Tools.closest_atom('R', pos_R_group[0], n_group_label, n_group_pos)[1]
@@ -360,56 +386,61 @@ class Building_Block():
 
             self.atom_labels = self.atom_labels + n_group_label
 
-    def create_BB_structure(self,
-                            simmetry='C2',
-                            nucleo_name='BENZ',
-                            conector='CHO',
-                            R1='H',
-                            R2='H',
-                            R3='H',
-                            R4='H',
-                            R5='H',
-                            R6='H',
-                            R7='H',
-                            R8='H',
-                            R9='H'):
+    def _create_BB_structure(self,
+                             symmetry='C2',
+                             core_name='BENZ',
+                             conector='CHO',
+                             R1='H',
+                             R2='H',
+                             R3='H',
+                             R4='H',
+                             R5='H',
+                             R6='H',
+                             R7='H',
+                             R8='H',
+                             R9='H'):
         '''Create a building block'''
 
-        self.name = f'{simmetry}_{nucleo_name}_{conector}'
+        self.name = f'{symmetry}_{core_name}_{conector}'
 
         chem_json = Tools.read_json(
-            os.path.join(self.main_path, 'nucleo', simmetry),
-            nucleo_name
+            os.path.join(self.main_path, 'nucleo', symmetry),
+            core_name
             )
 
-        self.smiles = chem_json['xsmiles']
+        self.smiles = chem_json['smiles']
 
         self.atom_labels = chem_json['atoms']['elements']['elementType']
         self.atom_pos = chem_json['atoms']['coords']['3d']
+        self.composition = chem_json['formula']
 
         self.centralize_molecule()
 
-        self.add_connection_group(conector)
+        self._add_connection_group(conector)
 
         R_list_names = [R1, R2, R3, R4, R5, R6, R7, R8, R9]
         R_list_labels = ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9']
 
+        radical_string = []
         for i in range(len(R_list_names)):
             if R_list_labels[i] in self.atom_labels:
-                self.add_R_group(R_list_names[i], R_list_labels[i])
+                self._add_R_group(R_list_names[i], R_list_labels[i])
                 self.name += f'_{R_list_names[i]}'
+                radical_string.append(R_list_names[i])
+
+        self.radicals = radical_string
 
         self.connectivity = len([i for i in self.atom_labels if 'X' in i])
-        self.align_to()
-        self.calculate_size()
+        self._align_to()
+        self._calculate_size()
 
     def save(self, extension='xyz'):
 
         if extension == 'xyz':
             Tools.save_xyz(self.save_dir, self.name + '.xyz', self.atom_labels, self.atom_pos)
 
-    def get_available_nucleo(self):
-        '''Get the list of available nucleos'''
+    def get_available_core(self):
+        '''Get the list of available cores'''
         C2_PATH = os.path.join(self.main_path, 'nucleo', 'C2')
         C2_list = [i.rstrip('.gjf') for i in os.listdir(C2_PATH) if '.gjf' in i]
 
@@ -440,30 +471,30 @@ class Building_Block():
 
     def check_existence(self, name):
 
-        simm_check = False
-        nucleo_check = False
+        symm_check = False
+        core_check = False
         conector_check = False
         radicals_check = True
 
         name = name.split('_')
-        simm = name[0]
-        nucleo = name[1]
+        symm = name[0]
+        core = name[1]
         conector = name[2]
         radicals = name[3:]
 
-        BB_dict = {s: self.get_available_nucleo()[i] for i, s in enumerate(self.available_symmetry)}
+        BB_dict = {s: self.get_available_core()[i] for i, s in enumerate(self.available_symmetry)}
 
-        if simm in self.available_symmetry:
-            simm_check = True
+        if symm in self.available_symmetry:
+            symm_check = True
         else:
-            print('ERROR!: Building Block simmetry must be C2, C3, C4, or C6.')
-            simm_check = False
+            print('ERROR!: Building Block symmetry must be C2, C3, C4, or C6.')
+            symm_check = False
 
-        if nucleo in BB_dict[simm]:
-            nucleo_check = True
+        if core in BB_dict[symm]:
+            core_check = True
         else:
-            print(f'ERROR!: {nucleo} not available!')
-            print(f'Available nucleos with {simm} simmetry are {BB_dict[simm]}')
+            print(f'ERROR!: {core} not available!')
+            print(f'Available cores with {symm} symmetry are {BB_dict[symm]}')
 
         if conector in self.get_available_conector():
             conector_check = True
@@ -478,7 +509,7 @@ class Building_Block():
                 print(f'Available list: {radicals_list}')
                 radicals_check = False
 
-        return simm_check, nucleo_check, conector_check, radicals_check
+        return symm_check, core_check, conector_check, radicals_check
 
     def get_bipodal_NH2(self):
 

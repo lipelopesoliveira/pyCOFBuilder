@@ -2565,7 +2565,7 @@ class Reticulum():
         if self.verbosity is True:
             print('Unitary cell built:', lattice)
 
-        bb1_v1, bb1_v2, bb1_v3, bb1_v4 = bb_1.get_X_points()[1]
+        bb1_v1, bb1_v2, bb1_v3, bb1_v4 = bb_1._get_X_points()[1]
         bb1_lado1, _, _ = (
             bb1_v1 + bb1_v2) / 2, (bb1_v1 + bb1_v3) / 2, (bb1_v1 + bb1_v4) / 2
 
@@ -2957,7 +2957,7 @@ class Reticulum():
         if self.verbosity is True:
             print('Unitary cell built:', lattice)
 
-        bb1_v1, bb1_v2, bb1_v3, bb1_v4 = bb_1.get_X_points()[1]
+        bb1_v1, bb1_v2, bb1_v3, bb1_v4 = bb_1._get_X_points()[1]
         bb1_lado1, _, _ = (
             bb1_v1 + bb1_v2) / 2, (bb1_v1 + bb1_v3) / 2, (bb1_v1 + bb1_v4) / 2
 
