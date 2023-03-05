@@ -4,7 +4,7 @@
   "code": "BDTP",
   "xsmiles": "[*]C(S1)=C([*])C2=C1C([*])=C(C([*])=C([*])S3)C3=C2[*]",
   "xsmiles_label": "|$Q;;;;R2;;;;R1;;;R2;;Q;;;;R1$|",
-  "formula": "R12R22Q2S2C10",
+  "formula": "Q2R22R12C10S2",
   "atoms": {
     "elements": {
       "elementType": [

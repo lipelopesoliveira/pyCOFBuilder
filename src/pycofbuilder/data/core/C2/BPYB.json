@@ -4,7 +4,7 @@
   "code": "BPYB",
   "xsmiles": "[*]C(C([*])=C1[*])=C([*])C([*])=C1C#CC(C([*])=C2[*])=C([*])C([*])=C2C#CC3=C([*])C([*])=C([*])C([*])=C3[*]",
   "xsmiles_label": "|$Q;;;R4;;R1;;R3;;R2;;;;;;R6;;R5;;R5;;R6;;;;;;R1;;R4;;Q;;R3;;R2$|",
-  "formula": "R32R12R22Q2R62R52C22R42",
+  "formula": "Q2R42R62R22R32R12C22R52",
   "atoms": {
     "elements": {
       "elementType": [

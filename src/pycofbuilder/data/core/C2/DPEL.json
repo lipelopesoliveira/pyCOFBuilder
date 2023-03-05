@@ -4,7 +4,7 @@
   "code": "DPEL",
   "xsmiles": "[*]C(C([*])=C1[*])=C([*])C([*])=C1/C=C/C2=C([*])C([*])=C([*])C([*])=C2[*]",
   "xsmiles_label": "|$Q;;;R4;;R2;;R1;;R3;;;;;;R2;;R4;;Q;;R1;;R3$|",
-  "formula": "R32R12R22Q2H2C14R42",
+  "formula": "Q2R42R22R32H2R12C14",
   "atoms": {
     "elements": {
       "elementType": [

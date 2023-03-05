@@ -4,7 +4,7 @@
   "code": "DPDA",
   "xsmiles": "[*]C(C([*])=C1[*])=C([*])C([*])=C1/N=N/C2=C([*])C([*])=C([*])C([*])=C2[*]",
   "xsmiles_label": "|$Q;;;R4;;R2;;R1;;R3;;;;;;R2;;R4;;Q;;R1;;R3$|",
-  "formula": "R32R12R22Q2N2C12R42",
+  "formula": "Q2R42R22R32N2R12C12",
   "atoms": {
     "elements": {
       "elementType": [

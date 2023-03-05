@@ -4,7 +4,7 @@
   "code": "ANTR",
   "xsmiles": "[*]C1=C2C(C([*])=C([*])C([*])=C2[*])=C([*])C3=C([*])C([*])=C([*])C([*])=C31",
   "xsmiles_label": "|$R1;;;;;R2;;R4;;Q;;R3;;R1;;;R3;;Q;;R4;;R2;$|",
-  "formula": "R32R12R22Q2C14R42",
+  "formula": "Q2R42R22R32R12C14",
   "atoms": {
     "elements": {
       "elementType": [

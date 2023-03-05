@@ -4,7 +4,7 @@
   "code": "PYRN",
   "xsmiles": "[*]C1=C([*])C2=C(C(C([*])=C3[*])=C1[*])C(C3=C([*])C([*])=C4[*])=C4C([*])=C2[*]",
   "xsmiles_label": "|$Q;;;R3;;;;;R2;;R1;;R4;;;;R3;;Q;;R4;;;R2;;R1$|",
-  "formula": "R32R12R22Q2C16R42",
+  "formula": "Q2R42R22R32R12C16",
   "atoms": {
     "elements": {
       "elementType": [
