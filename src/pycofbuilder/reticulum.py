@@ -124,24 +124,30 @@ class Reticulum():
         self.lib_path = os.path.join(self.out_path, 'building_blocks')
 
         self.name = None
+
+        self.BB1_name = None
+        self.BB2_name = None
         self.topology = None
-        self.dimention = None
-        self.lattice = None
+        self.stacking = None
+        self.smiles = None
+
+        self.atom_labels = []
+        self.atom_pos = []
+        self.lattice = np.eye(3)
         self.lattice_sgs = None
         self.space_group = None
         self.space_group_n = None
-        self.stacking = None
+
+        self.dimention = None
+        self.n_atoms = self.get_n_atoms()
         self.mass = None
         self.composition = None
         self.charge = 0
         self.multiplicity = 1
         self.chirality = False
-        self.atom_labels = []
-        self.atom_pos = []
-        self.lattice = np.eye(3)
+
         self.symm_tol = 0.1
         self.angle_tol = 0.1
-        self.n_atoms = self.get_n_atoms()
 
         # Falta adicionar: 'HXL', 'KGD_A'
         self.available_2D_topologies = ['HCB', 'HCB_A',
@@ -173,7 +179,7 @@ class Reticulum():
         return self.name
 
     def __repr__(self):
-        return self.name
+        return f'Reticulum({self.BB1_name}, {self.BB2_name}, {self.topology}, {self.stacking})'
 
     def get_n_atoms(self):
         ''' Returns the number of atoms in the unitary cell'''
@@ -228,20 +234,7 @@ class Reticulum():
         BB1 = Building_Block(name=BB1_name, save_dir=self.out_path)
         BB2 = Building_Block(name=BB2_name, save_dir=self.out_path)
 
-        net_build_dict = {
-            'HCB': self.create_hcb_structure,
-            'HCB_A': self.create_hcb_a_structure,
-            'SQL': self.create_sql_structure,
-            'SQL_A': self.create_sql_a_structure,
-            'KGM': self.create_kgm_structure,
-            'KGM_A': self.create_kgm_a_structure,
-            'KGD': self.create_kgd_structure,
-            'HXL_A': self.create_hxl_a_structure
-            }
-
-        result = net_build_dict[Net](BB1, BB2, stacking=Stacking, **kwargs)
-
-        return result
+        self.from_building_blocks(BB1, BB2, Net, Stacking, **kwargs)
 
     def from_building_blocks(self, BB1, BB2, Net, Stacking, **kwargs):
         """Creates a COF from the building blocks.
@@ -262,16 +255,25 @@ class Reticulum():
         COF
             The COF object
         """
+        self.name = f'{BB1.name}-{BB2.name}-{Net}-{Stacking}'
+        self.BB1_name = BB1.name
+        self.BB2_name = BB2.name
+        self.topology = Net
+        self.stacking = Stacking
+
+        # Check if the BB1 has the smiles attribute
+        if hasattr(BB1, 'smiles') and hasattr(BB2, 'smiles'):
+            self.smiles = f'{BB1.smiles}.{BB2.smiles}'
 
         net_build_dict = {
-            'HCB': self.create_hcb_structure,
-            'HCB_A': self.create_hcb_a_structure,
-            'SQL': self.create_sql_structure,
-            'SQL_A': self.create_sql_a_structure,
-            'KGM': self.create_kgm_structure,
-            'KGM_A': self.create_kgm_a_structure,
-            'KGD': self.create_kgd_structure,
-            'HXL_A': self.create_hxl_a_structure
+            'HCB': self._create_hcb_structure,
+            'HCB_A': self._create_hcb_a_structure,
+            'SQL': self._create_sql_structure,
+            'SQL_A': self._create_sql_a_structure,
+            'KGM': self._create_kgm_structure,
+            'KGM_A': self._create_kgm_a_structure,
+            'KGD': self._create_kgd_structure,
+            'HXL_A': self._create_hxl_a_structure
             }
 
         result = net_build_dict[Net](BB1, BB2, stacking=Stacking, **kwargs)
@@ -286,7 +288,7 @@ class Reticulum():
         ----------
         save_format : list, optional
             The file format to be saved
-            Can be `json`, `cif`, `xyz`, `turbomole`, `vasp`, `xsf`, `pdb`, `qe`.
+            Can be `json`, `cif`, `xyz`, `turbomole`, `vasp`, `xsf`, `pdb`, `pqr`, `qe`.
             Default: ['cif']
         supercell : list, optional
             The supercell to be used to save the structure.
@@ -319,16 +321,16 @@ class Reticulum():
 
 # --------------- Net creation methods -------------------------- #
 
-    def create_hcb_structure(self,
-                             BB1,
-                             BB2,
-                             stacking: str = 'AA',
-                             bond_atom: str = 'N',
-                             c_parameter_base: float = 3.6,
-                             print_result: bool = True,
-                             slab: float = 10.0,
-                             shift_vector: list = [1.0, 1.0, 0],
-                             tilt_angle: float = 5.0):
+    def _create_hcb_structure(self,
+                              BB1,
+                              BB2,
+                              stacking: str = 'AA',
+                              bond_atom: str = 'N',
+                              c_parameter_base: float = 3.6,
+                              print_result: bool = True,
+                              slab: float = 10.0,
+                              shift_vector: list = [1.0, 1.0, 0],
+                              tilt_angle: float = 5.0):
         """Creates a COF with HCB network.
 
         The HCB net is composed of two tripodal building blocks.
@@ -681,16 +683,16 @@ class Reticulum():
                 str(self.space_group_n),
                 len(symm_op)]
 
-    def create_hcb_a_structure(self,
-                               BB1: str,
-                               BB2: str,
-                               stacking: str = 'AA',
-                               bond_atom: str = 'N',
-                               c_parameter_base: float = 3.6,
-                               print_result: bool = True,
-                               slab: float = 10.0,
-                               shift_vector: list = [1.0, 1.0, 0],
-                               tilt_angle: float = 5.0):
+    def _create_hcb_a_structure(self,
+                                BB1: str,
+                                BB2: str,
+                                stacking: str = 'AA',
+                                bond_atom: str = 'N',
+                                c_parameter_base: float = 3.6,
+                                print_result: bool = True,
+                                slab: float = 10.0,
+                                shift_vector: list = [1.0, 1.0, 0],
+                                tilt_angle: float = 5.0):
         """Creates a COF with HCB-A network.
 
         The HCB-A net is composed of one tripodal and one linear building blocks.
@@ -1058,16 +1060,16 @@ class Reticulum():
                 str(self.space_group_n),
                 len(symm_op)]
 
-    def create_sql_structure(self,
-                             name_bb_a: str,
-                             name_bb_b: str,
-                             stacking: str = 'AA',
-                             bond_atom: str = 'N',
-                             c_parameter_base: float = 3.6,
-                             print_result: bool = True,
-                             slab: float = 10.0,
-                             shift_vector: list = [1.0, 1.0, 0],
-                             tilt_angle: float = 5.0):
+    def _create_sql_structure(self,
+                              name_bb_a: str,
+                              name_bb_b: str,
+                              stacking: str = 'AA',
+                              bond_atom: str = 'N',
+                              c_parameter_base: float = 3.6,
+                              print_result: bool = True,
+                              slab: float = 10.0,
+                              shift_vector: list = [1.0, 1.0, 0],
+                              tilt_angle: float = 5.0):
         """Creates a COF with SQL network.
 
         The SQL net is composed of two tetrapodal building blocks.
@@ -1431,16 +1433,16 @@ class Reticulum():
                 str(self.space_group_n),
                 len(symm_op)]
 
-    def create_sql_a_structure(self,
-                               name_bb_a: str,
-                               name_bb_b: str,
-                               stacking: str = 'AA',
-                               bond_atom: str = 'N',
-                               c_parameter_base: float = 3.6,
-                               print_result: bool = True,
-                               slab: float = 10.0,
-                               shift_vector: list = [1.0, 1.0, 0],
-                               tilt_angle: float = 5.0):
+    def _create_sql_a_structure(self,
+                                name_bb_a: str,
+                                name_bb_b: str,
+                                stacking: str = 'AA',
+                                bond_atom: str = 'N',
+                                c_parameter_base: float = 3.6,
+                                print_result: bool = True,
+                                slab: float = 10.0,
+                                shift_vector: list = [1.0, 1.0, 0],
+                                tilt_angle: float = 5.0):
         """Creates a COF with SQL-A network.
 
         The SQL-A net is composed of one tetrapodal and one linear building blocks.
@@ -1811,16 +1813,16 @@ class Reticulum():
                 str(self.space_group_n),
                 len(symm_op)]
 
-    def create_kgd_structure(self,
-                             name_bb_a: str,
-                             name_bb_b: str,
-                             stacking: str = 'AA',
-                             bond_atom: str = 'N',
-                             c_parameter_base: float = 3.6,
-                             print_result: bool = True,
-                             slab: float = 10.0,
-                             shift_vector: list = [1.0, 1.0, 0],
-                             tilt_angle: float = 5.0):
+    def _create_kgd_structure(self,
+                              name_bb_a: str,
+                              name_bb_b: str,
+                              stacking: str = 'AA',
+                              bond_atom: str = 'N',
+                              c_parameter_base: float = 3.6,
+                              print_result: bool = True,
+                              slab: float = 10.0,
+                              shift_vector: list = [1.0, 1.0, 0],
+                              tilt_angle: float = 5.0):
         """Creates a COF with KGD network.
 
         The KGD net is composed of one hexapodal and one tripodal building blocks.
@@ -2180,16 +2182,16 @@ class Reticulum():
                 str(self.space_group_n),
                 len(symm_op)]
 
-    def create_hxl_a_structure(self,
-                               name_bb_a: str,
-                               name_bb_b: str,
-                               stacking: str = 'AA',
-                               bond_atom: str = 'N',
-                               c_parameter_base: float = 3.6,
-                               print_result: bool = True,
-                               slab: float = 10.0,
-                               shift_vector: list = [1.0, 1.0, 0],
-                               tilt_angle: float = 5.0):
+    def _create_hxl_a_structure(self,
+                                name_bb_a: str,
+                                name_bb_b: str,
+                                stacking: str = 'AA',
+                                bond_atom: str = 'N',
+                                c_parameter_base: float = 3.6,
+                                print_result: bool = True,
+                                slab: float = 10.0,
+                                shift_vector: list = [1.0, 1.0, 0],
+                                tilt_angle: float = 5.0):
         """Creates a COF with HXL-A network.
 
         The HXK-A net is composed of one hexapodal and one linear building blocks.
@@ -2554,16 +2556,16 @@ class Reticulum():
                 str(self.space_group_n),
                 len(symm_op)]
 
-    def create_kgm_structure(self,
-                             name_bb_a: str,
-                             name_bb_b: str,
-                             stacking: str = 'AA',
-                             bond_atom: str = 'N',
-                             c_parameter_base: float = 3.6,
-                             print_result: bool = True,
-                             slab: float = 10.0,
-                             shift_vector: list = [1.0, 1.0, 0],
-                             tilt_angle: float = 5.0):
+    def _create_kgm_structure(self,
+                              name_bb_a: str,
+                              name_bb_b: str,
+                              stacking: str = 'AA',
+                              bond_atom: str = 'N',
+                              c_parameter_base: float = 3.6,
+                              print_result: bool = True,
+                              slab: float = 10.0,
+                              shift_vector: list = [1.0, 1.0, 0],
+                              tilt_angle: float = 5.0):
         """Creates a COF with KGM network.
 
         The KGM net is composed of two tetrapodal building blocks.
@@ -2946,16 +2948,16 @@ class Reticulum():
                 str(self.space_group_n),
                 len(symm_op)]
 
-    def create_kgm_a_structure(self,
-                               name_bb_a: str,
-                               name_bb_b: str,
-                               stacking: str = 'AA',
-                               bond_atom: str = 'N',
-                               c_parameter_base: float = 3.6,
-                               print_result: bool = True,
-                               slab: float = 10.0,
-                               shift_vector: list = [1.0, 1.0, 0],
-                               tilt_angle: float = 5.0):
+    def _create_kgm_a_structure(self,
+                                name_bb_a: str,
+                                name_bb_b: str,
+                                stacking: str = 'AA',
+                                bond_atom: str = 'N',
+                                c_parameter_base: float = 3.6,
+                                print_result: bool = True,
+                                slab: float = 10.0,
+                                shift_vector: list = [1.0, 1.0, 0],
+                                tilt_angle: float = 5.0):
         """Creates a COF with KGM-A network.
 
         The KGM-A net is composed of one tetrapodal and one linear building blocks.
@@ -3422,292 +3424,3 @@ class Reticulum():
                 str(self.space_group),
                 str(self.space_group_n),
                 len(symm_op)]
-
-# ----------------   Saving methods  ---------------- #
-
-    def save_cif(self, supercell: tuple = (1, 1, 1), path: str = None):
-        """Save the structure in .cif format
-
-        Parameters
-        ----------
-        supercell : tuple, optional
-            List containing the supercell parameters.
-            Default  = [1, 1, 1]
-        path : str, optional
-            Path to save the .cif file.
-        """
-
-        if path is not None:
-            self.out_path = path
-
-        os.makedirs(self.out_path, exist_ok=True)
-
-        self.symm_structure.make_supercell(supercell)
-
-        self.symm_structure.to(filename=os.path.join(
-            self.out_path, self.name + '.cif'))
-
-    def save_json(self, supercell: tuple = (1, 1, 1), path: str = None):
-        """Save the structure in .json format
-
-        Parameters
-        ----------
-        supercell : tuple, optional
-            List containing the supercell parameters.
-            Default  = [1, 1, 1]
-        path : str, optional
-            Path to save the .json file.
-        """
-
-        if path is not None:
-            self.out_path = path
-
-        os.makedirs(self.out_path, exist_ok=True)
-
-        self.symm_structure.make_supercell(supercell)
-
-        dict_sctructure = self.symm_structure.as_dict()
-
-        a = dict_sctructure['lattice']['a']
-        b = dict_sctructure['lattice']['b']
-        c = dict_sctructure['lattice']['c']
-
-        alpha = round(dict_sctructure['lattice']['alpha'], 3)
-        beta = round(dict_sctructure['lattice']['beta'], 3)
-        gamma = round(dict_sctructure['lattice']['gamma'], 3)
-
-        atom_labels = [i['label'] for i in dict_sctructure['sites']]
-
-        atom_pos = [i['xyz'] for i in dict_sctructure['sites']]
-
-        Tools.save_json(self.out_path,
-                        self.name,
-                        [a, b, c, alpha, beta, gamma],
-                        atom_labels, atom_pos)
-
-    def save_xsf(self, supercell: tuple = (1, 1, 1), path: str = None):
-        """Save the structure in XCrysDen .xsf format
-
-        Parameters
-        ----------
-        supercell : tuple, optional
-            List containing the supercell parameters.
-            Default  = [1, 1, 1]
-        path : str, optional
-            Path to save the .xsf file.
-        """
-
-        if path is not None:
-            self.out_path = path
-
-        os.makedirs(self.out_path, exist_ok=True)
-
-        self.symm_structure.make_supercell(supercell)
-
-        dict_sctructure = self.symm_structure.as_dict()
-
-        a = dict_sctructure['lattice']['a']
-        b = dict_sctructure['lattice']['b']
-        c = dict_sctructure['lattice']['c']
-
-        alpha = round(dict_sctructure['lattice']['alpha'], 3)
-        beta = round(dict_sctructure['lattice']['beta'], 3)
-        gamma = round(dict_sctructure['lattice']['gamma'], 3)
-
-        atom_labels = [i['label'] for i in dict_sctructure['sites']]
-
-        atom_pos = [i['xyz'] for i in dict_sctructure['sites']]
-
-        Tools.save_xsf(self.out_path,
-                       self.name,
-                       [a, b, c, alpha, beta, gamma],
-                       atom_labels, atom_pos)
-
-    def save_pdb(self, supercell: tuple = (1, 1, 1), path: str = None):
-        """Save the structure in .pdb format
-
-        Parameters
-        ----------
-        supercell : tuple, optional
-            List containing the supercell parameters.
-            Default  = [1, 1, 1]
-        path : str, optional
-            Path to save the .pdb file.
-        """
-        if path is not None:
-            self.out_path = path
-
-        os.makedirs(self.out_path, exist_ok=True)
-
-        self.symm_structure.make_supercell(supercell)
-
-        dict_sctructure = self.symm_structure.as_dict()
-
-        a = dict_sctructure['lattice']['a']
-        b = dict_sctructure['lattice']['b']
-        c = dict_sctructure['lattice']['c']
-        alpha = round(dict_sctructure['lattice']['alpha'], 3)
-        beta = round(dict_sctructure['lattice']['beta'], 3)
-        gamma = round(dict_sctructure['lattice']['gamma'], 3)
-
-        atom_labels = [i['label'] for i in dict_sctructure['sites']]
-
-        atom_pos = [i['xyz'] for i in dict_sctructure['sites']]
-
-        Tools.save_pdb(self.out_path, self.name, [
-                       a, b, c, alpha, beta, gamma], atom_labels, atom_pos)
-
-    def save_vasp(self, supercell: tuple = (1, 1, 1), path: str = None):
-        """Save the structure in VASP POSCAR .vasp format
-
-        Parameters
-        ----------
-        supercell : tuple, optional
-            List containing the supercell parameters.
-            Default  = [1, 1, 1]
-        path : str, optional
-            Path to save the .vasp file.
-        """
-        if path is not None:
-            self.out_path = path
-
-        os.makedirs(self.out_path, exist_ok=True)
-
-        self.symm_structure.make_supercell(supercell)
-
-        file_name = os.path.join(self.out_path, self.name + '.vasp')
-        self.symm_structure.to(fmt='poscar', filename=file_name)
-
-    def save_turbomole(self, supercell: tuple = (1, 1, 1), path: str = None):
-        """Save the structure in Turbomole .coord format
-
-        Parameters
-        ----------
-        supercell : tuple, optional
-            List containing the supercell parameters.
-            Default  = [1, 1, 1]
-        path : str, optional
-            Path to save the .coord file.
-        """
-        if path is not None:
-            self.out_path = path
-
-        os.makedirs(self.out_path, exist_ok=True)
-
-        self.symm_structure.make_supercell(supercell)
-
-        dict_sctructure = self.symm_structure.as_dict()
-
-        a = dict_sctructure['lattice']['a']
-        b = dict_sctructure['lattice']['b']
-        c = dict_sctructure['lattice']['c']
-
-        alpha = round(dict_sctructure['lattice']['alpha'], 3)
-        beta = round(dict_sctructure['lattice']['beta'], 3)
-        gamma = round(dict_sctructure['lattice']['gamma'], 3)
-
-        atom_labels = [i['label'] for i in dict_sctructure['sites']]
-
-        atom_pos = [i['xyz'] for i in dict_sctructure['sites']]
-
-        temp_file = open(os.path.join(
-            self.out_path, self.name + '.coord'), 'w')
-        temp_file.write('$coord angs\n')
-
-        for i in range(len(atom_labels)):
-            temp_file.write('{:>15.7f}{:>15.7f}{:>15.7f}   {:<5s}\n'.format(atom_pos[i][0],
-                                                                            atom_pos[i][1],
-                                                                            atom_pos[i][2],
-                                                                            atom_labels[i]))
-
-        temp_file.write('$periodic 3\n')
-        temp_file.write('$cell\n')
-        temp_file.write(f'{a}  {b}  {c}  {alpha}  {beta}  {gamma}\n')
-        temp_file.write('$opt\n')
-        temp_file.write('   engine=inertial\n')
-        temp_file.write('$end\n')
-
-        temp_file.close()
-
-    def save_xyz(self, supercell: tuple = (1, 1, 1), path: str = None):
-        """Save the structure in .xyz format
-
-        Parameters
-        ----------
-        supercell : tuple, optional
-            List containing the supercell parameters.
-            Default  = [1, 1, 1]
-        path : str, optional
-            Path to save the .xyz file.
-        """
-        if path is not None:
-            self.out_path = path
-
-        os.makedirs(self.out_path, exist_ok=True)
-
-        self.symm_structure.make_supercell(supercell)
-
-        dict_sctructure = self.symm_structure.as_dict()
-
-        a = dict_sctructure['lattice']['a']
-        b = dict_sctructure['lattice']['b']
-        c = dict_sctructure['lattice']['c']
-
-        alpha = round(dict_sctructure['lattice']['alpha'], 3)
-        beta = round(dict_sctructure['lattice']['beta'], 3)
-        gamma = round(dict_sctructure['lattice']['gamma'], 3)
-
-        atom_labels = [i['label'] for i in dict_sctructure['sites']]
-
-        atom_pos = [i['xyz'] for i in dict_sctructure['sites']]
-
-        temp_file = open(os.path.join(self.out_path, self.name + '.xyz'), 'w')
-        temp_file.write(f'{len(atom_labels)} \n')
-
-        temp_file.write(f'{a}  {b}  {c}  {alpha}  {beta}  {gamma}\n')
-
-        for i in range(len(atom_labels)):
-            temp_file.write('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(atom_labels[i],
-                                                                         atom_pos[i][0],
-                                                                         atom_pos[i][1],
-                                                                         atom_pos[i][2]))
-
-        temp_file.close()
-
-    def save_qe(self,
-                supercell: tuple = (1, 1, 1),
-                path: str = None,
-                ecut: int = 40,
-                erho: int = 360,
-                k_dist: float = 0.3):
-        """Save the structure in QuantumESPRESSO .in format
-
-        Parameters
-        ----------
-        supercell : tuple, optional
-            List containing the supercell parameters.
-            Default = [1, 1, 1]
-        path : str, optional
-            Path to save the .in file.
-        ecut : int, optional
-            Cutoff for wavefunctions. Default = 40
-        erho : int, optional
-            Cutoff for electronic density. Default = 360
-        k_dist : 0.3, optional
-            Distance of the k-points on the reciprocal space.
-            Default = 0.3
-        """
-
-        dict_sctructure = self.symm_structure.as_dict()
-
-        cell = dict_sctructure['lattice']['matrix']
-        atom_pos = [[i['label']] + i['xyz'] for i in dict_sctructure['sites']]
-
-        Tools.save_qe(out_path=self.out_path,
-                      name=self.name,
-                      lattice=cell,
-                      atom_labels=self.atom_labels,
-                      atom_pos=atom_pos,
-                      coords_are_cartesian=True,
-                      supercell=supercell,
-                      )

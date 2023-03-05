@@ -64,14 +64,14 @@ def build(cof_name=None,
     error_msg = f'Save format not recognized. Available formats: {list(save_dict.keys())}'
     assert all([i in save_dict for i in save_format]), error_msg
 
-    net_build_dict = {'HCB': Ret.create_hcb_structure,
-                      'HCB_A': Ret.create_hcb_a_structure,
-                      'SQL': Ret.create_sql_structure,
-                      'SQL_A': Ret.create_sql_a_structure,
-                      'KGM': Ret.create_kgm_structure,
-                      'KGM_A': Ret.create_kgm_a_structure,
-                      'KGD': Ret.create_kgd_structure,
-                      'HXL_A': Ret.create_hxl_a_structure}
+    net_build_dict = {'HCB': Ret._create_hcb_structure,
+                      'HCB_A': Ret._create_hcb_a_structure,
+                      'SQL': Ret._create_sql_structure,
+                      'SQL_A': Ret._create_sql_a_structure,
+                      'KGM': Ret._create_kgm_structure,
+                      'KGM_A': Ret._create_kgm_a_structure,
+                      'KGD': Ret._create_kgd_structure,
+                      'HXL_A': Ret._create_hxl_a_structure}
 
     bb1, bb2, net, stacking = cof_name.split('-')
 
