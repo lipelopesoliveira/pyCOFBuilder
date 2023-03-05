@@ -61,11 +61,11 @@ class Building_Block():
         # Check the existence of the building block files
         symm_check, core_check, conector_check, radicals_check = self.check_existence(name)
 
-        error_msg = "COF name is invalid! S: {}, N: {}, C: {}, R:{}".format(symm_check,
+        error_msg = "Building Block name is invalid!\n"
+        error_msg += "Symm: {}, Core: {}, Connector: {}, Radical:{}".format(symm_check,
                                                                             core_check,
                                                                             conector_check,
                                                                             radicals_check)
-
         assert all([symm_check, core_check, conector_check, radicals_check]), error_msg
 
         # Make the BB name global

@@ -140,7 +140,7 @@ def build_COFs_list(cofs_list,
             if succes is False:
                 failed_list += [name]
 
-        print('                      COF Name                              |    Lattice    | Point Group | N° of symmetry op. |')
+        print(f'{"COF Name:^60"}|    Lattice    | Point Group | N° of symmetry op. |')
         for s in sucess_list:
             Tools.print_result(*s)
 

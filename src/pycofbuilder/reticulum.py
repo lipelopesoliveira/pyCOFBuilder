@@ -21,7 +21,7 @@ from pycofbuilder.building_block import Building_Block
 
 class Reticulum():
     """
-    A class used to represent a Reticulum
+    A class used to represent a Covalent Organic Framework as a reticular entity.
 
     ...
 
@@ -71,42 +71,10 @@ class Reticulum():
 
     Methods
     -------
-    n_atoms()
-        Returns the number of atoms in the unitary cell
-    print_available_topologies()
-        Print all available topologies
-    create_hcb_structure()
-        Creates a COF with HCB network.
-    create_hcb_a_structure()
-        Creates a COF with HCB-A network.
-    create_sql_structure()
-        Creates a COF with SQL network.
-    create_sql_a_structure()
-        Creates a COF with SQL-A network.
-    create_kgd_structure()
-        Creates a COF with KGD network.
-    create_hxl_a_structure()
-        Creates a COF with HXL-A network.
-    create_kgm_structure()
-        Creates a COF with KGM network.
-    create_kgm_a_structure()
-        Creates a COF with KGM-A network.
-    save_cif()
-        Save the structure in .cif format
-    save_json()
-        Save the structure in .json format
-    save_xsf()
-        Save the structure in .xsf format
-    save_pdb()
-        Save the structure in .pdb format
-    save_vasp()
-        Save the structure in .vasp format
-    save_turbomole()
-        Save the structure in .coord format
-    save_xyz()
-        Save the structure in .xyz format
-    save_qe()
-        Save the structure in .in format
+    from_name()
+        Creates a reticulum from a name
+    from_building_blocks()
+        Creates a reticulum from two building blocks
     """
 
     def __init__(self, verbosity=False, out_dir=None):
@@ -139,7 +107,7 @@ class Reticulum():
         self.space_group_n = None
 
         self.dimention = None
-        self.n_atoms = self.get_n_atoms()
+        self.n_atoms = self._get_n_atoms()
         self.mass = None
         self.composition = None
         self.charge = 0
@@ -181,7 +149,7 @@ class Reticulum():
     def __repr__(self):
         return f'Reticulum({self.BB1_name}, {self.BB2_name}, {self.topology}, {self.stacking})'
 
-    def get_n_atoms(self):
+    def _get_n_atoms(self):
         ''' Returns the number of atoms in the unitary cell'''
         return len(self.atom_labels)
 
