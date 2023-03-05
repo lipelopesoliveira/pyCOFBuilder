@@ -4,7 +4,7 @@
   "code": "PTCD",
   "xsmiles": "O=C([*]C1=O)C2=C(C1C([*])=C3[*])C4=C3C(C([*])=C([*])C5C([*]C6=O)=O)=C(C5=C6C([*])=C7[*])C7=C4C([*])=C2[*]",
   "xsmiles_label": "|$;;Q;;;;;;;R1;;R3;;;;;R4;;R2;;;Q;;;;;;;;R1;;R3;;;;R4;;R2$|",
-  "formula": "Q2R42R22R32O4R12C24",
+  "formula": "R22C24R32R42O4R12Q2",
   "atoms": {
     "elements": {
       "elementType": [

@@ -4,7 +4,7 @@
   "code": "PYTO",
   "xsmiles": "O=C([*]C1=O)C2=C([*])C([*])=C3C4=C2C1=C([*])C([*])=C4C([*]C3=O)=O",
   "xsmiles_label": "|$;;Q;;;;;R1;;R2;;;;;;R2;;R1;;;Q;;;$|",
-  "formula": "R22O4R12C14X2",
+  "formula": "R22C14X2O4R12",
   "atoms": {
     "elements": {
       "elementType": [

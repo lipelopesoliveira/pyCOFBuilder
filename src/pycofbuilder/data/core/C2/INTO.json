@@ -4,7 +4,7 @@
   "code": "INTO",
   "xsmiles": "O=C([*]C1=O)C2=C1C([*])=C(C([*]C3=O)=O)C3=C2[*]",
   "xsmiles_label": "|$;;Q;;;;;;R;;;Q;;;;;;R$|",
-  "formula": "Q2R21O4R11C10",
+  "formula": "R21C10O4R11Q2",
   "atoms": {
     "elements": {
       "elementType": [

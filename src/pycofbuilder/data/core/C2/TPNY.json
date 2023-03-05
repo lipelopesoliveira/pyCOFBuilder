@@ -4,7 +4,7 @@
   "code": "TPNY",
   "xsmiles": "[*]C(C([*])=C1[*])=C([*])C([*])=C1C(C([*])=C2[*])=C([*])C([*])=C2C3=C([*])C([*])=C([*])C([*])=C3[*]",
   "xsmiles_label": "|$Q;;;R5;;R6;;R4;;R3;;;;R1;;R2;;R2;;R1;;;;R3;;R4;;Q;;R5;;R6$|",
-  "formula": "Q2R42R62R22R32R12C18R52",
+  "formula": "R22C18R32R62R42R52R12Q2",
   "atoms": {
     "elements": {
       "elementType": [

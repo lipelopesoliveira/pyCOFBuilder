@@ -4,7 +4,7 @@
   "code": "BPNY",
   "xsmiles": "[*]C1=C([*])C([*])=C(C2=C([*])C([*])=C([*])C([*])=C2[*])C([*])=C1[*]",
   "xsmiles_label": "|$Q;;;R1;;R3;;;;R4;;R2;;Q;;R1;;R3;;R4;;R2$|",
-  "formula": "Q2R42R22R32R12C12",
+  "formula": "R22C12R32R42R12Q2",
   "atoms": {
     "elements": {
       "elementType": [

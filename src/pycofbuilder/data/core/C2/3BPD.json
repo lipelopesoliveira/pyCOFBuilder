@@ -4,7 +4,7 @@
   "code": "3BPD",
   "xsmiles": "[*]C1=C([*])C([*])=C(C2=C([*])N=C([*])C([*])=C2[*])C([*])=N1",
   "xsmiles_label": "|$Q;;;R1;;R3;;;;R2;;;Q;;R1;;R3;;R2;$|",
-  "formula": "Q2R22R32N2R12C10",
+  "formula": "R22C10N2R32R12Q2",
   "atoms": {
     "elements": {
       "elementType": [

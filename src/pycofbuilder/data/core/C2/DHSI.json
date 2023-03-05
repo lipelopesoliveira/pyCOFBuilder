@@ -4,7 +4,7 @@
   "code": "DHSI",
   "xsmiles": "[*]C1=C2C(C([*])=C([*])C2[*])=C([*])C3=C1C([*])C([*])=C3[*]",
   "xsmiles_label": "|$R1;;;;;R2;;Q;;R3;;R1;;;;R2;;Q;;R3$|",
-  "formula": "Q2R22R32R12C12",
+  "formula": "R22C12R32R12Q2",
   "atoms": {
     "elements": {
       "elementType": [

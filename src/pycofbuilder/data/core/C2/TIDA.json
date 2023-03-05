@@ -4,7 +4,7 @@
   "code": "TIDA",
   "xsmiles": "O=C1N(C)C2=C(SC([*])=C2[*])/C1=C3C(SC([*])=C4[*])=C4N(C)C/3=O",
   "xsmiles_label": "|$;;;;;;;;Q;;R1;;;;;;Q;;R1;;;;;$|",
-  "formula": "Q2H6N2O2R12C14S2",
+  "formula": "C14N2S2O2R12Q2H6",
   "atoms": {
     "elements": {
       "elementType": [
