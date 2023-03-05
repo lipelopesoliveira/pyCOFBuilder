@@ -278,7 +278,7 @@ class Reticulum():
 
         return result
 
-    def save(self, save_format: list = ['cif'], supercell: list = [1, 1, 1]):
+    def save(self, save_format: list = ['cif'], supercell: list = [1, 1, 1], **kwargs):
         '''
         Save the structure in a specif file format.
 
@@ -300,6 +300,7 @@ class Reticulum():
             'vasp': Tools.save_vasp,
             'xsf': Tools.save_xsf,
             'pdb': Tools.save_pdb,
+            'pqr': Tools.save_pqr,
             'qe': Tools.save_qe
          }
 
@@ -313,7 +314,8 @@ class Reticulum():
                          file_name=self.name,
                          cell=self.lattice,
                          atom_labels=self.atom_labels,
-                         atom_pos=self.atom_pos)
+                         atom_pos=self.atom_pos,
+                         **kwargs)
 
 # --------------- Net creation methods -------------------------- #
 
@@ -749,7 +751,7 @@ class Reticulum():
 
         Tools.print_comand(f'BB_A size: {size_a}', self.verbosity, ['debug'])
         Tools.print_comand(f'BB_B size: {size_b}', self.verbosity, ['debug'])
-        
+
         # Define cell parameter a
         a = 2*np.cos(np.radians(30))*2*(size_a[0] + size_b[0])
 
@@ -786,7 +788,7 @@ class Reticulum():
         final_pos = np.vstack((final_pos, rotated_pos_a_1))
         final_label += BB1.atom_labels
 
-        # Translate BB2 to B1 site and add to the structure 
+        # Translate BB2 to B1 site and add to the structure
         final_pos = np.vstack((final_pos, BB2.atom_pos + np.array([0, np.sqrt(3)/6, 0])*a))
         final_label += BB2.atom_labels
 

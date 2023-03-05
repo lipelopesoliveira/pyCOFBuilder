@@ -10,8 +10,6 @@ import numpy as np
 from scipy.spatial import distance
 try:
     from pymatgen.io.cif import CifParser
-    from pymatgen.core import Structure
-    from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 except Exception:
     print('WARNING: Could no import CifParser from pymatgen.',
           'The conversion from cif to xyz and COF generation may not work properlly')
@@ -855,16 +853,16 @@ def save_xsf(path: str = None,
     xsf_file.write('  PRIMVEC\n')
 
     for i in range(len(cell)):
-        xsf_file.write(f'  {cell[i][0]:>5.9f}    {cell[i][1]:>5.9f}    {cell[i][2]:>5.9f}\n')
+        xsf_file.write(f'  {cell[i][0]:>15.9f}    {cell[i][1]:>15.9f}    {cell[i][2]:>15.9f}\n')
 
     xsf_file.write('   PRIMCOORD\n')
     xsf_file.write(f'           {len(atom_pos)}           1\n')
 
     for i in range(len(atom_pos)):
-        xsf_file.write('{:3s}        {:>5.9f}    {:>5.9f}    {:>5.9f}\n'.format(atom_labels[i],
-                                                                                atom_pos[i][0],
-                                                                                atom_pos[i][1],
-                                                                                atom_pos[i][2]))
+        xsf_file.write('{:3s}        {:>15.9f}    {:>15.9f}    {:>15.9f}\n'.format(atom_labels[i],
+                                                                                   atom_pos[i][0],
+                                                                                   atom_pos[i][1],
+                                                                                   atom_pos[i][2]))
 
     xsf_file.close()
 
@@ -915,23 +913,25 @@ def save_pqr(path: str = None,
                                                                                         cell[4],
                                                                                         cell[5]))
 
-    if partial_charges is not False:
+    if partial_charges is None:
+        atom_line = 'ATOM   {:>4} {:>2}   MOL A   0    {:>8.3f}{:>8.3f}{:>8.3f}   {:>15}\n'
         for i in range(len(atom_pos)):
-            pqr_file.write('ATOM   {:>4} {:>2}   MOL A   0    {:>8.3f}{:>8.3f}{:>8.3f}{:>8.5f}                {}\n'.format(i + 1,
-                                                                                                                           atom_labels[i],
-                                                                                                                           atom_pos[i][0],
-                                                                                                                           atom_pos[i][1],
-                                                                                                                           atom_pos[i][2],
-                                                                                                                           partial_charges[i],
-                                                                                                                           atom_labels[i]))
-    if partial_charges is False:
+            pqr_file.write(atom_line.format(i + 1,
+                                            atom_labels[i],
+                                            atom_pos[i][0],
+                                            atom_pos[i][1],
+                                            atom_pos[i][2],
+                                            atom_labels[i]))
+    else:
+        atom_line = 'ATOM   {:>4} {:>2}   MOL A   0    {:>8.3f}{:>8.3f}{:>8.3f}{:>8.5f}   {:>15}\n'
         for i in range(len(atom_pos)):
-            pqr_file.write('ATOM   {:>4} {:>2}   MOL A   0    {:>8.3f}{:>8.3f}{:>8.3f}                {}\n'.format(i + 1, 
-                                                                                                                   atom_labels[i],
-                                                                                                                   atom_pos[i][0],
-                                                                                                                   atom_pos[i][1],
-                                                                                                                   atom_pos[i][2],
-                                                                                                                   atom_labels[i]))
+            pqr_file.write(atom_line.format(i + 1,
+                                            atom_labels[i],
+                                            atom_pos[i][0],
+                                            atom_pos[i][1],
+                                            atom_pos[i][2],
+                                            partial_charges[i],
+                                            atom_labels[i]))
 
     pqr_file.close()
 
@@ -979,13 +979,15 @@ def save_pdb(path: str = None,
                                                                                         cell[4],
                                                                                         cell[5]))
 
+    atom_line = 'ATOM   {:>4} {:>2}   MOL     {:>13.3f}{:>8.3f}{:>8.3f}  1.00  0.00  {:>11}\n'
+
     for i in range(len(atom_pos)):
-        pdb_file.write('ATOM   {:>4} {:>2}   MOL          {:>8.3f}{:>8.3f}{:>8.3f}  1.00  0.00           {}\n'.format(i+1,
-                                                                                                                      atom_labels[i],
-                                                                                                                      atom_pos[i][0],
-                                                                                                                      atom_pos[i][1],
-                                                                                                                      atom_pos[i][2],
-                                                                                                                      atom_labels[i]))
+        pdb_file.write(atom_line.format(i+1,
+                                        atom_labels[i],
+                                        atom_pos[i][0],
+                                        atom_pos[i][1],
+                                        atom_pos[i][2],
+                                        atom_labels[i]))
 
     pdb_file.close()
 
@@ -1072,7 +1074,7 @@ def save_xyz(path: str = None,
         Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
     """
 
-    if cell.shape == (3,3):
+    if len(cell) == 3:
         cell = cell_to_cellpar(cell)
 
     if frac_coords:
@@ -1210,9 +1212,35 @@ def save_qe(path: str = None,
             atom_labels: list = None,
             atom_pos: list = None,
             frac_coords: bool = False,
-            param_dict: dict = None):
+            input_dict: dict = None):
     '''
-    Save the structure in Quantum Espresso .pwscf format
+    Save the structure in Quantum Espresso .pwscf format.
+
+    The `input_dict` can be used to specify the input parameters for the
+    QuantumESPRESSO calculation.
+
+    This dictionary must contain the keys: `control`, `system`, `electrons`, and `ions`.
+    Each of these keys must contain a dictionary with the corresponding input parameters.
+    This dictionary can contain the kpoints item, with the kpoints grid as a list of 3 integers.
+    Additionally, it can contain the kspacing item, with the kpoints spacing as a float. In this
+    case the kpoints grid will be calculated automatically. By default, the kspacing is set to 0.3.
+
+    Parameters
+    ----------
+    path : str
+        Path to the file.
+    file_name : str
+        Name of the file. Does not neet to contain the `.pwscf` extention.
+    cell : numpy array
+        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
+    atom_label : list
+        List of strings containing containg the N atom labels.
+    atom_pos : list
+        Nx3 array contaning the atoms coordinates.
+    frac_coords : bool
+        If True, the coordinates are in fractional coordinates.
+    input_dict : dict
+        Dictionary containing the input parameters for the Quantum Espresso calculation.
     '''
 
     if len(cell) == 6:
@@ -1220,77 +1248,79 @@ def save_qe(path: str = None,
     else:
         cell_matrix = cell
 
-    if param_dict is None:
-        param_dict = {'ecutwfc': 40,
-                      'ecutrho': 360,
-                      'kspacing': 0.3}
+    if input_dict is None:
+        input_dict = {}
 
-    kx, ky, kz = get_kgrid(cell_matrix, param_dict['kspacing'])
+        input_dict['control'] = {
+            'calculation': "'vc-relax'",
+            'restart_mode': "'from_scratch'",
+            'wf_collect': '.true.',
+            'pseudo_dir': "'$PSEUDO_DIR'",
+            'outdir': "'./'",
+            'prefix': f"'{file_name}'",
+            'verbosity': "'high'",
+            'tstress': '.true.',
+            'tprnfor': '.true.',
+            'etot_conv_thr': '1.0d-5',
+            'forc_conv_thr': '1.0d-6',
+            'nstep': 1000}
 
-    control_dict = {'calculation': "'vc-relax'",
-                    'restart_mode': "'from_scratch'",
-                    'wf_collect': '.true.',
-                    'pseudo_dir': "'$PSEUDO_DIR'",
-                    'outdir': "'./'",
-                    'prefix': f"'{file_name}'",
-                    'verbosity': "'high'",
-                    'tstress': '.true.',
-                    'tprnfor': '.true.',
-                    'etot_conv_thr': '1.0d-5',
-                    'forc_conv_thr': '1.0d-6',
-                    'nstep': 1000}
+        input_dict['system'] = {
+            'ibrav': 0,
+            'nat': len(atom_labels),
+            'ntyp': len(set(atom_labels)),
+            'ecutwfc': 40,
+            'ecutrho': 360,
+            'vdw_corr': "'grimme-d3'",
+            'occupations': "'smearing'"}
 
-    system_dict = {'ibrav': 0,
-                   'nat': len(atom_labels),
-                   'ntyp': len(set(atom_labels)),
-                   'ecutwfc': param_dict['ecutwfc'],
-                   'ecutrho': param_dict['ecutrho'],
-                   'vdw_corr': "'grimme-d3'",
-                   'occupations': "'smearing'"}
+        input_dict['electrons'] = {
+            'conv_thr': 1.0e-9,
+            'electron_maxstep': 100,
+            'mixing_beta': 0.3}
 
-    if 'smearing' in system_dict:
-        system_dict['degauss'] = system_dict['smearing']['degauss']
-        system_dict['smearing'] = system_dict['smearing']['smearing']
-        system_dict['occupations'] = system_dict['smearing']['occupations']
+        input_dict['ions'] = {
+            'ion_dynamics': "'bfgs'"}
 
-    electrons_dict = {'conv_thr': 1.0e-9,
-                      'electron_maxstep': 100,
-                      'mixing_beta': 0.3}
+        input_dict['cell'] = {
+            'cell_dynamics': "'bfgs'",
+            'cell_dofree': "'all'"}
 
-    ions_dict = {'ion_dynamics': "'bfgs'"}
-
-    cell_dict = {'cell_dynamics': "'bfgs'",
-                 'cell_dofree': "'all'"}
+    # If the kpoints grid is not specified, calculate it automatically
+    if 'k_points' not in input_dict.keys():
+        if 'kspacing' not in input_dict.keys():
+            input_dict['kspacing'] = 0.3
+        input_dict['kpoints'] = get_kgrid(cell_matrix, input_dict['kspacing'])
 
     with open(os.path.join(path, file_name + '.pwscf'), 'w') as f:
-        f.write('&control\n')
-        for key in control_dict:
-            f.write(f'  {key} = {control_dict[key]}\n')
+        f.write('&CONTROL\n')
+        for key in input_dict['control']:
+            f.write(f"  {key} = {input_dict['control'][key]}\n")
         f.write('/\n\n')
 
-        f.write('&system\n')
-        for key in system_dict:
-            f.write(f'  {key} = {system_dict[key]}\n')
+        f.write('&SYSTEM\n')
+        for key in input_dict['system']:
+            f.write(f"  {key} = {input_dict['system'][key]}\n")
         f.write('/\n\n')
 
-        f.write('&electrons\n')
-        for key in electrons_dict:
-            f.write(f'  {key} = {electrons_dict[key]}\n')
+        f.write('&ELECTRONS\n')
+        for key in input_dict['electrons']:
+            f.write(f"  {key} = {input_dict['electrons'][key]}\n")
         f.write('/\n\n')
 
-        f.write('&ions\n')
-        for key in ions_dict:
-            f.write(f'  {key} = {ions_dict[key]}\n')
+        f.write('&IONS\n')
+        for key in input_dict['ions']:
+            f.write(f"  {key} = {input_dict['ions'][key]}\n")
         f.write('/\n\n')
 
-        f.write('&cell\n')
-        for key in cell_dict:
-            f.write(f'  {key} = {cell_dict[key]}\n')
+        f.write('&CELL\n')
+        for key in input_dict['cell']:
+            f.write(f"  {key} = {input_dict['cell'][key]}\n")
         f.write('/\n\n')
 
         f.write('ATOMIC_SPECIES\n')
         for atom in set(atom_labels):
-            f.write(f' {atom}   {elements_dict()[atom]:.4f}  {atom}.PSEUDO.UPF\n')
+            f.write(f" {atom}   {elements_dict()[atom]:>9.5f}  {atom}.PSEUDO.UPF\n")
         f.write('\n')
 
         f.write('CELL_PARAMETERS (angstrom) \n')
@@ -1313,7 +1343,7 @@ def save_qe(path: str = None,
 
         f.write('\n')
         f.write('K_POINTS automatic\n')
-        f.write(f' {kx} {ky} {kz} 1 1 1\n')
+        f.write(' {} {} {} 1 1 1\n'.format(*input_dict['kpoints']))
 
 
 def convert_cif_2_qe(out_path, file_name):
