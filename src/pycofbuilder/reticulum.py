@@ -250,16 +250,16 @@ class Reticulum():
 
         return result
 
-    def save(self, save_format: list = ['cif'], supercell: list = [1, 1, 1], **kwargs):
+    def save(self, fmt: str = 'cif', supercell: list = [1, 1, 1], **kwargs):
         '''
         Save the structure in a specif file format.
 
         Parameters
         ----------
-        save_format : list, optional
+        save_format : str, optional
             The file format to be saved
             Can be `json`, `cif`, `xyz`, `turbomole`, `vasp`, `xsf`, `pdb`, `pqr`, `qe`.
-            Default: ['cif']
+            Default: 'cif'
         supercell : list, optional
             The supercell to be used to save the structure.
             Default: [1,1,1]
@@ -279,15 +279,14 @@ class Reticulum():
         self.symm_structure.make_supercell(supercell)
 
         file_format_error = f'Format must be one of the following: {save_dict.keys()}'
-        assert all([i in save_dict.keys() for i in save_format]), file_format_error
+        assert fmt in save_dict.keys(), file_format_error
 
-        for i in save_format:
-            save_dict[i](path=self.out_path,
-                         file_name=self.name,
-                         cell=self.lattice,
-                         atom_labels=self.atom_labels,
-                         atom_pos=self.atom_pos,
-                         **kwargs)
+        save_dict[fmt](path=self.out_path,
+                       file_name=self.name,
+                       cell=self.lattice,
+                       atom_labels=self.atom_labels,
+                       atom_pos=self.atom_pos,
+                       **kwargs)
 
 # --------------- Net creation methods -------------------------- #
 
