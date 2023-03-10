@@ -4,7 +4,7 @@
   "smiles": "[R]OCC",
   "xsmiles": "[*]OCC",
   "xsmiles_label": "|$R;;;$|",
-  "formula": "C2R1O1H5",
+  "formula": "H5O1R1C2",
   "atoms": {
     "elements": {
       "elementType": [

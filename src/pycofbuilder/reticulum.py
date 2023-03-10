@@ -232,6 +232,8 @@ class Reticulum():
         # Check if the BB1 has the smiles attribute
         if hasattr(BB1, 'smiles') and hasattr(BB2, 'smiles'):
             self.smiles = f'{BB1.smiles}.{BB2.smiles}'
+        else:
+            print('WARNING: The smiles attribute is not available for the building blocks')
 
         net_build_dict = {
             'HCB': self._create_hcb_structure,

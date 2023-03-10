@@ -125,7 +125,7 @@ class Building_Block():
 
         print(self._structure_as_string())
 
-    def _centralize_molecule(self, by_X=False):
+    def _centralize_molecule(self, by_X=True):
         ''' Centralize the molecule on its geometrical center'''
 
         transposed = np.transpose(self.atom_pos)
@@ -415,8 +415,6 @@ class Building_Block():
         self.atom_pos = chem_json['atoms']['coords']['3d']
         self.composition = chem_json['formula']
 
-        self._centralize_molecule()
-
         self._add_connection_group(conector)
 
         R_list_names = [R1, R2, R3, R4, R5, R6, R7, R8, R9]
@@ -432,6 +430,7 @@ class Building_Block():
         self.radicals = radical_string
 
         self.connectivity = len([i for i in self.atom_labels if 'X' in i])
+        self._centralize_molecule()
         self._align_to()
         self._calculate_size()
 
