@@ -4,7 +4,7 @@
   "code": "BDFN",
   "xsmiles": "[*]C(O1)=C([*])C2=C1C([*])=C(C([*])=C([*])O3)C3=C2[*]",
   "xsmiles_label": "|$Q;;;;R2;;;;R1;;;R2;;Q;;;;R1$|",
-  "formula": "R22C10O2R12Q2",
+  "formula": "C10R22O2R12Q2",
   "atoms": {
     "elements": {
       "elementType": [

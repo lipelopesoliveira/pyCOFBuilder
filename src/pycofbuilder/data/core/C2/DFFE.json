@@ -4,7 +4,7 @@
   "code": "DFFE",
   "xsmiles": "[*]C1=C([*])C2=C(C([*])=C1[*])C3=C4C(C(C(C([*])=C([*])C([*])=C5[*])=C5C6[*])=C6C([*])=C4[*])C([*])=C([*])C3=C2[*]",
   "xsmiles_label": "|$Q;;;R2;;;;R3;;R1;;;;;;;R3;;R1;;Q;;R2;;;R4;;;R5;;R6;;R6;;R5;;;R4$|",
-  "formula": "R22C24R32R62R42R52R12Q2",
+  "formula": "C24R52R42R22R62R12R32Q2",
   "atoms": {
     "elements": {
       "elementType": [

@@ -4,7 +4,7 @@
   "code": "TPDI",
   "xsmiles": "[*]C1=C([*])C(C([*])=C2C3C4C(C(C(C([*])=C([*])C([*])=C5[*])=C5C6[*])=C6C4[*])=C2[*])=C3C([*])=C1[*]",
   "xsmiles_label": "|$Q;;;R2;;;R4;;;;;;;;R3;;R1;;Q;;R2;;;R4;;;R5;;R5;;;R3;;R1$|",
-  "formula": "R22C22R32R42R52R12Q2",
+  "formula": "C22R52R42R22R12R32Q2",
   "atoms": {
     "elements": {
       "elementType": [

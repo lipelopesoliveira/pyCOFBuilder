@@ -4,7 +4,7 @@
   "smiles": "[Q]C1=C([R2])C2=C(C([R3])=C1[R1])C3=C([R5])C4=C([R4])C5=C(C([R3])=C([R1])C([Q])=C5[R2])C4=C([R5])C3=C2[R4]",
   "xsmiles": "[*]C1=C([*])C2=C(C([*])=C1[*])C3=C([*])C4=C([*])C5=C(C([*])=C([*])C([*])=C5[*])C4=C([*])C3=C2[*]",
   "xsmiles_label": "|$Q;;;R2;;;;R3;;R1;;;R5;;;R4;;;;R3;;R1;;Q;;R2;;;R5;;;R4$|",
-  "formula": "R22C20R32R42R52R12Q2",
+  "formula": "C20R52R42R22R12R32Q2",
   "atoms": {
     "elements": {
       "elementType": [

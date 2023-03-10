@@ -4,7 +4,7 @@
   "code": "BBTZ",
   "xsmiles": "[*]C(S1)=NC2=C1C([*])=C(N=C([*])S3)C3=C2[*]",
   "xsmiles_label": "|$Q;;;;;;;R1;;;;Q;;;;R1$|",
-  "formula": "C8N2S2R12Q2",
+  "formula": "C8R12N2S2Q2",
   "atoms": {
     "elements": {
       "elementType": [

@@ -4,7 +4,7 @@
   "code": "IITT",
   "xsmiles": "[*]C1=C([*])C(C([*])=C(S2)C3=C4C2=C5C(S4)=C([*])C6=C5C([*])=C([*])C([*])=C6[*])=C3C([*])=C1[*]",
   "xsmiles_label": "|$Q;;;R2;;;R4;;;;;;;;;;R4;;;;R3;;R1;;Q;;R2;;;R3;;R1$|",
-  "formula": "R22C20R32R42S2R12Q2",
+  "formula": "C20R42R22R12R32S2Q2",
   "atoms": {
     "elements": {
       "elementType": [

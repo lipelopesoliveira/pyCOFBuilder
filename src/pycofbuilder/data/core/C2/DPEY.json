@@ -4,7 +4,7 @@
   "code": "DPEY",
   "xsmiles": "[*]C(C([*])=C1[*])=C([*])C([*])=C1C#CC2=C([*])C([*])=C([*])C([*])=C2[*]",
   "xsmiles_label": "|$Q;;;R4;;R1;;R3;;R2;;;;;;R1;;R4;;Q;;R3;;R2$|",
-  "formula": "R22C14R34R12Q2",
+  "formula": "C14R22R12R34Q2",
   "atoms": {
     "elements": {
       "elementType": [

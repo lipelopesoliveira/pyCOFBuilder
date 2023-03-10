@@ -4,7 +4,7 @@
   "code": "3IDT",
   "xsmiles": "[*]C(S1)=C([*])C2=C1C([*])=C3C2=C([*])C4C([*])=C5C(C([*])=C([*])S5)C4=C3[*]",
   "xsmiles_label": "|$Q;;;;R1;;;;R2;;;;R3;;;R2;;;;R1;;Q;;;;R3$|",
-  "formula": "R22C16R32S2R12Q2",
+  "formula": "C16R22R12R32S2Q2",
   "atoms": {
     "elements": {
       "elementType": [

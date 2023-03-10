@@ -4,7 +4,7 @@
   "code": "BENZ",
   "xsmiles": "[*]C1=C([*])C([*])=C([*])C([*])=C1[*]",
   "xsmiles_label": "|$Q;;;R2;;R1;;Q;;R2;;R1$|",
-  "formula": "C6R12Q2R22",
+  "formula": "C6Q2R12R22",
   "atoms": {
     "elements": {
       "elementType": [

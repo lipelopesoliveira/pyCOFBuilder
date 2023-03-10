@@ -4,7 +4,7 @@
   "code": "NAPT",
   "xsmiles": "[*]C1=C([*])C([*])=C2C(C([*])=C([*])C([*])=C2[*])=C1[*]",
   "xsmiles_label": "|$Q;;;R3;;R2;;;;R2;;R3;;Q;;R1;;R1$|",
-  "formula": "R22C10R32R12Q2",
+  "formula": "C10R22R12R32Q2",
   "atoms": {
     "elements": {
       "elementType": [

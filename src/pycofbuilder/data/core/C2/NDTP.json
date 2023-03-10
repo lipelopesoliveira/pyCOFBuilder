@@ -4,7 +4,7 @@
   "code": "NDTP",
   "xsmiles": "[*]C(S1)=C([*])C2=C1C(C([*])=C([*])C3=C4SC([*])=C3[*])=C4C([*])=C2[*]",
   "xsmiles_label": "|$Q;;;;R1;;;;;R3;;R2;;;;;Q;;R1;;;R3;;R2$|",
-  "formula": "R22C14R32S2R12Q2",
+  "formula": "C14R22R12R32S2Q2",
   "atoms": {
     "elements": {
       "elementType": [

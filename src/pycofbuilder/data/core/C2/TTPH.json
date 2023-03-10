@@ -4,7 +4,7 @@
   "code": "TTPH",
   "xsmiles": "[*]C1=C([*])C2=C(S1)C([*])=C([*])S2",
   "xsmiles_label": "|$Q;;;R;;;;;R;;Q;$|",
-  "formula": "C6R12Q2S2",
+  "formula": "C6S2R12Q2",
   "atoms": {
     "elements": {
       "elementType": [

@@ -4,7 +4,7 @@
   "code": "DHPI",
   "xsmiles": "[*]C(N1[H])=C([*])C2=C1C([*])=C(C([*])=C([*])N3[H])C3=C2[*]",
   "xsmiles_label": "|$Q;;;;;R2;;;;R1;;;R2;;Q;;;;;R1$|",
-  "formula": "R22C10N2R12Q2H2",
+  "formula": "C10H2R22N2R12Q2",
   "atoms": {
     "elements": {
       "elementType": [

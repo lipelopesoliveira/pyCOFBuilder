@@ -4,7 +4,7 @@
   "code": "DPBY",
   "xsmiles": "[*]C(C([*])=C1[*])=C([*])C([*])=C1C#CC#CC2=C([*])C([*])=C([*])C([*])=C2[*]",
   "xsmiles_label": "|$Q;;;R4;;R1;;R2;;R3;;;;;;;;R1;;R3;;Q;;R2;;R3$|",
-  "formula": "R22C16R32R42R12Q2",
+  "formula": "C16R42R22R12R32Q2",
   "atoms": {
     "elements": {
       "elementType": [

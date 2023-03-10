@@ -4,7 +4,7 @@
   "code": "BTPH",
   "xsmiles": "[*]C1=C([*])C([*])=C(C2=C([*])C([*])=C([*])S2)S1",
   "xsmiles_label": "|$Q;;;R2;;R1;;;;R1;;R2;;Q;;$|",
-  "formula": "R22C8S2R12Q2",
+  "formula": "C8R22R12S2Q2",
   "atoms": {
     "elements": {
       "elementType": [
