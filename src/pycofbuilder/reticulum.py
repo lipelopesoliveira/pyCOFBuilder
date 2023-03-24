@@ -301,7 +301,6 @@ class Reticulum():
                               BB1,
                               BB2,
                               stacking: str = 'AA',
-                              bond_atom: str = 'N',
                               c_parameter_base: float = 3.6,
                               print_result: bool = True,
                               slab: float = 10.0,
@@ -360,6 +359,13 @@ class Reticulum():
         self.chirality = BB1.chirality or BB2.chirality
 
         Tools.print_comand(f'Starting the creation of {self.name}',
+                           self.verbosity,
+                           ['debug', 'high'])
+        
+        # Detect the bond atom from the connection groups type
+        bond_atom = Tools.get_bond_atom(BB1.conector, BB2.conector)
+
+        Tools.print_comand(f'Bond atom detected: {bond_atom}',
                            self.verbosity,
                            ['debug', 'high'])
 
@@ -663,7 +669,6 @@ class Reticulum():
                                 BB1: str,
                                 BB2: str,
                                 stacking: str = 'AA',
-                                bond_atom: str = 'N',
                                 c_parameter_base: float = 3.6,
                                 print_result: bool = True,
                                 slab: float = 10.0,
@@ -681,8 +686,6 @@ class Reticulum():
             The 4 letter code for the linear Buiding Block B
         stacking : str, optional
             The stacking pattern of the COF layers (default is 'AA')
-        bond_atom : str, optional
-            The atom that connect the buiding blocks (default is 'N')
         c_parameter_base : float, optional
             The base value for interlayer distance in angstroms (default is 3.6)
         print_result : bool, optional
@@ -726,7 +729,9 @@ class Reticulum():
         # Detect the bond atom from the connection groups type
         bond_atom = Tools.get_bond_atom(BB1.conector, BB2.conector)
 
-        print('Bond atom: ', bond_atom)
+        Tools.print_comand(f'Bond atom detected: {bond_atom}',
+                           self.verbosity,
+                           ['debug', 'high'])
 
         # Calculates the cell parameters based on building blocks size
         size_a = BB1.size
@@ -1045,7 +1050,6 @@ class Reticulum():
                               name_bb_a: str,
                               name_bb_b: str,
                               stacking: str = 'AA',
-                              bond_atom: str = 'N',
                               c_parameter_base: float = 3.6,
                               print_result: bool = True,
                               slab: float = 10.0,
@@ -1063,8 +1067,6 @@ class Reticulum():
             The 4 letter code for the tetrapodal Buiding Block B
         stacking : str, optional
             The stacking pattern of the COF layers (default is 'AA')
-        bond_atom : str, optional
-            The atom that connect the buiding blocks (default is 'N')
         c_parameter_base : float, optional
             The base value for interlayer distance in angstroms (default is 3.6)
         print_result : bool, optional
@@ -1115,6 +1117,13 @@ class Reticulum():
             print(f'Building block B ({name_bb_b}) must present connectivity 4 insted of',
                   bb_2.connectivity)
             return None
+        
+        # Detect the bond atom from the connection groups type
+        bond_atom = Tools.get_bond_atom(BB1.conector, BB2.conector)
+
+        Tools.print_comand(f'Bond atom detected: {bond_atom}',
+                           self.verbosity,
+                           ['debug', 'high'])
 
         # Calculates the cell parameter based on the building blocks size
         size_a = bb_1.size
@@ -1418,7 +1427,6 @@ class Reticulum():
                                 name_bb_a: str,
                                 name_bb_b: str,
                                 stacking: str = 'AA',
-                                bond_atom: str = 'N',
                                 c_parameter_base: float = 3.6,
                                 print_result: bool = True,
                                 slab: float = 10.0,
@@ -1436,8 +1444,6 @@ class Reticulum():
             The 4 letter code for the linear Buiding Block B
         stacking : str, optional
             The stacking pattern of the COF layers (default is 'AA')
-        bond_atom : str, optional
-            The atom that connect the buiding blocks (default is 'N')
         c_parameter_base : float, optional
             The base value for interlayer distance in angstroms (default is 3.6)
         print_result : bool, optional
@@ -1483,13 +1489,18 @@ class Reticulum():
         if bb_1.connectivity != 4:
             print(f'Building block A ({name_bb_a}) must present connectivity 4 insted of',
                   bb_1.connectivity)
-
             return None
         if bb_2.connectivity != 2:
             print(f'Building block B ({name_bb_b}) must present connectivity 2 insted of',
                   bb_2.connectivity)
-
             return None
+        
+        # Detect the bond atom from the connection groups type
+        bond_atom = Tools.get_bond_atom(BB1.conector, BB2.conector)
+
+        Tools.print_comand(f'Bond atom detected: {bond_atom}',
+                           self.verbosity,
+                           ['debug', 'high'])
 
         # Calcula o parâmetro de célula com base no tamanho dos blocos de construção
         size_a = bb_1.size
@@ -1794,7 +1805,6 @@ class Reticulum():
                               name_bb_a: str,
                               name_bb_b: str,
                               stacking: str = 'AA',
-                              bond_atom: str = 'N',
                               c_parameter_base: float = 3.6,
                               print_result: bool = True,
                               slab: float = 10.0,
@@ -1812,8 +1822,6 @@ class Reticulum():
             The 4 letter code for the tripodal Buiding Block B
         stacking : str, optional
             The stacking pattern of the COF layers (default is 'AA')
-        bond_atom : str, optional
-            The atom that connect the buiding blocks (default is 'N')
         c_parameter_base : float, optional
             The base value for interlayer distance in angstroms (default is 3.6)
         print_result : bool, optional
@@ -1863,6 +1871,13 @@ class Reticulum():
             print('Building block B must present connectivity 3 insted of',
                   len(bb_2.connectivity))
             return None
+
+        # Detect the bond atom from the connection groups type
+        bond_atom = Tools.get_bond_atom(BB1.conector, BB2.conector)
+
+        Tools.print_comand(f'Bond atom detected: {bond_atom}',
+                           self.verbosity,
+                           ['debug', 'high'])
 
         # Calculate the cell parameter based on the size of the building blocks
         size_a = max(bb_1.size)
@@ -2163,7 +2178,6 @@ class Reticulum():
                                 name_bb_a: str,
                                 name_bb_b: str,
                                 stacking: str = 'AA',
-                                bond_atom: str = 'N',
                                 c_parameter_base: float = 3.6,
                                 print_result: bool = True,
                                 slab: float = 10.0,
@@ -2181,8 +2195,6 @@ class Reticulum():
             The 4 letter code for the linear Buiding Block B
         stacking : str, optional
             The stacking pattern of the COF layers (default is 'AA')
-        bond_atom : str, optional
-            The atom that connect the buiding blocks (default is 'N')
         c_parameter_base : float, optional
             The base value for interlayer distance in angstroms (default is 3.6)
         print_result : bool, optional
@@ -2232,6 +2244,13 @@ class Reticulum():
             print('Building block B must present connectivity 2 insted of',
                   len(bb_2.connectivity))
             return None
+
+        # Detect the bond atom from the connection groups type
+        bond_atom = Tools.get_bond_atom(BB1.conector, BB2.conector)
+
+        Tools.print_comand(f'Bond atom detected: {bond_atom}',
+                           self.verbosity,
+                           ['debug', 'high'])
 
         # Calculate the cell parameter based on the size of the building blocks
         size_a = max(bb_1.size)
@@ -2537,7 +2556,6 @@ class Reticulum():
                               name_bb_a: str,
                               name_bb_b: str,
                               stacking: str = 'AA',
-                              bond_atom: str = 'N',
                               c_parameter_base: float = 3.6,
                               print_result: bool = True,
                               slab: float = 10.0,
@@ -2606,6 +2624,13 @@ class Reticulum():
             print('Building block B must present connectivity 4 insted of',
                   len(bb_2.connectivity))
             return None
+
+        # Detect the bond atom from the connection groups type
+        bond_atom = Tools.get_bond_atom(BB1.conector, BB2.conector)
+
+        Tools.print_comand(f'Bond atom detected: {bond_atom}',
+                           self.verbosity,
+                           ['debug', 'high'])
 
         # Calculate the cell parameter based on the size of the building blocks
         if self.verbosity:
@@ -2929,7 +2954,6 @@ class Reticulum():
                                 name_bb_a: str,
                                 name_bb_b: str,
                                 stacking: str = 'AA',
-                                bond_atom: str = 'N',
                                 c_parameter_base: float = 3.6,
                                 print_result: bool = True,
                                 slab: float = 10.0,
@@ -2947,8 +2971,6 @@ class Reticulum():
             The 4 letter code for the linear Buiding Block B
         stacking : str, optional
             The stacking pattern of the COF layers (default is 'AA')
-        bond_atom : str, optional
-            The atom that connect the buiding blocks (default is 'N')
         c_parameter_base : float, optional
             The base value for interlayer distance in angstroms (default is 3.6)
         print_result : bool, optional
@@ -2998,6 +3020,13 @@ class Reticulum():
             print('Building block B must present connectivity 2 insted of',
                   len(bb_2.connectivity))
             return None
+
+        # Detect the bond atom from the connection groups type
+        bond_atom = Tools.get_bond_atom(BB1.conector, BB2.conector)
+
+        Tools.print_comand(f'Bond atom detected: {bond_atom}',
+                           self.verbosity,
+                           ['debug', 'high'])
 
         # Calculate the cell parameter based on the size of the building blocks
         size_a = max(bb_1.size)
