@@ -622,6 +622,25 @@ def closest_atom_struc(label_1, pos_1, labels, pos):
     return closet_label, closet_position, euclidian_distance
 
 
+def get_bond_atom(connector_1: str, connector_2: str) -> str:
+    '''
+    Get the atom that will be used to bond two building blocks.
+    '''
+
+    bond_dict = {'NH2': 'N',
+                 'CONHNH2': 'N',
+                 'BOH2': 'B',
+                 'Cl': 'C',
+                 'Br': 'C'}
+
+    bond_atom = None
+    for group in list(bond_dict.keys()):
+        if group in [connector_1, connector_2]:
+            bond_atom = bond_dict[group]
+
+    return bond_atom
+
+
 def print_result(name, lattice, hall, space_group, space_number, symm_op):
     '''Print the results of the created structure'''
     print('{:<60s} {:^12s} {:<4s} {:^4s} #{:^5s}   {:^2} sym. op.'.format(name,

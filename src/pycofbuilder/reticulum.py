@@ -264,6 +264,7 @@ class Reticulum():
             The supercell to be used to save the structure.
             Default: [1,1,1]
         '''
+
         save_dict = {
             'json': Tools.save_json,
             'cif': Tools.save_cif,
@@ -275,17 +276,23 @@ class Reticulum():
             'pqr': Tools.save_pqr,
             'qe': Tools.save_qe
          }
-
-        self.symm_structure.make_supercell(supercell)
-
+        
         file_format_error = f'Format must be one of the following: {save_dict.keys()}'
         assert fmt in save_dict.keys(), file_format_error
 
+        structure = self.symm_structure
+        structure.make_supercell(supercell)
+        structure_dict = structure.as_dict()
+
+        cell = structure_dict['lattice']['matrix']
+        atom_pos = [site['xyz'] for site in structure_dict['sites']]
+        atom_labels = [site['species'][0]['element'] for site in structure_dict['sites']]
+
         save_dict[fmt](path=self.out_path,
                        file_name=self.name,
-                       cell=self.lattice,
-                       atom_labels=self.atom_labels,
-                       atom_pos=self.atom_pos,
+                       cell=cell,
+                       atom_labels=atom_labels,
+                       atom_pos=atom_pos,
                        **kwargs)
 
 # --------------- Net creation methods -------------------------- #
@@ -715,6 +722,11 @@ class Reticulum():
         Tools.print_comand(f'Starting the creation of {self.name}',
                            self.verbosity,
                            ['debug', 'high'])
+
+        # Detect the bond atom from the connection groups type
+        bond_atom = Tools.get_bond_atom(BB1.conector, BB2.conector)
+
+        print('Bond atom: ', bond_atom)
 
         # Calculates the cell parameters based on building blocks size
         size_a = BB1.size
