@@ -91,7 +91,7 @@ class Reticulum():
 
         self.lib_path = os.path.join(self.out_path, 'building_blocks')
 
-        self.name = None
+        self.name = ""
 
         self.BB1_name = None
         self.BB2_name = None
@@ -143,13 +143,13 @@ class Reticulum():
                                    'BOR': [5, 8, 6, 7]  # Temporary
                                    }
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'Reticulum({self.BB1_name}, {self.BB2_name}, {self.topology}, {self.stacking})'
 
-    def _get_n_atoms(self):
+    def _get_n_atoms(self) -> int:
         ''' Returns the number of atoms in the unitary cell'''
         return len(self.atom_labels)
 
@@ -165,7 +165,7 @@ class Reticulum():
             for i in self.available_3D_topologies:
                 print(i.upper())
 
-    def check_name_concistency(self, FrameworkName):
+    def check_name_concistency(self, FrameworkName) -> tuple[str, str, str, str]:
         """Checks if the name is in the correct format."""
 
         string_error = 'FrameworkName must be in the format: BB1_BB2_Net_Stacking'
@@ -184,7 +184,7 @@ class Reticulum():
 
         return BB1_name, BB2_name, Net, Stacking
 
-    def from_name(self, FrameworkName, **kwargs):
+    def from_name(self, FrameworkName, **kwargs) -> None:
         """Creates a COF from a given FrameworkName.
 
         Parameters
@@ -250,7 +250,7 @@ class Reticulum():
 
         return result
 
-    def save(self, fmt: str = 'cif', supercell: list = [1, 1, 1], **kwargs):
+    def save(self, fmt: str = 'cif', supercell: list = [1, 1, 1], **kwargs) -> None:
         '''
         Save the structure in a specif file format.
 
