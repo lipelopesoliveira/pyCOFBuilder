@@ -77,7 +77,7 @@ class Reticulum():
         Creates a reticulum from two building blocks
     """
 
-    def __init__(self, verbosity=False, out_dir=None):
+    def __init__(self, name=None, verbosity=False, out_dir=None):
 
         _ROOTDIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -90,8 +90,6 @@ class Reticulum():
             self.out_path = out_dir
 
         self.lib_path = os.path.join(self.out_path, 'building_blocks')
-
-        self.name = ""
 
         self.BB1_name = None
         self.BB2_name = None
@@ -142,6 +140,12 @@ class Reticulum():
                                    'DIA': [1, 2, 3, 4],  # Temporary
                                    'BOR': [5, 8, 6, 7]  # Temporary
                                    }
+
+        if name is None:
+            self.name = ""
+        else:
+            self.name = name
+            self.from_name(self.name)
 
     def __str__(self) -> str:
         return self.name
