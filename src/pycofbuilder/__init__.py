@@ -3,9 +3,9 @@
 import os
 import sys
 
-# This code is written for Python 3.
+# This code is written for Python 3
 if sys.version_info[0] != 3:
-    raise Exception("pyCOFBuilder requires Python 3.")
+    raise Exception("Sorry but pyCOFBuilder requires Python 3.")
     sys.exit(1)
 
 # Import tools class
@@ -27,8 +27,8 @@ __all__ = ['Tools',
 
 _ROOT = os.path.abspath(os.path.dirname(__file__))
 
-__author__ = "Felipe Lopes de Oliveira"
+__author__  = "Felipe Lopes de Oliveira"
 __license__ = "MIT"
 __version__ = '0.0.3'
-__email__ = "felipe.lopes@nano.ufrj.br"
-__status__ = "Development"
+__email__   = "felipe.lopes@nano.ufrj.br"
+__status__  = "Development"
