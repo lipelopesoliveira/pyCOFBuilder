@@ -28,10 +28,6 @@ The Python dependencies are most easily satisfied using a conda
 ([anaconda](https://www.anaconda.com/distribution)/[miniconda](https://docs.conda.io/en/latest/miniconda.html))
 installation by running
 
-```Shell
-conda env create --file environment.yml
-```
-
 ## Basic Usage
 
 To create a specific COF, like `C3_BENZ_CHO_OH-C2_HDZ_NH2-HCB_A-AA`:
@@ -46,26 +42,6 @@ C3_BENZ_CHO_OH-C2_HDZ_NH2-HCB_A-AA                            hexagonal   P    P
 A `.cif` file (the default save format is CIF, but it can be easily changed) will be created in the `out` folder. The code will print out some information about the structure created.
 
 Besides, the variable `c` now is a list with two elements. The first element is a Boolean value indicating whether the network creation was successful and the second element is the name of the created network. This information can be useful for workflows for creating multiple structures.
-
-## Manual cration of a Reticular Object
-
-It is possible to manually create a `Reticular` object:
-
-```python
-Ret = COF.Reticulum(out_dir=os.getcwd(), verbosity=True)
-
-simm_data = Ret.create_hcb_a_structure('C3_BENZ_CHO_OH',
-                                       'C2_DBPL_NH2_CH3_H_H_H',
-                                       stacking='AA',
-                                       bond_atom='N',
-                                       print_result=True)
-
-Ret.save_cif([1, 1, 2])
-```
-
-This code will create a COF with the name `C3_BENZ_CHO_OH-C2_DBPL_NH2_CH3_H_H_H-HCB_A-AA` and save it in the current directory. The code will print out some information about the structure created.
-
-## Creating multiple COFs
 
 You can also create multiple building blocks and then construct all available COFs from the connection of those blocks.
 

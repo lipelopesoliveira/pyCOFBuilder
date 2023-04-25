@@ -2,7 +2,7 @@
 """
 Created on Thu Dec 17 11:31:19 2020
 
-@author: Felipe Lopes de Oliveira
+@author: lipel
 """
 
 import os
@@ -11,63 +11,220 @@ from scipy.spatial import distance
 try:
     from pymatgen.io.cif import CifParser
 except Exception:
-    print('WARNING: Could no import CifParser from pymatgen.',
-          'The conversion from cif to xyz and COF generation may not work properlly')
+    print('WARNING: Could no import CifParser from pymatgen the conversion from cif to xyz and COF generation may not work properlly')
     CIF_PARSER_IMPORTED = False
 import simplejson
 
-
-def elements_dict(property='atomic_mass'):
+def elements_dict(prop='mass'):
     '''Returns a dictionary containing the elements symbol and its selected property.
-
     Parameters
     ----------
     prop : string
-        The desired property can be:
-            - "full_name"
-            - "atomic_number"
-            - "atomic_mass"
-            - "polarizability"
-            - "pauling_electronegativity"
-            - "thermo_electronegativity"
-            - "mulliken_electronegativity"
-            - "sanderson_electronegativity"
-            - "allen_electronegativity"
-            - "ghosh_electronegativity"
-            - "martynov_batsanov_electronegativity"
-            - "atomic_radius"
-            - "covalent_radius"
-            - "vdw_radius"
-
+        The desired property. Can be:
+        - mass: Atomi mass
+        - full_name : Full name of all elements
+        - atomic_number: Atomic number
+        - polarizability: Polarizability
+        - pauling: Enetronegativity on Pauling scale
+        - thermo_electronecativity: Eletronecativity on the thermodynamic scale
+        - mulliken: Eletronegativity on the Mulliken scale
+        - covalent_radius: Covalent radius
+        - atomic_radius: Atomic radius
+        - element_symbols: Elements labels
     Returns
     -------
     prop_dic : dictionary
         A dictionary containing the elements symbol and its respective property.
     '''
 
-    file_name = os.path.join(os.path.dirname(__file__), 'data', 'periodic_table.json')
+    mass = {'H': 1.00794, 'He': 4.002602, 'Li': 6.941, 'Be': 9.012182, 'B': 10.811, 'C': 12.0107, 'N': 14.0067,
+            'O': 15.9994, 'F': 18.9984032, 'Ne': 20.1797, 'Na': 22.98976928, 'Mg': 24.305, 'Al': 26.9815386,
+            'Si': 28.0855, 'P': 30.973762, 'S': 32.065, 'Cl': 35.453, 'Ar': 39.948, 'K': 39.0983, 'Ca': 40.078,
+            'Sc': 44.955912, 'Ti': 47.867, 'V': 50.9415, 'Cr': 51.9961, 'Mn': 54.938045, 'Fe': 55.845,
+            'Co': 58.933195, 'Ni': 58.6934, 'Cu': 63.546, 'Zn': 65.409, 'Ga': 69.723, 'Ge': 72.64,
+            'As': 74.9216, 'Se': 78.96, 'Br': 79.904, 'Kr': 83.798, 'Rb': 85.4678, 'Sr': 87.62, 'Y': 88.90585,
+            'Zr': 91.224, 'Nb': 92.90638, 'Mo': 95.94, 'Tc': 98.9063, 'Ru': 101.07, 'Rh': 102.9055, 'Pd': 106.42,
+            'Ag': 107.8682, 'Cd': 112.411, 'In': 114.818, 'Sn': 118.71, 'Sb': 121.760, 'Te': 127.6,
+            'I': 126.90447, 'Xe': 131.293, 'Cs': 132.9054519, 'Ba': 137.327, 'La': 138.90547, 'Ce': 140.116,
+            'Pr': 140.90465, 'Nd': 144.242, 'Pm': 146.9151, 'Sm': 150.36, 'Eu': 151.964, 'Gd': 157.25,
+            'Tb': 158.92535, 'Dy': 162.5, 'Ho': 164.93032, 'Er': 167.259, 'Tm': 168.93421, 'Yb': 173.04,
+            'Lu': 174.967, 'Hf': 178.49, 'Ta': 180.9479, 'W': 183.84, 'Re': 186.207, 'Os': 190.23, 'Ir': 192.217,
+            'Pt': 195.084, 'Au': 196.966569, 'Hg': 200.59, 'Tl': 204.3833, 'Pb': 207.2, 'Bi': 208.9804,
+            'Po': 208.9824, 'At': 209.9871, 'Rn': 222.0176, 'Fr': 223.0197, 'Ra': 226.0254, 'Ac': 227.0278,
+            'Th': 232.03806, 'Pa': 231.03588, 'U': 238.02891, 'Np': 237.0482, 'Pu': 244.0642, 'Am': 243.0614,
+            'Cm': 247.0703, 'Bk': 247.0703, 'Cf': 251.0796, 'Es': 252.0829, 'Fm': 257.0951, 'Md': 258.0951,
+            'No': 259.1009, 'Lr': 262, 'Rf': 267, 'Db': 268, 'Sg': 271, 'Bh': 270, 'Hs': 269, 'Mt': 278,
+            'Ds': 281, 'Rg': 281, 'Cn': 285, 'Nh': 284, 'Fl': 289, 'Mc': 289, 'Lv': 292, 'Ts': 294, 'Og': 294,
+            'X': 0.0, 'Q': 0.0, 'R': 0.0, 'R1': 0.0, 'R2': 0.0, 'R3': 0.0, 'R4': 0.0, 'R5': 0.0, 'R6': 0.0, 'R7': 0.0,
+            'R8': 0.0, 'R9': 0.0}
 
-    with open(file_name, 'r') as f:
-        periodic_table = simplejson.load(f)
+    full_name = {'H': 'Hydrogen', 'He': 'Helium', 'Li': 'Lithium', 'Be': 'Beryllium', 'B': 'Boron',
+                 'C': 'Carbon', 'N': 'Nitrogen', 'O': 'Oxygen', 'F': 'Fluorine', 'Ne': 'Neon', 'Na': 'Sodium',
+                 'Mg': 'Magnesium', 'Al': 'Aluminium', 'Si': 'Silicon', 'P': 'Phosphorus', 'S': 'Sulfur',
+                 'Cl': 'Chlorine', 'Ar': 'Argon', 'K': 'Potassium', 'Ca': 'Calcium', 'Sc': 'Scandium',
+                 'Ti': 'Titanium', 'V': 'Vanadium', 'Cr': 'Chromium', 'Mn': 'Manganese', 'Fe': 'Iron', 'Co': 'Cobalt',
+                 'Ni': 'Nickel', 'Cu': 'Copper', 'Zn': 'Zinc', 'Ga': 'Gallium', 'Ge': 'Germanium', 'As': 'Arsenic',
+                 'Se': 'Selenium', 'Br': 'Bromine', 'Kr': 'Krypton', 'Rb': 'Rubidium', 'Sr': 'Strontium',
+                 'Y': 'Yttrium', 'Zr': 'Zirconium', 'Nb': 'Niobium', 'Mo': 'Molybdenum', 'Tc': 'Technetium',
+                 'Ru': 'Ruthenium', 'Rh': 'Rhodium', 'Pd': 'Palladium', 'Ag': 'Silver', 'Cd': 'Cadmium',
+                 'In': 'Indium', 'Sn': 'Tin', 'Sb': 'Antimony', 'Te': 'Tellurium', 'I': 'Iodine', 'Xe': 'Xenon',
+                 'Cs': 'Caesium', 'Ba': 'Barium', 'La': 'Lanthanum', 'Ce': 'Cerium', 'Pr': 'Praseodymium',
+                 'Nd': 'Neodymium', 'Pm': 'Promethium', 'Sm': 'Samarium', 'Eu': 'Europium', 'Gd': 'Gadolinium',
+                 'Tb': 'Terbium', 'Dy': 'Dysprosium', 'Ho': 'Holmium', 'Er': 'Erbium', 'Tm': 'Thulium',
+                 'Yb': 'Ytterbium', 'Lu': 'Lutetium', 'Hf': 'Hafnium', 'Ta': 'Tantalum', 'W': 'Tungsten',
+                 'Re': 'Rhenium', 'Os': 'Osmium', 'Ir': 'Iridium', 'Pt': 'Platinum', 'Au': 'Gold', 'Hg': 'Mercury',
+                 'Tl': 'Thallium', 'Pb': 'Lead', 'Bi': 'Bismuth', 'Po': 'Polonium', 'At': 'Astatine', 'Rn': 'Radon',
+                 'Fr': 'Francium', 'Ra': 'Radium', 'Ac': 'Actinium', 'Th': 'Thorium', 'Pa': 'Protactinium', 'U': 'Uranium',
+                 'Np': 'Neptunium', 'Pu': 'Plutonium', 'Am': 'Americium', 'Cm': 'Curium', 'Bk': 'Berkelium', 'Cf': 'Californium',
+                 'Es': 'Einsteinium', 'Fm': 'Fermium', 'Md': 'Mendelevium', 'No': 'Nobelium', 'Lr': 'Lawrencium', 'Rf': 'Rutherfordium',
+                 'Db': 'Dubnium', 'Sg': 'Seaborgium', 'Bh': 'Bohrium', 'Hs': 'Hassium', 'Mt': 'Meitnerium', 'Ds': 'Darmstadtium',
+                 'Rg': 'Roentgenium', 'Cn': 'Copernicium', 'Nh': 'Nihonium', 'Fl': 'Flerovium', 'Mc': 'Moscovium',
+                 'Lv': 'Livermorium', 'Ts': 'Tennessine', 'Og': 'Oganesson'}
 
-    prop_list = periodic_table['H'].keys()
+    atomic_number = {'H': 1, 'He': 2, 'Li': 3, 'Be': 4, 'B': 5, 'C': 6, 'N': 7, 'O': 8, 'F': 9, 'Ne': 10, 'Na': 11,
+                     'Mg': 12, 'Al': 13, 'Si': 14, 'P': 15, 'S': 16, 'Cl': 17, 'Ar': 18, 'K': 19, 'Ca': 20, 'Sc': 21,
+                     'Ti': 22, 'V': 23, 'Cr': 24, 'Mn': 25, 'Fe': 26, 'Co': 27, 'Ni': 28, 'Cu': 29, 'Zn': 30, 'Ga': 31,
+                     'Ge': 32, 'As': 33, 'Se': 34, 'Br': 35, 'Kr': 36, 'Rb': 37, 'Sr': 38, 'Y': 39, 'Zr': 40, 'Nb': 41,
+                     'Mo': 42, 'Tc': 43, 'Ru': 44, 'Rh': 45, 'Pd': 46, 'Ag': 47, 'Cd': 48, 'In': 49, 'Sn': 50, 'Sb': 51,
+                     'Te': 52, 'I': 53, 'Xe': 54, 'Cs': 55, 'Ba': 56, 'La': 57, 'Ce': 58, 'Pr': 59, 'Nd': 60, 'Pm': 61,
+                     'Sm': 62, 'Eu': 63, 'Gd': 64, 'Tb': 65, 'Dy': 66, 'Ho': 67, 'Er': 68, 'Tm': 69, 'Yb': 70, 'Lu': 71,
+                     'Hf': 72, 'Ta': 73, 'W': 74, 'Re': 75, 'Os': 76, 'Ir': 77, 'Pt': 78, 'Au': 79, 'Hg': 80, 'Tl': 81,
+                     'Pb': 82, 'Bi': 83, 'Po': 84, 'At': 85, 'Rn': 86, 'Fr': 87, 'Ra': 88, 'Ac': 89, 'Th': 90, 'Pa': 91,
+                     'U': 92, 'Np': 93, 'Pu': 94, 'Am': 95, 'Cm': 96, 'Bk': 97, 'Cf': 98, 'Es': 99, 'Fm': 100, 'Md': 101,
+                     'No': 102, 'Lr': 103, 'Rf': 104, 'Ha': 105, 'Sg': 106, 'Hs': 107, 'Bh': 108, 'Mt': 109, 'Uun': 110,
+                     'X': 0.0, 'Q': 0.0, 'R': 0.0, 'R1': 0.0, 'R2': 0.0, 'R3': 0.0, 'R4': 0.0, 'R5': 0.0, 'R6': 0.0, 'R7': 0.0,
+                     'R8': 0.0, 'R9': 0.0}
 
-    # Check if the property is valid
-    if property not in prop_list:
-        raise ValueError('Invalid property. Valid properties are: ' + ', '.join(prop_list))
+    # https://www.tandfonline.com/doi/full/10.1080/00268976.2018.1535143
+    polarizability = {'H': 4.51, 'He': 1.38, 'Li': 164, 'Be': 37.7, 'B': 20.5, 'C': 11.3, 'N': 7.4,
+                      'O': 5.3, 'F': 3.74, 'Ne': 2.66, 'Na': 163, 'Mg': 71.2, 'Al': 58, 'Si': 37.3,
+                      'P': 25, 'S': 19.4, 'Cl': 14.6, 'Ar': 11.1, 'K': 290, 'Ca': 161, 'Sc': 97,
+                      'Ti': 100, 'V': 87, 'Cr': 83, 'Mn': 68, 'Fe': 62, 'Co': 55, 'Ni': 49, 'Cu': 74,
+                      'Zn': 38.7, 'Ga': 50, 'Ge': 40, 'As': 30, 'Se': 29, 'Br': 21, 'Kr': 16.8,
+                      'Rb': 320, 'Sr': 197, 'Y': 162, 'Zr': 112, 'Nb': 98, 'Mo': 87, 'Tc': 79,
+                      'Ru': 72, 'Rh': 66, 'Pd': 26.1, 'Ag': 55, 'Cd': 46, 'In': 65, 'Sn': 53, 'Sb': 43,
+                      'Te': 38, 'I': 32.9, 'Xe': 27.3, 'Cs': 401, 'Ba': 272, 'La': 215, 'Ce': 205,
+                      'Pr': 216, 'Nd': 208, 'Pm': 200, 'Sm': 192, 'Eu': 184, 'Gd': 158, 'Tb': 170,
+                      'Dy': 165, 'Ho': 156, 'Er': 150, 'Tm': 144, 'Yb': 139, 'Lu': 137, 'Hf': 103,
+                      'Ta': 74, 'W': 68, 'Re': 62, 'Os': 57, 'Ir': 54, 'Pt': 48, 'Au': 36, 'Hg': 33.9,
+                      'Tl': 50, 'Pb': 47, 'Bi': 48, 'Po': 44, 'At': 42, 'Rn': 35, 'Fr': 318, 'Ra': 246,
+                      'Ac': 203, 'Th': 217, 'Pa': 154, 'U': 129, 'Np': 151, 'Pu': 132, 'Am': 131,
+                      'Cm': 144, 'Bk': 125, 'Cf': 122, 'Es': 118, 'Fm': 113, 'Md': 109, 'No': 110,
+                      'Lr': 320, 'Rf': 112, 'Db': 42, 'Sg': 40, 'Bh': 38, 'Hs': 36, 'Mt': 34, 'Ds': 32,
+                      'Rg': 32, 'Cn': 28, 'Nh': 29, 'Fl': 31, 'Mc': 70, 'Lv': 67, 'Ts': 62, 'Og': 58,
+                      'X': 0.0, 'Q': 0.0, 'R': 0.0, 'R1': 0.0, 'R2': 0.0, 'R3': 0.0, 'R4': 0.0, 'R5': 0.0, 'R6': 0.0, 'R7': 0.0,
+                      'R8': 0.0, 'R9': 0.0}
 
-    prop_dic = {}
-    for element in periodic_table:
-        prop_dic[element] = periodic_table[element][property]
+    pauling = {'H': 2.2, 'Li': 0.98, 'Na': 0.93, 'K': 0.82, 'Rb': 0.82, 'Cs': 0.79, 'Fr': 0.7,
+               'Be': 1.57, 'Mg': 1.31, 'Ca': 1.0, 'Sr': 0.95, 'Ba': 0.89, 'Ra': 0.9, 'Sc': 1.36,
+               'Ti': 1.54, 'V': 1.63, 'Cr': 1.66, 'Mn': 1.55, 'Fe': 1.83, 'Co': 1.88, 'Ni': 1.91,
+               'Cu': 1.9, 'Zn': 1.65, 'Y': 1.22, 'Zr': 1.33, 'Nb': 1.6, 'Mo': 2.16, 'Tc': 1.9,
+               'Ru': 2.2, 'Rh': 2.28, 'Pd': 2.2, 'Ag': 1.93, 'Cd': 1.69, 'Hf': 1.3, 'Ta': 1.5,
+               'W': 2.36, 'Re': 1.9, 'Os': 2.2, 'Ir': 2.2, 'Pt': 2.28, 'Au': 2.54, 'Hg': 2.0,
+               'B': 2.04, 'Al': 1.61, 'Ga': 1.81, 'In': 1.78, 'Tl': 1.62, 'C': 2.55, 'Si': 1.9,
+               'Ge': 2.01, 'Sn': 1.96, 'Pb': 2.33, 'N': 3.04, 'P': 2.19, 'As': 2.18, 'Sb': 2.05,
+               'Bi': 2.02, 'O': 3.44, 'S': 2.58, 'Se': 2.55, 'Te': 2.1, 'Po': 2.0, 'F': 3.98,
+               'Cl': 3.16, 'Br': 2.96, 'I': 2.66, 'At': 2.2, 'La': 1.1, 'Ce': 1.12, 'Pr': 1.13,
+               'Nd': 1.14, 'Pm': 1.13, 'Sm': 1.17, 'Eu': 1.2, 'Gd': 1.2, 'Tb': 1.1, 'Dy': 1.22,
+               'Ho': 1.23, 'Er': 1.24, 'Tm': 1.25, 'Yb': 1.1, 'Lu': 1.27, 'Th': 1.3, 'U': 1.38,
+               'Kr': 3.23, 'Xe': 3.02, 'Rn': 2.81, 'X': 0.0, 'Q': 0.0, 'R': 0.0, 'R1': 0.0,
+               'R2': 0.0, 'R3': 0.0, 'R4': 0.0, 'R5': 0.0, 'R6': 0.0, 'R7': 0.0, 'R8': 0.0, 'R9': 0.0}
 
-    return prop_dic
+    # https://www.nature.com/articles/s41467-021-22429-0#Sec5
+    thermo_electronecativity = {'H': 3.04, 'Li': 2.17, 'Na': 2.15, 'K': 2.07, 'Rb': 2.07, 'Cs': 1.97,
+                                'Fr': 2.01, 'Be': 2.42, 'Mg': 2.39, 'Ca': 2.2, 'Sr': 2.13, 'Ba': 2.02,
+                                'Sc': 2.35, 'Ti': 2.23, 'V': 2.08, 'Cr': 2.12, 'Mn': 2.2, 'Fe': 2.32,
+                                'Co': 2.34, 'Ni': 2.32, 'Cu': 2.86, 'Zn': 2.26, 'Y': 2.52, 'Zr': 2.05,
+                                'Nb': 2.59, 'Mo': 2.47, 'Tc': 2.82, 'Ru': 2.68, 'Rh': 2.65, 'Pd': 2.7,
+                                'Ag': 2.88, 'Cd': 2.36, 'Hf': 2.01, 'Ta': 2.32, 'W': 2.42, 'Re': 2.59,
+                                'Os': 2.72, 'Ir': 2.79, 'Pt': 2.98, 'Au': 2.81, 'Hg': 2.92, 'B': 3.04,
+                                'Al': 2.52, 'Ga': 2.43, 'In': 2.29, 'Tl': 2.26, 'C': 3.15, 'Si': 2.82,
+                                'Ge': 2.79, 'Sn': 2.68, 'Pb': 2.62, 'N': 3.56, 'P': 3.16, 'As': 3.15,
+                                'Sb': 3.05, 'O': 3.78, 'S': 3.44, 'Se': 3.37, 'Te': 3.14, 'F': 4.0,
+                                'Cl': 3.56, 'Br': 3.45, 'I': 3.2, 'La': 2.49, 'Ce': 2.61, 'Pr': 2.24,
+                                'Nd': 2.11, 'Sm': 1.9, 'Eu': 1.81, 'Gd': 2.4, 'Tb': 2.29, 'Dy': 2.07,
+                                'Ho': 2.12, 'Er': 2.02, 'Tm': 2.03, 'Yb': 1.78, 'Lu': 2.68, 'Th': 2.62,
+                                'U': 2.45, 'X': 0.0, 'Q': 0.0, 'R': 0.0, 'R1': 0.0, 'R2': 0.0, 'R3': 0.0,
+                                'R4': 0.0, 'R5': 0.0, 'R6': 0.0, 'R7': 0.0, 'R8': 0.0, 'R9': 0.0}
 
+    mulliken = {'H': 7.18, 'Li': 3.0, 'Na': 2.84, 'K': 2.42, 'Rb': 2.33, 'Cs': 2.18, 'Fr': 2.21, 'Be': 4.41,
+                'Mg': 3.62, 'Ca': 3.07, 'Sr': 2.87, 'Ba': 2.68, 'Ra': 2.69, 'Sc': 3.37, 'Ti': 3.45, 'V': 3.64,
+                'Cr': 3.72, 'Mn': 3.46, 'Fe': 4.03, 'Co': 4.27, 'Ni': 4.4, 'Cu': 4.48, 'Zn': 4.4, 'Y': 3.26,
+                'Zr': 3.53, 'Nb': 3.84, 'Mo': 3.92, 'Tc': 3.91, 'Ru': 4.2, 'Rh': 4.3, 'Pd': 4.45, 'Ag': 4.44,
+                'Cd': 4.14, 'Hf': 3.5, 'Ta': 4.1, 'W': 4.4, 'Re': 3.97, 'Os': 4.89, 'Ir': 5.34, 'Pt': 5.57,
+                'Au': 5.77, 'Hg': 4.97, 'B': 4.29, 'Al': 3.21, 'Ga': 3.21, 'In': 3.09, 'Tl': 3.24, 'C': 6.26,
+                'Si': 4.77, 'Ge': 4.57, 'Sn': 4.23, 'Pb': 3.89, 'N': 7.23, 'P': 5.62, 'As': 5.31, 'Sb': 4.85,
+                'Bi': 4.11, 'O': 7.54, 'S': 6.22, 'Se': 5.89, 'Te': 5.49, 'Po': 4.91, 'F': 10.41, 'Cl': 8.29,
+                'Br': 7.59, 'I': 6.76, 'At': 5.87, 'La': 3.06, 'Ce': 3.05, 'Pr': 3.21, 'Nd': 3.72, 'Pm': 2.86,
+                'Sm': 2.9, 'Eu': 2.89, 'Gd': 3.14, 'Tb': 3.51, 'Dy': 3.15, 'Ho': 3.18, 'Er': 3.21, 'Tm': 3.61,
+                'Yb': 3.12, 'Lu': 2.89, 'Th': 3.63, 'U': 3.36, 'He': 12.29, 'Ne': 10.78, 'Ar': 7.88, 'Kr': 7.0,
+                'Xe': 6.07, 'Rn': 5.37, 'X': 0.0, 'Q': 0.0, 'R': 0.0, 'R1': 0.0, 'R2': 0.0, 'R3': 0.0,
+                'R4': 0.0, 'R5': 0.0, 'R6': 0.0, 'R7': 0.0, 'R8': 0.0, 'R9': 0.0}
+
+    covalent_radius = {'H': 0.32, 'He': 0.93, 'Li': 1.23, 'Be': 0.9, 'B': 0.82, 'C': 0.77, 'N': 0.75, 'O': 0.73,
+                       'F': 0.72, 'Ne': 0.71, 'Na': 1.54, 'Mg': 1.36, 'Al': 1.18, 'Si': 1.11, 'P': 1.06,
+                       'S': 1.02, 'Cl': 0.99, 'Ar': 0.98, 'K': 2.03, 'Ca': 1.74, 'Sc': 1.44, 'Ti': 1.32,
+                       'V': 1.22, 'Cr': 1.18, 'Mn': 1.17, 'Fe': 1.17, 'Co': 1.16, 'Ni': 1.15, 'Cu': 1.17,
+                       'Zn': 1.25, 'Ga': 1.26, 'Ge': 1.22, 'As': 1.2, 'Se': 1.16, 'Br': 1.14, 'Kr': 1.12,
+                       'Rb': 2.16, 'Sr': 1.91, 'Y': 1.62, 'Zr': 1.45, 'Nb': 1.34, 'Mo': 1.3, 'Tc': 1.27,
+                       'Ru': 1.25, 'Rh': 1.25, 'Pd': 1.28, 'Ag': 1.34, 'Cd': 1.48, 'In': 1.44, 'Sn': 1.41,
+                       'Sb': 1.4, 'Te': 1.36, 'I': 1.33, 'Xe': 1.31, 'Cs': 2.35, 'Ba': 1.98, 'La': 1.69,
+                       'Ce': 1.65, 'Pr': 1.65, 'Nd': 1.64, 'Pm': 1.63, 'Sm': 1.62, 'Eu': 1.85, 'Gd': 1.61,
+                       'Tb': 1.59, 'Dy': 1.59, 'Ho': 1.58, 'Er': 1.57, 'Tm': 1.56, 'Yb': 1.74, 'Lu': 1.56,
+                       'Hf': 1.44, 'Ta': 1.34, 'W': 1.3, 'Re': 1.28, 'Os': 1.26, 'Ir': 1.27, 'Pt': 1.3,
+                       'Au': 1.34, 'Hg': 1.49, 'Tl': 1.48, 'Pb': 1.47, 'Bi': 1.46, 'Po': 1.46, 'At': 1.45,
+                       'Rn': 2.0, 'Fr': 2.0, 'Ra': 2.0, 'Ac': 2.0, 'Th': 1.65, 'Pa': 2.0, 'U': 1.42, 'Np': 2.0,
+                       'Pu': 2.0, 'Am': 2.0, 'Cm': 2.0, 'Bk': 2.0, 'Cf': 2.0, 'Es': 2.0, 'Fm': 2.0, 'Md': 2.0,
+                       'No': 2.0, 'Lr': 2.0, 'Rf': 2.0, 'Ha': 2.0, 'Sg': 2.0, 'Hs': 2.0, 'Bh': 2.0, 'Mt': 2.0,
+                       'X': 0.0, 'Q': 0.0, 'R': 0.0, 'R1': 0.0, 'R2': 0.0, 'R3': 0.0, 'R4': 0.0, 'R5': 0.0, 'R6': 0.0, 'R7': 0.0,
+                       'R8': 0.0, 'R9': 0.0}
+
+    atomic_radius = {'H': 0.79, 'He': 0.49, 'Li': 2.05, 'Be': 1.4, 'B': 1.17, 'C': 0.91, 'N': 0.75, 'O': 0.65,
+                     'F': 0.57, 'Ne': 0.51, 'Na': 2.23, 'Mg': 1.72, 'Al': 1.82, 'Si': 1.46, 'P': 1.23, 'S': 1.09,
+                     'Cl': 0.97, 'Ar': 0.88, 'K': 2.77, 'Ca': 2.23, 'Sc': 2.09, 'Ti': 2, 'V': 1.92, 'Cr': 1.85,
+                     'Mn': 1.79, 'Fe': 1.72, 'Co': 1.67, 'Ni': 1.62, 'Cu': 1.57, 'Zn': 1.53, 'Ga': 1.81,
+                     'Ge': 1.52, 'As': 1.33, 'Se': 1.22, 'Br': 1.12, 'Kr': 1.03, 'Rb': 2.98, 'Sr': 2.45, 'Y': 2.27,
+                     'Zr': 2.16, 'Nb': 2.08, 'Mo': 2.01, 'Tc': 1.95, 'Ru': 1.89, 'Rh': 1.83, 'Pd': 1.79, 'Ag': 1.75,
+                     'Cd': 1.71, 'In': 2, 'Sn': 1.72, 'Sb': 1.53, 'Te': 1.42, 'I': 1.32, 'Xe': 1.24, 'Cs': 3.34,
+                     'Ba': 2.78, 'La': 2.74, 'Ce': 2.7, 'Pr': 2.67, 'Nd': 2.64, 'Pm': 2.62, 'Sm': 2.59, 'Eu': 2.56,
+                     'Gd': 2.54, 'Tb': 2.51, 'Dy': 2.49, 'Ho': 2.47, 'Er': 2.45, 'Tm': 2.42, 'Yb': 2.4, 'Lu': 2.25,
+                     'Hf': 2.16, 'Ta': 2.09, 'W': 2.02, 'Re': 1.97, 'Os': 1.92, 'Ir': 1.87, 'Pt': 1.83, 'Au': 1.79,
+                     'Hg': 1.76, 'Tl': 2.08, 'Pb': 1.81, 'Bi': 1.63, 'Po': 1.53, 'At': 1.43, 'Rn': 1.34, 'Fr': 2.0,
+                     'Ra': 2.0, 'Ac': 2.0, 'Th': 2.0, 'Pa': 2.0, 'U': 2.0, 'Np': 2.0, 'Pu': 2.0, 'Am': 2.0, 'Cm': 2.0,
+                     'Bk': 2.0, 'Cf': 2.0, 'Es': 2.0, 'Fm': 2.0, 'Md': 2.0, 'No': 2.0, 'Lr': 2.0, 'Rf': 2.0, 'Ha': 2.0,
+                     'Sg': 2.0, 'Hs': 2.0, 'Bh': 2.0, 'Mt': 2.0, 'Uun': 2.0, 'X': 0.0, 'Q': 0.0, 'R': 0.0, 'R1': 0.0,
+                     'R2': 0.0, 'R3': 0.0, 'R4': 0.0, 'R5': 0.0, 'R6': 0.0, 'R7': 0.0, 'R8': 0.0, 'R9': 0.0}
+
+    element_symbols = [
+    'H', 'He',  # Period 1
+    'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne',  # Period 2
+    'Na', 'Mg', 'Al', 'Si', 'P', 'S', 'Cl', 'Ar',  # Period 3
+    'K', 'Ca', 'Sc', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Co',  # Period 4
+    'Ni', 'Cu', 'Zn', 'Ga', 'Ge', 'As', 'Se', 'Br', 'Kr',  # Period 4
+    'Rb', 'Sr', 'Y', 'Zr', 'Nb', 'Mo', 'Tc', 'Ru', 'Rh',  # Period 5
+    'Pd', 'Ag', 'Cd', 'In', 'Sn', 'Sb', 'Te', 'I', 'Xe',  # Period 5
+    'Cs', 'Ba',  # Period 6
+    'La', 'Ce', 'Pr', 'Nd', 'Pm', 'Sm', 'Eu', 'Gd', 'Tb',  # Lanthanides
+    'Dy', 'Ho', 'Er', 'Tm', 'Yb', 'Lu',  # Lanthanides
+    'Hf', 'Ta', 'W', 'Re', 'Os', 'Ir', 'Pt', 'Au', 'Hg',  # Period 6
+    'Tl', 'Pb', 'Bi', 'Po', 'At', 'Rn',  # Period 6
+    'Fr', 'Ra',  # Period 7
+    'Ac', 'Th', 'Pa', 'U', 'Np', 'Pu', 'Am', 'Cm', 'Bk',  # Actinides
+    'Cf', 'Es', 'Fm', 'Md', 'No', 'Lr',  # Actinides
+    'Rf', 'Db', 'Sg', 'Bh', 'Hs', 'Mt', 'Ds', 'Rg', 'Cn',  # Period 7
+    'Uut', 'Fl', 'Uup', 'Lv', 'Uus', 'Uuo', # Period 7
+    'X', 'Q', 'R', 'R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9']  #Specific labels for the programm
+
+    out = {'full_name':full_name, 'mass':mass, 'atomic_number':atomic_number, 'polarizability':polarizability, 'pauling':pauling, 
+    'thermo_electronecativity':thermo_electronecativity, 'mulliken':mulliken, 'covalent_radius':covalent_radius,
+    'atomic_radius':atomic_radius, 'element_symbols':element_symbols}
+
+    return out[prop]
 
 def unit_vector(vector):
     """Return a unit vector in the same direction as x."""
     y = np.array(vector, dtype='float')
     return y / np.linalg.norm(y)
-
 
 def angle(v1, v2, unit='degree'):
     """
@@ -82,7 +239,7 @@ def angle(v1, v2, unit='degree'):
     Returns
     -------
     angle : float
-        Angle in the selected unit.
+        Angle in the selected unit. 
     """
     unit_vector1 = unit_vector(v1)
     unit_vector2 = unit_vector(v2)
@@ -96,7 +253,6 @@ def angle(v1, v2, unit='degree'):
     if unit == 'cos':
         angle = dot_product
     return angle
-
 
 def rotation_matrix_from_vectors(vec1, vec2):
     '''
@@ -133,7 +289,6 @@ def translate_inside(matrix):
                 matrix[i][j] -= 1
     return matrix
 
-
 def rmsd(V, W):
     """
     Calculate Root-mean-square deviation from two sets of vectors V and W.
@@ -152,9 +307,8 @@ def rmsd(V, W):
     N = len(V)
     return np.sqrt((diff * diff).sum() / N)
 
-
 def cell_to_cellpar(cell, radians=False):
-    """Returns the cell parameters [a, b, c, alpha, beta, gamma]
+    """Returns the cell parameters [a, b, c, alpha, beta, gamma] 
     given a 3x3 cell matrix [v1, v2, v3]
 
     Angles are in degrees unless radian=True is used.
@@ -174,7 +328,6 @@ def cell_to_cellpar(cell, radians=False):
     if radians:
         angles = [angle * np.pi / 180 for angle in angles]
     return np.array(lengths + angles)
-
 
 def cellpar_to_cell(cellpar, ab_normal=(0, 0, 1), a_direction=None):
     """Return a 3x3 cell matrix from cellpar=[a,b,c,alpha,beta,gamma].
@@ -263,7 +416,6 @@ def cellpar_to_cell(cellpar, ab_normal=(0, 0, 1), a_direction=None):
 
     return cell
 
-
 def get_fractional_to_cartesian_matrix(cell_a: float,
                                        cell_b: float,
                                        cell_c: float,
@@ -291,33 +443,22 @@ def get_fractional_to_cartesian_matrix(cell_a: float,
         alpha = np.deg2rad(alpha)
         beta = np.deg2rad(beta)
         gamma = np.deg2rad(gamma)
-
     cosa = np.cos(alpha)
     cosb = np.cos(beta)
     cosg = np.cos(gamma)
     sing = np.sin(gamma)
-
-    volume = np.sqrt(1.0 - cosa**2.0 - cosb**2.0 - cosg**2.0 + 2.0 * cosa * cosb * cosg)
-
+    volume = 1.0 - cosa**2.0 - cosb**2.0 - cosg**2.0 + 2.0 * cosa * cosb * cosg
+    volume = np.sqrt(volume)
     r = np.zeros((3, 3))
-
     r[0, 0] = cell_a
     r[0, 1] = cell_b * cosg
     r[0, 2] = cell_c * cosb
     r[1, 1] = cell_b * sing
     r[1, 2] = cell_c * (cosa - cosb * cosg) / sing
     r[2, 2] = cell_c * volume / sing
-
     return r
 
-
-def get_cartesian_to_fractional_matrix(a: float,
-                                       b: float,
-                                       c: float,
-                                       alpha: float,
-                                       beta: float,
-                                       gamma: float,
-                                       angle_in_degrees: bool = True):
+def get_cartesian_to_fractional_matrix(a, b, c, alpha, beta, gamma, angle_in_degrees=True):
     """
     Return the transformation matrix that converts cartesian coordinates to
     fractional coordinates.
@@ -338,25 +479,20 @@ def get_cartesian_to_fractional_matrix(a: float,
         alpha = np.deg2rad(alpha)
         beta = np.deg2rad(beta)
         gamma = np.deg2rad(gamma)
-
     cosa = np.cos(alpha)
     cosb = np.cos(beta)
     cosg = np.cos(gamma)
     sing = np.sin(gamma)
-
-    volume = np.sqrt(1.0 - cosa**2.0 - cosb**2.0 - cosg**2.0 + 2.0 * cosa * cosb * cosg)
-
+    volume = 1.0 - cosa**2.0 - cosb**2.0 - cosg**2.0 + 2.0 * cosa * cosb * cosg
+    volume = np.sqrt(volume)
     r = np.zeros((3, 3))
-
     r[0, 0] = 1.0 / a
     r[0, 1] = -cosg / (a * sing)
     r[0, 2] = (cosa * cosg - cosb) / (a * volume * sing)
     r[1, 1] = 1.0 / (b * sing)
     r[1, 2] = (cosb * cosg - cosa) / (b * volume * sing)
     r[2, 2] = sing / (c * volume)
-
     return r
-
 
 def get_reciprocal_vectors(cell):
     '''
@@ -379,16 +515,14 @@ def get_reciprocal_vectors(cell):
         v1, v2, v3 = cellpar_to_cell(cell)
 
     vol = np.dot(v1, np.cross(v2, v3))
-
-    b1 = 2 * np.pi * np.cross(v2, v3) / vol
-    b2 = 2 * np.pi * np.cross(v3, v1) / vol
-    b3 = 2 * np.pi * np.cross(v1, v2) / vol
+    b1 = 2*np.pi*np.cross(v2, v3)/vol
+    b2 = 2*np.pi*np.cross(v3, v1)/vol
+    b3 = 2*np.pi*np.cross(v1, v2)/vol
 
     return b1, b2, b3
 
-
 def get_kgrid(cell, distance=0.3):
-    '''Get the k-points grid in the reciprocal space with a given distance for a
+    '''Get the k-points grid in the reciprocal space with a given distance for a 
     cell given in cell parameters of cell vectors.
     ----------
     cell : array
@@ -404,39 +538,30 @@ def get_kgrid(cell, distance=0.3):
     kz : int
         Number of points in the z direction on reciprocal space
     '''
-
     b1, b2, b3 = get_reciprocal_vectors(cell)
-
     b = np.array([np.linalg.norm(b1), np.linalg.norm(b2), np.linalg.norm(b3)])
-
-    kx = np.ceil(b[0]/distance).astype(int)
-    ky = np.ceil(b[1]/distance).astype(int)
-    kz = np.ceil(b[2]/distance).astype(int)
+    kx = np.ceil(b[0]/distance)
+    ky = np.ceil(b[1]/distance)
+    kz = np.ceil(b[2]/distance)
 
     return kx, ky, kz
 
-
 def create_CellBox(A, B, C, alpha, beta, gamma):
     """Creates the CellBox using the same expression as RASPA."""
-
     tempd = np.cos(alpha) - np.cos(gamma) * np.cos(beta) / np.sin(gamma)
-
     ax = A
     ay = 0
     az = 0
     bx = B * np.cos(gamma)
     by = B * np.sin(gamma)
-    bz = 0
+    bz = 0 
     cx = C * np.cos(beta)
     cy = C * tempd
-    cz = C * np.sqrt(1 - np.cos(beta) ** 2 - tempd ** 2)
-
-    CellBox = np.array([[ax, ay, az],
-                        [bx, by, bz],
-                        [cx, cy, cz]])
-
+    cz = C * np.sqrt(1 - np.cos(beta) ** 2 - tempd ** 2 )
+    
+    CellBox = np.array([[ax, ay, az], [bx, by, bz], [cx, cy, cz]])
+    
     return CellBox
-
 
 def calculate_UnitCells(cell, cutoff):
     '''
@@ -453,7 +578,7 @@ def calculate_UnitCells(cell, cutoff):
         (3,3) cell vectors or (6,1)
     Returns
     -------
-    superCell
+    SuperCell
         (3,1) list containg the number of repiting units in `x`, `y`, `z` directions.
     '''
 
@@ -481,14 +606,7 @@ def calculate_UnitCells(cell, cutoff):
 
     return supercell
 
-
-def cellpar_to_lammpsbox(a: float,
-                         b: float,
-                         c: float,
-                         alpha: float,
-                         beta: float,
-                         gamma: float,
-                         angle_in_degrees: bool = True):
+def cellpar_to_lammpsbox(a, b, c, alpha, beta, gamma, angle_in_degrees=True):
     """
     Return the box parameters lx, ly, lz, xy, xz, yz for LAMMPS data input.
     Parameters
@@ -512,12 +630,11 @@ def cellpar_to_lammpsbox(a: float,
     lx = a
     xy = b * np.cos(gamma)
     xz = c * np.cos(beta)
-    ly = np.sqrt(b ** 2 - xy ** 2)
+    ly = np.sqrt( b**2 - xy **2)
     yz = (b * c * np.cos(alpha) - xy * xz) / ly
-    lz = np.sqrt(c ** 2 - xz ** 2 - yz ** 2)
+    lz = np.sqrt(c**2 - xz**2 - yz**2)
 
     return np.array([lx, ly, lz, xy, xz, yz])
-
 
 def find_index(element, e_list):
     '''Finds the index of a given element in a list
@@ -535,19 +652,18 @@ def find_index(element, e_list):
         if np.array_equal(e_list[i], element):
             return i
 
-
 def change_X_atoms(atom_labels, atom_pos, bond_atom):
     ''' Changes the X atom for the desired bond_atom or remove it if bond_atom == 'R'.
     ----------
     atom_labels : list
         List containing the atom labels
-    atom_pos : list
+    atom_pos : list 
         List containing the atom position
     Returns
     ----------
     labels : list
         List containing the processed atom labels
-    pos : list
+    pos : list 
         List containing the processed atom position
     '''
     label, pos = [], []
@@ -560,22 +676,19 @@ def change_X_atoms(atom_labels, atom_pos, bond_atom):
             label += [atom_labels[i]]
             pos += [atom_pos[i]]
 
-    return label, pos
-
+    return label, pos 
 
 def find_bond_atom(cof_name):
-    '''Finds the type of atom that the program heve
-    to substitute X based on the building blocks'''
-
+    '''Finds the type of atom that the program heve to substitute X based on the building blocks'''
     bb1, bb2, net, stacking = cof_name.split('-')
     conect_1 = bb1.split('_')[2]
     conect_2 = bb2.split('_')[2]
 
-    bond_dict = {'NH2': 'N',
-                 'CONHNH2': 'N',
+    bond_dict = {'NH2':'N',
+                 'CONHNH2':'N',
                  'BOH2': 'B',
                  'Cl': 'R',
-                 'Br': 'R'}
+                 'Br':'R'}
 
     for group in list(bond_dict.keys()):
         if group in [conect_1, conect_2]:
@@ -583,7 +696,6 @@ def find_bond_atom(cof_name):
 
 
 def closest_atom(label_1, pos_1, labels, pos):
-    '''Finds the closest atom to a given atom'''
 
     list_labels = []
     list_pos = []
@@ -595,16 +707,9 @@ def closest_atom(label_1, pos_1, labels, pos):
 
     closest_index = distance.cdist([pos_1], list_pos).argmin()
 
-    closest_label = list_labels[closest_index]
-    closest_position = list_pos[closest_index]
-    euclidian_distance = np.linalg.norm(pos_1 - list_pos[closest_index])
-
-    return closest_label, closest_position, euclidian_distance
-
+    return list_labels[closest_index], list_pos[closest_index], np.linalg.norm(pos_1 - list_pos[closest_index])
 
 def closest_atom_struc(label_1, pos_1, labels, pos):
-    '''Finds the closest atom on the structure to a given atom'''
-
     list_labels = []
     list_pos = []
     for i in range(len(labels)):
@@ -612,51 +717,19 @@ def closest_atom_struc(label_1, pos_1, labels, pos):
             if 'C' in labels[i]:
                 list_labels += [labels[i]]
                 list_pos += [pos[i]]
-
     closest_index = distance.cdist([pos_1], list_pos).argmin()
 
-    closet_label = list_labels[closest_index]
-    closet_position = list_pos[closest_index]
-    euclidian_distance = np.linalg.norm(pos_1 - list_pos[closest_index])
-
-    return closet_label, closet_position, euclidian_distance
-
-
-def get_bond_atom(connector_1: str, connector_2: str) -> str:
-    '''
-    Get the atom that will be used to bond two building blocks.
-    '''
-
-    bond_dict = {'NH2': 'N',
-                 'CONHNH2': 'N',
-                 'BOH2': 'B',
-                 'Cl': 'C',
-                 'Br': 'C'}
-
-    bond_atom = None
-    for group in list(bond_dict.keys()):
-        if group in [connector_1, connector_2]:
-            bond_atom = bond_dict[group]
-
-    return bond_atom
-
+    return list_labels[closest_index], list_pos[closest_index], np.linalg.norm(pos_1-list_pos[closest_index])
 
 def print_result(name, lattice, hall, space_group, space_number, symm_op):
     '''Print the results of the created structure'''
-    print('{:<60s} {:^12s} {:<4s} {:^4s} #{:^5s}   {:^2} sym. op.'.format(name,
-                                                                          lattice,
-                                                                          hall.lstrip('-'),
-                                                                          space_group,
-                                                                          space_number,
-                                                                          symm_op))
-
+    print('{:<60s} {:^12s} {:<4s} {:^4s} #{:^5s}   {:^2} sym. op.'.format(name, lattice, hall.lstrip('-'), space_group, space_number, symm_op))
 
 def print_comand(text, verbose, match):
     if verbose in match:
         print(text)
 
-# ------------------------- Reads and save files ----------------------------- #
-
+############# Reads and save files #####################
 
 def save_csv(path, file_name, data, delimiter=',', head=False):
     """
@@ -667,56 +740,50 @@ def save_csv(path, file_name, data, delimiter=',', head=False):
     path : str
         Path to the file.
     file_name : str
-        Name of the `csv` file. Does not neet to contain the `.csv` extention.
+        Name of the `csv` file. Does not neet to contain the `.csv` extention. 
     data : list
         Data to be saved.
     delimiter: str
-        Delimiter of the columns. `,` is the default.
+        Delimiter of the columns. `,` is the default. 
     head : str
         Names of the columns.
     """
-
-    # Remove the extention if exists
-    file_name = file_name.split('.')[0]
+    file_name = file_name.split('.')[0] # Remove the extention if exists
     file_name = os.path.join(path, file_name + '.csv')
 
     file_temp = open(file_name, 'w')
     if head is not False:
         file_temp.write(head)
-
     for i in range(len(data)):
         file_temp.write(delimiter.join([str(j) for j in data[i]]) + '\n')
 
     file_temp.close()
 
-
 def read_xyz_file(path, file_name):
     """
-    Reads a file in format `.xyz` from the `path` given and returns
-    a list containg the N atom labels and a Nx3 array contaning
-    the atoms coordinates.
+    Reads a file in format `.xyz` from the `path` given and returns a list containg the N atom labels and 
+    a Nx3 array contaning the atoms coordinates.
 
     Parameters
     ----------
     path : str
         Path to the file.
     file_name : str
-        Name of the `xyz` file. Does not neet to contain the `.xyz` extention.
+        Name of the `xyz` file. Does not neet to contain the `.xyz` extention. 
 
     Returns
     -------
     atom_labels : list
-        List of strings containing containg the N atom labels.
+        List of strings containing containg the N atom labels. 
     atom_pos : numpy array
         Nx3 array contaning the atoms coordinates
     """
-
-    # Remove the extention if exists
-    file_name = file_name.split('.')[0]
+    
+    file_name = file_name.split('.')[0] # Remove the extention if exists
 
     if os.path.exists(os.path.join(path, file_name + '.xyz')):
         temp_file = open(os.path.join(path, file_name + '.xyz'), 'r').readlines()
-
+        
         atoms = [i.split() for i in temp_file[2:]]
 
         atom_labels = [i[0] for i in atoms if len(i) > 1]
@@ -727,32 +794,30 @@ def read_xyz_file(path, file_name):
         print(f'File {file_name} not found!')
         return None
 
-
 def read_gjf_file(path, file_name):
     """
-    Reads a file in format `.gjf` from the `path` given and returns
-    a list containg the N atom labels and a Nx3 array contaning
-    the atoms coordinates.
+    Reads a file in format `.gjf` from the `path` given and returns a list containg the N atom labels and 
+    a Nx3 array contaning the atoms coordinates.
 
     Parameters
     ----------
     path : str
         Path to the file.
     file_name : str
-        Name of the `gjf` file. Does not neet to contain the `.gjf` extention.
+        Name of the `gjf` file. Does not neet to contain the `.gjf` extention. 
 
     Returns
     -------
     atom_labels : list
-        List of strings containing containg the N atom labels.
+        List of strings containing containg the N atom labels. 
     atom_pos : numpy array
         Nx3 array contaning the atoms coordinates
     """
-    # Remove the extention if exists
-    file_name = file_name.split('.')[0]
+
+    file_name = file_name.split('.')[0] # Remove the extention if exists
 
     if os.path.exists(os.path.join(path, file_name + '.gjf')):
-
+    
         temp_file = open(os.path.join(path, file_name + '.gjf'), 'r').readlines()
         temp_file = [i.split() for i in temp_file if i != '\n']
 
@@ -766,34 +831,31 @@ def read_gjf_file(path, file_name):
         print(f'File {file_name} not found!')
         return None
 
-
 def read_cif(path, file_name):
     """
-    Reads a file in format `.cif` from the `path` given and returns
-    a list containg the N atom labels and a Nx3 array contaning
-    the atoms coordinates.
+    Reads a file in format `.cif` from the `path` given and returns a list containg the N atom labels and 
+    a Nx3 array contaning the atoms coordinates.
 
     Parameters
     ----------
     path : str
         Path to the file.
     file_name : str
-        Name of the `cif` file. Does not neet to contain the `.cif` extention.
+        Name of the `cif` file. Does not neet to contain the `.cif` extention. 
 
     Returns
     -------
     cell : numpy array
         3x3 array contaning the cell vectors.
     atom_labels : list
-        List of strings containing containg the N atom labels.
+        List of strings containing containg the N atom labels. 
     atom_pos : numpy array
         Nx3 array contaning the atoms coordinates
     charges : list
-        List of strings containing containg the N atom partial charges.
+        List of strings containing containg the N atom partial charges. 
     """
 
-    # Remove the extention if exists
-    file_name = file_name.split('.')[0]
+    file_name = file_name.split('.')[0] # Remove the extention if exists
 
     if os.path.exists(os.path.join(path, file_name + '.cif')):
 
@@ -807,15 +869,15 @@ def read_cif(path, file_name):
             if 'cell_length_a' in i:
                 cell += [float(i.split()[-1])]
             if 'cell_length_b' in i:
-                cell += [float(i.split()[-1])]
+                cell += [float(i.split()[-1])]    
             if 'cell_length_c' in i:
-                cell += [float(i.split()[-1])]
+                cell += [float(i.split()[-1])]  
             if 'cell_angle_alpha' in i:
-                cell += [float(i.split()[-1])]
+                cell += [float(i.split()[-1])]  
             if '_cell_angle_beta' in i:
-                cell += [float(i.split()[-1])]
+                cell += [float(i.split()[-1])]  
             if '_cell_angle_gamma' in i:
-                cell += [float(i.split()[-1])]
+                cell += [float(i.split()[-1])]  
             if '_atom_site_charge' in i:
                 has_charges = True
 
@@ -828,18 +890,12 @@ def read_cif(path, file_name):
                     charges += [float(line[-1])]
         cell = cellpar_to_cell(cell)
 
-        return cell, atom_label, atom_pos, charges
+        return cell, atom_label, atom_pos, charges 
     else:
         print(f'File {file_name} not found!')
-        return None
+        return None   
 
-
-def save_xsf(path: str = None,
-             file_name: str = None,
-             cell: np.ndarray = np.eye(3),
-             atom_labels: list = None,
-             atom_pos: list = None,
-             frac_coords: bool = False):
+def save_xsf(path, file_name, cell, atom_label, atom_pos):
     """
     Save a file in format `.xsf` on the `path`.
 
@@ -848,11 +904,11 @@ def save_xsf(path: str = None,
     path : str
         Path to the file.
     file_name : str
-        Name of the file. Does not neet to contain the `.xsf` extention.
+        Name of the file. Does not neet to contain the `.xsf` extention. 
     cell : numpy array
-        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
+        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters. 
     atom_label : list
-        List of strings containing containg the N atom label.
+        List of strings containing containg the N atom label. 
     atom_pos : list
         Nx3 array contaning the atoms coordinates.
     """
@@ -862,37 +918,22 @@ def save_xsf(path: str = None,
     if len(cell) == 6:
         cell = cellpar_to_cell(cell)
 
-    if frac_coords:
-        # Convert to fractional coordinates
-        frac_matrix = get_fractional_to_cartesian_matrix(*cell_to_cellpar(cell))
-        atom_pos = [np.dot(frac_matrix, [i[0], i[1], i[2]]) for i in atom_pos]
-
     xsf_file = open(os.path.join(path, file_name + '.xsf'), 'w')
     xsf_file.write(' CRYSTAL\n')
     xsf_file.write('  PRIMVEC\n')
 
     for i in range(len(cell)):
-        xsf_file.write(f'  {cell[i][0]:>15.9f}    {cell[i][1]:>15.9f}    {cell[i][2]:>15.9f}\n')
+        xsf_file.write(f'  {cell[i][0]:>5.9f}    {cell[i][1]:>5.9f}    {cell[i][2]:>5.9f}\n')
 
     xsf_file.write('   PRIMCOORD\n')
     xsf_file.write(f'           {len(atom_pos)}           1\n')
 
     for i in range(len(atom_pos)):
-        xsf_file.write('{:3s}        {:>15.9f}    {:>15.9f}    {:>15.9f}\n'.format(atom_labels[i],
-                                                                                   atom_pos[i][0],
-                                                                                   atom_pos[i][1],
-                                                                                   atom_pos[i][2]))
+        xsf_file.write(f'{atom_label[i]}        {atom_pos[i][0]:>5.9f}    {atom_pos[i][1]:>5.9f}    {atom_pos[i][2]:>5.9f}\n')
 
     xsf_file.close()
 
-
-def save_pqr(path: str = None,
-             file_name: str = None,
-             cell: np.ndarray = np.eye(3),
-             atom_labels: list = None,
-             atom_pos: list = None,
-             partial_charges: list = None,
-             frac_coords: bool = False):
+def save_pqr(path, file_name, cell, atom_label, atom_pos, partial_charges=False):
     """
     Save a file in format `.pqr` on the `path`.
 
@@ -901,15 +942,15 @@ def save_pqr(path: str = None,
     path : str
         Path to the file.
     file_name : str
-        Name of the file. Does not neet to contain the `.pqr` extention.
+        Name of the file. Does not neet to contain the `.pqr` extention. 
     cell : numpy array
-        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
+        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters. 
     atom_label : list
-        List of strings containing containg the N atom partial charges.
+        List of strings containing containg the N atom partial charges. 
     atom_pos : list
         Nx3 array contaning the atoms coordinates.
     partial_charges: list
-        List of strings containing containg the N atom partial charges.
+        List of strings containing containg the N atom partial charges. 
     """
 
     file_name = file_name.split('.')[0]
@@ -917,50 +958,21 @@ def save_pqr(path: str = None,
     if len(cell) == 3:
         cell = cell_to_cellpar(cell)
 
-    if frac_coords:
-        # Convert to fractional coordinates
-        frac_matrix = get_fractional_to_cartesian_matrix(*cell)
-        atom_pos = [np.dot(frac_matrix, [i[0], i[1], i[2]]) for i in atom_pos]
-
     pqr_file = open(os.path.join(path, file_name + '.pqr'), 'w')
     pqr_file.write(f'TITLE       {file_name}  \n')
     pqr_file.write('REMARK   4\n')
-    pqr_file.write('CRYST1{:>9.3f}{:>9.3f}{:>9.3f}{:>7.2f}{:>7.2f}{:>7.2f} P1\n'.format(cell[0],
-                                                                                        cell[1],
-                                                                                        cell[2],
-                                                                                        cell[3],
-                                                                                        cell[4],
-                                                                                        cell[5]))
+    pqr_file.write(f'CRYST1{cell[0]:>9.3f}{cell[1]:>9.3f}{cell[2]:>9.3f}{cell[3]:>7.2f}{cell[4]:>7.2f}{cell[5]:>7.2f} P1\n')
 
-    if partial_charges is None:
-        atom_line = 'ATOM   {:>4} {:>2}   MOL A   0    {:>8.3f}{:>8.3f}{:>8.3f}   {:>15}\n'
+    if partial_charges is not False:
         for i in range(len(atom_pos)):
-            pqr_file.write(atom_line.format(i + 1,
-                                            atom_labels[i],
-                                            atom_pos[i][0],
-                                            atom_pos[i][1],
-                                            atom_pos[i][2],
-                                            atom_labels[i]))
-    else:
-        atom_line = 'ATOM   {:>4} {:>2}   MOL A   0    {:>8.3f}{:>8.3f}{:>8.3f}{:>8.5f}   {:>15}\n'
+            pqr_file.write(f'ATOM   {i+1:>4} {atom_label[i]:>2}   MOL A   0    {atom_pos[i][0]:>8.3f}{atom_pos[i][1]:>8.3f}{atom_pos[i][2]:>8.3f}{partial_charges:>8.5f}                {atom_label[i]}\n')
+    if partial_charges is False:
         for i in range(len(atom_pos)):
-            pqr_file.write(atom_line.format(i + 1,
-                                            atom_labels[i],
-                                            atom_pos[i][0],
-                                            atom_pos[i][1],
-                                            atom_pos[i][2],
-                                            partial_charges[i],
-                                            atom_labels[i]))
+            pqr_file.write(f'ATOM   {i+1:>4} {atom_label[i]:>2}   MOL A   0    {atom_pos[i][0]:>8.3f}{atom_pos[i][1]:>8.3f}{atom_pos[i][2]:>8.3f}                {atom_label[i]}\n')
 
     pqr_file.close()
 
-
-def save_pdb(path: str = None,
-             file_name: str = None,
-             cell: np.ndarray = np.eye(3),
-             atom_labels: list = None,
-             atom_pos: list = None,
-             frac_coords: bool = False):
+def save_pdb(path, file_name, cell, atom_label, atom_pos):
     """
     Save a file in format `.pdb` on the `path`.
 
@@ -969,11 +981,11 @@ def save_pdb(path: str = None,
     path : str
         Path to the file.
     file_name : str
-        Name of the file. Does not neet to contain the `.pdb` extention.
+        Name of the file. Does not neet to contain the `.pdb` extention. 
     cell : numpy array
-        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
+        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters. 
     atom_label : list
-        List of strings containing containg the N atom partial charges.
+        List of strings containing containg the N atom partial charges. 
     atom_pos : list
         Nx3 array contaning the atoms coordinates in cartesian form.
     """
@@ -983,42 +995,17 @@ def save_pdb(path: str = None,
     if len(cell) == 3:
         cell = cell_to_cellpar(cell)
 
-    if frac_coords:
-        # Convert to fractional coordinates
-        frac_matrix = get_fractional_to_cartesian_matrix(*cell)
-        atom_pos = [np.dot(frac_matrix, [i[0], i[1], i[2]]) for i in atom_pos]
-
     pdb_file = open(os.path.join(path, file_name + '.pdb'), 'w')
     pdb_file.write(f'TITLE       {file_name}  \n')
     pdb_file.write('REMARK   pyCOFBuilder\n')
-    pdb_file.write('CRYST1{:>9.3f}{:>9.3f}{:>9.3f}{:>7.2f}{:>7.2f}{:>7.2f} P1\n'.format(cell[0],
-                                                                                        cell[1],
-                                                                                        cell[2],
-                                                                                        cell[3],
-                                                                                        cell[4],
-                                                                                        cell[5]))
-
-    atom_line = 'ATOM   {:>4} {:>2}   MOL     {:>13.3f}{:>8.3f}{:>8.3f}  1.00  0.00  {:>11}\n'
+    pdb_file.write(f'CRYST1{cell[0]:>9.3f}{cell[1]:>9.3f}{cell[2]:>9.3f}{cell[3]:>7.2f}{cell[4]:>7.2f}{cell[5]:>7.2f} P1\n')
 
     for i in range(len(atom_pos)):
-        pdb_file.write(atom_line.format(i+1,
-                                        atom_labels[i],
-                                        atom_pos[i][0],
-                                        atom_pos[i][1],
-                                        atom_pos[i][2],
-                                        atom_labels[i]))
+        pdb_file.write(f'ATOM   {i+1:>4} {atom_label[i]:>2}   MOL          {atom_pos[i][0]:>8.3f}{atom_pos[i][1]:>8.3f}{atom_pos[i][2]:>8.3f}  1.00  0.00           {atom_label[i]}\n')
 
     pdb_file.close()
 
-
-def save_gjf(path: str = None,
-             file_name: str = None,
-             cell: np.ndarray = np.eye(3),
-             atom_labels: list = None,
-             atom_pos: list = None,
-             frac_coords: bool = False,
-             text: str = 'opt pm6'):
-
+def save_gjf(path, file_name, atom_labels, atom_pos, text='opt pm6'):
     """
     Save a file in format `.gjf` on the `path`.
 
@@ -1027,24 +1014,16 @@ def save_gjf(path: str = None,
     path : str
         Path to the file.
     file_name : str
-        Name of the file. Does not neet to contain the `.gjf` extention.
+        Name of the file. Does not neet to contain the `.gjf` extention. 
     cell : numpy array
-        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
+        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters. 
     atom_label : list
-        List of strings containing containg the N atom partial charges.
+        List of strings containing containg the N atom partial charges. 
     atom_pos : list
         Nx3 array contaning the atoms coordinates.
     text : str
         Parameters for Gaussian calculations.
     """
-
-    if cell.shape == 6:
-        cell = cellpar_to_cell(cell)
-
-    if frac_coords:
-        # Convert to fractional coordinates
-        frac_matrix = get_fractional_to_cartesian_matrix(*cell_to_cellpar(cell))
-        atom_pos = [np.dot(frac_matrix, [i[0], i[1], i[2]]) for i in atom_pos]
 
     file_name = file_name.split('.')[0]
 
@@ -1057,25 +1036,13 @@ def save_gjf(path: str = None,
     temp_file.write('0 1 \n')
 
     for i in range(len(atom_labels)):
-        temp_file.write('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(atom_labels[i],
-                                                                     atom_pos[i][0],
-                                                                     atom_pos[i][1],
-                                                                     atom_pos[i][2]))
-    if cell is not None:
-        for i in range(len(cell)):
-            temp_file.write('Tv {:>15.7f} {:>15.7f} {:>15.7f}'.format(*cell[i]))
+        temp_file.write('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(atom_labels[i], atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]))
 
     temp_file.write('\n')
     temp_file.write('\n')
     temp_file.close()
 
-
-def save_xyz(path: str = None,
-             file_name: str = None,
-             cell: np.ndarray = np.eye(3),
-             atom_labels: list = None,
-             atom_pos: list = None,
-             frac_coords: bool = False):
+def save_xyz(path, file_name, atom_labels, atom_pos, cell=None):
     """
     Save a file in format `.xyz` on the `path`.
 
@@ -1084,22 +1051,14 @@ def save_xyz(path: str = None,
     path : str
         Path to the file.
     file_name : str
-        Name of the file. Does not neet to contain the `.xyz` extention.
+        Name of the file. Does not neet to contain the `.xyz` extention. 
     atom_label : list
-        List of strings containing containg the N atom partial charges.
+        List of strings containing containg the N atom partial charges. 
     atom_pos : list
         Nx3 array contaning the atoms coordinates.
     cell : numpy array
-        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
+        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters. 
     """
-
-    if len(cell) == 3:
-        cell = cell_to_cellpar(cell)
-
-    if frac_coords:
-        # Convert to fractional coordinates
-        frac_matrix = get_fractional_to_cartesian_matrix(cell)
-        atom_pos = [np.dot(frac_matrix, [i[0], i[1], i[2]]) for i in atom_pos]
 
     file_name = file_name.split('.')[0]
 
@@ -1109,292 +1068,16 @@ def save_xyz(path: str = None,
     if cell is None:
         temp_file.write(f'{file_name}\n')
     else:
+        if len(cell) == 3:
+            cell = cell_to_cellpar(cell)
         temp_file.write(f'{cell[0]}  {cell[1]}  {cell[2]}  {cell[3]}  {cell[4]}  {cell[5]}\n')
 
     for i in range(len(atom_labels)):
-        temp_file.write('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(atom_labels[i],
-                                                                     atom_pos[i][0],
-                                                                     atom_pos[i][1],
-                                                                     atom_pos[i][2]))
+        temp_file.write('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(atom_labels[i], atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]))
 
     temp_file.close()
 
-
-def save_turbomole(path: str = None,
-                   file_name: str = None,
-                   cell: np.ndarray = np.eye(3),
-                   atom_labels: list = None,
-                   atom_pos: list = None,
-                   frac_coords: bool = False):
-    """Save the structure in Turbomole .coord format
-
-    Parameters
-    ----------
-    path : str
-        Path to the file.
-    file_name : str
-        Name of the file. Does not neet to contain the `.coord` extention.
-    cell : numpy array
-        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
-    atom_label : list
-        List of strings containing containg the N atom partial charges.
-    atom_pos : list
-        Nx3 array contaning the atoms coordinates.
-    """
-
-    if cell.shape == (3, 3):
-        cell = cell_to_cellpar(cell)
-
-    if frac_coords:
-        # Convert to fractional coordinates
-        frac_matrix = get_fractional_to_cartesian_matrix(*cell)
-        atom_pos = [np.dot(frac_matrix, [i[0], i[1], i[2]]) for i in atom_pos]
-
-    with open(os.path.join(path, file_name + '.coord'), 'w') as temp_file:
-        temp_file.write('$coord angs\n')
-
-        for i in range(len(atom_labels)):
-            temp_file.write('{:>15.7f}{:>15.7f}{:>15.7f}   {:<5s}\n'.format(atom_pos[i][0],
-                                                                            atom_pos[i][1],
-                                                                            atom_pos[i][2],
-                                                                            atom_labels[i]))
-
-        temp_file.write('$periodic 3\n')
-        temp_file.write('$cell\n')
-        temp_file.write('{}  {}  {}  {}  {}  {}\n'.format(*cell))
-        temp_file.write('$opt\n')
-        temp_file.write('   engine=inertial\n')
-        temp_file.write('$end\n')
-
-
-def save_vasp(path: str = None,
-              file_name: str = None,
-              cell: np.ndarray = np.eye(3),
-              atom_labels: list = None,
-              atom_pos: list = None,
-              frac_coords: bool = False):
-    """Save the structure in VASP .vasp format
-
-    Parameters
-    ----------
-    path : str
-        Path to the file.
-    file_name : str
-        Name of the file. Does not neet to contain the `.vasp` extention.
-    cell : numpy array
-        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
-    atom_label : list
-        List of strings containing containg the N atom partial charges.
-    atom_pos : list
-        Nx3 array contaning the atoms coordinates.
-    coords_are_cartesian : bool
-        If True, the coordinates are in cartesian coordinates.
-    """
-
-    if cell.shape == 6:
-        cell = cellpar_to_cell(cell)
-
-    unique_atoms = []
-    for i in atom_labels:
-        if i not in unique_atoms:
-            unique_atoms.append(i)
-
-    composition_dict = {i: atom_labels.count(i) for i in unique_atoms}
-
-    with open(os.path.join(path, file_name + '.vasp'), 'w') as temp_file:
-        temp_file.write(f'{file_name}\n')
-        temp_file.write('1.0\n')
-
-        for i in range(3):
-            temp_file.write('{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(cell[i][0],
-                                                                   cell[i][1],
-                                                                   cell[i][2]))
-
-        temp_file.write(' '.join(composition_dict.keys()) + '\n')
-        temp_file.write(' '.join([str(i) for i in composition_dict.values()]) + '\n')
-
-        if frac_coords:
-            temp_file.write('Direct\n')
-        else:
-            temp_file.write('Cartesian\n')
-
-        for i in range(len(atom_labels)):
-            temp_file.write('{:>15.7f}{:>15.7f}{:>15.7f}   {:<5s}\n'.format(atom_pos[i][0],
-                                                                            atom_pos[i][1],
-                                                                            atom_pos[i][2],
-                                                                            atom_labels[i]))
-
-
-def save_qe(path: str = None,
-            file_name: str = None,
-            cell: np.ndarray = np.eye(3),
-            atom_labels: list = None,
-            atom_pos: list = None,
-            frac_coords: bool = False,
-            input_dict: dict = None):
-    '''
-    Save the structure in Quantum Espresso .pwscf format.
-
-    The `input_dict` can be used to specify the input parameters for the
-    QuantumESPRESSO calculation.
-
-    This dictionary must contain the keys: `control`, `system`, `electrons`, and `ions`.
-    Each of these keys must contain a dictionary with the corresponding input parameters.
-    This dictionary can contain the kpoints item, with the kpoints grid as a list of 3 integers.
-    Additionally, it can contain the kspacing item, with the kpoints spacing as a float. In this
-    case the kpoints grid will be calculated automatically. By default, the kspacing is set to 0.3.
-
-    Parameters
-    ----------
-    path : str
-        Path to the file.
-    file_name : str
-        Name of the file. Does not neet to contain the `.pwscf` extention.
-    cell : numpy array
-        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
-    atom_label : list
-        List of strings containing containg the N atom labels.
-    atom_pos : list
-        Nx3 array contaning the atoms coordinates.
-    frac_coords : bool
-        If True, the coordinates are in fractional coordinates.
-    input_dict : dict
-        Dictionary containing the input parameters for the Quantum Espresso calculation.
-    '''
-
-    if len(cell) == 6:
-        cell_matrix = cellpar_to_cell(cell)
-    else:
-        cell_matrix = cell
-
-    if input_dict is None:
-        input_dict = {}
-
-        input_dict['control'] = {
-            'calculation': "'vc-relax'",
-            'restart_mode': "'from_scratch'",
-            'wf_collect': '.true.',
-            'pseudo_dir': "'$PSEUDO_DIR'",
-            'outdir': "'./'",
-            'prefix': f"'{file_name}'",
-            'verbosity': "'high'",
-            'tstress': '.true.',
-            'tprnfor': '.true.',
-            'etot_conv_thr': '1.0d-5',
-            'forc_conv_thr': '1.0d-6',
-            'nstep': 1000}
-
-        input_dict['system'] = {
-            'ibrav': 0,
-            'nat': len(atom_labels),
-            'ntyp': len(set(atom_labels)),
-            'ecutwfc': 40,
-            'ecutrho': 360,
-            'vdw_corr': "'grimme-d3'",
-            'occupations': "'smearing'"}
-
-        input_dict['electrons'] = {
-            'conv_thr': 1.0e-9,
-            'electron_maxstep': 100,
-            'mixing_beta': 0.3}
-
-        input_dict['ions'] = {
-            'ion_dynamics': "'bfgs'"}
-
-        input_dict['cell'] = {
-            'cell_dynamics': "'bfgs'",
-            'cell_dofree': "'all'"}
-
-    # If the kpoints grid is not specified, calculate it automatically
-    if 'k_points' not in input_dict.keys():
-        if 'kspacing' not in input_dict.keys():
-            input_dict['kspacing'] = 0.3
-        input_dict['kpoints'] = get_kgrid(cell_matrix, input_dict['kspacing'])
-
-    with open(os.path.join(path, file_name + '.pwscf'), 'w') as f:
-        f.write('&CONTROL\n')
-        for key in input_dict['control']:
-            f.write(f"  {key} = {input_dict['control'][key]}\n")
-        f.write('/\n\n')
-
-        f.write('&SYSTEM\n')
-        for key in input_dict['system']:
-            f.write(f"  {key} = {input_dict['system'][key]}\n")
-        f.write('/\n\n')
-
-        f.write('&ELECTRONS\n')
-        for key in input_dict['electrons']:
-            f.write(f"  {key} = {input_dict['electrons'][key]}\n")
-        f.write('/\n\n')
-
-        f.write('&IONS\n')
-        for key in input_dict['ions']:
-            f.write(f"  {key} = {input_dict['ions'][key]}\n")
-        f.write('/\n\n')
-
-        f.write('&CELL\n')
-        for key in input_dict['cell']:
-            f.write(f"  {key} = {input_dict['cell'][key]}\n")
-        f.write('/\n\n')
-
-        f.write('ATOMIC_SPECIES\n')
-        for atom in set(atom_labels):
-            f.write(f" {atom}   {elements_dict()[atom]:>9.5f}  {atom}.PSEUDO.UPF\n")
-        f.write('\n')
-
-        f.write('CELL_PARAMETERS (angstrom) \n')
-        for v in cell_matrix:
-            f.write(f'{v[0]:>15.9f}      {v[1]:>15.9f}      {v[2]:>15.9f}\n')
-        f.write('\n')
-
-        if frac_coords:
-            coords_type = 'crystal'
-        else:
-            coords_type = 'angstrom'
-
-        f.write(f'ATOMIC_POSITIONS ({coords_type})\n')
-
-        for i, atom in enumerate(atom_pos):
-            f.write('{:<5s}{:>15.9f}{:>15.9f}{:>15.9f}\n'.format(atom_labels[i],
-                                                                 atom[0],
-                                                                 atom[1],
-                                                                 atom[2]))
-
-        f.write('\n')
-        f.write('K_POINTS automatic\n')
-        f.write(' {} {} {} 1 1 1\n'.format(*input_dict['kpoints']))
-
-
-def convert_cif_2_qe(out_path, file_name):
-    """
-    Convert a cif file to a Quantum Espresso input file
-
-    Parameters
-    ----------
-    out_path : str
-        Path to the file.
-    file_name : str
-        Name of the file. Does not neet to contain the `.cif` extention.
-    """
-
-    cell, atom_labels, atom_pos, _ = read_cif(out_path, file_name, has_charges=False)
-
-    print(cell, atom_labels, atom_pos)
-
-    save_qe(out_path,
-            file_name,
-            cell,
-            atom_labels,
-            atom_pos,
-            coords_are_cartesian=True,
-            supercell=False,
-            angs=False,
-            ecut=40,
-            erho=360,
-            k_dist=0.3)
-
-
-def save_json(path, file_name, cell, atom_labels, atom_pos, frac_coords=False):
+def save_json(path, file_name, cell, atom_labels, atom_pos):
     """
     Save a file in format `.json` on the `path`.
 
@@ -1403,13 +1086,13 @@ def save_json(path, file_name, cell, atom_labels, atom_pos, frac_coords=False):
     path : str
         Path to the file.
     file_name : str
-        Name of the file. Does not neet to contain the `.cif` extention.
+        Name of the file. Does not neet to contain the `.cif` extention. 
     atom_label : list
-        List of strings containing containg the N atom partial charges.
+        List of strings containing containg the N atom partial charges. 
     atom_pos : list
         Nx3 array contaning the atoms coordinates.
     cell : numpy array
-        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
+        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters. 
     """
 
     file_name = file_name.split('.')[0]
@@ -1418,21 +1101,20 @@ def save_json(path, file_name, cell, atom_labels, atom_pos, frac_coords=False):
 
     if len(cell) == 3:
         cell_par = cell_to_cellpar(np.array(cell)).tolist()
-        cell_matrix = np.array(cell).astype(float).tolist()
+        cell_par =  [round(i, 10) for i in cell_par]
 
     if len(cell) == 6:
-        cell_par = np.array(cell).astype(float).tolist()
-        cell_matrix = cellpar_to_cell(cell_par).tolist()
+        cell_par = cell
+        cell = cellpar_to_cell(cell_par).tolist()
 
     cof_json['system']['geo_opt'] = False
 
-    cof_json['geometry']['cell_matrix'] = cell_matrix
+    cof_json['geometry']['cell_matrix'] = cell
     cof_json['geometry']['cell_parameters'] = cell_par
-    cof_json['geometry']['atom_labels'] = list(atom_labels)
-    cof_json['geometry']['atom_pos'] = list(atom_pos)
+    cof_json['geometry']['atom_labels'] = atom_labels
+    cof_json['geometry']['atom_pos'] = atom_pos
 
     write_json(path, file_name, cof_json)
-
 
 def save_cif(path,
              file_name,
@@ -1440,7 +1122,7 @@ def save_cif(path,
              atom_labels,
              atom_pos,
              partial_charges=False,
-             frac_coords=False):
+             frac_coords=True ):
     """
     Save a file in format `.cif` on the `path`.
 
@@ -1492,7 +1174,7 @@ loop_
    _atom_site_fract_x
    _atom_site_fract_y
    _atom_site_fract_z
-"""
+    """
 
     if partial_charges is not False:
         cif_text += '   _atom_site_charge\n'
@@ -1505,25 +1187,15 @@ loop_
     for i in range(len(atom_pos)):
         u, v, w = atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]
         if partial_charges is not False:
-            cif_text += '{}    {} {:>15.9f} {:>15.9f} {:>15.9f} {:>10.5f}\n'.format(
-                atom_labels[i],
-                atom_labels[i],
-                u,
-                v,
-                w,
-                partial_charges[i])
+            cif_text += f'{atom_labels[i]}    {atom_labels[i]} {u:>15.9f} {v:>15.9f} {w:>15.9f} {partial_charges[i]:>10.5f}\n'
         else:
-            cif_text += '{}    {} {:>15.9f} {:>15.9f} {:>15.9f}\n'.format(
-                atom_labels[i],
-                atom_labels[i],
-                u,
-                v,
-                w)
+            cif_text += f'{atom_labels[i]}    {atom_labels[i]} {u:>15.9f} {v:>15.9f} {w:>15.9f}\n'
 
     # Write cif_text to file
     cif_file = open(os.path.join(path, file_name + '.cif'), 'w')
     cif_file.write(cif_text)
     cif_file.close()
+
 
 
 def convert_json_2_cif(origin_path, file_name, destiny_path, charge_type='None'):
@@ -1535,7 +1207,7 @@ def convert_json_2_cif(origin_path, file_name, destiny_path, charge_type='None')
     origin_path : str
         Path to the '.json' file.
     file_name : str
-        Name of the file. Does not neet to contain the `.json` extention.
+        Name of the file. Does not neet to contain the `.json` extention. 
     destiny_path : str
         path where the `.cif` file will be saved.
     """
@@ -1552,13 +1224,12 @@ def convert_json_2_cif(origin_path, file_name, destiny_path, charge_type='None')
         partial_charges = False
 
     save_cif(destiny_path,
-             file_name,
-             cell,
-             atom_labels,
-             atom_pos,
-             partial_charges,
-             frac_coords=False)
-
+            file_name,
+            cell,
+            atom_labels,
+            atom_pos,
+            partial_charges,
+            frac_coords=False)
 
 def convert_gjf_2_xyz(path, file_name):
 
@@ -1568,7 +1239,6 @@ def convert_gjf_2_xyz(path, file_name):
 
     save_xyz(path, file_name + '.xyz', atom_labels, atom_pos)
 
-
 def convert_xyz_2_gjf(path, file_name):
 
     file_name = file_name.split('.')[0]
@@ -1577,27 +1247,18 @@ def convert_xyz_2_gjf(path, file_name):
 
     save_xyz(path, file_name + '.gjf', atom_labels, atom_pos)
 
-
 def convert_cif_2_xyz(path, file_name, supercell=[1, 1, 1]):
 
     file_name = file_name.split('.')[0]
 
     if CIF_PARSER_IMPORTED is not False:
 
-        structure = CifParser(
-            os.path.join(path, file_name + '.cif')
-            ).get_structures(primitive=True)[0]
+        structure = CifParser(os.path.join(path, file_name + '.cif')).get_structures(primitive=True)[0]
 
-        structure.make_supercell([[supercell[0], 0, 0],
-                                  [0, supercell[1], 0],
-                                  [0, 0, supercell[2]]])
+        structure.make_supercell([[supercell[0], 0, 0], [0, supercell[1], 0], [0, 0, supercell[2]]])
 
         dict_sctructure = structure.as_dict()
-
-        a, b, c = dict_sctructure['lattice']['a']
-        b = dict_sctructure['lattice']['b']
-        c = dict_sctructure['lattice']['c']
-
+        a, b, c = dict_sctructure['lattice']['a'], dict_sctructure['lattice']['b'], dict_sctructure['lattice']['c']
         alpha = round(dict_sctructure['lattice']['alpha'])
         beta = round(dict_sctructure['lattice']['beta'])
         gamma = round(dict_sctructure['lattice']['gamma'])
@@ -1616,14 +1277,12 @@ def convert_cif_2_xyz(path, file_name, supercell=[1, 1, 1]):
     temp_file.write(f'{a}  {b}  {c}  {alpha}  {beta}  {gamma}\n')
 
     for i in range(len(atom_labels)):
-        temp_file.write('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(atom_labels[i],
-                                                                     atom_pos[i][0],
-                                                                     atom_pos[i][1],
-                                                                     atom_pos[i][2]))
+        temp_file.write('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(atom_labels[i], atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]))
 
     temp_file.close()
 
-# ---------------------------- JSON related -------------------------------- #
+
+########################### JSON related ##########################  
 
 
 def write_json(path, name, COF_json):
@@ -1636,55 +1295,37 @@ def write_json(path, name, COF_json):
     save_path = os.path.join(path, name + '.json')
 
     with open(save_path, 'w', encoding='utf-8') as f:
-        simplejson.dump(COF_json,
-                        f,
-                        ensure_ascii=False,
-                        separators=(',', ':'),
-                        indent=2,
-                        ignore_nan=True)
+        simplejson.dump(COF_json, f, ensure_ascii=False, separators=(',', ':'), indent=2, ignore_nan=True)
+        
+def read_json(path, cof_name):
 
-
-def read_json(path, name):
-
-    cof_path = os.path.join(path, name + '.json')
+    cof_path = os.path.join(path, cof_name + '.json')
 
     with open(cof_path, 'r') as r:
         json_object = simplejson.loads(r.read())
 
     return json_object
 
-
 def create_COF_json(name):
 
-    system_info = 'Informations about the system such as name, if it is optimized and other \
-        relevant information.'
-
-    geometry_info = 'Informations about the geometry: cell parameters, cell matrix, \
-    atomic positions, partial charges, bond orders, simmetry information'
-
-    optimization_info = 'Information about the optimization process such as level \
-        of calculations, optimization schema and optimization steps.'
-
+    system_info = 'Informations about the system such as name, if it is optimized and other relevant information.'
+    geometry_info = 'Informations about the geometry: cell parameters, cell matrix, atomic positions, partial charges, bond orders, simmetry information'
+    optimization_info = 'Information about the optimization process such as level of calculations, optimization schema and optimization steps.'
     adsorption_info = 'Information about the adsorption simulation experiments on RASPA2'
-
-    textural_info = 'Information about the textural calculations of the structure such \
-        as specific area, pore volume, void fraction.'
-
-    spectrum_info = 'Information about spectra simulation like DRX, FTIR, ssNMR, UV-VIS,\
-         Band dispersion, Phonon dispersion...'
-
+    textural_info = 'Information about the textural calculations of the structure such as specific area, pore volume, void fraction.'
+    spectrum_info = 'Information about spectra simulation like DRX, FTIR, ssNMR, UV-VIS, Band dispersion, Phonon dispersion...'
     experimental_info = 'Experimental data DRX, FTIR, ssNMR, UV-VIS...'
 
-    COF_json = {'system': {'description': system_info,
-                           'name': name,
-                           'geo_opt': False,
-                           'execution_times_seconds': {}},
-                'geometry': {'description': geometry_info},
-                'optimization': {'description': optimization_info},
-                'adsorption': {'description': adsorption_info},
-                'textural': {'description': textural_info},
-                'spectrum': {'description': spectrum_info},
-                'experimental': {'description': experimental_info}
+    COF_json = {'system':{'description':system_info,
+                           'name':name,
+                            'geo_opt':False,
+                            'execution_times_seconds':{}},
+                'geometry':{'description':geometry_info},
+                'optimization':{'description':optimization_info},
+                'adsorption':{'description':adsorption_info},
+                'textural':{'description':textural_info},
+                'spectrum':{'description':spectrum_info},
+                'experimental':{'description':experimental_info}
                 }
 
     return COF_json
