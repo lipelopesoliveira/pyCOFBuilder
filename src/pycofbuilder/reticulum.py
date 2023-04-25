@@ -361,7 +361,7 @@ class Reticulum():
         Tools.print_comand(f'Starting the creation of {self.name}',
                            self.verbosity,
                            ['debug', 'high'])
-        
+
         # Detect the bond atom from the connection groups type
         bond_atom = Tools.get_bond_atom(BB1.conector, BB2.conector)
 
