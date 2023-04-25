@@ -276,7 +276,7 @@ class Reticulum():
             'pqr': Tools.save_pqr,
             'qe': Tools.save_qe
          }
-        
+
         file_format_error = f'Format must be one of the following: {save_dict.keys()}'
         assert fmt in save_dict.keys(), file_format_error
 
@@ -1117,9 +1117,9 @@ class Reticulum():
             print(f'Building block B ({name_bb_b}) must present connectivity 4 insted of',
                   bb_2.connectivity)
             return None
-        
+
         # Detect the bond atom from the connection groups type
-        bond_atom = Tools.get_bond_atom(BB1.conector, BB2.conector)
+        bond_atom = Tools.get_bond_atom(bb_1.conector, bb_2.conector)
 
         Tools.print_comand(f'Bond atom detected: {bond_atom}',
                            self.verbosity,
@@ -1494,9 +1494,9 @@ class Reticulum():
             print(f'Building block B ({name_bb_b}) must present connectivity 2 insted of',
                   bb_2.connectivity)
             return None
-        
+
         # Detect the bond atom from the connection groups type
-        bond_atom = Tools.get_bond_atom(BB1.conector, BB2.conector)
+        bond_atom = Tools.get_bond_atom(bb_1.conector, bb_2.conector)
 
         Tools.print_comand(f'Bond atom detected: {bond_atom}',
                            self.verbosity,
@@ -1873,7 +1873,7 @@ class Reticulum():
             return None
 
         # Detect the bond atom from the connection groups type
-        bond_atom = Tools.get_bond_atom(BB1.conector, BB2.conector)
+        bond_atom = Tools.get_bond_atom(bb_1.conector, bb_2.conector)
 
         Tools.print_comand(f'Bond atom detected: {bond_atom}',
                            self.verbosity,
@@ -2246,7 +2246,7 @@ class Reticulum():
             return None
 
         # Detect the bond atom from the connection groups type
-        bond_atom = Tools.get_bond_atom(BB1.conector, BB2.conector)
+        bond_atom = Tools.get_bond_atom(bb_1.conector, bb_2.conector)
 
         Tools.print_comand(f'Bond atom detected: {bond_atom}',
                            self.verbosity,
@@ -2626,7 +2626,7 @@ class Reticulum():
             return None
 
         # Detect the bond atom from the connection groups type
-        bond_atom = Tools.get_bond_atom(BB1.conector, BB2.conector)
+        bond_atom = Tools.get_bond_atom(bb_1.conector, bb_2.conector)
 
         Tools.print_comand(f'Bond atom detected: {bond_atom}',
                            self.verbosity,
@@ -3022,7 +3022,7 @@ class Reticulum():
             return None
 
         # Detect the bond atom from the connection groups type
-        bond_atom = Tools.get_bond_atom(BB1.conector, BB2.conector)
+        bond_atom = Tools.get_bond_atom(bb_1.conector, bb_2.conector)
 
         Tools.print_comand(f'Bond atom detected: {bond_atom}',
                            self.verbosity,
