@@ -1,0 +1,30 @@
+{
+  "name": "amine",
+  "code": "NH2",
+  "smiles": "[Q]N",
+  "xsmiles": "[*]N",
+  "xsmiles_label": "|$Q;$|",
+  "formula": "Q1X1",
+  "atoms": {
+    "elements": {
+      "elementType": [
+        "Q",
+        "X"
+      ]
+    },
+    "coords": {
+      "3d": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.381,
+          0.0,
+          0.0
+        ]
+      ]
+    }
+  }
+}
