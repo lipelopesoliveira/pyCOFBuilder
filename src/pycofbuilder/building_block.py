@@ -36,7 +36,7 @@ class Building_Block():
         self.conector = None
         self.radicals = None
 
-        self.available_symmetry = ['C2', 'C3', 'C4', 'C6']
+        self.available_symmetry = ['L2', 'T3', 'S4', 'H6']
 
         # Check if save_dir exists and try to create it if not
         if self.save_dir is not False:
@@ -388,7 +388,7 @@ class Building_Block():
             self.atom_labels = self.atom_labels + n_group_label
 
     def _create_BB_structure(self,
-                             symmetry='C2',
+                             symmetry='L2',
                              core_name='BENZ',
                              conector='CHO',
                              R1='H',
@@ -444,19 +444,19 @@ class Building_Block():
 
     def get_available_core(self):
         '''Get the list of available cores'''
-        C2_PATH = os.path.join(self.main_path, 'core', 'C2')
-        C2_list = [i.rstrip('.gjf') for i in os.listdir(C2_PATH) if '.gjf' in i]
+        L2_PATH = os.path.join(self.main_path, 'core', 'L2')
+        L2_list = [i.rstrip('.gjf') for i in os.listdir(L2_PATH) if '.gjf' in i]
 
-        C3_PATH = os.path.join(self.main_path, 'core', 'C3')
-        C3_list = [i.rstrip('.gjf') for i in os.listdir(C3_PATH) if '.gjf' in i]
+        T3_PATH = os.path.join(self.main_path, 'core', 'T3')
+        T3_list = [i.rstrip('.gjf') for i in os.listdir(T3_PATH) if '.gjf' in i]
 
-        C4_PATH = os.path.join(self.main_path, 'core', 'C4')
-        C4_list = [i.rstrip('.gjf') for i in os.listdir(C4_PATH) if '.gjf' in i]
+        S4_PATH = os.path.join(self.main_path, 'core', 'S4')
+        S4_list = [i.rstrip('.gjf') for i in os.listdir(S4_PATH) if '.gjf' in i]
 
-        C6_PATH = os.path.join(self.main_path, 'core', 'C6')
-        C6_list = [i.rstrip('.gjf') for i in os.listdir(C6_PATH) if '.gjf' in i]
+        H6_PATH = os.path.join(self.main_path, 'core', 'H6')
+        H6_list = [i.rstrip('.gjf') for i in os.listdir(H6_PATH) if '.gjf' in i]
 
-        return C2_list, C3_list, C4_list, C6_list
+        return L2_list, T3_list, S4_list, H6_list
 
     def get_available_R(self):
         '''Get the list of available radicals'''
@@ -490,7 +490,7 @@ class Building_Block():
         if symm in self.available_symmetry:
             symm_check = True
         else:
-            print('ERROR!: Building Block symmetry must be C2, C3, C4, or C6.')
+            print('ERROR!: Building Block symmetry must be L2, T3, S4, or H6.')
             symm_check = False
 
         if core in BB_dict[symm]:
@@ -518,82 +518,82 @@ class Building_Block():
 
         files_list = os.listdir(self.save_dir)
 
-        return [i.rstrip('.xyz') for i in files_list if 'C2' == i.split('_')[0]
+        return [i.rstrip('.xyz') for i in files_list if 'L2' == i.split('_')[0]
                 and 'NH2' in i.split('_')[2]]
 
     def get_tripodal_NH2(self):
 
         files_list = os.listdir(self.save_dir)
 
-        return [i.rstrip('.xyz') for i in files_list if 'C3' == i.split('_')[0]
+        return [i.rstrip('.xyz') for i in files_list if 'T3' == i.split('_')[0]
                 and 'NH2' in i.split('_')[2]]
 
     def get_bipodal_CHO(self):
 
         files_list = os.listdir(self.save_dir)
 
-        return [i.rstrip('.xyz') for i in files_list if 'C2' == i.split('_')[0]
+        return [i.rstrip('.xyz') for i in files_list if 'L2' == i.split('_')[0]
                 and 'CHO' == i.split('_')[2]]
 
     def get_tripodal_CHO(self):
 
         files_list = os.listdir(self.save_dir)
 
-        return [i.rstrip('.xyz') for i in files_list if 'C3' == i.split('_')[0]
+        return [i.rstrip('.xyz') for i in files_list if 'T3' == i.split('_')[0]
                 and 'CHO' == i.split('_')[2]]
 
     def get_bipodal_BOH2(self):
 
         files_list = os.listdir(self.save_dir)
 
-        return [i.rstrip('.xyz') for i in files_list if 'C2' == i.split('_')[0]
+        return [i.rstrip('.xyz') for i in files_list if 'L2' == i.split('_')[0]
                 and 'BOH2' == i.split('_')[2]]
 
     def get_tripodal_BOH2(self):
 
         files_list = os.listdir(self.save_dir)
 
-        return [i.rstrip('.xyz') for i in files_list if 'C3' == i.split('_')[0]
+        return [i.rstrip('.xyz') for i in files_list if 'T3' == i.split('_')[0]
                 and 'BOH2' == i.split('_')[2]]
 
     def get_bipodal_OH2(self):
 
         files_list = os.listdir(self.save_dir)
 
-        return [i.rstrip('.xyz') for i in files_list if 'C2' == i.split('_')[0]
+        return [i.rstrip('.xyz') for i in files_list if 'L2' == i.split('_')[0]
                 and 'OH2' == i.split('_')[2]]
 
     def get_tripodal_OH2(self):
 
         files_list = os.listdir(self.save_dir)
 
-        return [i.rstrip('.xyz') for i in files_list if 'C3' == i.split('_')[0]
+        return [i.rstrip('.xyz') for i in files_list if 'T3' == i.split('_')[0]
                 and 'OH2' == i.split('_')[2]]
 
     def get_tetrapodal_squared_OH2(self):
 
         files_list = os.listdir(self.save_dir)
 
-        return [i.rstrip('.xyz') for i in files_list if 'C4' == i.split('_')[0]
+        return [i.rstrip('.xyz') for i in files_list if 'S4' == i.split('_')[0]
                 and 'OH2' == i.split('_')[2]]
 
     def get_tetrapodal_squared_CHO(self):
 
         files_list = os.listdir(self.save_dir)
 
-        return [i.rstrip('.xyz') for i in files_list if 'C4' == i.split('_')[0]
+        return [i.rstrip('.xyz') for i in files_list if 'S4' == i.split('_')[0]
                 and 'CHO' == i.split('_')[2]]
 
     def get_tetrapodal_squared_BOH2(self):
 
         files_list = os.listdir(self.save_dir)
 
-        return [i.rstrip('.xyz') for i in files_list if 'C4' == i.split('_')[0]
+        return [i.rstrip('.xyz') for i in files_list if 'S4' == i.split('_')[0]
                 and 'BOH2' == i.split('_')[2]]
 
     def get_tetrapodal_squared_NH2(self):
 
         files_list = os.listdir(self.save_dir)
 
-        return [i.rstrip('.xyz') for i in files_list if 'C4' == i.split('_')[0]
+        return [i.rstrip('.xyz') for i in files_list if 'S4' == i.split('_')[0]
                 and 'NH2' in i.split('_')[2]]
