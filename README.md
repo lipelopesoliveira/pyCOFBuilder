@@ -34,36 +34,34 @@ conda env create --file environment.yml
 
 ## Basic Usage
 
-To create a specific COF, like `C3_BENZ_CHO_OH-C2_HDZ_NH2-HCB_A-AA`:
+To create a specific COF, like `T3_BENZ_NH2_OH-L2_BENZ_CHO_H-HCB_A-AA`:
 
 ```python
 >>> import pycofbuilder as COF
 
->>> c = COF.build('C3_BENZ_CHO_OH-C2_HDZ_NH2-HCB_A-AA')
-C3_BENZ_CHO_OH-C2_HDZ_NH2-HCB_A-AA                            hexagonal   P    P6/m # 175    12 sym. op.
+>>> structure = COF.Reticulum(name='T3_BENZ_NH2_OH-L2_BENZ_CHO_H-HCB_A-AA')
+T3_BENZ_NH2_OH-L2_BENZ_CHO_H_H-HCB_A-AA                       hexagonal   P    P6/m # 175    12 sym. op.
+>>> structure.save(fmt='cif', supercell = [1, 1, 2])
 ```
 
-A `.cif` file (the default save format is CIF, but it can be easily changed) will be created in the `out` folder. The code will print out some information about the structure created.
+A `.cif` file (the default save format is CIF, but it can be easily changed by setting other value on the `fmt` option) will be created in the `out` folder. The code will print out some information about the structure created.
 
-Besides, the variable `c` now is a list with two elements. The first element is a Boolean value indicating whether the network creation was successful and the second element is the name of the created network. This information can be useful for workflows for creating multiple structures.
-
-## Manual cration of a Reticular Object
-
-It is possible to manually create a `Reticular` object:
+Besides, the variable `structure` now is a `Reticulum` object. This object has some attributes that can be accessed:
 
 ```python
-Ret = COF.Reticulum(out_dir=os.getcwd(), verbosity=True)
-
-simm_data = Ret.create_hcb_a_structure('C3_BENZ_CHO_OH',
-                                       'C2_DBPL_NH2_CH3_H_H_H',
-                                       stacking='AA',
-                                       bond_atom='N',
-                                       print_result=True)
-
-Ret.save_cif([1, 1, 2])
+>>> structure.name
+'T3_BENZ_NH2_OH-L2_BENZ_CHO_H-HCB_A-AA'
+>>> structure.smiles
+'(N)C1=C(O)C((N))=C(O)C((N))=C1O.(C([H])=O)C1=C([H])C([H])=C((C([H])=O))C([H])=C1[H]'
+>>> structure.lattice
+array([[ 22.49540055,   0.        ,   0.        ],
+       [-11.24770028,  19.48158835,   0.        ],
+       [  0.        ,   0.        ,   3.6       ]])
+>>> Ret.n_atoms
+72
+>>> Ret.space_group
+'P6/m'
 ```
-
-This code will create a COF with the name `C3_BENZ_CHO_OH-C2_DBPL_NH2_CH3_H_H_H-HCB_A-AA` and save it in the current directory. The code will print out some information about the structure created.
 
 ## Creating multiple COFs
 
