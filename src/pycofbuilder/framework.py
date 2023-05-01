@@ -18,8 +18,10 @@ from scipy.spatial.transform import Rotation as R
 import pycofbuilder.tools as Tools
 from pycofbuilder.building_block import Building_Block
 
+from pycofbuilder.data.topology import TOPOLOGY_DICT
 
-class Reticulum():
+
+class Framework():
     """
     A class used to represent a Covalent Organic Framework as a reticular entity.
 
@@ -302,10 +304,9 @@ class Reticulum():
 # --------------- Net creation methods -------------------------- #
 
     def _create_hcb_structure(self,
-                              BB1,
-                              BB2,
+                              BB_T3_A,
+                              BB_T3_B,
                               stacking: str = 'AA',
-                              c_parameter_base: float = 3.6,
                               print_result: bool = True,
                               slab: float = 10.0,
                               shift_vector: list = [1.0, 1.0, 0],
@@ -316,16 +317,12 @@ class Reticulum():
 
         Parameters
         ----------
-        name_bb_a : str, required
-            The 4 letter code for the tripodal Buiding Block A
-        name_bb_b : str, required
-            The 4 letter code for the tripodal Buiding Block B
+        BB_T3_1 : BuildingBlock, required
+            The BuildingBlock object of the tripodal Buiding Block A
+        BB_T3_2 : BuildingBlock, required
+            The BuildingBlock object of the tripodal Buiding Block B
         stacking : str, optional
             The stacking pattern of the COF layers (default is 'AA')
-        bond_atom : str, optional
-            The atom that connect the buiding blocks (default is 'N')
-        c_parameter_base : float, optional
-            The base value for interlayer distance in angstroms (default is 3.6)
         print_result : bool, optional
             Parameter for the control for printing the result (default is True)
         slab : float, optional
@@ -348,110 +345,128 @@ class Reticulum():
         """
 
         connectivity_error = 'Building block A must present connectivity {}'
-        assert BB1.connectivity == 3, connectivity_error.format(3)
-        assert BB2.connectivity == 3, connectivity_error.format(3)
+        assert BB_T3_A.connectivity == 3, connectivity_error.format(3)
+        assert BB_T3_B.connectivity == 3, connectivity_error.format(3)
 
         self.topology = 'HCB'
         self.dimension = 2
 
-        self.charge = BB1.charge + BB2.charge
-        self.chirality = BB1.chirality or BB2.chirality
+        self.charge = BB_T3_A.charge + BB_T3_B.charge
+        self.chirality = BB_T3_A.chirality or BB_T3_B.chirality
 
-        self.name = f'{BB1.name}-{BB2.name}-HCB-{stacking}'
+        self.name = f'{BB_T3_A.name}-{BB_T3_B.name}-HCB-{stacking}'
 
-        self.charge = BB1.charge + BB2.charge
-        self.chirality = BB1.chirality or BB2.chirality
+        self.charge = BB_T3_A.charge + BB_T3_B.charge
+        self.chirality = BB_T3_A.chirality or BB_T3_B.chirality
 
         Tools.print_comand(f'Starting the creation of {self.name}',
                            self.verbosity,
                            ['debug', 'high'])
 
         # Detect the bond atom from the connection groups type
-        bond_atom = Tools.get_bond_atom(BB1.conector, BB2.conector)
+        bond_atom = Tools.get_bond_atom(BB_T3_A.conector, BB_T3_B.conector)
 
         Tools.print_comand(f'Bond atom detected: {bond_atom}',
                            self.verbosity,
                            ['debug', 'high'])
 
-        # Calculates the cell parameters based on building blocks size
-        size_a = BB1.size
-        size_b = BB2.size
+        # Get the topology information
+        topology_info = TOPOLOGY_DICT[self.topology]
 
-        Tools.print_comand(f'BB_A size: {size_a}', self.verbosity, ['debug'])
-        Tools.print_comand(f'BB_B size: {size_b}', self.verbosity, ['debug'])
+        # Measure the base size of the building blocks
+        size = BB_T3_A.size[0] + BB_T3_B.size[0]
 
-        # Define cell parameter a
-        a = np.cos(np.radians(30))*2*(size_a[0] + size_b[0])
+        # Calculate the delta size to add to the c parameter
+        delta_a = abs(max(np.transpose(BB_T3_A.atom_pos)[2])) + abs(min(np.transpose(BB_T3_A.atom_pos)[2]))
+        delta_b = abs(max(np.transpose(BB_T3_B.atom_pos)[2])) + abs(min(np.transpose(BB_T3_B.atom_pos)[2]))
 
-        Tools.print_comand(f'Calculated cell parameter a: {a}', self.verbosity, ['debug'])
+        delta_max = max([delta_a, delta_b])
 
-        # Gets the maximum distace in the z axis to create the c parameter
-        delta_a = abs(max(np.transpose(BB1.atom_pos)[2])) + abs(min(np.transpose(BB1.atom_pos)[2]))
-        delta_b = abs(max(np.transpose(BB2.atom_pos)[2])) + abs(min(np.transpose(BB2.atom_pos)[2]))
+        # Calculate the cell parameters
+        a = topology_info['a'] * size
+        b = topology_info['b'] * size
+        c = topology_info['c'] + delta_max
+        alpha = topology_info['alpha']
+        beta = topology_info['beta']
+        gamma = topology_info['gamma']
 
-        # Build the matrix of unitary hexagonal cell
-        if stacking == 'A':
-            c = slab
-        else:
-            c = c_parameter_base + max([delta_a, delta_b])
+        # Create the lattice
+        lattice = Lattice.from_parameters(a, b, c, alpha, beta, gamma)
 
-        # Define the cell lattice
-        lattice = np.array([
-            [a, 0, 0],
-            [-0.5*a, np.sqrt(3)/2*a, 0],
-            [0, 0, c]
-            ]).astype(float)
+        # Create the structure
+        final_label = []
+        final_pos = []
 
-        Tools.print_comand(f'Unitary cell built: {lattice}', self.verbosity, ['debug'])
+        # Add the building blocks to the structure
+        vertice_data = topology_info['vertices'][0]
+        final_label += BB_T3_A.atom_labels
+        vertice_pos = np.array(vertice_data['position'])*a
 
-        # Adds the building block A in the origin of the unitary cell (A1 site)
-        final_label = BB1.atom_labels
-        final_pos = BB1.atom_pos
+        R_Matrix = R.from_euler('z',
+                                vertice_data['angle'],
+                                degrees=True).as_matrix()
 
-        # Rotates and add the building block A to site A2 of unitary cell
-        r_pos_a_2 = np.dot(BB2.atom_pos, R.from_euler('z', 180, degrees=True).as_matrix())
+        rotated_pos = np.dot(BB_T3_A.atom_pos, R_Matrix) + vertice_pos
+        final_pos += rotated_pos.tolist()
 
-        r_pos_a_2 += np.array([0, np.sqrt(3)/3, 0])*a
+        vertice_data = topology_info['vertices'][1]
+        final_label += BB_T3_B.atom_labels
+        vertice_pos = np.array(vertice_data['position'])*a
 
-        final_pos = np.vstack((final_pos, r_pos_a_2))
-        final_label += BB2.atom_labels
+        R_Matrix = R.from_euler('z',
+                                vertice_data['angle'],
+                                degrees=True).as_matrix()
 
-        # Changes the X atoms by the desirede bond_atom
-        final_label, final_pos = Tools.change_X_atoms(final_label, final_pos, bond_atom)
+        rotated_pos = np.dot(BB_T3_B.atom_pos, R_Matrix) + vertice_pos
+        final_pos += rotated_pos.tolist()
 
-        # Creates the COF as a pymatgen structure
-        struct = Structure(lattice, final_label, final_pos, coords_are_cartesian=True)
+        # Replace "X" on final_label with the correct bond atom
+        final_label = [x.replace('X', bond_atom) for x in final_label]
 
-        # Remove duplicate atoms and translate the structure to the center of the cell
-        struct.sort(reverse=True)
-        struct.merge_sites(tol=.5, mode='delete')
-        struct.translate_sites(range(len(struct.as_dict()['sites'])),
-                               [0, 0, 0.5],
-                               frac_coords=True,
-                               to_unit_cell=True)
+        FinalFramework = Structure(lattice,
+                                   final_label,
+                                   final_pos,
+                                   coords_are_cartesian=True)
+        FinalFramework.sort(reverse=True)
 
-        # Simetrizes the structure using pymatgen
-        symm = SpacegroupAnalyzer(struct, symprec=self.symm_tol, angle_tolerance=self.angle_tol)
-        struct_symm_prim = symm.get_primitive_standard_structure()
+        # Remove duplicated atoms
+        FinalFramework.merge_sites(tol=.5, mode='delete')
+
+        # Translates the structure to the center of the cell
+        FinalFramework.translate_sites(
+            range(len(FinalFramework.as_dict()['sites'])),
+            [0, 0, 0.5],
+            frac_coords=True,
+            to_unit_cell=True)
+
+        # Symmetrize the structure
+        try:
+            symm = SpacegroupAnalyzer(FinalFramework,
+                                      symprec=self.symm_tol, 
+                                      angle_tolerance=self.angle_tol)
+            SymmPrimFramework = symm.get_refined_structure()
+        except Exception:
+            print('Error in the symmetry analysis. Try to increase the symm_tol or angle_tol parameters')
+            return None
 
         # Create A stacking, a 2D isolated sheet with slab
         if stacking == 'A':
             self.stacking = 'A'
-            self.symm_structure = struct_symm_prim
+            self.symm_structure = SymmPrimFramework
 
         # Create AA staking. By default one sheet per unitary cell is used
         if stacking == 'AA':
             self.stacking = 'AA'
-            self.symm_structure = struct_symm_prim
+            self.symm_structure = SymmPrimFramework
 
         # Create AB1 staking.
         if stacking == 'AB1':
             self.stacking = 'AB1'
             labels_conv_crystal = np.array(
-                [[i['label']] for i in struct_symm_prim.as_dict()['sites']])
+                [[i['label']] for i in SymmPrimFramework.as_dict()['sites']])
             ion_conv_crystal = np.array(
-                [i['xyz'] for i in struct_symm_prim.as_dict()['sites']])
-            cell = np.array(struct_symm_prim.as_dict()[
+                [i['xyz'] for i in SymmPrimFramework.as_dict()['sites']])
+            cell = np.array(SymmPrimFramework.as_dict()[
                             'lattice']['matrix'])*(1, 1, 2)
 
             A = ion_conv_crystal
@@ -478,10 +493,10 @@ class Reticulum():
         if stacking == 'AB2':
             self.stacking = 'AB2'
             labels_conv_crystal = np.array(
-                [[i['label']] for i in struct_symm_prim.as_dict()['sites']])
+                [[i['label']] for i in SymmPrimFramework.as_dict()['sites']])
             ion_conv_crystal = np.array(
-                [i['xyz'] for i in struct_symm_prim.as_dict()['sites']])
-            cell = np.array(struct_symm_prim.as_dict()[
+                [i['xyz'] for i in SymmPrimFramework.as_dict()['sites']])
+            cell = np.array(SymmPrimFramework.as_dict()[
                             'lattice']['matrix'])*(1, 1, 2)
 
             A = ion_conv_crystal
@@ -508,10 +523,10 @@ class Reticulum():
         if stacking == 'AAl':
             self.stacking = 'AAl'
             labels_conv_crystal = np.array(
-                [[i['label']] for i in struct_symm_prim.as_dict()['sites']])
+                [[i['label']] for i in SymmPrimFramework.as_dict()['sites']])
             ion_conv_crystal = np.array(
-                [i['abc'] for i in struct_symm_prim.as_dict()['sites']])
-            cell = np.array(struct_symm_prim.as_dict()[
+                [i['abc'] for i in SymmPrimFramework.as_dict()['sites']])
+            cell = np.array(SymmPrimFramework.as_dict()[
                             'lattice']['matrix'])*(1, 1, 2)
 
             # Shift the first sheet to be at 0.25 * c
@@ -541,10 +556,10 @@ class Reticulum():
             self.stacking = 'AAt'
 
             labels_conv_crystal = np.array(
-                [[i['label']] for i in struct_symm_prim.as_dict()['sites']])
+                [[i['label']] for i in SymmPrimFramework.as_dict()['sites']])
             ion_conv_crystal = np.array(
-                [i['xyz'] for i in struct_symm_prim.as_dict()['sites']])
-            cell = struct_symm_prim.as_dict()['lattice']
+                [i['xyz'] for i in SymmPrimFramework.as_dict()['sites']])
+            cell = SymmPrimFramework.as_dict()['lattice']
 
             # Shift the cell by the tilt angle
             a_cell = cell['a']
@@ -575,10 +590,10 @@ class Reticulum():
         if stacking == 'ABC1':
             self.stacking = 'ABC1'
             labels_conv_crystal = np.array(
-                [[i['label']] for i in struct_symm_prim.as_dict()['sites']])
+                [[i['label']] for i in SymmPrimFramework.as_dict()['sites']])
             ion_conv_crystal = np.array(
-                [i['abc'] for i in struct_symm_prim.as_dict()['sites']])
-            cell = np.array(struct_symm_prim.as_dict()[
+                [i['abc'] for i in SymmPrimFramework.as_dict()['sites']])
+            cell = np.array(SymmPrimFramework.as_dict()[
                             'lattice']['matrix'])*(1, 1, 3)
 
             A = ion_conv_crystal*(1, 1, 5/3)
@@ -606,10 +621,10 @@ class Reticulum():
         if stacking == 'ABC2':
             self.stacking = 'ABC2'
             labels_conv_crystal = np.array(
-                [[i['label']] for i in struct_symm_prim['sites']])
+                [[i['label']] for i in SymmPrimFramework['sites']])
             ion_conv_crystal = np.array([i['abc']
-                                        for i in struct_symm_prim['sites']])
-            cell = np.array(struct_symm_prim['lattice']['matrix'])*(1, 1, 3)
+                                        for i in SymmPrimFramework['sites']])
+            cell = np.array(SymmPrimFramework['lattice']['matrix'])*(1, 1, 3)
 
             A = ion_conv_crystal*(1, 1, 5/3)
             B = Tools.translate_inside(
@@ -670,10 +685,9 @@ class Reticulum():
                 len(symm_op)]
 
     def _create_hcb_a_structure(self,
-                                BB1: str,
-                                BB2: str,
+                                BB_T3: str,
+                                BB_L2: str,
                                 stacking: str = 'AA',
-                                c_parameter_base: float = 3.6,
                                 print_result: bool = True,
                                 slab: float = 10.0,
                                 shift_vector: list = [1.0, 1.0, 0],
@@ -684,10 +698,10 @@ class Reticulum():
 
         Parameters
         ----------
-        name_bb_a : str, required
-            The 4 letter code for the tripodal Buiding Block A
-        name_bb_b : str, required
-            The 4 letter code for the linear Buiding Block B
+        BB_T3 : BuildingBlock, required
+            The BuildingBlock object of the tripodal Buiding Block
+        BB_L2 : BuildingBlock, required
+            The BuildingBlock object of the linear Buiding Block
         stacking : str, optional
             The stacking pattern of the COF layers (default is 'AA')
         c_parameter_base : float, optional
@@ -713,136 +727,120 @@ class Reticulum():
                 6. number of operation symmetry
         """
         connectivity_error = 'Building block A must present connectivity 3'
-        assert BB1.connectivity == 3, connectivity_error
+        assert BB_T3.connectivity == 3, connectivity_error
 
         connectivity_error = 'Building block B must present connectivity 2'
-        assert BB2.connectivity == 2, connectivity_error
+        assert BB_L2.connectivity == 2, connectivity_error
 
         self.topology = 'HCB_A'
         self.dimension = 2
 
-        self.charge = BB2.charge + BB1.charge
-        self.chirality = BB2.chirality or BB1.chirality
+        self.charge = BB_L2.charge + BB_T3.charge
+        self.chirality = BB_L2.chirality or BB_T3.chirality
 
-        self.name = f'{BB1.name}-{BB2.name}-HCB_A-{stacking}'
+        self.name = f'{BB_T3.name}-{BB_L2.name}-HCB_A-{stacking}'
 
         Tools.print_comand(f'Starting the creation of {self.name}',
                            self.verbosity,
                            ['debug', 'high'])
 
         # Detect the bond atom from the connection groups type
-        bond_atom = Tools.get_bond_atom(BB1.conector, BB2.conector)
+        bond_atom = Tools.get_bond_atom(BB_T3.conector, BB_L2.conector)
 
         Tools.print_comand(f'Bond atom detected: {bond_atom}',
                            self.verbosity,
                            ['debug', 'high'])
 
-        # Calculates the cell parameters based on building blocks size
-        size_a = BB1.size
-        size_b = BB2.size
+        # Get the topology information
+        topology_info = TOPOLOGY_DICT[self.topology]
 
-        Tools.print_comand(f'BB_A size: {size_a}', self.verbosity, ['debug'])
-        Tools.print_comand(f'BB_B size: {size_b}', self.verbosity, ['debug'])
+        # Measure the base size of the building blocks
+        size = BB_T3.size[0] + BB_L2.size[0]
 
-        # Define cell parameter a
-        a = 2*np.cos(np.radians(30))*2*(size_a[0] + size_b[0])
+        # Calculate the delta size to add to the c parameter
+        delta_a = abs(max(np.transpose(BB_T3.atom_pos)[2])) + abs(min(np.transpose(BB_T3.atom_pos)[2]))
+        delta_b = abs(max(np.transpose(BB_L2.atom_pos)[2])) + abs(min(np.transpose(BB_L2.atom_pos)[2]))
 
-        Tools.print_comand(f'Calculated cell parameter a: {a}', self.verbosity, ['debug'])
+        delta_max = max([delta_a, delta_b])
 
-        # Mede o valor do delta c dos blocos de construção
-        delta_a = abs(max(np.transpose(BB1.atom_pos)[2])) + abs(min(np.transpose(BB1.atom_pos)[2]))
-        delta_b = abs(max(np.transpose(BB2.atom_pos)[2])) + abs(min(np.transpose(BB2.atom_pos)[2]))
+        # Calculate the cell parameters
+        a = topology_info['a'] * size
+        b = topology_info['b'] * size
+        c = topology_info['c'] + delta_max
+        alpha = topology_info['alpha']
+        beta = topology_info['beta']
+        gamma = topology_info['gamma']
 
-        # Build the matrix of unitary hexagonal cell
-        if stacking == 'A':
-            c = slab
-        else:
-            c = c_parameter_base + max([delta_a, delta_b])
+        # Create the lattice
+        lattice = Lattice.from_parameters(a, b, c, alpha, beta, gamma)
 
-        # Define the cell lattice
-        lattice = np.array([
-            [a, 0.0, 0.0],
-            [-0.5*a, np.sqrt(3)/2*a, 0.0],
-            [0.0, 0.0, c]]
-            ).astype(float)
+        # Create the structure
+        final_label = []
+        final_pos = []
 
-        Tools.print_comand(f'Unitary cell built: {lattice}', self.verbosity, ['debug'])
+        # Add the building blocks to the structure
+        for vertice_data in topology_info['vertices']:
+            final_label += BB_T3.atom_labels
+            vertice_pos = np.array(vertice_data['position'])*a
 
-        # Ad BB1 to the oring of unitary cell (Site A1)
-        final_label = BB1.atom_labels
-        final_pos = BB1.atom_pos
+            R_Matrix = R.from_euler('z', vertice_data['angle'], degrees=True).as_matrix()
 
-        # Rotate BB1 and translate it to the A2 site
-        R_Matrix = R.from_euler('z', 180, degrees=True).as_matrix()
-        rotated_pos_a_1 = np.dot(BB1.atom_pos, R_Matrix) + np.array([0, np.sqrt(3)/3, 0])*a
+            rotated_pos = np.dot(BB_T3.atom_pos, R_Matrix) + vertice_pos
+            final_pos += rotated_pos.tolist()
 
-        # Add BB1 to the structure
-        final_pos = np.vstack((final_pos, rotated_pos_a_1))
-        final_label += BB1.atom_labels
+        # Add the building blocks to the structure
+        for edge_data in topology_info['edges']:
+            final_label += BB_L2.atom_labels
+            edge_pos = np.array(edge_data['position'])*a
 
-        # Translate BB2 to B1 site and add to the structure
-        final_pos = np.vstack((final_pos, BB2.atom_pos + np.array([0, np.sqrt(3)/6, 0])*a))
-        final_label += BB2.atom_labels
+            R_Matrix = R.from_euler('z', edge_data['angle'], degrees=True).as_matrix()
 
-        # Rotate and translate BB2 tp B2 site
-        R_Matrix = R.from_euler('z', 120, degrees=True).as_matrix()
-        r_pos_b_1 = np.dot(BB2.atom_pos, R_Matrix) + np.array([-1/4, 5*np.sqrt(3)/12, 0])*a
+            rotated_pos = np.dot(BB_L2.atom_pos, R_Matrix) + edge_pos
+            final_pos += rotated_pos.tolist()
 
-        # Add BB2 to the structure
-        final_pos = np.vstack((final_pos, r_pos_b_1))
-        final_label += BB2.atom_labels
+        # Replace "X" on final_label with the correct bond atom
+        final_label = [x.replace('X', bond_atom) for x in final_label]
 
-        # Rotate BB2 and translate it to B3 site
-        R_Matrix = R.from_euler('z', 240, degrees=True).as_matrix()
-        r_pos_b_2 = np.dot(BB2.atom_pos, R_Matrix) + np.array([1/4, 5*np.sqrt(3)/12, 0])*a
-
-        # Add BB2 to the structure
-        final_pos = np.vstack((final_pos, r_pos_b_2))
-        final_label += BB2.atom_labels
-
-        # Changes the X atoms by the desirede bond_atom
-        final_label, final_pos = Tools.change_X_atoms(final_label, final_pos, bond_atom)
-
-        # Creates the structure as a PyMatGen object
-        struct = Structure(lattice, final_label, final_pos, coords_are_cartesian=True)
-        struct.sort(reverse=True)
+        FinalFramework = Structure(lattice, final_label, final_pos, coords_are_cartesian=True)
+        FinalFramework.sort(reverse=True)
 
         # Remove duplicated atoms
-        struct.merge_sites(tol=.5, mode='delete')
+        FinalFramework.merge_sites(tol=.5, mode='delete')
 
         # Translates the structure to the center of the cell
-        struct.translate_sites(range(len(struct.as_dict()['sites'])),
-                               [0, 0, 0.5],
-                               frac_coords=True,
-                               to_unit_cell=True)
+        FinalFramework.translate_sites(
+            range(len(FinalFramework.as_dict()['sites'])),
+            [0, 0, 0.5],
+            frac_coords=True,
+            to_unit_cell=True)
 
         # Symmetrize the structure
         try:
-            symm = SpacegroupAnalyzer(struct, symprec=0.3, angle_tolerance=3.0)
-            struct_symm_prim = symm.get_refined_structure()
+            symm = SpacegroupAnalyzer(FinalFramework, symprec=0.3, angle_tolerance=3.0)
+            SymmPrimFramework = symm.get_refined_structure()
         except Exception:
-            print('Error in the symmetry analysis')
+            print('Error in the symmetry analysis. Try to increase the symm_tol or angle_tol parameters')
             return None
 
         # Create A stacking. The slab is defined by the c_cell parameter
         if stacking == 'A':
             self.stacking = 'A'
-            self.symm_structure = struct_symm_prim
+            self.symm_structure = SymmPrimFramework
 
         # Create AA staking. By default one sheet per unitary cell is used
         if stacking == 'AA':
             self.stacking = 'AA'
-            self.symm_structure = struct_symm_prim
+            self.symm_structure = SymmPrimFramework
 
         if stacking == 'AB1':
             self.stacking = 'AB1'
             labels_conv_crystal = np.array(
-                [[i['label']] for i in struct_symm_prim.as_dict()['sites']]
+                [[i['label']] for i in SymmPrimFramework.as_dict()['sites']]
                 )
             ion_conv_crystal = np.array(
-                [i['xyz'] for i in struct_symm_prim.as_dict()['sites']]
+                [i['xyz'] for i in SymmPrimFramework.as_dict()['sites']]
                 )
-            cell = np.array(struct_symm_prim.as_dict()['lattice']['matrix'])*(1, 1, 2)
+            cell = np.array(SymmPrimFramework.as_dict()['lattice']['matrix'])*(1, 1, 2)
 
             A = ion_conv_crystal
             B = ion_conv_crystal
@@ -864,10 +862,10 @@ class Reticulum():
         if stacking == 'AB2':
             self.stacking = 'AB2'
             labels_conv_crystal = np.array(
-                [[i['label']] for i in struct_symm_prim.as_dict()['sites']])
+                [[i['label']] for i in SymmPrimFramework.as_dict()['sites']])
             ion_conv_crystal = np.array(
-                [i['xyz'] for i in struct_symm_prim.as_dict()['sites']])
-            cell = np.array(struct_symm_prim.as_dict()[
+                [i['xyz'] for i in SymmPrimFramework.as_dict()['sites']])
+            cell = np.array(SymmPrimFramework.as_dict()[
                             'lattice']['matrix'])*(1, 1, 2)
 
             A = ion_conv_crystal
@@ -893,10 +891,10 @@ class Reticulum():
         if stacking == 'AAl':
             self.stacking = 'AAl'
             labels_conv_crystal = np.array(
-                [[i['label']] for i in struct_symm_prim.as_dict()['sites']])
+                [[i['label']] for i in SymmPrimFramework.as_dict()['sites']])
             ion_conv_crystal = np.array(
-                [i['abc'] for i in struct_symm_prim.as_dict()['sites']])
-            cell = np.array(struct_symm_prim.as_dict()[
+                [i['abc'] for i in SymmPrimFramework.as_dict()['sites']])
+            cell = np.array(SymmPrimFramework.as_dict()[
                             'lattice']['matrix'])*(1, 1, 2)
 
             # Shift the first sheet to be at 0.25 * c
@@ -925,10 +923,10 @@ class Reticulum():
             self.stacking = 'AAt'
 
             labels_conv_crystal = np.array(
-                [[i['label']] for i in struct_symm_prim.as_dict()['sites']])
+                [[i['label']] for i in SymmPrimFramework.as_dict()['sites']])
             ion_conv_crystal = np.array(
-                [i['xyz'] for i in struct_symm_prim.as_dict()['sites']])
-            cell = struct_symm_prim.as_dict()['lattice']
+                [i['xyz'] for i in SymmPrimFramework.as_dict()['sites']])
+            cell = SymmPrimFramework.as_dict()['lattice']
 
             # Shift the cell by the tilt angle
             a_cell = cell['a']
@@ -959,10 +957,10 @@ class Reticulum():
         if stacking == 'ABC1':
             self.stacking = 'ABC1'
             labels_conv_crystal = np.array(
-                [[i['label']] for i in struct_symm_prim.as_dict()['sites']])
+                [[i['label']] for i in SymmPrimFramework.as_dict()['sites']])
             ion_conv_crystal = np.array(
-                [i['abc'] for i in struct_symm_prim.as_dict()['sites']])
-            cell = np.array(struct_symm_prim.as_dict()[
+                [i['abc'] for i in SymmPrimFramework.as_dict()['sites']])
+            cell = np.array(SymmPrimFramework.as_dict()[
                             'lattice']['matrix'])*(1, 1, 3)
 
             A = ion_conv_crystal*(1, 1, 5/3)
@@ -989,10 +987,10 @@ class Reticulum():
         if stacking == 'ABC2':
             self.stacking = 'ABC2'
             labels_conv_crystal = np.array(
-                [[i['label']] for i in struct_symm_prim.as_dict()['sites']])
+                [[i['label']] for i in SymmPrimFramework.as_dict()['sites']])
             ion_conv_crystal = np.array(
-                [i['abc'] for i in struct_symm_prim.as_dict()['sites']])
-            cell = np.array(struct_symm_prim.as_dict()[
+                [i['abc'] for i in SymmPrimFramework.as_dict()['sites']])
+            cell = np.array(SymmPrimFramework.as_dict()[
                             'lattice']['matrix'])*(1, 1, 3)
 
             A = ion_conv_crystal*(1, 1, 5/3)
