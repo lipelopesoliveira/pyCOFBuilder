@@ -143,22 +143,7 @@ TOPOLOGY_DICT = {
             {'position': [0, np.sqrt(3)/4, 0], 'angle': 90},
             ]
         },
-    'FTX': {
-        'a': 4,
-        'b': 4,
-        'c': 3.6,
-        'alpha': 90,
-        'beta': 90,
-        'gamma': 120,
-        'vertice_connectivity': 4,
-        'edge_connectivity': 0,
-        'vertices': [
-            {'position': [1/4, np.sqrt(3)/4, 0], 'angle': 30},
-            {'position': [1/2, 0, 0], 'angle': -90},
-            {'position': [-1/4, np.sqrt(3)/4, 0], 'angle': -30}
-            ],
-        },
-    'FTX_A': {
+    'FXT_A': {
         'a': 4,
         'b': 4,
         'c': 3.6,
@@ -168,17 +153,17 @@ TOPOLOGY_DICT = {
         'vertice_connectivity': 4,
         'edge_connectivity': 2,
         'vertices': [
-            {'position': [1/4, np.sqrt(3)/4, 0], 'angle': 0},
-            {'position': [1/2, 0, 0], 'angle': 30},
-            {'position': [-1/4, np.sqrt(3)/4, 0], 'angle': 0}
+            {'position': [1/4, np.sqrt(3)/4, 0], 'angle': -15},
+            {'position': [1/2, 0, 0], 'angle': 45},
+            {'position': [-1/4, np.sqrt(3)/4, 0], 'angle': 15}
             ],
         'edges': [
-            {'position': [3/8, np.sqrt(3)/8, 0], 'angle': -30},
-            {'position': [1/8, 3*np.sqrt(3)/8, 0], 'angle': -30},
-            {'position': [5/8, np.sqrt(3)/8, 0], 'angle': 30},
-            {'position': [-1/8, 3*np.sqrt(3)/8, 0], 'angle': 30},
-            {'position': [4/8, np.sqrt(3)/4, 0], 'angle': 90},
-            {'position': [0, np.sqrt(3)/4, 0], 'angle': 90},
+            {'position': [22/64, 7*np.sqrt(3)/64, 0], 'angle': -30},
+            {'position': [85/128, 7*np.sqrt(3)/64, 0], 'angle': 30},
+            {'position': [10/64, 24*np.sqrt(3)/64, 0], 'angle': -30},
+            {'position': [-10/64, 24*np.sqrt(3)/64, 0], 'angle': 30},
+            {'position': [4/8, 17*np.sqrt(3)/64, 0], 'angle': 90},
+            {'position': [0, 15*np.sqrt(3)/64, 0], 'angle': 90},
             ]
         },
     }
