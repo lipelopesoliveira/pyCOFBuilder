@@ -168,15 +168,15 @@ TOPOLOGY_DICT = {
         'vertice_connectivity': 4,
         'edge_connectivity': 2,
         'vertices': [
-            {'position': [1/4, np.sqrt(3)/4, 0], 'angle': 30},
+            {'position': [1/4, np.sqrt(3)/4, 0], 'angle': 45},
             {'position': [1/2, 0, 0], 'angle': -90},
-            {'position': [-1/4, np.sqrt(3)/4, 0], 'angle': -30}
+            {'position': [-1/4, np.sqrt(3)/4, 0], 'angle': -45}
             ],
         'edges': [
             {'position': [3/8, np.sqrt(3)/8, 0], 'angle': -30},
             {'position': [1/8, 3*np.sqrt(3)/8, 0], 'angle': -30},
             {'position': [5/8, np.sqrt(3)/8, 0], 'angle': 30},
-            {'position': [-1/8, np.sqrt(3)/8, 0], 'angle': 30},
+            {'position': [-1/8, 3*np.sqrt(3)/8, 0], 'angle': 30},
             {'position': [4/8, np.sqrt(3)/4, 0], 'angle': 90},
             {'position': [0, np.sqrt(3)/4, 0], 'angle': 90},
             ]
