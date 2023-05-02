@@ -139,6 +139,8 @@ class Framework():
                                    'HXL_A': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
                                    'KGM': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
                                    'KGM_A': ['AA', 'AB1x', 'AB1y', 'AB1xy', 'AB2', 'AAl', 'AAt'],
+                                   'FXT': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
+                                   'FXT_A': ['AA', 'AB1x', 'AB1y', 'AB1xy', 'AB2', 'AAl', 'AAt'],
                                    'DIA': [1, 2, 3, 4],  # Temporary
                                    'BOR': [5, 8, 6, 7]  # Temporary
                                    }
@@ -249,7 +251,9 @@ class Framework():
             'KGM': self._create_kgm_structure,
             'KGM_A': self._create_kgm_a_structure,
             'KGD': self._create_kgd_structure,
-            'HXL_A': self._create_hxl_a_structure
+            'HXL_A': self._create_hxl_a_structure,
+            'FXT': self._create_fxt_structure,
+            'FXT_A': self._create_fxt_a_structure,
             }
 
         result = net_build_dict[Net](BB1, BB2, stacking=Stacking, **kwargs)
