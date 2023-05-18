@@ -252,7 +252,7 @@ class Framework():
             'KGM_A': self._create_kgm_a_structure,
             'KGD': self._create_kgd_structure,
             'HXL_A': self._create_hxl_a_structure,
-            'FXT': self._create_fxt_structure,
+            #'FXT': self._create_fxt_structure,
             'FXT_A': self._create_fxt_a_structure,
             }
 
