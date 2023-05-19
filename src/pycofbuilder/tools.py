@@ -6,6 +6,7 @@ Created on Thu Dec 17 11:31:19 2020
 """
 
 import os
+from datetime import date
 import numpy as np
 from scipy.spatial import distance
 try:
@@ -1468,7 +1469,7 @@ def save_cif(path,
     cif_text = f"""\
 data_{file_name}
 
-_audit_creation_date
+_audit_creation_date    {date.today().strftime("%Y-%d-%m")}
 _audit_creation_method pyCOFBuilder
 _audit_author_name  'Felipe Lopes de Oliveira'
 
@@ -1479,7 +1480,7 @@ _cell_length_c                          {c:>10.6f}
 _cell_angle_alpha                       {alpha:>6.2f}
 _cell_angle_beta                        {beta:>6.2f}
 _cell_angle_gamma                       {gamma:>6.2f}
-_space_group_name_H-M_alt               P 1
+_space_group_name_H-M_alt               'P 1'
 _space_group_IT_number                  1
 
 loop_
@@ -1505,16 +1506,16 @@ loop_
     for i in range(len(atom_pos)):
         u, v, w = atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]
         if partial_charges is not False:
-            cif_text += '{}    {} {:>15.9f} {:>15.9f} {:>15.9f} {:>10.5f}\n'.format(
-                atom_labels[i],
+            cif_text += '{:<4}    {} {:>15.9f} {:>15.9f} {:>15.9f} {:>10.5f}\n'.format(
+                atom_labels[i] + str(i),
                 atom_labels[i],
                 u,
                 v,
                 w,
                 partial_charges[i])
         else:
-            cif_text += '{}    {} {:>15.9f} {:>15.9f} {:>15.9f}\n'.format(
-                atom_labels[i],
+            cif_text += '{:<4}    {} {:>15.9f} {:>15.9f} {:>15.9f}\n'.format(
+                atom_labels[i] + str(i),
                 atom_labels[i],
                 u,
                 v,
