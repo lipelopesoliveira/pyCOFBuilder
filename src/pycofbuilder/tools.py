@@ -630,7 +630,7 @@ def get_bond_atom(connector_1: str, connector_2: str) -> str:
 
     bond_dict = {'NH2': 'N',
                  'CONHNH2': 'N',
-                 'NHNH2': 'N',
+                 'CHNNH2': 'N',
                  'BOH2': 'B',
                  'Cl': 'C',
                  'Br': 'C',
