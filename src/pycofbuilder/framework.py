@@ -260,7 +260,7 @@ class Framework():
 
         return result
 
-    def save(self, fmt: str = 'cif', supercell: list = [1, 1, 1], **kwargs) -> None:
+    def save(self, fmt: str = 'cif', supercell: list = [1, 1, 1], save_dir=None, **kwargs) -> None:
         '''
         Save the structure in a specif file format.
 
@@ -298,7 +298,12 @@ class Framework():
         atom_pos = [site['xyz'] for site in structure_dict['sites']]
         atom_labels = [site['species'][0]['element'] for site in structure_dict['sites']]
 
-        save_dict[fmt](path=self.out_path,
+        if save_dir is None:
+            save_path = self.out_path
+        else:
+            save_path = save_dir
+
+        save_dict[fmt](path=save_path,
                        file_name=self.name,
                        cell=cell,
                        atom_labels=atom_labels,
