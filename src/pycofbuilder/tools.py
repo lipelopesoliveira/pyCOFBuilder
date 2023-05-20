@@ -630,9 +630,11 @@ def get_bond_atom(connector_1: str, connector_2: str) -> str:
 
     bond_dict = {'NH2': 'N',
                  'CONHNH2': 'N',
+                 'NHNH2': 'N',
                  'BOH2': 'B',
                  'Cl': 'C',
-                 'Br': 'C'}
+                 'Br': 'C',
+                 'CHCN': 'C'}
 
     bond_atom = None
     for group in list(bond_dict.keys()):
