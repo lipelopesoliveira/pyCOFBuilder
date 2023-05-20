@@ -1,5 +1,5 @@
 {
-  "name": "porfirine",
+  "name": "porphyrin",
   "smiles": "[Q]C1=C([R1])C([R3])=C(C2=NC([R2])=C([Q])C([R1])=C2[R3])N=C1[R2]",
   "code": "PORP",
   "xsmiles": "[*]C1=C([*])C([*])=C(C2=NC([*])=C([*])C([*])=C2[*])N=C1[*]",
