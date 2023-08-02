@@ -3,3 +3,7 @@ numpy >= 1.6.3
 scipy >= 1.2
 pymatgen >=2022.0.8
 simplejson
+jupyter
+jupyterlab
+pandas
+tqdm
