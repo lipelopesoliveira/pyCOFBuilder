@@ -1661,22 +1661,17 @@ def read_json(path, name):
 
 def create_COF_json(name):
 
-    system_info = 'Informations about the system such as name, if it is optimized and other \
-        relevant information.'
+    system_info = 'Informations about the system.'
 
-    geometry_info = 'Informations about the geometry: cell parameters, cell matrix, \
-    atomic positions, partial charges, bond orders, simmetry information'
+    geometry_info = 'Informations about the geometry.'
 
-    optimization_info = 'Information about the optimization process such as level \
-        of calculations, optimization schema and optimization steps.'
+    optimization_info = 'Information about the optimization process.'
 
     adsorption_info = 'Information about the adsorption simulation experiments on RASPA2'
 
-    textural_info = 'Information about the textural calculations of the structure such \
-        as specific area, pore volume, void fraction.'
+    textural_info = 'Information about the textural properties'
 
-    spectrum_info = 'Information about spectra simulation like DRX, FTIR, ssNMR, UV-VIS,\
-         Band dispersion, Phonon dispersion...'
+    spectrum_info = 'Information about spectra simulation.'
 
     experimental_info = 'Experimental data DRX, FTIR, ssNMR, UV-VIS...'
 
