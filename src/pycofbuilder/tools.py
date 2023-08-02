@@ -9,12 +9,14 @@ import os
 from datetime import date
 import numpy as np
 from scipy.spatial import distance
+
 try:
     from pymatgen.io.cif import CifParser
 except Exception:
     print('WARNING: Could no import CifParser from pymatgen.',
           'The conversion from cif to xyz and COF generation may not work properlly')
     CIF_PARSER_IMPORTED = False
+
 import simplejson
 
 
@@ -420,7 +422,7 @@ def get_kgrid(cell, distance=0.3):
 def create_CellBox(A, B, C, alpha, beta, gamma):
     """Creates the CellBox using the same expression as RASPA."""
 
-    tempd = np.cos(alpha) - np.cos(gamma) * np.cos(beta) / np.sin(gamma)
+    tempd = (np.cos(alpha) - np.cos(gamma) * np.cos(beta)) / np.sin(gamma)
 
     ax = A
     ay = 0
