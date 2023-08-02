@@ -1659,20 +1659,17 @@ def read_json(path, name):
     return json_object
 
 
-def create_COF_json(name):
+def create_COF_json(name) -> dict:
+    """
+    Create a empty dictionary with the COF information.
+    """
 
     system_info = 'Informations about the system.'
-
     geometry_info = 'Informations about the geometry.'
-
     optimization_info = 'Information about the optimization process.'
-
     adsorption_info = 'Information about the adsorption simulation experiments on RASPA2'
-
     textural_info = 'Information about the textural properties'
-
     spectrum_info = 'Information about spectra simulation.'
-
     experimental_info = 'Experimental data DRX, FTIR, ssNMR, UV-VIS...'
 
     COF_json = {'system': {'description': system_info,
