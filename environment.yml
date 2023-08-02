@@ -9,7 +9,7 @@ dependencies:
   - pandas
   - panel
   - pip
-  - python
+  - python >= 3.10
   - pymatgen
   - scipy
   - simplejson
