@@ -6,14 +6,17 @@ Created on Thu Dec 17 11:31:19 2020
 """
 
 import os
+from datetime import date
 import numpy as np
 from scipy.spatial import distance
+
 try:
     from pymatgen.io.cif import CifParser
 except Exception:
     print('WARNING: Could no import CifParser from pymatgen.',
           'The conversion from cif to xyz and COF generation may not work properlly')
     CIF_PARSER_IMPORTED = False
+
 import simplejson
 
 
@@ -419,7 +422,7 @@ def get_kgrid(cell, distance=0.3):
 def create_CellBox(A, B, C, alpha, beta, gamma):
     """Creates the CellBox using the same expression as RASPA."""
 
-    tempd = np.cos(alpha) - np.cos(gamma) * np.cos(beta) / np.sin(gamma)
+    tempd = (np.cos(alpha) - np.cos(gamma) * np.cos(beta)) / np.sin(gamma)
 
     ax = A
     ay = 0
@@ -629,9 +632,11 @@ def get_bond_atom(connector_1: str, connector_2: str) -> str:
 
     bond_dict = {'NH2': 'N',
                  'CONHNH2': 'N',
+                 'CHNNH2': 'N',
                  'BOH2': 'B',
                  'Cl': 'C',
-                 'Br': 'C'}
+                 'Br': 'C',
+                 'CHCN': 'C'}
 
     bond_atom = None
     for group in list(bond_dict.keys()):
@@ -1468,9 +1473,9 @@ def save_cif(path,
     cif_text = f"""\
 data_{file_name}
 
-_audit_creation_date
-_audit_creation_method pyCOFBuilder
-_audit_author_name  'Felipe Lopes de Oliveira'
+_audit_creation_date     {date.today().strftime("%Y-%d-%m")}
+_audit_creation_method   pyCOFBuilder
+_audit_author_name       'Felipe Lopes de Oliveira'
 
 _chemical_name_common                  '{file_name}'
 _cell_length_a                          {a:>10.6f}
@@ -1479,7 +1484,7 @@ _cell_length_c                          {c:>10.6f}
 _cell_angle_alpha                       {alpha:>6.2f}
 _cell_angle_beta                        {beta:>6.2f}
 _cell_angle_gamma                       {gamma:>6.2f}
-_space_group_name_H-M_alt               P 1
+_space_group_name_H-M_alt               'P 1'
 _space_group_IT_number                  1
 
 loop_
@@ -1505,16 +1510,16 @@ loop_
     for i in range(len(atom_pos)):
         u, v, w = atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]
         if partial_charges is not False:
-            cif_text += '{}    {} {:>15.9f} {:>15.9f} {:>15.9f} {:>10.5f}\n'.format(
-                atom_labels[i],
+            cif_text += '{:<4}    {} {:>15.9f} {:>15.9f} {:>15.9f} {:>10.5f}\n'.format(
+                atom_labels[i] + str(i),
                 atom_labels[i],
                 u,
                 v,
                 w,
                 partial_charges[i])
         else:
-            cif_text += '{}    {} {:>15.9f} {:>15.9f} {:>15.9f}\n'.format(
-                atom_labels[i],
+            cif_text += '{:<4}    {} {:>15.9f} {:>15.9f} {:>15.9f}\n'.format(
+                atom_labels[i] + str(i),
                 atom_labels[i],
                 u,
                 v,
@@ -1654,25 +1659,17 @@ def read_json(path, name):
     return json_object
 
 
-def create_COF_json(name):
+def create_COF_json(name) -> dict:
+    """
+    Create a empty dictionary with the COF information.
+    """
 
-    system_info = 'Informations about the system such as name, if it is optimized and other \
-        relevant information.'
-
-    geometry_info = 'Informations about the geometry: cell parameters, cell matrix, \
-    atomic positions, partial charges, bond orders, simmetry information'
-
-    optimization_info = 'Information about the optimization process such as level \
-        of calculations, optimization schema and optimization steps.'
-
+    system_info = 'Informations about the system.'
+    geometry_info = 'Informations about the geometry.'
+    optimization_info = 'Information about the optimization process.'
     adsorption_info = 'Information about the adsorption simulation experiments on RASPA2'
-
-    textural_info = 'Information about the textural calculations of the structure such \
-        as specific area, pore volume, void fraction.'
-
-    spectrum_info = 'Information about spectra simulation like DRX, FTIR, ssNMR, UV-VIS,\
-         Band dispersion, Phonon dispersion...'
-
+    textural_info = 'Information about the textural properties'
+    spectrum_info = 'Information about spectra simulation.'
     experimental_info = 'Experimental data DRX, FTIR, ssNMR, UV-VIS...'
 
     COF_json = {'system': {'description': system_info,

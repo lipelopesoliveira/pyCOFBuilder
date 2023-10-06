@@ -37,11 +37,11 @@ conda env create --file environment.yml
 To create a specific COF, like `T3_BENZ_NH2_OH-L2_BENZ_CHO_H-HCB_A-AA`:
 
 ```python
->>> import pycofbuilder as COF
+>>> import pycofbuilder as cof
 
->>> structure = COF.Reticulum(name='T3_BENZ_NH2_OH-L2_BENZ_CHO_H-HCB_A-AA')
+>>> cof.Framework('T3_BENZ_CHO_OH-L2_BENZ_NH2_H-HCB_A-AA')
 T3_BENZ_NH2_OH-L2_BENZ_CHO_H_H-HCB_A-AA                       hexagonal   P    P6/m # 175    12 sym. op.
->>> structure.save(fmt='cif', supercell = [1, 1, 2])
+>>> cof.save(fmt='cif', supercell = [1, 1, 2])
 ```
 
 A `.cif` file (the default save format is CIF, but it can be easily changed by setting other value on the `fmt` option) will be created in the `out` folder. The code will print out some information about the structure created.
@@ -49,17 +49,17 @@ A `.cif` file (the default save format is CIF, but it can be easily changed by s
 Besides, the variable `structure` now is a `Reticulum` object. This object has some attributes that can be accessed:
 
 ```python
->>> structure.name
+>>> cof.name
 'T3_BENZ_NH2_OH-L2_BENZ_CHO_H-HCB_A-AA'
->>> structure.smiles
+>>> cof.smiles
 '(N)C1=C(O)C((N))=C(O)C((N))=C1O.(C([H])=O)C1=C([H])C([H])=C((C([H])=O))C([H])=C1[H]'
->>> structure.lattice
+>>> cof.lattice
 array([[ 22.49540055,   0.        ,   0.        ],
        [-11.24770028,  19.48158835,   0.        ],
        [  0.        ,   0.        ,   3.6       ]])
->>> Ret.n_atoms
+>>> cof.n_atoms
 72
->>> Ret.space_group
+>>> cof.space_group
 'P6/m'
 ```
 
@@ -176,10 +176,5 @@ If you find **pyCOFBuilder** useful in your research please consider citing the 
 
 > F. L. Oliveira and P. M. Esteves,
 > _pyCOFBuilder: A Python Module for Automated Assembly of Covalent Organic Frameworks_
->
-> _Manuscript in preparation._ [DOI](https://doi.org/)
->
-> F. L. Oliveira, J.M.C. Souza and P. M. Esteves,
-> _Exploring Machine Learning Strategies for Partial Atomic Charges Prediction  on Covalent Organic Framework_
 >
 > _Manuscript in preparation._ [DOI](https://doi.org/)

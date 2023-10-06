@@ -37,7 +37,7 @@ COF_list = ['C3_TPBZ_NH2_H-C2_BENZ_CHO_H-HCB_A-AA',
             'C3_BENZ_CHO_OH-C2_BENZ_NH2_H-HCB_A-AA',
             'C3_BENZ_CHO_OH-C2_ANTR_NH2_O-HCB_A-AA']
 
-COF.build_COFs_list(COF_list, supercell=[1,1,1], save_format=['cif'])
+COF.build_COFs_list(COF_list, supercell=[1, 1, 1], save_format=['cif'])
 
 #COF.build('C3_BENZ_CHO_OH-C2_HDZ_NH2-HCB_A-AA', supercell=[1,1,1])
 #COF.build('C3_BENZ_CHO_H-C2_HDZ_NH2-HCB_A-AA', supercell=[1,1,1])
@@ -54,7 +54,3 @@ COF.build_COFs_list(COF_list, supercell=[1,1,1], save_format=['cif'])
 #COF.create_all_C3(nucleos=['BENZ', 'TPBZ'], conectores=['CHO'], radicais=['H'])
 
 #COF.build_all_available_COFs()
-
-
-
-

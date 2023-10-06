@@ -269,7 +269,7 @@ class Building_Block():
                 close_Q_struct = Tools.closest_atom('Q',
                                                     location_Q_struct[1][i],
                                                     self.atom_labels,
-                                                    self.atom_pos)[1]                
+                                                    self.atom_pos)[1]
 
             # Get the position of Q in the conection group
             location_Q_connector = self._get_Q_points(n_conector_label, n_conector_pos)
@@ -443,30 +443,30 @@ class Building_Block():
     def get_available_core(self):
         '''Get the list of available cores'''
         L2_PATH = os.path.join(self.main_path, 'core', 'L2')
-        L2_list = [i.rstrip('.gjf') for i in os.listdir(L2_PATH) if '.gjf' in i]
+        L2_list = [i.rstrip('.json') for i in os.listdir(L2_PATH) if '.json' in i]
 
         T3_PATH = os.path.join(self.main_path, 'core', 'T3')
-        T3_list = [i.rstrip('.gjf') for i in os.listdir(T3_PATH) if '.gjf' in i]
+        T3_list = [i.rstrip('.json') for i in os.listdir(T3_PATH) if '.json' in i]
 
         S4_PATH = os.path.join(self.main_path, 'core', 'S4')
-        S4_list = [i.rstrip('.gjf') for i in os.listdir(S4_PATH) if '.gjf' in i]
+        S4_list = [i.rstrip('.json') for i in os.listdir(S4_PATH) if '.json' in i]
 
         H6_PATH = os.path.join(self.main_path, 'core', 'H6')
-        H6_list = [i.rstrip('.gjf') for i in os.listdir(H6_PATH) if '.gjf' in i]
+        H6_list = [i.rstrip('.json') for i in os.listdir(H6_PATH) if '.json' in i]
 
         return L2_list, T3_list, S4_list, H6_list
 
     def get_available_R(self):
         '''Get the list of available radicals'''
         R_PATH = os.path.join(self.main_path, 'radical')
-        R_list = [i.rstrip('.gjf') for i in os.listdir(R_PATH) if '.gjf' in i]
+        R_list = [i.rstrip('.json') for i in os.listdir(R_PATH) if '.json' in i]
 
         return R_list
 
     def get_available_conector(self):
         '''Get the list of available conectores'''
         C_PATH = os.path.join(self.main_path, 'conector')
-        C_list = [i.rstrip('.gjf') for i in os.listdir(C_PATH) if '.gjf' in i]
+        C_list = [i.rstrip('.json') for i in os.listdir(C_PATH) if '.json' in i]
 
         return C_list
 
