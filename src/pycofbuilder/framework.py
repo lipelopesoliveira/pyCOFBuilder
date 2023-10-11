@@ -125,8 +125,7 @@ class Framework():
                                         'HXL_A',
                                         'FXT_A']
 
-        # Falta adicionar: ['dia', 'bor', 'srs', 'pts', 'ctn', 'rra', 'fcc',
-        # 'lon', 'stp', 'acs', 'tbo', 'bcu', 'fjh', 'ceq']
+        # Falta add: ['dia', 'bor', 'srs', 'pts', 'ctn', 'rra', 'fcc', 'lon', 'stp', 'acs', 'tbo', 'bcu', 'fjh', 'ceq']
         self.available_3D_topologies = ['DIA', 'BOR']  # Temporary
         self.available_topologies = self.available_2D_topologies + \
             self.available_3D_topologies

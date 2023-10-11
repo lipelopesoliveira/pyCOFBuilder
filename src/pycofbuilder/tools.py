@@ -660,6 +660,28 @@ def print_comand(text, verbose, match):
     if verbose in match:
         print(text)
 
+
+def formula_from_atom_list(AtomLabels: list) -> str:
+    """
+    Create a string with the formula of the structure from the list of atoms.
+
+    Parameters
+    ----------
+    AtomLabels : list
+        List of strings containing the atom labels.
+
+    Returns
+    -------
+    formula : str
+        String with the formula of the structure.
+    """
+
+    formula = ''
+    for i in set(AtomLabels):
+        formula += i + str(AtomLabels.count(i))
+
+    return formula
+
 # ------------------------- Reads and save files ----------------------------- #
 
 
@@ -1685,3 +1707,127 @@ def create_COF_json(name) -> dict:
                 }
 
     return COF_json
+
+
+def create_empty_CJSON() -> dict:
+    """
+    Create a dictionary with the structure information to be saved using the
+    chemical JSON format.
+    """
+
+    chemJSON = {
+        "chemicalJson": 1,
+        "name": "",
+        "formula": "",
+        "unitCell": {
+            "a": 0.0,
+            "b": 0.0,
+            "c": 0.0,
+            "alpha": 0.0,
+            "beta":  0.0,
+            "gamma": 0.0,
+            "cellVectors": []
+        },
+        "atoms": {
+            "elements": {
+                "number": [],
+                "type": []
+                },
+            "coords": {
+                "3d": [],
+                "3dFractional": []
+            },
+            "bonds": {
+                "connections": {
+                    "index": []
+                },
+                "order": []
+            },
+            "formalCharges": [],
+            "labels": []
+        },
+        "PartialCharges": {},
+        "properties": {
+            "molecularMass": 0,
+            "totalCharge": 0,
+            "spinMultiplicity": 0,
+            "totalEnergy": 0,
+            "bandGap": 0,
+        },
+        "spectra": {},
+        "vibrations": {},
+        "metadata": {},
+    }
+
+    return chemJSON
+
+
+def create_structure_CJSON(StructureName: str,
+                           CellParameters: list = None,
+                           CellMatrix: list = None,
+                           AtomTypes: list = None,
+                           AtomPositions: list = None,
+                           CartesianPositions: bool = False,
+                           AtomLabels: list = [],
+                           Bonds: list = [],
+                           BondOrders: list = [],
+                           PartialCharges: dict = {},
+                           ) -> dict:
+    """
+    Creates a dictionary with the structure information to be saved using the
+    chemical JSON format.
+
+    Parameters
+    ----------
+    StructureName : str
+        Name of the structure.
+    CellParameters : list
+        List with the cell parameters.
+    CellMatrix : list
+        List with the cell matrix. Optional
+    AtomLabels : list
+        List with the atom labels.
+    AtomPositions : list
+        List with the atom positions.
+
+    """
+
+    chemJSON = create_empty_CJSON()
+
+    chemJSON['name'] = StructureName
+    chemJSON['formula'] = formula_from_atom_list(AtomLabels)
+
+    if CellParameters is not None:
+        CellMatrix = cellpar_to_cell(CellParameters)
+    else:
+        CellParameters = cell_to_cellpar(CellMatrix)
+
+    chemJSON['unitCell']['a'] = CellParameters[0]
+    chemJSON['unitCell']['b'] = CellParameters[1]
+    chemJSON['unitCell']['c'] = CellParameters[2]
+    chemJSON['unitCell']['alpha'] = CellParameters[3]
+    chemJSON['unitCell']['beta'] = CellParameters[4]
+    chemJSON['unitCell']['gamma'] = CellParameters[5]
+    chemJSON['unitCell']['cellVectors'] = CellMatrix.flatten().tolist()
+
+    AtomNumbers = [elements_dict(property="atomic_number")[i] for i in AtomTypes]
+    chemJSON['atoms']['elements']['number'] = [AtomNumbers]
+    chemJSON['atoms']['elements']['type'] = [AtomTypes]
+
+    chemJSON['atoms']['elements']['labels'] = AtomLabels
+
+    if CartesianPositions:
+        chemJSON['coords']['3d'] = np.array(AtomPositions).flatten().tolist()
+        R = get_fractional_to_cartesian_matrix(*CellParameters)
+        chemJSON['coords']['3dFractional'] = np.dot(AtomPositions, R).flatten().tolist()
+
+    else:
+        chemJSON['coords']['3dFractional'] = np.array(AtomPositions).flatten().tolist()
+        R = get_cartesian_to_fractional_matrix(*CellParameters)
+        chemJSON['coords']['3d'] = np.dot(AtomPositions, R).flatten().tolist()
+
+    chemJSON['bonds']['connections']['index'] = Bonds
+    chemJSON['bonds']['order'] = BondOrders
+    chemJSON['PartialCharges'] = PartialCharges
+
+    return chemJSON
