@@ -1461,6 +1461,42 @@ def save_json(path, file_name, cell, atom_labels, atom_pos, frac_coords=False):
     write_json(path, file_name, cof_json)
 
 
+def save_chemjson(path, file_name, cell, atom_labels, atom_pos, frac_coords=False):
+    """
+    Save a file in format `.json` on the `path`.
+
+    Parameters
+    ----------
+    path : str
+        Path to the file.
+    file_name : str
+        Name of the file. Does not neet to contain the `.cif` extention.
+    atom_label : list
+        List of strings containing containg the N atom partial charges.
+    atom_pos : list
+        Nx3 array contaning the atoms coordinates.
+    cell : numpy array
+        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
+    """
+
+    file_name = file_name.split('.')[0]
+    if len(cell) == 6:
+        CellParameters = cell
+        CellMatrix = None
+    if len(cell) == 3:
+        CellParameters = None
+        CellMatrix = cell
+
+    chemJSON = create_structure_CJSON(StructureName=file_name.split('.')[0],
+                                      CellParameters=CellParameters,
+                                      CellMatrix=CellMatrix,
+                                      AtomTypes=atom_labels,
+                                      AtomPositions=atom_pos,
+                                      CartesianPositions=not frac_coords)
+
+    write_json(path, file_name, chemJSON)
+
+
 def save_cif(path,
              file_name,
              cell,
