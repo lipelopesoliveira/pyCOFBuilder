@@ -34,9 +34,14 @@ class Building_Block():
         self.symmetry = None
         self.core = None
         self.conector = None
-        self.radicals = None
+        self.funcGroups = None
 
-        self.available_symmetry = ['L2', 'T3', 'S4', 'H6']
+        self.available_symmetry = ['L2',
+                                   'T3',
+                                   'S4', 'R4', 'T4',
+                                   'H6', 'O6', 'P6'
+                                   'C8', 'A8', 'E8'
+                                   'B12', 'I12', 'U12', 'X12']
 
         # Check if save_dir exists and try to create it if not
         if self.save_dir is not False:
@@ -53,20 +58,20 @@ class Building_Block():
         return 'BuildingBlock({}, {}, {}, {})'.format(self.symmetry,
                                                       self.core,
                                                       self.conector,
-                                                      self.radicals)
+                                                      self.funcGroups)
 
     def from_name(self, name):
         '''Automatically read or create a buiding block based on its name'''
 
         # Check the existence of the building block files
-        symm_check, core_check, conector_check, radicals_check = self.check_existence(name)
+        symm_check, core_check, conector_check, funcGroup_check = self.check_existence(name)
 
         error_msg = "Building Block name is invalid!\n"
-        error_msg += "Symm: {}, Core: {}, Connector: {}, Radical:{}".format(symm_check,
-                                                                            core_check,
-                                                                            conector_check,
-                                                                            radicals_check)
-        assert all([symm_check, core_check, conector_check, radicals_check]), error_msg
+        error_msg += "Symm: {}, Core: {}, Connector: {}, Functional Group:{}".format(symm_check,
+                                                                                     core_check,
+                                                                                     conector_check,
+                                                                                     funcGroup_check)
+        assert all([symm_check, core_check, conector_check, funcGroup_check]), error_msg
 
         # Make the BB name global
         self.name = name
@@ -75,12 +80,12 @@ class Building_Block():
         self.symmetry = BB_name[0]
         self.core = BB_name[1]
         self.conector = BB_name[2]
-        possible_radicals = BB_name[3:] + ['H'] * (9 - len(BB_name[3:]))
+        possible_funcGroups = BB_name[3:] + ['H'] * (9 - len(BB_name[3:]))
 
         self._create_BB_structure(self.symmetry,
                                   self.core,
                                   self.conector,
-                                  *possible_radicals)
+                                  *possible_funcGroups)
         if self.save_bb:
             self.save()
 
@@ -108,7 +113,7 @@ class Building_Block():
             self.symmetry = BB_name[0]
             self.core = BB_name[1]
             self.conector = BB_name[2]
-            self.radicals = BB_name[3:]
+            self.funcGroups = BB_name[3:]
 
         except Exception:
             print('Error on the definition of the BB nomenclature.')
@@ -318,7 +323,7 @@ class Building_Block():
 
         # Read the R group
         R_chem_json = Tools.read_json(
-            os.path.join(self.main_path, 'radical'),
+            os.path.join(self.main_path, 'func_groups'),
             R_name)
 
         r_smiles = R_chem_json['smiles'].replace('[R]', '')
@@ -418,14 +423,14 @@ class Building_Block():
         R_list_names = [R1, R2, R3, R4, R5, R6, R7, R8, R9]
         R_list_labels = ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9']
 
-        radical_string = []
+        funcGroup_string = []
         for i in range(len(R_list_names)):
             if R_list_labels[i] in self.atom_labels:
                 self._add_R_group(R_list_names[i], R_list_labels[i])
                 self.name += f'_{R_list_names[i]}'
-                radical_string.append(R_list_names[i])
+                funcGroup_string.append(R_list_names[i])
 
-        self.radicals = radical_string
+        self.funcGroups = funcGroup_string
 
         self.connectivity = len([i for i in self.atom_labels if 'X' in i])
         self._centralize_molecule()
@@ -457,8 +462,8 @@ class Building_Block():
         return L2_list, T3_list, S4_list, H6_list
 
     def get_available_R(self):
-        '''Get the list of available radicals'''
-        R_PATH = os.path.join(self.main_path, 'radical')
+        '''Get the list of available functional groups'''
+        R_PATH = os.path.join(self.main_path, 'func_groups')
         R_list = [i.rstrip('.json') for i in os.listdir(R_PATH) if '.json' in i]
 
         return R_list
@@ -475,13 +480,13 @@ class Building_Block():
         symm_check = False
         core_check = False
         conector_check = False
-        radicals_check = True
+        funcGroup_check = True
 
         name = name.split('_')
         symm = name[0]
         core = name[1]
         conector = name[2]
-        radicals = name[3:]
+        funcGroups = name[3:]
 
         BB_dict = {s: self.get_available_core()[i] for i, s in enumerate(self.available_symmetry)}
 
@@ -503,14 +508,14 @@ class Building_Block():
             print(f'ERROR! {conector} is not a available conector.')
             print(f'Available list: {self.get_available_conector()}')
 
-        radicals_list = self.get_available_R()
-        for rad in radicals:
-            if rad not in radicals_list:
-                print(f'ERROR! Radical {rad} is not a available.')
-                print(f'Available list: {radicals_list}')
-                radicals_check = False
+        possible_funcGroups_list = self.get_available_R()
+        for func in funcGroups:
+            if func not in possible_funcGroups_list:
+                print(f'ERROR! Functional group {func} is not a available.')
+                print(f'Available list: {possible_funcGroups_list}')
+                funcGroup_check = False
 
-        return symm_check, core_check, conector_check, radicals_check
+        return symm_check, core_check, conector_check, funcGroup_check
 
     def get_bipodal_NH2(self):
 
