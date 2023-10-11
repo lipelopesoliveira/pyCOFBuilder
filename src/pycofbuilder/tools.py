@@ -1696,7 +1696,7 @@ def write_json(path, name, COF_json):
     if os.path.exists(path) is not True:
         os.mkdir(path)
 
-    save_path = os.path.join(path, name + '.json')
+    save_path = os.path.join(path, name + '.cjson')
 
     with open(save_path, 'w', encoding='utf-8') as f:
         simplejson.dump(COF_json,
@@ -1773,15 +1773,15 @@ def create_empty_CJSON() -> dict:
                 "3d": [],
                 "3dFractional": []
             },
-            "bonds": {
+            "formalCharges": [],
+            "labels": []
+        },
+        "bonds": {
                 "connections": {
                     "index": []
                 },
                 "order": []
             },
-            "formalCharges": [],
-            "labels": []
-        },
         "PartialCharges": {},
         "properties": {
             "molecularMass": 0,
@@ -1837,6 +1837,7 @@ def create_structure_CJSON(StructureName: str,
         CellMatrix = cellpar_to_cell(CellParameters)
     else:
         CellParameters = cell_to_cellpar(CellMatrix)
+        CellMatrix = np.array(CellMatrix)
 
     chemJSON['unitCell']['a'] = CellParameters[0]
     chemJSON['unitCell']['b'] = CellParameters[1]
@@ -1847,23 +1848,27 @@ def create_structure_CJSON(StructureName: str,
     chemJSON['unitCell']['cellVectors'] = CellMatrix.flatten().tolist()
 
     AtomNumbers = [elements_dict(property="atomic_number")[i] for i in AtomTypes]
-    chemJSON['atoms']['elements']['number'] = [AtomNumbers]
-    chemJSON['atoms']['elements']['type'] = [AtomTypes]
+    chemJSON['atoms']['elements']['number'] = AtomNumbers
+    chemJSON['atoms']['elements']['type'] = AtomTypes
 
     chemJSON['atoms']['elements']['labels'] = AtomLabels
 
     if CartesianPositions:
-        chemJSON['coords']['3d'] = np.array(AtomPositions).flatten().tolist()
-        R = get_fractional_to_cartesian_matrix(*CellParameters)
-        chemJSON['coords']['3dFractional'] = np.dot(AtomPositions, R).flatten().tolist()
+        print(CellParameters)
+        chemJSON['atoms']['coords']['3d'] = np.array(AtomPositions).flatten().tolist()
+        V_frac = get_cartesian_to_fractional_matrix(*CellParameters)
+        FracPosition = np.array([np.dot(V_frac, atom) for atom in AtomPositions]).flatten().tolist()
+        chemJSON['atoms']['coords']['3dFractional'] = FracPosition
 
     else:
-        chemJSON['coords']['3dFractional'] = np.array(AtomPositions).flatten().tolist()
-        R = get_cartesian_to_fractional_matrix(*CellParameters)
-        chemJSON['coords']['3d'] = np.dot(AtomPositions, R).flatten().tolist()
+        chemJSON['atoms']['coords']['3dFractional'] = np.array(AtomPositions).flatten().tolist()
+        V_cart = get_fractional_to_cartesian_matrix(*CellParameters)
+        CartPosition = np.array([np.dot(V_cart, atom) for atom in AtomPositions]).flatten().tolist()
+        chemJSON['atoms']['coords']['3d'] = CartPosition
+
+    chemJSON['atoms']['PartialCharges'] = PartialCharges
 
     chemJSON['bonds']['connections']['index'] = Bonds
     chemJSON['bonds']['order'] = BondOrders
-    chemJSON['PartialCharges'] = PartialCharges
 
     return chemJSON

@@ -38,10 +38,11 @@ class Building_Block():
 
         self.available_symmetry = ['L2',
                                    'T3',
-                                   'S4', 'R4', 'T4',
-                                   'H6', 'O6', 'P6'
-                                   'C8', 'A8', 'E8'
-                                   'B12', 'I12', 'U12', 'X12']
+                                   'S4',  # 'R4', 'T4',
+                                   'H6',  # 'O6', 'P6'
+                                   # 'C8', 'A8', 'E8'
+                                   # 'B12', 'I12', 'U12', 'X12'
+                                   ]
 
         # Check if save_dir exists and try to create it if not
         if self.save_dir is not False:

@@ -276,7 +276,7 @@ class Framework():
 
         save_dict = {
             'json': Tools.save_json,
-            'cjson': Tools.save_cjson,
+            'cjson': Tools.save_chemjson,
             'cif': Tools.save_cif,
             'xyz': Tools.save_xyz,
             'turbomole': Tools.save_turbomole,
