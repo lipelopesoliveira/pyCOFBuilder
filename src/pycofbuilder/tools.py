@@ -1854,7 +1854,6 @@ def create_structure_CJSON(StructureName: str,
     chemJSON['atoms']['elements']['labels'] = AtomLabels
 
     if CartesianPositions:
-        print(CellParameters)
         chemJSON['atoms']['coords']['3d'] = np.array(AtomPositions).flatten().tolist()
         V_frac = get_cartesian_to_fractional_matrix(*CellParameters)
         FracPosition = np.array([np.dot(V_frac, atom) for atom in AtomPositions]).flatten().tolist()
