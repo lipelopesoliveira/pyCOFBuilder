@@ -270,9 +270,11 @@ class Framework():
             'KGM': self._create_kgm_structure,
             'KGM_A': self._create_kgm_a_structure,
             'KGD': self._create_kgd_structure,
+            # 'HXL': self._create_hxl_structure,
             'HXL_A': self._create_hxl_a_structure,
             # 'FXT': self._create_fxt_structure,
             'FXT_A': self._create_fxt_a_structure,
+            # 'BEX': self._create_bex_structure
             }
 
         result = net_build_dict[Net](BB1, BB2, stacking=Stacking, **kwargs)
@@ -1565,8 +1567,7 @@ class Framework():
             cell = np.array(SymmPrimFramework.as_dict()['lattice']['matrix'])*(1, 1, 2)
 
             A = ion_conv_crystal*(1, 1, 0.5)
-            B = translate_inside(
-                ion_conv_crystal*(1, 1, 1.5) + (1/4, 1/4, 0))
+            B = translate_inside(ion_conv_crystal*(1, 1, 1.5) + (1/4, 1/4, 0))
 
             AB = np.concatenate((A, B))
             AB_label = [i[0] for i in labels_conv_crystal]
