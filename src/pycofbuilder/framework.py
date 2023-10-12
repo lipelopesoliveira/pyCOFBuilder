@@ -3,7 +3,7 @@
 # Distributed under the terms of the MIT License.
 
 """
-This class implements definitions for Reticulum buiding
+This class implements definitions for a Framework buiding
 """
 
 import os
@@ -15,7 +15,27 @@ from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 
 from scipy.spatial.transform import Rotation as R
 
-import pycofbuilder.tools as Tools
+from pycofbuilder.tools import (print_command,
+                                get_bond_atom,
+                                translate_inside,
+                                get_cartesian_to_fractional_matrix,
+                                cell_to_cellpar,
+                                cellpar_to_cell,
+                                rotation_matrix_from_vectors,
+                                change_X_atoms,
+                                print_framework_name)
+
+from pycofbuilder.io_tools import (save_json,
+                                   save_chemjson,
+                                   save_cif,
+                                   save_xyz,
+                                   save_turbomole,
+                                   save_vasp,
+                                   save_xsf,
+                                   save_pdb,
+                                   save_pqr,
+                                   save_qe)
+
 from pycofbuilder.building_block import Building_Block
 
 from pycofbuilder.data.topology import TOPOLOGY_DICT
@@ -275,16 +295,16 @@ class Framework():
         '''
 
         save_dict = {
-            'json': Tools.save_json,
-            'cjson': Tools.save_chemjson,
-            'cif': Tools.save_cif,
-            'xyz': Tools.save_xyz,
-            'turbomole': Tools.save_turbomole,
-            'vasp': Tools.save_vasp,
-            'xsf': Tools.save_xsf,
-            'pdb': Tools.save_pdb,
-            'pqr': Tools.save_pqr,
-            'qe': Tools.save_qe
+            'json': save_json,
+            'cjson': save_chemjson,
+            'cif': save_cif,
+            'xyz': save_xyz,
+            'turbomole': save_turbomole,
+            'vasp': save_vasp,
+            'xsf': save_xsf,
+            'pdb': save_pdb,
+            'pqr': save_pqr,
+            'qe': save_qe
          }
 
         file_format_error = f'Format must be one of the following: {save_dict.keys()}'
@@ -368,16 +388,12 @@ class Framework():
         self.charge = BB_T3_A.charge + BB_T3_B.charge
         self.chirality = BB_T3_A.chirality or BB_T3_B.chirality
 
-        Tools.print_comand(f'Starting the creation of {self.name}',
-                           self.verbosity,
-                           ['debug', 'high'])
+        print_command(f'Starting the creation of {self.name}', self.verbosity, ['debug', 'high'])
 
         # Detect the bond atom from the connection groups type
-        bond_atom = Tools.get_bond_atom(BB_T3_A.conector, BB_T3_B.conector)
+        bond_atom = get_bond_atom(BB_T3_A.conector, BB_T3_B.conector)
 
-        Tools.print_comand(f'Bond atom detected: {bond_atom}',
-                           self.verbosity,
-                           ['debug', 'high'])
+        print_command(f'Bond atom detected: {bond_atom}', self.verbosity, ['debug', 'high'])
 
         # Get the topology information
         topology_info = TOPOLOGY_DICT[self.topology]
@@ -542,8 +558,7 @@ class Framework():
             A = ion_conv_crystal * np.array([1, 1, 0.5])
 
             # Calculates the shift vector in crystal units
-            r = Tools.get_cartesian_to_fractional_matrix(
-                *Tools.cell_to_cellpar(cell))
+            r = get_cartesian_to_fractional_matrix(*cell_to_cellpar(cell))
             shift_vector = np.dot(r, np.array(shift_vector))
 
             # Shift the first sheet to be at 0.75 * c and translate by the shift_vector
@@ -578,8 +593,7 @@ class Framework():
             beta = cell['beta'] - tilt_angle
             gamma = cell['gamma']
 
-            new_cell = Tools.cellpar_to_cell(
-                [a_cell, b_cell, c_cell, alpha, beta, gamma])
+            new_cell = cellpar_to_cell([a_cell, b_cell, c_cell, alpha, beta, gamma])
 
             # Shift the first sheet to be at 0.25 * c
             A = ion_conv_crystal
@@ -606,10 +620,8 @@ class Framework():
                             'lattice']['matrix'])*(1, 1, 3)
 
             A = ion_conv_crystal*(1, 1, 5/3)
-            B = Tools.translate_inside(
-                ion_conv_crystal*(1, 1, 1) + (2/3, 1/3, 0))
-            C = Tools.translate_inside(
-                ion_conv_crystal*(1, 1, 1/3) + (4/3, 2/3, 0))
+            B = translate_inside(ion_conv_crystal*(1, 1, 1) + (2/3, 1/3, 0))
+            C = translate_inside(ion_conv_crystal*(1, 1, 1/3) + (4/3, 2/3, 0))
 
             ABC = np.concatenate((A, B, C))
             ABC_label = [i[0] for i in labels_conv_crystal]
@@ -636,10 +648,8 @@ class Framework():
             cell = np.array(SymmPrimFramework['lattice']['matrix'])*(1, 1, 3)
 
             A = ion_conv_crystal*(1, 1, 5/3)
-            B = Tools.translate_inside(
-                ion_conv_crystal*(1, 1, 1) + (1/3, 0, 0))
-            C = Tools.translate_inside(
-                ion_conv_crystal*(1, 1, 1/3) + (2/3, 0, 0))
+            B = translate_inside(ion_conv_crystal*(1, 1, 1) + (1/3, 0, 0))
+            C = translate_inside(ion_conv_crystal*(1, 1, 1/3) + (2/3, 0, 0))
 
             ABC = np.concatenate((A, B, C))
             ABC_label = [i[0] for i in labels_conv_crystal]
@@ -679,12 +689,12 @@ class Framework():
         self.hall = symm.get_hall()
 
         if print_result is True:
-            Tools.print_result(self.name,
-                               str(self.lattice_type),
-                               str(self.hall[0:2]),
-                               str(self.space_group),
-                               str(self.space_group_n),
-                               len(symm_op))
+            print_framework_name(self.name,
+                                 str(self.lattice_type),
+                                 str(self.hall[0:2]),
+                                 str(self.space_group),
+                                 str(self.space_group_n),
+                                 len(symm_op))
 
         return [self.name,
                 str(self.lattice_type),
@@ -748,16 +758,12 @@ class Framework():
 
         self.name = f'{BB_T3.name}-{BB_L2.name}-HCB_A-{stacking}'
 
-        Tools.print_comand(f'Starting the creation of {self.name}',
-                           self.verbosity,
-                           ['debug', 'high'])
+        print_command(f'Starting the creation of {self.name}', self.verbosity, ['debug', 'high'])
 
         # Detect the bond atom from the connection groups type
-        bond_atom = Tools.get_bond_atom(BB_T3.conector, BB_L2.conector)
+        bond_atom = get_bond_atom(BB_T3.conector, BB_L2.conector)
 
-        Tools.print_comand(f'Bond atom detected: {bond_atom}',
-                           self.verbosity,
-                           ['debug', 'high'])
+        print_command(f'Bond atom detected: {bond_atom}', self.verbosity, ['debug', 'high'])
 
         # Get the topology information
         topology_info = TOPOLOGY_DICT[self.topology]
@@ -909,8 +915,7 @@ class Framework():
             A = ion_conv_crystal * np.array([1, 1, 0.5])
 
             # Calculates the shift vector in crystal units
-            r = Tools.get_cartesian_to_fractional_matrix(
-                *Tools.cell_to_cellpar(cell))
+            r = get_cartesian_to_fractional_matrix(*cell_to_cellpar(cell))
             shift_vector = np.dot(r, np.array(shift_vector))
 
             # Shift the first sheet to be at 0.75 * c and translate by the shift_vector
@@ -944,7 +949,7 @@ class Framework():
             beta = cell['beta'] - tilt_angle
             gamma = cell['gamma']
 
-            new_cell = Tools.cellpar_to_cell(
+            new_cell = cellpar_to_cell(
                 [a_cell, b_cell, c_cell, alpha, beta, gamma])
 
             # Shift the first sheet to be at 0.25 * c
@@ -972,10 +977,8 @@ class Framework():
                             'lattice']['matrix'])*(1, 1, 3)
 
             A = ion_conv_crystal*(1, 1, 5/3)
-            B = Tools.translate_inside(
-                ion_conv_crystal*(1, 1, 1) + (2/3, 1/3, 0))
-            C = Tools.translate_inside(
-                ion_conv_crystal*(1, 1, 1/3) + (4/3, 2/3, 0))
+            B = translate_inside(ion_conv_crystal*(1, 1, 1) + (2/3, 1/3, 0))
+            C = translate_inside(ion_conv_crystal*(1, 1, 1/3) + (4/3, 2/3, 0))
 
             ABC = np.concatenate((A, B, C))
             ABC_label = [i[0] for i in labels_conv_crystal]
@@ -1002,10 +1005,8 @@ class Framework():
                             'lattice']['matrix'])*(1, 1, 3)
 
             A = ion_conv_crystal*(1, 1, 5/3)
-            B = Tools.translate_inside(
-                ion_conv_crystal*(1, 1, 1) + (1/3, 0, 0))
-            C = Tools.translate_inside(
-                ion_conv_crystal*(1, 1, 1/3) + (2/3, 0, 0))
+            B = translate_inside(ion_conv_crystal*(1, 1, 1) + (1/3, 0, 0))
+            C = translate_inside(ion_conv_crystal*(1, 1, 1/3) + (2/3, 0, 0))
 
             ABC = np.concatenate((A, B, C))
             ABC_label = [i[0] for i in labels_conv_crystal]
@@ -1031,7 +1032,7 @@ class Framework():
         self.n_atoms = len(self.symm_structure)
         self.composition = self.symm_structure.formula
 
-        Tools.print_comand(self.symm_structure, self.verbosity, ['debug'])
+        print_command(self.symm_structure, self.verbosity, ['debug'])
 
         # Get the simmetry information of the generated structure
         self.lattice_type = symm.get_lattice_type()
@@ -1042,12 +1043,12 @@ class Framework():
         self.hall = symm.get_hall()
 
         if print_result is True:
-            Tools.print_result(self.name,
-                               str(self.lattice_type),
-                               str(self.hall[0:2]),
-                               str(self.space_group),
-                               str(self.space_group_n),
-                               len(symm_op))
+            print_framework_name(self.name,
+                                 str(self.lattice_type),
+                                 str(self.hall[0:2]),
+                                 str(self.space_group),
+                                 str(self.space_group_n),
+                                 len(symm_op))
 
         return [self.name,
                 str(self.lattice_type),
@@ -1109,16 +1110,12 @@ class Framework():
 
         self.name = f'{BB_S4_A.name}-{BB_S4_B.name}-{self.topology}-{stacking}'
 
-        Tools.print_comand(f'Starting the creation of {self.name}',
-                           self.verbosity,
-                           ['debug', 'high'])
+        print_command(f'Starting the creation of {self.name}', self.verbosity, ['debug', 'high'])
 
         # Detect the bond atom from the connection groups type
-        bond_atom = Tools.get_bond_atom(BB_S4_A.conector, BB_S4_B.conector)
+        bond_atom = get_bond_atom(BB_S4_A.conector, BB_S4_B.conector)
 
-        Tools.print_comand(f'Bond atom detected: {bond_atom}',
-                           self.verbosity,
-                           ['debug', 'high'])
+        print_command(f'Bond atom detected: {bond_atom}', self.verbosity, ['debug', 'high'])
 
         # Get the topology information
         topology_info = TOPOLOGY_DICT[self.topology]
@@ -1214,8 +1211,7 @@ class Framework():
                             'lattice']['matrix'])*(1, 1, 2)
 
             A = ion_conv_crystal*(1, 1, 0.5)
-            B = Tools.translate_inside(
-                ion_conv_crystal*(1, 1, 1.5) + (1/4, 1/4, 0))
+            B = translate_inside(ion_conv_crystal*(1, 1, 1.5) + (1/4, 1/4, 0))
 
             AB = np.concatenate((A, B))
             AB_label = [i[0] for i in labels_conv_crystal]
@@ -1238,8 +1234,7 @@ class Framework():
                             'lattice']['matrix'])*(1, 1, 2)
 
             A = ion_conv_crystal*(1, 1, 0.5)
-            B = Tools.translate_inside(
-                ion_conv_crystal*(1, 1, 1.5) + (1/2, 0, 0))
+            B = translate_inside(ion_conv_crystal*(1, 1, 1.5) + (1/2, 0, 0))
 
             AB = np.concatenate((A, B))
             AB_label = [i[0] for i in labels_conv_crystal]
@@ -1271,8 +1266,7 @@ class Framework():
             A = ion_conv_crystal * np.array([1, 1, 0.5])
 
             # Calculates the shift vector in crystal units
-            r = Tools.get_cartesian_to_fractional_matrix(
-                *Tools.cell_to_cellpar(cell))
+            r = get_cartesian_to_fractional_matrix(*cell_to_cellpar(cell))
             shift_vector = np.dot(r, np.array(shift_vector))
 
             # Shift the first sheet to be at 0.75 * c and translate by the shift_vector
@@ -1306,8 +1300,7 @@ class Framework():
             beta = cell['beta'] - tilt_angle
             gamma = cell['gamma']
 
-            new_cell = Tools.cellpar_to_cell(
-                [a_cell, b_cell, c_cell, alpha, beta, gamma])
+            new_cell = cellpar_to_cell([a_cell, b_cell, c_cell, alpha, beta, gamma])
 
             # Shift the first sheet to be at 0.25 * c
             A = ion_conv_crystal
@@ -1334,10 +1327,8 @@ class Framework():
                             'lattice']['matrix'])*(1, 1, 3)
 
             A = ion_conv_crystal*(1, 1, 5/3)
-            B = Tools.translate_inside(
-                ion_conv_crystal*(1, 1, 1) + (2/3, 1/3, 0))
-            C = Tools.translate_inside(
-                ion_conv_crystal*(1, 1, 1/3) + (4/3, 2/3, 0))
+            B = translate_inside(ion_conv_crystal*(1, 1, 1) + (2/3, 1/3, 0))
+            C = translate_inside(ion_conv_crystal*(1, 1, 1/3) + (4/3, 2/3, 0))
 
             ABC = np.concatenate((A, B, C))
             ABC_label = [i[0] for i in labels_conv_crystal]
@@ -1365,10 +1356,8 @@ class Framework():
                             'lattice']['matrix'])*(1, 1, 3)
 
             A = ion_conv_crystal*(1, 1, 5/3)
-            B = Tools.translate_inside(
-                ion_conv_crystal*(1, 1, 1) + (1/3, 0, 0))
-            C = Tools.translate_inside(
-                ion_conv_crystal*(1, 1, 1/3) + (2/3, 0, 0))
+            B = translate_inside(ion_conv_crystal*(1, 1, 1) + (1/3, 0, 0))
+            C = translate_inside(ion_conv_crystal*(1, 1, 1/3) + (2/3, 0, 0))
 
             ABC = np.concatenate((A, B, C))
             ABC_label = [i[0] for i in labels_conv_crystal]
@@ -1407,12 +1396,12 @@ class Framework():
         self.hall = symm.get_hall()
 
         if print_result is True:
-            Tools.print_result(self.name,
-                               str(self.lattice_type),
-                               str(self.hall[0:2]),
-                               str(self.space_group),
-                               str(self.space_group_n),
-                               len(symm_op))
+            print_framework_name(self.name,
+                                 str(self.lattice_type),
+                                 str(self.hall[0:2]),
+                                 str(self.space_group),
+                                 str(self.space_group_n),
+                                 len(symm_op))
 
         return [self.name,
                 str(self.lattice_type),
@@ -1475,16 +1464,12 @@ class Framework():
 
         self.name = f'{BB_S4.name}-{BB_L2.name}-{self.topology}-{stacking}'
 
-        Tools.print_comand(f'Starting the creation of {self.name}',
-                           self.verbosity,
-                           ['debug', 'high'])
+        print_command(f'Starting the creation of {self.name}', self.verbosity, ['debug', 'high'])
 
         # Detect the bond atom from the connection groups type
-        bond_atom = Tools.get_bond_atom(BB_S4.conector, BB_L2.conector)
+        bond_atom = get_bond_atom(BB_S4.conector, BB_L2.conector)
 
-        Tools.print_comand(f'Bond atom detected: {bond_atom}',
-                           self.verbosity,
-                           ['debug', 'high'])
+        print_command(f'Bond atom detected: {bond_atom}', self.verbosity, ['debug', 'high'])
 
         # Get the topology information
         topology_info = TOPOLOGY_DICT[self.topology]
@@ -1534,7 +1519,7 @@ class Framework():
             final_pos += rotated_pos.tolist()
 
         # Replace "X" on final_label with the correct bond atom
-        bond_atom = Tools.get_bond_atom(BB_S4.conector, BB_L2.conector)
+        bond_atom = get_bond_atom(BB_S4.conector, BB_L2.conector)
 
         final_label = [x.replace('X', bond_atom) for x in final_label]
 
@@ -1580,7 +1565,7 @@ class Framework():
             cell = np.array(SymmPrimFramework.as_dict()['lattice']['matrix'])*(1, 1, 2)
 
             A = ion_conv_crystal*(1, 1, 0.5)
-            B = Tools.translate_inside(
+            B = translate_inside(
                 ion_conv_crystal*(1, 1, 1.5) + (1/4, 1/4, 0))
 
             AB = np.concatenate((A, B))
@@ -1604,7 +1589,7 @@ class Framework():
             cell = np.array(SymmPrimFramework.as_dict()['lattice']['matrix'])*(1, 1, 2)
 
             A = ion_conv_crystal*(1, 1, 0.5)
-            B = Tools.translate_inside(
+            B = translate_inside(
                 ion_conv_crystal*(1, 1, 1.5) + (1/2, 0, 0))
 
             AB = np.concatenate((A, B))
@@ -1633,8 +1618,8 @@ class Framework():
             A = ion_conv_crystal * np.array([1, 1, 0.5])
 
             # Calculates the shift vector in crystal units
-            r = Tools.get_cartesian_to_fractional_matrix(
-                *Tools.cell_to_cellpar(cell))
+            r = get_cartesian_to_fractional_matrix(
+                *cell_to_cellpar(cell))
             shift_vector = np.dot(r, np.array(shift_vector))
 
             # Shift the first sheet to be at 0.75 * c and translate by the shift_vector
@@ -1668,7 +1653,7 @@ class Framework():
             beta = cell['beta'] - tilt_angle
             gamma = cell['gamma']
 
-            new_cell = Tools.cellpar_to_cell(
+            new_cell = cellpar_to_cell(
                 [a_cell, b_cell, c_parameter_base, alpha, beta, gamma])
 
             # Shift the first sheet to be at 0.25 * c
@@ -1695,9 +1680,9 @@ class Framework():
             cell = np.array(SymmPrimFramework.as_dict()['lattice']['matrix'])*(1, 1, 3)
 
             A = ion_conv_crystal*(1, 1, 5/3)
-            B = Tools.translate_inside(
+            B = translate_inside(
                 ion_conv_crystal*(1, 1, 1) + (2/3, 1/3, 0))
-            C = Tools.translate_inside(
+            C = translate_inside(
                 ion_conv_crystal*(1, 1, 1/3) + (4/3, 2/3, 0))
 
             ABC = np.concatenate((A, B, C))
@@ -1725,9 +1710,9 @@ class Framework():
                             'lattice']['matrix'])*(1, 1, 3)
 
             A = ion_conv_crystal*(1, 1, 5/3)
-            B = Tools.translate_inside(
+            B = translate_inside(
                 ion_conv_crystal*(1, 1, 1) + (1/3, 0, 0))
-            C = Tools.translate_inside(
+            C = translate_inside(
                 ion_conv_crystal*(1, 1, 1/3) + (2/3, 0, 0))
 
             ABC = np.concatenate((A, B, C))
@@ -1763,12 +1748,12 @@ class Framework():
         self.hall = symm.get_hall()
 
         if print_result is True:
-            Tools.print_result(self.name,
-                               str(self.lattice_type),
-                               str(self.hall[0:2]),
-                               str(self.space_group),
-                               str(self.space_group_n),
-                               len(symm_op))
+            print_framework_name(self.name,
+                                 str(self.lattice_type),
+                                 str(self.hall[0:2]),
+                                 str(self.space_group),
+                                 str(self.space_group_n),
+                                 len(symm_op))
 
         return [self.name,
                 str(self.lattice_type),
@@ -1831,16 +1816,12 @@ class Framework():
 
         self.name = f'{BB_H6.name}-{BB_T3.name}-{self.topology}-{stacking}'
 
-        Tools.print_comand(f'Starting the creation of {self.name}',
-                           self.verbosity,
-                           ['debug', 'high'])
+        print_command(f'Starting the creation of {self.name}', self.verbosity, ['debug', 'high'])
 
         # Detect the bond atom from the connection groups type
-        bond_atom = Tools.get_bond_atom(BB_H6.conector, BB_T3.conector)
+        bond_atom = get_bond_atom(BB_H6.conector, BB_T3.conector)
 
-        Tools.print_comand(f'Bond atom detected: {bond_atom}',
-                           self.verbosity,
-                           ['debug', 'high'])
+        print_command(f'Bond atom detected: {bond_atom}', self.verbosity, ['debug', 'high'])
 
         # Get the topology information
         topology_info = TOPOLOGY_DICT[self.topology]
@@ -1894,7 +1875,7 @@ class Framework():
             final_pos += rotated_pos.tolist()
 
         # Replace "X" on final_label with the correct bond atom
-        bond_atom = Tools.get_bond_atom(BB_H6.conector, BB_T3.conector)
+        bond_atom = get_bond_atom(BB_H6.conector, BB_T3.conector)
 
         final_label = [x.replace('X', bond_atom) for x in final_label]
 
@@ -2001,8 +1982,8 @@ class Framework():
             A = ion_conv_crystal * np.array([1, 1, 0.5])
 
             # Calculates the shift vector in crystal units
-            r = Tools.get_cartesian_to_fractional_matrix(
-                *Tools.cell_to_cellpar(cell))
+            r = get_cartesian_to_fractional_matrix(
+                *cell_to_cellpar(cell))
             shift_vector = np.dot(r, np.array(shift_vector))
 
             # Shift the first sheet to be at 0.75 * c and translate by the shift_vector
@@ -2037,7 +2018,7 @@ class Framework():
             beta = cell['beta'] - tilt_angle
             gamma = cell['gamma']
 
-            new_cell = Tools.cellpar_to_cell(
+            new_cell = cellpar_to_cell(
                 [a_cell, b_cell, c_cell, alpha, beta, gamma])
 
             # Shift the first sheet to be at 0.25 * c
@@ -2064,9 +2045,9 @@ class Framework():
             cell = np.array(SymmPrimFramework.as_dict()['lattice']['matrix'])*(1, 1, 3)
 
             A = ion_conv_crystal*(1, 1, 5/3)
-            B = Tools.translate_inside(
+            B = translate_inside(
                 ion_conv_crystal*(1, 1, 1) + (2/3, 1/3, 0))
-            C = Tools.translate_inside(
+            C = translate_inside(
                 ion_conv_crystal*(1, 1, 1/3) + (4/3, 2/3, 0))
 
             ABC = np.concatenate((A, B, C))
@@ -2089,9 +2070,9 @@ class Framework():
             cell = np.array(SymmPrimFramework['lattice']['matrix'])*(1, 1, 3)
 
             A = ion_conv_crystal*(1, 1, 5/3)
-            B = Tools.translate_inside(
+            B = translate_inside(
                 ion_conv_crystal*(1, 1, 1) + (1/3, 0, 0))
-            C = Tools.translate_inside(
+            C = translate_inside(
                 ion_conv_crystal*(1, 1, 1/3) + (2/3, 0, 0))
 
             ABC = np.concatenate((A, B, C))
@@ -2127,12 +2108,12 @@ class Framework():
         self.hall = symm.get_hall()
 
         if print_result is True:
-            Tools.print_result(self.name,
-                               str(self.lattice_type),
-                               str(self.hall[0:2]),
-                               str(self.space_group),
-                               str(self.space_group_n),
-                               len(symm_op))
+            print_framework_name(self.name,
+                                 str(self.lattice_type),
+                                 str(self.hall[0:2]),
+                                 str(self.space_group),
+                                 str(self.space_group_n),
+                                 len(symm_op))
 
         return [self.name,
                 str(self.lattice_type),
@@ -2194,16 +2175,12 @@ class Framework():
 
         self.name = f'{BB_H6.name}-{BB_L2.name}-{self.topology}-{stacking}'
 
-        Tools.print_comand(f'Starting the creation of {self.name}',
-                           self.verbosity,
-                           ['debug', 'high'])
+        print_command(f'Starting the creation of {self.name}', self.verbosity, ['debug', 'high'])
 
         # Detect the bond atom from the connection groups type
-        bond_atom = Tools.get_bond_atom(BB_H6.conector, BB_L2.conector)
+        bond_atom = get_bond_atom(BB_H6.conector, BB_L2.conector)
 
-        Tools.print_comand(f'Bond atom detected: {bond_atom}',
-                           self.verbosity,
-                           ['debug', 'high'])
+        print_command(f'Bond atom detected: {bond_atom}', self.verbosity, ['debug', 'high'])
 
         # Get the topology information
         topology_info = TOPOLOGY_DICT[self.topology]
@@ -2257,7 +2234,7 @@ class Framework():
             final_pos += rotated_pos.tolist()
 
         # Replace "X" on final_label with the correct bond atom
-        bond_atom = Tools.get_bond_atom(BB_H6.conector, BB_L2.conector)
+        bond_atom = get_bond_atom(BB_H6.conector, BB_L2.conector)
 
         final_label = [x.replace('X', bond_atom) for x in final_label]
 
@@ -2362,8 +2339,8 @@ class Framework():
             A = ion_conv_crystal * np.array([1, 1, 0.5])
 
             # Calculates the shift vector in crystal units
-            r = Tools.get_cartesian_to_fractional_matrix(
-                *Tools.cell_to_cellpar(cell))
+            r = get_cartesian_to_fractional_matrix(
+                *cell_to_cellpar(cell))
             shift_vector = np.dot(r, np.array(shift_vector))
 
             # Shift the first sheet to be at 0.75 * c and translate by the shift_vector
@@ -2398,7 +2375,7 @@ class Framework():
             beta = cell['beta'] - tilt_angle
             gamma = cell['gamma']
 
-            new_cell = Tools.cellpar_to_cell(
+            new_cell = cellpar_to_cell(
                 [a_cell, b_cell, c_cell, alpha, beta, gamma])
 
             # Shift the first sheet to be at 0.25 * c
@@ -2425,9 +2402,9 @@ class Framework():
             cell = np.array(FinalFramework.as_dict()['lattice']['matrix'])*(1, 1, 3)
 
             A = ion_conv_crystal*(1, 1, 5/3)
-            B = Tools.translate_inside(
+            B = translate_inside(
                 ion_conv_crystal*(1, 1, 1) + (2/3, 1/3, 0))
-            C = Tools.translate_inside(
+            C = translate_inside(
                 ion_conv_crystal*(1, 1, 1/3) + (4/3, 2/3, 0))
 
             ABC = np.concatenate((A, B, C))
@@ -2450,9 +2427,9 @@ class Framework():
             cell = np.array(FinalFramework['lattice']['matrix'])*(1, 1, 3)
 
             A = ion_conv_crystal*(1, 1, 5/3)
-            B = Tools.translate_inside(
+            B = translate_inside(
                 ion_conv_crystal*(1, 1, 1) + (1/3, 0, 0))
-            C = Tools.translate_inside(
+            C = translate_inside(
                 ion_conv_crystal*(1, 1, 1/3) + (2/3, 0, 0))
 
             ABC = np.concatenate((A, B, C))
@@ -2488,12 +2465,12 @@ class Framework():
         self.hall = symm.get_hall()
 
         if print_result is True:
-            Tools.print_result(self.name,
-                               str(self.lattice_type),
-                               str(self.hall[0:2]),
-                               str(self.space_group),
-                               str(self.space_group_n),
-                               len(symm_op))
+            print_framework_name(self.name,
+                                 str(self.lattice_type),
+                                 str(self.hall[0:2]),
+                                 str(self.space_group),
+                                 str(self.space_group_n),
+                                 len(symm_op))
 
         return [self.name,
                 str(self.lattice_type),
@@ -2556,16 +2533,12 @@ class Framework():
 
         self.name = f'{BB_S4.name}-{BB_L2.name}-{self.topology}-{stacking}'
 
-        Tools.print_comand(f'Starting the creation of {self.name}',
-                           self.verbosity,
-                           ['debug', 'high'])
+        print_command(f'Starting the creation of {self.name}', self.verbosity, ['debug', 'high'])
 
         # Detect the bond atom from the connection groups type
-        bond_atom = Tools.get_bond_atom(BB_S4.conector, BB_L2.conector)
+        bond_atom = get_bond_atom(BB_S4.conector, BB_L2.conector)
 
-        Tools.print_comand(f'Bond atom detected: {bond_atom}',
-                           self.verbosity,
-                           ['debug', 'high'])
+        print_command(f'Bond atom detected: {bond_atom}', self.verbosity, ['debug', 'high'])
 
         # Get the topology information
         topology_info = TOPOLOGY_DICT[self.topology]
@@ -2615,7 +2588,7 @@ class Framework():
             final_pos += rotated_pos.tolist()
 
         # Replace "X" on final_label with the correct bond atom
-        bond_atom = Tools.get_bond_atom(BB_S4.conector, BB_L2.conector)
+        bond_atom = get_bond_atom(BB_S4.conector, BB_L2.conector)
 
         final_label = [x.replace('X', bond_atom) for x in final_label]
 
@@ -2661,7 +2634,7 @@ class Framework():
             cell = np.array(SymmPrimFramework.as_dict()['lattice']['matrix'])*(1, 1, 2)
 
             A = ion_conv_crystal*(1, 1, 0.5)
-            B = Tools.translate_inside(
+            B = translate_inside(
                 ion_conv_crystal*(1, 1, 1.5) + (1/4, 1/4, 0))
 
             AB = np.concatenate((A, B))
@@ -2685,7 +2658,7 @@ class Framework():
             cell = np.array(SymmPrimFramework.as_dict()['lattice']['matrix'])*(1, 1, 2)
 
             A = ion_conv_crystal*(1, 1, 0.5)
-            B = Tools.translate_inside(
+            B = translate_inside(
                 ion_conv_crystal*(1, 1, 1.5) + (1/2, 0, 0))
 
             AB = np.concatenate((A, B))
@@ -2714,8 +2687,8 @@ class Framework():
             A = ion_conv_crystal * np.array([1, 1, 0.5])
 
             # Calculates the shift vector in crystal units
-            r = Tools.get_cartesian_to_fractional_matrix(
-                *Tools.cell_to_cellpar(cell))
+            r = get_cartesian_to_fractional_matrix(
+                *cell_to_cellpar(cell))
             shift_vector = np.dot(r, np.array(shift_vector))
 
             # Shift the first sheet to be at 0.75 * c and translate by the shift_vector
@@ -2749,7 +2722,7 @@ class Framework():
             beta = cell['beta'] - tilt_angle
             gamma = cell['gamma']
 
-            new_cell = Tools.cellpar_to_cell(
+            new_cell = cellpar_to_cell(
                 [a_cell, b_cell, c_parameter_base, alpha, beta, gamma])
 
             # Shift the first sheet to be at 0.25 * c
@@ -2776,9 +2749,9 @@ class Framework():
             cell = np.array(SymmPrimFramework.as_dict()['lattice']['matrix'])*(1, 1, 3)
 
             A = ion_conv_crystal*(1, 1, 5/3)
-            B = Tools.translate_inside(
+            B = translate_inside(
                 ion_conv_crystal*(1, 1, 1) + (2/3, 1/3, 0))
-            C = Tools.translate_inside(
+            C = translate_inside(
                 ion_conv_crystal*(1, 1, 1/3) + (4/3, 2/3, 0))
 
             ABC = np.concatenate((A, B, C))
@@ -2806,9 +2779,9 @@ class Framework():
                             'lattice']['matrix'])*(1, 1, 3)
 
             A = ion_conv_crystal*(1, 1, 5/3)
-            B = Tools.translate_inside(
+            B = translate_inside(
                 ion_conv_crystal*(1, 1, 1) + (1/3, 0, 0))
-            C = Tools.translate_inside(
+            C = translate_inside(
                 ion_conv_crystal*(1, 1, 1/3) + (2/3, 0, 0))
 
             ABC = np.concatenate((A, B, C))
@@ -2844,12 +2817,12 @@ class Framework():
         self.hall = symm.get_hall()
 
         if print_result is True:
-            Tools.print_result(self.name,
-                               str(self.lattice_type),
-                               str(self.hall[0:2]),
-                               str(self.space_group),
-                               str(self.space_group_n),
-                               len(symm_op))
+            print_framework_name(self.name,
+                                 str(self.lattice_type),
+                                 str(self.hall[0:2]),
+                                 str(self.space_group),
+                                 str(self.space_group_n),
+                                 len(symm_op))
 
         return [self.name,
                 str(self.lattice_type),
@@ -2932,11 +2905,9 @@ class Framework():
             return None
 
         # Detect the bond atom from the connection groups type
-        bond_atom = Tools.get_bond_atom(bb_1.conector, bb_2.conector)
+        bond_atom = get_bond_atom(bb_1.conector, bb_2.conector)
 
-        Tools.print_comand(f'Bond atom detected: {bond_atom}',
-                           self.verbosity,
-                           ['debug', 'high'])
+        print_command(f'Bond atom detected: {bond_atom}', self.verbosity, ['debug', 'high'])
 
         # Calculate the cell parameter based on the size of the building blocks
         if self.verbosity:
@@ -2977,8 +2948,7 @@ class Framework():
         bb1_lado1, _, _ = (
             bb1_v1 + bb1_v2) / 2, (bb1_v1 + bb1_v3) / 2, (bb1_v1 + bb1_v4) / 2
 
-        R_matrix = Tools.rotation_matrix_from_vectors(
-            bb1_lado1, np.array([1, 0, 0]))
+        R_matrix = rotation_matrix_from_vectors(bb1_lado1, np.array([1, 0, 0]))
 
         bb_1.atom_pos = np.dot(bb_1.atom_pos, np.transpose(R_matrix))
 
@@ -2998,8 +2968,7 @@ class Framework():
         final_label += list(bb_1.atom_labels)
 
         # Changes the X atoms by the desired bond_atom
-        final_label, final_pos = Tools.change_X_atoms(
-            final_label, final_pos, bond_atom)
+        final_label, final_pos = change_X_atoms(final_label, final_pos, bond_atom)
 
         # Cria a estrutura como entidade do pymatgen
         struct = Structure(lattice, final_label, final_pos,
@@ -3017,8 +2986,7 @@ class Framework():
         cell = np.array(struct.as_dict()['lattice']['matrix'])
 
         # Change the X atoms by the desired bond_atom
-        final_label, final_pos = Tools.change_X_atoms(
-            final_label, final_pos, bond_atom)
+        final_label, final_pos = change_X_atoms(final_label, final_pos, bond_atom)
 
         # Cria a estrutura como entidade do pymatgen
         struct = Structure(lattice, final_label, final_pos,
@@ -3064,7 +3032,7 @@ class Framework():
                             'lattice']['matrix'])*(1, 1, 2)
 
             A = ion_conv_crystal*(1, 1, 0.5)
-            B = Tools.translate_inside(
+            B = translate_inside(
                 ion_conv_crystal*(1, 1, 1.5) + (1/4, 1/4, 0))
 
             AB = np.concatenate((A, B))
@@ -3088,7 +3056,7 @@ class Framework():
                             'lattice']['matrix'])*(1, 1, 2)
 
             A = ion_conv_crystal*(1, 1, 0.5)
-            B = Tools.translate_inside(
+            B = translate_inside(
                 ion_conv_crystal*(1, 1, 1.5) + (1/2, 0, 0))
 
             AB = np.concatenate((A, B))
@@ -3117,8 +3085,8 @@ class Framework():
             A = ion_conv_crystal * np.array([1, 1, 0.5])
 
             # Calculates the shift vector in crystal units
-            r = Tools.get_cartesian_to_fractional_matrix(
-                *Tools.cell_to_cellpar(cell))
+            r = get_cartesian_to_fractional_matrix(
+                *cell_to_cellpar(cell))
             shift_vector = np.dot(r, np.array(shift_vector))
 
             # Shift the first sheet to be at 0.75 * c and translate by the shift_vector
@@ -3151,7 +3119,7 @@ class Framework():
             beta = cell['beta'] - tilt_angle
             gamma = cell['gamma']
 
-            new_cell = Tools.cellpar_to_cell(
+            new_cell = cellpar_to_cell(
                 [a_cell, b_cell, c_cell, alpha, beta, gamma])
 
             # Shift the first sheet to be at 0.25 * c
@@ -3177,9 +3145,9 @@ class Framework():
                             'lattice']['matrix'])*(1, 1, 3)
 
             A = ion_conv_crystal*(1, 1, 5/3)
-            B = Tools.translate_inside(
+            B = translate_inside(
                 ion_conv_crystal*(1, 1, 1) + (2/3, 1/3, 0))
-            C = Tools.translate_inside(
+            C = translate_inside(
                 ion_conv_crystal*(1, 1, 1/3) + (4/3, 2/3, 0))
 
             ABC = np.concatenate((A, B, C))
@@ -3204,9 +3172,9 @@ class Framework():
                             'lattice']['matrix'])*(1, 1, 3)
 
             A = ion_conv_crystal*(1, 1, 5/3)
-            B = Tools.translate_inside(
+            B = translate_inside(
                 ion_conv_crystal*(1, 1, 1) + (1/3, 0, 0))
-            C = Tools.translate_inside(
+            C = translate_inside(
                 ion_conv_crystal*(1, 1, 1/3) + (2/3, 0, 0))
 
             ABC = np.concatenate((A, B, C))
@@ -3242,12 +3210,12 @@ class Framework():
         self.hall = symm.get_hall()
 
         if print_result is True:
-            Tools.print_result(self.name,
-                               str(self.lattice_type),
-                               str(self.hall[0:2]),
-                               str(self.space_group),
-                               str(self.space_group_n),
-                               len(symm_op))
+            print_framework_name(self.name,
+                                 str(self.lattice_type),
+                                 str(self.hall[0:2]),
+                                 str(self.space_group),
+                                 str(self.space_group_n),
+                                 len(symm_op))
 
         return [self.name,
                 str(self.lattice_type),
@@ -3328,11 +3296,9 @@ class Framework():
             return None
 
         # Detect the bond atom from the connection groups type
-        bond_atom = Tools.get_bond_atom(bb_1.conector, bb_2.conector)
+        bond_atom = get_bond_atom(bb_1.conector, bb_2.conector)
 
-        Tools.print_comand(f'Bond atom detected: {bond_atom}',
-                           self.verbosity,
-                           ['debug', 'high'])
+        print_command(f'Bond atom detected: {bond_atom}', self.verbosity, ['debug', 'high'])
 
         # Calculate the cell parameter based on the size of the building blocks
         size_a = max(bb_1.size)
@@ -3373,7 +3339,7 @@ class Framework():
         bb1_lado1, _, _ = (
             bb1_v1 + bb1_v2) / 2, (bb1_v1 + bb1_v3) / 2, (bb1_v1 + bb1_v4) / 2
 
-        R_matrix = Tools.rotation_matrix_from_vectors(
+        R_matrix = rotation_matrix_from_vectors(
             bb1_lado1, np.array([1, 0, 0]))
 
         bb_1.atom_pos = np.dot(bb_1.atom_pos, np.transpose(R_matrix))
@@ -3441,7 +3407,7 @@ class Framework():
         final_label += list(bb_2.atom_labels)
 
         # Change the X atoms by the desired bond_atom
-        final_label, final_pos = Tools.change_X_atoms(
+        final_label, final_pos = change_X_atoms(
             final_label, final_pos, bond_atom)
 
         # Creates a pymatgen structure
@@ -3628,7 +3594,7 @@ class Framework():
             B_pos = np.array([i['xyz'] for i in B.as_dict()['sites']])
 
             # Calculates the shift vector in crystal units
-            r = Tools.get_cartesian_to_fractional_matrix(*lattice.parameters)
+            r = get_cartesian_to_fractional_matrix(*lattice.parameters)
             shift_vector = np.dot(r, np.array(shift_vector))
 
             B_pos += np.array([lattice.a, lattice.b*1/2 *
@@ -3664,7 +3630,7 @@ class Framework():
             beta = struct.as_dict()['lattice']['beta'] - tilt_angle
             gamma = struct.as_dict()['lattice']['gamma']
 
-            new_cell = Tools.cellpar_to_cell(
+            new_cell = cellpar_to_cell(
                 [a_cell, b_cell, c_cell, alpha, beta, gamma])
 
             lattice = Lattice(new_cell)
@@ -3678,7 +3644,7 @@ class Framework():
             B_pos = np.array([i['xyz'] for i in B.as_dict()['sites']])
 
             # Calculates the shift vector in crystal units
-            r = Tools.get_cartesian_to_fractional_matrix(*lattice.parameters)
+            r = get_cartesian_to_fractional_matrix(*lattice.parameters)
             shift_vector = np.dot(r, np.array(shift_vector))
 
             B_pos += np.array([lattice.a, lattice.b*1/2 *
@@ -3723,12 +3689,12 @@ class Framework():
         self.hall = symm.get_hall()
 
         if print_result is True:
-            Tools.print_result(self.name,
-                               str(self.lattice_type),
-                               str(self.hall[0:2]),
-                               str(self.space_group),
-                               str(self.space_group_n),
-                               len(symm_op))
+            print_framework_name(self.name,
+                                 str(self.lattice_type),
+                                 str(self.hall[0:2]),
+                                 str(self.space_group),
+                                 str(self.space_group_n),
+                                 len(symm_op))
 
         return [self.name,
                 str(self.lattice_type),

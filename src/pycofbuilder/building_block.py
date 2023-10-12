@@ -7,7 +7,15 @@ Created on Thu Dec 17 11:31:19 2020
 
 import os
 import numpy as np
-import pycofbuilder.tools as Tools
+# import pycofbuilder.tools as Tools
+
+from pycofbuilder.tools import (rotation_matrix_from_vectors,
+                                closest_atom,
+                                closest_atom_struc,
+                                find_index)
+from pycofbuilder.io_tools import (read_xyz_file,
+                                   read_json,
+                                   save_xyz)
 
 
 class Building_Block():
@@ -99,7 +107,7 @@ class Building_Block():
         try:
             self.name = file_name.split('.')[0]
 
-            self.atom_labels, self.atom_pos = Tools.read_xyz_file(path, file_name)
+            self.atom_labels, self.atom_pos = read_xyz_file(path, file_name)
             self.connectivity = len([i for i in self.atom_labels if 'X' in i])
 
             self._align_to()
@@ -215,7 +223,7 @@ class Building_Block():
     def _align_to(self, vec=[0, 1, 0]):
         '''Align the molecule to a given vector'''
         _, X_pos = self._get_X_points()
-        R_matrix = Tools.rotation_matrix_from_vectors(X_pos[0], vec)
+        R_matrix = rotation_matrix_from_vectors(X_pos[0], vec)
 
         self.atom_pos = np.dot(self.atom_pos, np.transpose(R_matrix))
 
@@ -227,13 +235,13 @@ class Building_Block():
 
             normal = np.cross(X_pos[0], X_pos[-1])
             if normal[0] != 0 and normal[1] != 0:
-                R_matrix = Tools.rotation_matrix_from_vectors(normal, [0, 0, 1])
+                R_matrix = rotation_matrix_from_vectors(normal, [0, 0, 1])
                 self.atom_pos = np.dot(self.atom_pos, np.transpose(R_matrix))
 
         if len(X_pos) == 2:
             normal = np.cross(X_pos[0], self.atom_pos[1])
             if normal[0] != 0 and normal[1] != 0:
-                R_matrix = Tools.rotation_matrix_from_vectors(normal, [0, 0, 1])
+                R_matrix = rotation_matrix_from_vectors(normal, [0, 0, 1])
                 self.atom_pos = np.dot(self.atom_pos, np.transpose(R_matrix))
 
     def _structure_as_string(self):
@@ -249,9 +257,7 @@ class Building_Block():
     def _add_connection_group(self, conector_name):
         '''Adds the functional group by which the COF will be formed from the building blocks'''
 
-        conector_chem_json = Tools.read_json(
-            os.path.join(self.main_path, 'conector'),
-            conector_name)
+        conector_chem_json = read_json(os.path.join(self.main_path, 'conector'), conector_name)
 
         conector_smiles = conector_chem_json['smiles'].replace('[Q]', '')
         self.smiles = self.smiles.replace('[Q]', f'({conector_smiles})')
@@ -272,19 +278,19 @@ class Building_Block():
                 close_Q_struct = [0, 0, 0]
             else:
                 # Get the position of the closest atom to Q in the structure
-                close_Q_struct = Tools.closest_atom('Q',
-                                                    location_Q_struct[1][i],
-                                                    self.atom_labels,
-                                                    self.atom_pos)[1]
+                close_Q_struct = closest_atom('Q',
+                                              location_Q_struct[1][i],
+                                              self.atom_labels,
+                                              self.atom_pos)[1]
 
             # Get the position of Q in the conection group
             location_Q_connector = self._get_Q_points(n_conector_label, n_conector_pos)
 
             # Get the position of the closest atom to Q in the conection group
-            close_Q_connector = Tools.closest_atom('Q',
-                                                   location_Q_connector[1][0],
-                                                   n_conector_label,
-                                                   n_conector_pos)[1]
+            close_Q_connector = closest_atom('Q',
+                                             location_Q_connector[1][0],
+                                             n_conector_label,
+                                             n_conector_pos)[1]
 
             # Create the vector Q in the structure
             v1 = close_Q_struct - location_Q_struct[1][i]
@@ -292,17 +298,17 @@ class Building_Block():
             v2 = np.array(close_Q_connector) - np.array(location_Q_connector[1][0])
 
             # Find the rotation matrix that align v2 with v1
-            Rot_m = Tools.rotation_matrix_from_vectors(v2, v1)
+            Rot_m = rotation_matrix_from_vectors(v2, v1)
 
             # Delete the "Q" atom position of the conector group and the structure
             n_conector_pos = np.delete(
                 n_conector_pos,
-                Tools.find_index(np.array([0., 0., 0.]), n_conector_pos),
+                find_index(np.array([0., 0., 0.]), n_conector_pos),
                 axis=0)
 
             self.atom_pos = np.delete(
                 self.atom_pos,
-                Tools.find_index(location_Q_struct[1][i], self.atom_pos),
+                find_index(location_Q_struct[1][i], self.atom_pos),
                 axis=0)
 
             # Rotate and translade the conector group to Q position in the strucutre
@@ -323,9 +329,7 @@ class Building_Block():
         '''Adds group R in building blocks'''
 
         # Read the R group
-        R_chem_json = Tools.read_json(
-            os.path.join(self.main_path, 'func_groups'),
-            R_name)
+        R_chem_json = read_json(os.path.join(self.main_path, 'func_groups'), R_name)
 
         r_smiles = R_chem_json['smiles'].replace('[R]', '')
         self.smiles = self.smiles.replace(f'[{R_type}]', r_smiles)
@@ -342,16 +346,16 @@ class Building_Block():
             n_group_pos = group_pos.copy()
 
             # Get the position of the closest atom to R in the structure
-            close_R_struct = Tools.closest_atom_struc(R_type,
-                                                      location_R_struct[i],
-                                                      self.atom_labels,
-                                                      self.atom_pos)[1]
+            close_R_struct = closest_atom_struc(R_type,
+                                                location_R_struct[i],
+                                                self.atom_labels,
+                                                self.atom_pos)[1]
 
             # Get the position of R in the R group
             pos_R_group = self._get_R_points(n_group_label, n_group_pos)['R']
 
             # Get the position of the closest atom to R in the R group
-            close_R_group = Tools.closest_atom('R', pos_R_group[0], n_group_label, n_group_pos)[1]
+            close_R_group = closest_atom('R', pos_R_group[0], n_group_label, n_group_pos)[1]
 
             # Create the vector R in the structure
             v1 = close_R_struct - location_R_struct[i]
@@ -360,12 +364,12 @@ class Building_Block():
             v2 = np.array(close_R_group) - np.array(pos_R_group[0])
 
             # Find the rotation matrix that align v2 with v1
-            Rot_m = Tools.rotation_matrix_from_vectors(v2, v1)
+            Rot_m = rotation_matrix_from_vectors(v2, v1)
 
             # Delete the "R" atom position of the R group and the structure
             n_group_pos = np.delete(
                 n_group_pos,
-                Tools.find_index(np.array([0.0, 0.0, 0.0]), n_group_pos),
+                find_index(np.array([0.0, 0.0, 0.0]), n_group_pos),
                 axis=0)
 
             # Rotate and translade the R group to R position in the strucutre
@@ -377,7 +381,7 @@ class Building_Block():
             # Remove the R atoms from structure
             self.atom_pos = np.delete(
                 self.atom_pos,
-                Tools.find_index(location_R_struct[i], self.atom_pos),
+                find_index(location_R_struct[i], self.atom_pos),
                 axis=0)
 
             # Add the position of rotated atoms to the main structure
@@ -408,10 +412,7 @@ class Building_Block():
 
         self.name = f'{symmetry}_{core_name}_{conector}'
 
-        chem_json = Tools.read_json(
-            os.path.join(self.main_path, 'core', symmetry),
-            core_name
-            )
+        chem_json = read_json(os.path.join(self.main_path, 'core', symmetry), core_name)
 
         self.smiles = chem_json['smiles']
 
@@ -441,10 +442,10 @@ class Building_Block():
     def save(self, extension='xyz'):
 
         if extension == 'xyz':
-            Tools.save_xyz(path=self.save_dir,
-                           file_name=self.name + '.xyz',
-                           atom_labels=self.atom_labels,
-                           atom_pos=self.atom_pos)
+            save_xyz(path=self.save_dir,
+                     file_name=self.name + '.xyz',
+                     atom_labels=self.atom_labels,
+                     atom_pos=self.atom_pos)
 
     def get_available_core(self):
         '''Get the list of available cores'''
