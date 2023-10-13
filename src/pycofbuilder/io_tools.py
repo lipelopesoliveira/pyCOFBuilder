@@ -924,7 +924,7 @@ loop_
         u, v, w = atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]
         if partial_charges is not False:
             cif_text += '{:<7}    {} {:>15.9f} {:>15.9f} {:>15.9f} {:>10.5f}\n'.format(
-                f"{atom_types[i]}{str(i)}_{atom_labels[i]}",
+                f"{atom_types[i]}{str(i + 1)}_{atom_labels[i]}",
                 atom_types[i],
                 u,
                 v,
@@ -932,7 +932,7 @@ loop_
                 partial_charges[i])
         else:
             cif_text += '{:<7}    {} {:>15.9f} {:>15.9f} {:>15.9f}\n'.format(
-                f"{atom_types[i]}{str(i)}_{atom_labels[i]}",
+                f"{atom_types[i]}{str(i + 1)}_{atom_labels[i]}",
                 atom_types[i],
                 u,
                 v,
