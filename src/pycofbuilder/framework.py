@@ -99,7 +99,7 @@ class Framework():
         Creates a reticulum from two building blocks
     """
 
-    def __init__(self, name=None, verbosity=False, out_dir=None):
+    def __init__(self, name=None, verbosity=False, out_dir=None, save_bb=False):
 
         _ROOTDIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -110,6 +110,8 @@ class Framework():
             self.out_path = os.path.join(os.getcwd(), 'out')
         else:
             self.out_path = out_dir
+
+        self.save_bb = save_bb
 
         self.lib_path = os.path.join(self.out_path, 'building_blocks')
 
@@ -226,8 +228,8 @@ class Framework():
         """
         BB1_name, BB2_name, Net, Stacking = self.check_name_concistency(FrameworkName)
 
-        BB1 = Building_Block(name=BB1_name, save_dir=self.out_path)
-        BB2 = Building_Block(name=BB2_name, save_dir=self.out_path)
+        BB1 = Building_Block(name=BB1_name, save_dir=self.out_path, save_bb=self.save_bb)
+        BB2 = Building_Block(name=BB2_name, save_dir=self.out_path, save_bb=self.save_bb)
 
         self.from_building_blocks(BB1, BB2, Net, Stacking, **kwargs)
 

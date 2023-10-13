@@ -46,7 +46,7 @@ class Building_Block():
         self.core = None
         self.conector = None
         self.funcGroups = None
-        
+
         self.available_symmetry = ['L2',
                                    'T3',
                                    'S4',  # 'R4', 'T4',
