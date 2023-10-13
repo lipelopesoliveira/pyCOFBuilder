@@ -200,8 +200,9 @@ def read_cif(path, file_name):
 def save_xsf(path: str = None,
              file_name: str = None,
              cell: np.ndarray = np.eye(3),
-             atom_labels: list = None,
+             atom_types: list = None,
              atom_pos: list = None,
+             atom_labels: list = None,
              frac_coords: bool = False):
     """
     Save a file in format `.xsf` on the `path`.
@@ -241,7 +242,7 @@ def save_xsf(path: str = None,
     xsf_file.write(f'           {len(atom_pos)}           1\n')
 
     for i in range(len(atom_pos)):
-        xsf_file.write('{:3s}        {:>15.9f}    {:>15.9f}    {:>15.9f}\n'.format(atom_labels[i],
+        xsf_file.write('{:3s}        {:>15.9f}    {:>15.9f}    {:>15.9f}\n'.format(atom_types[i],
                                                                                    atom_pos[i][0],
                                                                                    atom_pos[i][1],
                                                                                    atom_pos[i][2]))
@@ -252,8 +253,9 @@ def save_xsf(path: str = None,
 def save_pqr(path: str = None,
              file_name: str = None,
              cell: np.ndarray = np.eye(3),
-             atom_labels: list = None,
+             atom_types: list = None,
              atom_pos: list = None,
+             atom_labels: list = None,
              partial_charges: list = None,
              frac_coords: bool = False):
     """
@@ -299,21 +301,21 @@ def save_pqr(path: str = None,
         atom_line = 'ATOM   {:>4} {:>2}   MOL A   0    {:>8.3f}{:>8.3f}{:>8.3f}   {:>15}\n'
         for i in range(len(atom_pos)):
             pqr_file.write(atom_line.format(i + 1,
-                                            atom_labels[i],
+                                            atom_types[i],
                                             atom_pos[i][0],
                                             atom_pos[i][1],
                                             atom_pos[i][2],
-                                            atom_labels[i]))
+                                            atom_types[i]))
     else:
         atom_line = 'ATOM   {:>4} {:>2}   MOL A   0    {:>8.3f}{:>8.3f}{:>8.3f}{:>8.5f}   {:>15}\n'
         for i in range(len(atom_pos)):
             pqr_file.write(atom_line.format(i + 1,
-                                            atom_labels[i],
+                                            atom_types[i],
                                             atom_pos[i][0],
                                             atom_pos[i][1],
                                             atom_pos[i][2],
                                             partial_charges[i],
-                                            atom_labels[i]))
+                                            atom_types[i]))
 
     pqr_file.close()
 
@@ -321,8 +323,9 @@ def save_pqr(path: str = None,
 def save_pdb(path: str = None,
              file_name: str = None,
              cell: np.ndarray = np.eye(3),
-             atom_labels: list = None,
+             atom_types: list = None,
              atom_pos: list = None,
+             atom_labels: list = None,
              frac_coords: bool = False):
     """
     Save a file in format `.pdb` on the `path`.
@@ -365,11 +368,11 @@ def save_pdb(path: str = None,
 
     for i in range(len(atom_pos)):
         pdb_file.write(atom_line.format(i+1,
-                                        atom_labels[i],
+                                        atom_types[i],
                                         atom_pos[i][0],
                                         atom_pos[i][1],
                                         atom_pos[i][2],
-                                        atom_labels[i]))
+                                        atom_types[i]))
 
     pdb_file.close()
 
@@ -377,8 +380,9 @@ def save_pdb(path: str = None,
 def save_gjf(path: str = None,
              file_name: str = None,
              cell: np.ndarray = np.eye(3),
-             atom_labels: list = None,
+             atom_types: list = None,
              atom_pos: list = None,
+             atom_labels: list = None,
              frac_coords: bool = False,
              text: str = 'opt pm6'):
 
@@ -419,8 +423,8 @@ def save_gjf(path: str = None,
     temp_file.write('\n')
     temp_file.write('0 1 \n')
 
-    for i in range(len(atom_labels)):
-        temp_file.write('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(atom_labels[i],
+    for i in range(len(atom_types)):
+        temp_file.write('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(atom_types[i],
                                                                      atom_pos[i][0],
                                                                      atom_pos[i][1],
                                                                      atom_pos[i][2]))
@@ -436,8 +440,9 @@ def save_gjf(path: str = None,
 def save_xyz(path: str = None,
              file_name: str = None,
              cell: np.ndarray = np.eye(3),
-             atom_labels: list = None,
+             atom_types: list = None,
              atom_pos: list = None,
+             atom_labels: list = None,
              frac_coords: bool = False):
     """
     Save a file in format `.xyz` on the `path`.
@@ -448,8 +453,8 @@ def save_xyz(path: str = None,
         Path to the file.
     file_name : str
         Name of the file. Does not neet to contain the `.xyz` extention.
-    atom_label : list
-        List of strings containing containg the N atom partial charges.
+    atom_types : list
+        List of strings containing containg the N atom types
     atom_pos : list
         Nx3 array contaning the atoms coordinates.
     cell : numpy array
@@ -467,15 +472,15 @@ def save_xyz(path: str = None,
     file_name = file_name.split('.')[0]
 
     temp_file = open(os.path.join(path, file_name + '.xyz'), 'w')
-    temp_file.write(f'{len(atom_labels)}\n')
+    temp_file.write(f'{len(atom_types)}\n')
 
     if cell is None:
         temp_file.write(f'{file_name}\n')
     else:
         temp_file.write(f'{cell[0]}  {cell[1]}  {cell[2]}  {cell[3]}  {cell[4]}  {cell[5]}\n')
 
-    for i in range(len(atom_labels)):
-        temp_file.write('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(atom_labels[i],
+    for i in range(len(atom_types)):
+        temp_file.write('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(atom_types[i],
                                                                      atom_pos[i][0],
                                                                      atom_pos[i][1],
                                                                      atom_pos[i][2]))
@@ -486,8 +491,9 @@ def save_xyz(path: str = None,
 def save_turbomole(path: str = None,
                    file_name: str = None,
                    cell: np.ndarray = np.eye(3),
-                   atom_labels: list = None,
+                   atom_types: list = None,
                    atom_pos: list = None,
+                   atom_labels: list = None,
                    frac_coords: bool = False):
     """Save the structure in Turbomole .coord format
 
@@ -516,11 +522,11 @@ def save_turbomole(path: str = None,
     with open(os.path.join(path, file_name + '.coord'), 'w') as temp_file:
         temp_file.write('$coord angs\n')
 
-        for i in range(len(atom_labels)):
+        for i in range(len(atom_types)):
             temp_file.write('{:>15.7f}{:>15.7f}{:>15.7f}   {:<5s}\n'.format(atom_pos[i][0],
                                                                             atom_pos[i][1],
                                                                             atom_pos[i][2],
-                                                                            atom_labels[i]))
+                                                                            atom_types[i]))
 
         temp_file.write('$periodic 3\n')
         temp_file.write('$cell\n')
@@ -533,8 +539,9 @@ def save_turbomole(path: str = None,
 def save_vasp(path: str = None,
               file_name: str = None,
               cell: np.ndarray = np.eye(3),
-              atom_labels: list = None,
+              atom_types: list = None,
               atom_pos: list = None,
+              atom_labels: list = None,
               frac_coords: bool = False):
     """Save the structure in VASP .vasp format
 
@@ -558,11 +565,11 @@ def save_vasp(path: str = None,
         cell = cellpar_to_cell(cell)
 
     unique_atoms = []
-    for i in atom_labels:
+    for i in atom_types:
         if i not in unique_atoms:
             unique_atoms.append(i)
 
-    composition_dict = {i: atom_labels.count(i) for i in unique_atoms}
+    composition_dict = {i: atom_types.count(i) for i in unique_atoms}
 
     with open(os.path.join(path, file_name + '.vasp'), 'w') as temp_file:
         temp_file.write(f'{file_name}\n')
@@ -581,18 +588,19 @@ def save_vasp(path: str = None,
         else:
             temp_file.write('Cartesian\n')
 
-        for i in range(len(atom_labels)):
+        for i in range(len(atom_types)):
             temp_file.write('{:>15.7f}{:>15.7f}{:>15.7f}   {:<5s}\n'.format(atom_pos[i][0],
                                                                             atom_pos[i][1],
                                                                             atom_pos[i][2],
-                                                                            atom_labels[i]))
+                                                                            atom_types[i]))
 
 
 def save_qe(path: str = None,
             file_name: str = None,
             cell: np.ndarray = np.eye(3),
-            atom_labels: list = None,
+            atom_types: list = None,
             atom_pos: list = None,
+            atom_labels: list = None,
             frac_coords: bool = False,
             input_dict: dict = None):
     '''
@@ -649,8 +657,8 @@ def save_qe(path: str = None,
 
         input_dict['system'] = {
             'ibrav': 0,
-            'nat': len(atom_labels),
-            'ntyp': len(set(atom_labels)),
+            'nat': len(atom_types),
+            'ntyp': len(set(atom_types)),
             'ecutwfc': 40,
             'ecutrho': 360,
             'vdw_corr': "'grimme-d3'",
@@ -701,7 +709,7 @@ def save_qe(path: str = None,
         f.write('/\n\n')
 
         f.write('ATOMIC_SPECIES\n')
-        for atom in set(atom_labels):
+        for atom in set(atom_types):
             f.write(f" {atom}   {elements_dict()[atom]:>9.5f}  {atom}.PSEUDO.UPF\n")
         f.write('\n')
 
@@ -718,7 +726,7 @@ def save_qe(path: str = None,
         f.write(f'ATOMIC_POSITIONS ({coords_type})\n')
 
         for i, atom in enumerate(atom_pos):
-            f.write('{:<5s}{:>15.9f}{:>15.9f}{:>15.9f}\n'.format(atom_labels[i],
+            f.write('{:<5s}{:>15.9f}{:>15.9f}{:>15.9f}\n'.format(atom_types[i],
                                                                  atom[0],
                                                                  atom[1],
                                                                  atom[2]))
@@ -757,7 +765,7 @@ def convert_cif_2_qe(out_path, file_name):
             k_dist=0.3)
 
 
-def save_json(path, file_name, cell, atom_labels, atom_pos, frac_coords=False):
+def save_json(path, file_name, cell, atom_types, atom_pos, frac_coords=False):
     """
     Save a file in format `.json` on the `path`.
 
@@ -791,13 +799,19 @@ def save_json(path, file_name, cell, atom_labels, atom_pos, frac_coords=False):
 
     cof_json['geometry']['cell_matrix'] = cell_matrix
     cof_json['geometry']['cell_parameters'] = cell_par
-    cof_json['geometry']['atom_labels'] = list(atom_labels)
+    cof_json['geometry']['atom_labels'] = list(atom_types)
     cof_json['geometry']['atom_pos'] = list(atom_pos)
 
     write_json(path, file_name, cof_json)
 
 
-def save_chemjson(path, file_name, cell, atom_labels, atom_pos, frac_coords=False):
+def save_chemjson(path,
+                  file_name,
+                  cell,
+                  atom_types,
+                  atom_pos,
+                  atom_labels,
+                  frac_coords=False):
     """
     Save a file in format `.json` on the `path`.
 
@@ -826,8 +840,9 @@ def save_chemjson(path, file_name, cell, atom_labels, atom_pos, frac_coords=Fals
     chemJSON = create_structure_CJSON(StructureName=file_name.split('.')[0],
                                       CellParameters=CellParameters,
                                       CellMatrix=CellMatrix,
-                                      AtomTypes=atom_labels,
+                                      AtomTypes=atom_types,
                                       AtomPositions=atom_pos,
+                                      AtomLabels=atom_labels,
                                       CartesianPositions=not frac_coords)
 
     write_json(path, file_name, chemJSON)
@@ -836,8 +851,9 @@ def save_chemjson(path, file_name, cell, atom_labels, atom_pos, frac_coords=Fals
 def save_cif(path,
              file_name,
              cell,
-             atom_labels,
+             atom_types,
              atom_pos,
+             atom_labels=None,
              partial_charges=False,
              frac_coords=False):
     """
@@ -863,6 +879,9 @@ def save_cif(path,
         a, b, c, alpha, beta, gamma = cell_to_cellpar(cell)
     if len(cell) == 6:
         a, b, c, alpha, beta, gamma = cell
+
+    if atom_labels is None:
+        atom_labels = [''] * len(atom_types)
 
     cif_text = f"""\
 data_{file_name}
@@ -904,17 +923,17 @@ loop_
     for i in range(len(atom_pos)):
         u, v, w = atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]
         if partial_charges is not False:
-            cif_text += '{:<4}    {} {:>15.9f} {:>15.9f} {:>15.9f} {:>10.5f}\n'.format(
-                atom_labels[i] + str(i),
-                atom_labels[i],
+            cif_text += '{:<7}    {} {:>15.9f} {:>15.9f} {:>15.9f} {:>10.5f}\n'.format(
+                f"{atom_types[i]}{str(i)}_{atom_labels[i]}",
+                atom_types[i],
                 u,
                 v,
                 w,
                 partial_charges[i])
         else:
-            cif_text += '{:<4}    {} {:>15.9f} {:>15.9f} {:>15.9f}\n'.format(
-                atom_labels[i] + str(i),
-                atom_labels[i],
+            cif_text += '{:<7}    {} {:>15.9f} {:>15.9f} {:>15.9f}\n'.format(
+                f"{atom_types[i]}{str(i)}_{atom_labels[i]}",
+                atom_types[i],
                 u,
                 v,
                 w)
@@ -1155,7 +1174,7 @@ def create_structure_CJSON(StructureName: str,
     chemJSON = create_empty_CJSON()
 
     chemJSON['name'] = StructureName
-    chemJSON['formula'] = formula_from_atom_list(AtomLabels)
+    chemJSON['formula'] = formula_from_atom_list(AtomTypes)
 
     if CellParameters is not None:
         CellMatrix = cellpar_to_cell(CellParameters)

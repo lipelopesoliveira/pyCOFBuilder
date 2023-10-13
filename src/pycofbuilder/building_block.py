@@ -7,7 +7,6 @@ Created on Thu Dec 17 11:31:19 2020
 
 import os
 import numpy as np
-# import pycofbuilder.tools as Tools
 
 from pycofbuilder.tools import (rotation_matrix_from_vectors,
                                 closest_atom,
@@ -33,17 +32,21 @@ class Building_Block():
         self.size = 0
         self.mass = None
         self.composition = None
-        self.atom_labels = None
+
+        self.atom_types = None
         self.atom_pos = None
+        self.atom_labels = None
+
         self.smiles = None
         self.charge = 0
         self.multiplicity = 1
         self.chirality = None
         self.symmetry = None
+
         self.core = None
         self.conector = None
         self.funcGroups = None
-
+        
         self.available_symmetry = ['L2',
                                    'T3',
                                    'S4',  # 'R4', 'T4',
@@ -82,7 +85,6 @@ class Building_Block():
                                                                                      funcGroup_check)
         assert all([symm_check, core_check, conector_check, funcGroup_check]), error_msg
 
-        # Make the BB name global
         self.name = name
 
         BB_name = self.name.split('_')
@@ -107,8 +109,8 @@ class Building_Block():
         try:
             self.name = file_name.split('.')[0]
 
-            self.atom_labels, self.atom_pos = read_xyz_file(path, file_name)
-            self.connectivity = len([i for i in self.atom_labels if 'X' in i])
+            self.atom_types, self.atom_pos = read_xyz_file(path, file_name)
+            self.connectivity = len([i for i in self.atom_types if 'X' in i])
 
             self._align_to()
             self._calculate_size()
@@ -129,7 +131,7 @@ class Building_Block():
 
     def n_atoms(self):
         ''' Returns the number of atoms in the unitary cell'''
-        return len(self.atom_labels)
+        return len(self.atom_types)
 
     def print_structure(self):
         """
@@ -157,32 +159,32 @@ class Building_Block():
     def _get_X_points(self):
         '''Get the X points in a molecule'''
 
-        if 'X' in self.atom_labels:
+        if 'X' in self.atom_types:
             X_labels, X_pos = [], []
-            for i in range(len(self.atom_labels)):
-                if self.atom_labels[i] == 'X':
-                    X_labels += [self.atom_labels[i]]
+            for i in range(len(self.atom_types)):
+                if self.atom_types[i] == 'X':
+                    X_labels += [self.atom_types[i]]
                     X_pos += [self.atom_pos[i]]
 
             return X_labels, np.array(X_pos)
 
         else:
             print('No X ponts could be found!')
-            return self.atom_labels, self.atom_pos
+            return self.atom_types, self.atom_pos
 
-    def _get_Q_points(self, atom_labels, atom_pos):
+    def _get_Q_points(self, atom_types, atom_pos):
         '''Get the Q points in a molecule'''
 
         Q_labels, Q_pos = [], []
 
-        for i in range(len(atom_labels)):
-            if atom_labels[i] == 'Q':
-                Q_labels += [atom_labels[i]]
+        for i in range(len(atom_types)):
+            if atom_types[i] == 'Q':
+                Q_labels += [atom_types[i]]
                 Q_pos += [atom_pos[i]]
 
         return Q_labels, np.array(Q_pos)
 
-    def _get_R_points(self, atom_labels, atom_pos):
+    def _get_R_points(self, atom_types, atom_pos):
         """
         Get the R points in a molecule
         """
@@ -202,8 +204,8 @@ class Building_Block():
         # Iterate over the R keys
         for key in R_dict.keys():
             # Iterate over the atoms
-            for i in range(len(atom_labels)):
-                if atom_labels[i] == key:
+            for i in range(len(atom_types)):
+                if atom_types[i] == key:
                     R_dict[key] += [atom_pos[i]]
 
         return R_dict
@@ -246,8 +248,8 @@ class Building_Block():
 
     def _structure_as_string(self):
         struct_string = ''
-        for i, _ in enumerate(self.atom_labels):
-            struct_string += '{:<5s}{:>10.7f}{:>15.7f}{:>15.7f}\n'.format(self.atom_labels[i],
+        for i, _ in enumerate(self.atom_types):
+            struct_string += '{:<5s}{:>10.7f}{:>15.7f}{:>15.7f}\n'.format(self.atom_types[i],
                                                                           self.atom_pos[i][0],
                                                                           self.atom_pos[i][1],
                                                                           self.atom_pos[i][2])
@@ -266,7 +268,7 @@ class Building_Block():
         conector_pos = conector_chem_json['atoms']['coords']['3d']
 
         # Get the position of the Q points in the structure
-        location_Q_struct = self._get_Q_points(self.atom_labels, self.atom_pos)
+        location_Q_struct = self._get_Q_points(self.atom_types, self.atom_pos)
 
         for i in range(len(location_Q_struct[0])):
 
@@ -280,7 +282,7 @@ class Building_Block():
                 # Get the position of the closest atom to Q in the structure
                 close_Q_struct = closest_atom('Q',
                                               location_Q_struct[1][i],
-                                              self.atom_labels,
+                                              self.atom_types,
                                               self.atom_pos)[1]
 
             # Get the position of Q in the conection group
@@ -306,24 +308,31 @@ class Building_Block():
                 find_index(np.array([0., 0., 0.]), n_conector_pos),
                 axis=0)
 
+            self.atom_labels = np.delete(
+                self.atom_labels,
+                find_index(location_Q_struct[1][i], self.atom_pos),
+                axis=0
+            )
+
             self.atom_pos = np.delete(
                 self.atom_pos,
                 find_index(location_Q_struct[1][i], self.atom_pos),
-                axis=0)
+                axis=0
+            )
 
             # Rotate and translade the conector group to Q position in the strucutre
-            rotated_translated_group = np.dot(
-                n_conector_pos,
-                -np.transpose(Rot_m)) + location_Q_struct[1][i]
+            rotated_translated_group = np.dot(n_conector_pos, -np.transpose(Rot_m)) + location_Q_struct[1][i]
 
             # Add the position of conector atoms to the main structure
             self.atom_pos = np.append(self.atom_pos, rotated_translated_group, axis=0)
 
             # Remove the Q atoms from structure
-            self.atom_labels.remove('Q')
+            self.atom_types.remove('Q')
             n_conector_label.remove('Q')
 
-            self.atom_labels = self.atom_labels + n_conector_label
+            self.atom_types = self.atom_types + n_conector_label
+
+            self.atom_labels = np.append(self.atom_labels, [['Q'] * len(n_conector_label)])
 
     def _add_R_group(self, R_name, R_type):
         '''Adds group R in building blocks'''
@@ -338,7 +347,7 @@ class Building_Block():
         group_pos = np.array(R_chem_json['atoms']['coords']['3d']).astype(float)
 
         # Get the position of the R points in the structure
-        location_R_struct = self._get_R_points(self.atom_labels, self.atom_pos)[R_type]
+        location_R_struct = self._get_R_points(self.atom_types, self.atom_pos)[R_type]
 
         # Get the position of the R points in the R group
         for i, _ in enumerate(location_R_struct):
@@ -348,7 +357,7 @@ class Building_Block():
             # Get the position of the closest atom to R in the structure
             close_R_struct = closest_atom_struc(R_type,
                                                 location_R_struct[i],
-                                                self.atom_labels,
+                                                self.atom_types,
                                                 self.atom_pos)[1]
 
             # Get the position of R in the R group
@@ -370,7 +379,8 @@ class Building_Block():
             n_group_pos = np.delete(
                 n_group_pos,
                 find_index(np.array([0.0, 0.0, 0.0]), n_group_pos),
-                axis=0)
+                axis=0
+            )
 
             # Rotate and translade the R group to R position in the strucutre
             rotated_translated_group = np.dot(
@@ -378,22 +388,32 @@ class Building_Block():
                 -np.transpose(Rot_m)
                 ) + location_R_struct[i]
 
+            # Remove the R atoms from the labels list
+            # Remove the R atoms from structure
+            self.atom_labels = np.delete(
+                self.atom_labels,
+                find_index(location_R_struct[i], self.atom_pos),
+                axis=0
+            )
+
             # Remove the R atoms from structure
             self.atom_pos = np.delete(
                 self.atom_pos,
                 find_index(location_R_struct[i], self.atom_pos),
-                axis=0)
+                axis=0
+            )
 
             # Add the position of rotated atoms to the main structure
             self.atom_pos = np.append(self.atom_pos, rotated_translated_group, axis=0)
 
             # Remove the R atoms from structure
-            self.atom_labels.remove(R_type)
+            self.atom_types.remove(R_type)
 
             # Remove the R atoms from R group
             n_group_label.remove('R')
 
-            self.atom_labels = self.atom_labels + n_group_label
+            self.atom_types = self.atom_types + n_group_label
+            self.atom_labels = np.append(self.atom_labels, ['R'] * len(n_group_label))
 
     def _create_BB_structure(self,
                              symmetry='L2',
@@ -416,9 +436,10 @@ class Building_Block():
 
         self.smiles = chem_json['smiles']
 
-        self.atom_labels = chem_json['atoms']['elements']['elementType']
+        self.atom_types = chem_json['atoms']['elements']['elementType']
         self.atom_pos = chem_json['atoms']['coords']['3d']
         self.composition = chem_json['formula']
+        self.atom_labels = ['C']*len(chem_json['atoms']['elements']['elementType'])
 
         self._add_connection_group(conector)
 
@@ -427,24 +448,42 @@ class Building_Block():
 
         funcGroup_string = []
         for i in range(len(R_list_names)):
-            if R_list_labels[i] in self.atom_labels:
+            if R_list_labels[i] in self.atom_types:
                 self._add_R_group(R_list_names[i], R_list_labels[i])
                 self.name += f'_{R_list_names[i]}'
                 funcGroup_string.append(R_list_names[i])
 
         self.funcGroups = funcGroup_string
 
-        self.connectivity = len([i for i in self.atom_labels if 'X' in i])
+        self.connectivity = len([i for i in self.atom_types if 'X' in i])
         self._centralize_molecule()
         self._align_to()
         self._calculate_size()
+
+    def replace_X(self, target_type):
+        for i in range(len(self.atom_types)):
+            if self.atom_types[i] == "X":
+                self.atom_types[i] = target_type
+
+    def remove_X(self):
+
+        atom_types, atom_pos, atom_labels = [], [], []
+        for i in range(len(self.atom_types)):
+            if self.atom_types[i] != "X":
+                atom_types.append(self.atom_types[i])
+                atom_pos.append(self.atom_pos[i])
+                atom_labels.append(self.atom_labels[i])
+
+        self.atom_types = atom_types
+        self.atom_pos = atom_pos
+        self.atom_labels = atom_labels
 
     def save(self, extension='xyz'):
 
         if extension == 'xyz':
             save_xyz(path=self.save_dir,
                      file_name=self.name + '.xyz',
-                     atom_labels=self.atom_labels,
+                     atom_types=self.atom_types,
                      atom_pos=self.atom_pos)
 
     def get_available_core(self):
@@ -519,86 +558,8 @@ class Building_Block():
 
         return symm_check, core_check, conector_check, funcGroup_check
 
-    def get_bipodal_NH2(self):
+    def get_buildingblock_list(self, shape, connector_group):
 
         files_list = os.listdir(self.save_dir)
 
-        return [i.rstrip('.xyz') for i in files_list if 'L2' == i.split('_')[0]
-                and 'NH2' in i.split('_')[2]]
-
-    def get_tripodal_NH2(self):
-
-        files_list = os.listdir(self.save_dir)
-
-        return [i.rstrip('.xyz') for i in files_list if 'T3' == i.split('_')[0]
-                and 'NH2' in i.split('_')[2]]
-
-    def get_bipodal_CHO(self):
-
-        files_list = os.listdir(self.save_dir)
-
-        return [i.rstrip('.xyz') for i in files_list if 'L2' == i.split('_')[0]
-                and 'CHO' == i.split('_')[2]]
-
-    def get_tripodal_CHO(self):
-
-        files_list = os.listdir(self.save_dir)
-
-        return [i.rstrip('.xyz') for i in files_list if 'T3' == i.split('_')[0]
-                and 'CHO' == i.split('_')[2]]
-
-    def get_bipodal_BOH2(self):
-
-        files_list = os.listdir(self.save_dir)
-
-        return [i.rstrip('.xyz') for i in files_list if 'L2' == i.split('_')[0]
-                and 'BOH2' == i.split('_')[2]]
-
-    def get_tripodal_BOH2(self):
-
-        files_list = os.listdir(self.save_dir)
-
-        return [i.rstrip('.xyz') for i in files_list if 'T3' == i.split('_')[0]
-                and 'BOH2' == i.split('_')[2]]
-
-    def get_bipodal_OH2(self):
-
-        files_list = os.listdir(self.save_dir)
-
-        return [i.rstrip('.xyz') for i in files_list if 'L2' == i.split('_')[0]
-                and 'OH2' == i.split('_')[2]]
-
-    def get_tripodal_OH2(self):
-
-        files_list = os.listdir(self.save_dir)
-
-        return [i.rstrip('.xyz') for i in files_list if 'T3' == i.split('_')[0]
-                and 'OH2' == i.split('_')[2]]
-
-    def get_tetrapodal_squared_OH2(self):
-
-        files_list = os.listdir(self.save_dir)
-
-        return [i.rstrip('.xyz') for i in files_list if 'S4' == i.split('_')[0]
-                and 'OH2' == i.split('_')[2]]
-
-    def get_tetrapodal_squared_CHO(self):
-
-        files_list = os.listdir(self.save_dir)
-
-        return [i.rstrip('.xyz') for i in files_list if 'S4' == i.split('_')[0]
-                and 'CHO' == i.split('_')[2]]
-
-    def get_tetrapodal_squared_BOH2(self):
-
-        files_list = os.listdir(self.save_dir)
-
-        return [i.rstrip('.xyz') for i in files_list if 'S4' == i.split('_')[0]
-                and 'BOH2' == i.split('_')[2]]
-
-    def get_tetrapodal_squared_NH2(self):
-
-        files_list = os.listdir(self.save_dir)
-
-        return [i.rstrip('.xyz') for i in files_list if 'S4' == i.split('_')[0]
-                and 'NH2' in i.split('_')[2]]
+        return [i.rstrip('.xyz') for i in files_list if shape == i.split('_')[0] and connector_group in i.split('_')[2]]
