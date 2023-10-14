@@ -825,7 +825,9 @@ class Framework():
 
             rotated_pos = np.dot(BB_T3.atom_pos, R_Matrix) + vertice_pos
             final_pos += rotated_pos.tolist()
-            final_labels += BB_T3.atom_labels.tolist()
+
+            C1_labels = ['C1' if i == 'C' else i for i in BB_T3.atom_labels]
+            final_labels += C1_labels
 
         # Add the building blocks to the structure
         for edge_data in topology_info['edges']:
@@ -836,7 +838,9 @@ class Framework():
             rotated_pos = np.dot(BB_L2.atom_pos, R_Matrix) + np.array(edge_data['position'])*a
 
             final_pos += rotated_pos.tolist()
-            final_labels += BB_L2.atom_labels
+
+            C2_labels = ['C2' if i == 'C' else i for i in BB_L2.atom_labels]
+            final_labels += C2_labels
 
         self.atom_types = final_types
         self.atom_labels = final_labels
