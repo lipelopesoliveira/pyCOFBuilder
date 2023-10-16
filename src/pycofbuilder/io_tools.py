@@ -602,7 +602,7 @@ def save_qe(path: str = None,
             atom_pos: list = None,
             atom_labels: list = None,
             frac_coords: bool = False,
-            input_dict: dict = None):
+            calc_type: str = 'scf'):
     '''
     Save the structure in Quantum Espresso .pwscf format.
 
@@ -629,8 +629,8 @@ def save_qe(path: str = None,
         Nx3 array contaning the atoms coordinates.
     frac_coords : bool
         If True, the coordinates are in fractional coordinates.
-    input_dict : dict
-        Dictionary containing the input parameters for the Quantum Espresso calculation.
+    calc_type : str
+       Type of pw.x calculation. Can be 'scf', 'nscf', 'bands', and 'vc-relax'.
     '''
 
     if len(cell) == 6:
@@ -638,36 +638,37 @@ def save_qe(path: str = None,
     else:
         cell_matrix = cell
 
-    if input_dict is None:
-        input_dict = {}
+    input_dict = {}
 
-        input_dict['control'] = {
-            'calculation': "'vc-relax'",
-            'restart_mode': "'from_scratch'",
-            'wf_collect': '.true.',
-            'pseudo_dir': "'$PSEUDO_DIR'",
-            'outdir': "'./'",
-            'prefix': f"'{file_name}'",
-            'verbosity': "'high'",
-            'tstress': '.true.',
-            'tprnfor': '.true.',
-            'etot_conv_thr': '1.0d-5',
-            'forc_conv_thr': '1.0d-6',
-            'nstep': 1000}
+    input_dict['control'] = {
+        'prefix': f"'{file_name}'",
+        'calculation': f"{calc_type}",
+        'restart_mode': "'from_scratch'",
+        'wf_collect': '.true.',
+        'pseudo_dir': "'$PSEUDO_DIR'",
+        'outdir': "'$SCRATCH_DIR'",
+        'verbosity': "'high'",
+        'tstress': '.true.',
+        'tprnfor': '.true.',
+        'etot_conv_thr': '1.0d-5',
+        'forc_conv_thr': '1.0d-6',
+        'nstep': 1000}
 
-        input_dict['system'] = {
-            'ibrav': 0,
-            'nat': len(atom_types),
-            'ntyp': len(set(atom_types)),
-            'ecutwfc': 40,
-            'ecutrho': 360,
-            'vdw_corr': "'grimme-d3'",
-            'occupations': "'smearing'"}
+    input_dict['system'] = {
+        'ibrav': 0,
+        'nat': len(atom_types),
+        'ntyp': len(set(atom_types)),
+        'ecutwfc': 40,
+        'ecutrho': 360,
+        'vdw_corr': "'grimme-d3'",
+        'occupations': "'smearing'"}
 
-        input_dict['electrons'] = {
-            'conv_thr': 1.0e-9,
-            'electron_maxstep': 100,
-            'mixing_beta': 0.3}
+    input_dict['electrons'] = {
+        'conv_thr': 1.0e-9,
+        'electron_maxstep': 100,
+        'mixing_beta': 0.3}
+
+    if calc_type == 'vc-relax':
 
         input_dict['ions'] = {
             'ion_dynamics': "'bfgs'"}
@@ -698,15 +699,16 @@ def save_qe(path: str = None,
             f.write(f"  {key} = {input_dict['electrons'][key]}\n")
         f.write('/\n\n')
 
-        f.write('&IONS\n')
-        for key in input_dict['ions']:
-            f.write(f"  {key} = {input_dict['ions'][key]}\n")
-        f.write('/\n\n')
+        if calc_type == 'vc-relax':
+            f.write('&IONS\n')
+            for key in input_dict['ions']:
+                f.write(f"  {key} = {input_dict['ions'][key]}\n")
+            f.write('/\n\n')
 
-        f.write('&CELL\n')
-        for key in input_dict['cell']:
-            f.write(f"  {key} = {input_dict['cell'][key]}\n")
-        f.write('/\n\n')
+            f.write('&CELL\n')
+            for key in input_dict['cell']:
+                f.write(f"  {key} = {input_dict['cell'][key]}\n")
+            f.write('/\n\n')
 
         f.write('ATOMIC_SPECIES\n')
         for atom in set(atom_types):
@@ -726,10 +728,11 @@ def save_qe(path: str = None,
         f.write(f'ATOMIC_POSITIONS ({coords_type})\n')
 
         for i, atom in enumerate(atom_pos):
-            f.write('{:<5s}{:>15.9f}{:>15.9f}{:>15.9f}\n'.format(atom_types[i],
-                                                                 atom[0],
-                                                                 atom[1],
-                                                                 atom[2]))
+            f.write('{:<5s}{:>15.9f}{:>15.9f}{:>15.9f}   " {:5}\n'.format(atom_types[i],
+                                                                          atom[0],
+                                                                          atom[1],
+                                                                          atom[2],
+                                                                          atom_labels[i]))
 
         f.write('\n')
         f.write('K_POINTS automatic\n')

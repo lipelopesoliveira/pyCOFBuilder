@@ -626,8 +626,8 @@ def get_bond_atom(connector_1: str, connector_2: str) -> str:
                  'CONHNH2': 'N',
                  'CHNNH2': 'N',
                  'BOH2': 'B',
-                 'Cl': 'C',
-                 'Br': 'C',
+                 'Cl': 'X',
+                 'Br': 'X',
                  'CHCN': 'C'}
 
     bond_atom = None
@@ -673,3 +673,135 @@ def formula_from_atom_list(AtomLabels: list) -> str:
         formula += i + str(AtomLabels.count(i))
 
     return formula
+
+
+def ibrav_to_cell(ibrav, celldm1, celldm2, celldm3, celldm4, celldm5, celldm6):
+    """
+    Convert a value of ibrav to a cell.
+
+    Parameters
+    ----------
+    ibrav : int
+    celldmx: float
+
+    Returns
+    -------
+    cell : matrix
+        The cell as a 3x3 numpy array
+    """
+
+    alat = celldm1 * 0.5291772105638411
+
+    if ibrav == 1:
+        cell = np.identity(3) * alat
+    elif ibrav == 2:
+        cell = np.array([[-1.0, 0.0, 1.0],
+                         [0.0, 1.0, 1.0],
+                         [-1.0, 1.0, 0.0]]) * (alat / 2)
+    elif ibrav == 3:
+        cell = np.array([[1.0, 1.0, 1.0],
+                         [-1.0, 1.0, 1.0],
+                         [-1.0, -1.0, 1.0]]) * (alat / 2)
+    elif ibrav == -3:
+        cell = np.array([[-1.0, 1.0, 1.0],
+                         [1.0, -1.0, 1.0],
+                         [1.0, 1.0, -1.0]]) * (alat / 2)
+    elif ibrav == 4:
+        cell = np.array([[1.0, 0.0, 0.0],
+                         [-0.5, 0.5 * 3**0.5, 0.0],
+                         [0.0, 0.0, celldm3]]) * alat
+    elif ibrav == 5:
+        tx = ((1.0 - celldm4) / 2.0)**0.5
+        ty = ((1.0 - celldm4) / 6.0)**0.5
+        tz = ((1 + 2 * celldm4) / 3.0)**0.5
+        cell = np.array([[tx, -ty, tz],
+                         [0, 2 * ty, tz],
+                         [-tx, -ty, tz]]) * alat
+    elif ibrav == -5:
+        ty = ((1.0 - celldm4) / 6.0)**0.5
+        tz = ((1 + 2 * celldm4) / 3.0)**0.5
+        a_prime = alat / 3**0.5
+        u = tz - 2 * 2**0.5 * ty
+        v = tz + 2**0.5 * ty
+        cell = np.array([[u, v, v],
+                         [v, u, v],
+                         [v, v, u]]) * a_prime
+    elif ibrav == 6:
+        cell = np.array([[1.0, 0.0, 0.0],
+                         [0.0, 1.0, 0.0],
+                         [0.0, 0.0, celldm3]]) * alat
+    elif ibrav == 7:
+        cell = np.array([[1.0, -1.0, celldm3],
+                         [1.0, 1.0, celldm3],
+                         [-1.0, -1.0, celldm3]]) * (alat / 2)
+    elif ibrav == 8:
+        cell = np.array([[1.0, 0.0, 0.0],
+                         [0.0, celldm2, 0.0],
+                         [0.0, 0.0, celldm3]]) * alat
+    elif ibrav == 9:
+        cell = np.array([[1.0 / 2.0, celldm2 / 2.0, 0.0],
+                         [-1.0 / 2.0, celldm2 / 2.0, 0.0],
+                         [0.0, 0.0, celldm3]]) * alat
+    elif ibrav == -9:
+        cell = np.array([[1.0 / 2.0, -celldm2 / 2.0, 0.0],
+                         [1.0 / 2.0, celldm2 / 2.0, 0.0],
+                         [0.0, 0.0, celldm3]]) * alat
+    elif ibrav == 10:
+        cell = np.array([[1.0 / 2.0, 0.0, celldm3 / 2.0],
+                         [1.0 / 2.0, celldm2 / 2.0, 0.0],
+                         [0.0, celldm2 / 2.0, celldm3 / 2.0]]) * alat
+    elif ibrav == 11:
+        cell = np.array([[1.0 / 2.0, celldm2 / 2.0, celldm3 / 2.0],
+                         [-1.0 / 2.0, celldm2 / 2.0, celldm3 / 2.0],
+                         [-1.0 / 2.0, -celldm2 / 2.0, celldm3 / 2.0]]) * alat
+    elif ibrav == 12:
+        sinab = (1.0 - celldm4**2)**0.5
+        cell = np.array([[1.0, 0.0, 0.0],
+                         [celldm2 * celldm4, celldm2 * sinab, 0.0],
+                         [0.0, 0.0, celldm3]]) * alat
+    elif ibrav == -12:
+        sinac = (1.0 - celldm5**2)**0.5
+        cell = np.array([[1.0, 0.0, 0.0],
+                         [0.0, celldm2, 0.0],
+                         [celldm3 * celldm5, 0.0, celldm3 * sinac]]) * alat
+    elif ibrav == 13:
+        sinab = (1.0 - celldm4**2)**0.5
+        cell = np.array([[1.0 / 2.0, 0.0, -celldm3 / 2.0],
+                         [celldm2 * celldm4, celldm2 * sinab, 0.0],
+                         [1.0 / 2.0, 0.0, celldm3 / 2.0]]) * alat
+    elif ibrav == 14:
+        sinab = (1.0 - celldm4**2)**0.5
+        v3 = [celldm3 * celldm5,
+              celldm3 * (celldm6 - celldm5 * celldm4) / sinab,
+              celldm3 * ((1 + 2 * celldm6 * celldm5 * celldm4
+                          - celldm6**2 - celldm5**2 - celldm4**2)**0.5) / sinab]
+        cell = np.array([[1.0, 0.0, 0.0],
+                         [celldm2 * celldm4, celldm2 * sinab, 0.0],
+                         v3]) * alat
+    else:
+        raise NotImplementedError('ibrav = {0} is not implemented'.format(ibrav))
+
+    return cell
+
+
+def a_equal(val1, val2, threshold=1e-3):
+    return abs(val1 - val2) <= threshold
+
+
+def classify_unit_cell(a, b, c, alpha, beta, gamma, thr=1e-3):
+    # Determine the type of unit cell based on the angles and edge lengths
+    if a_equal(alpha, 90, thr) and a_equal(beta, 90, thr) and a_equal(gamma, 90, thr):
+        if a_equal(a, b, thr) and a_equal(b, c, thr):
+            return "cubic"
+        if a_equal(a, b, thr) and not a_equal(a, c, thr):
+            return "tetragonal"
+        else:
+            return "orthorhombic"
+    elif a_equal(alpha, 90, thr) and a_equal(beta, 90, thr) and a_equal(gamma, 120, thr):
+        if a_equal(a, b, thr):
+            return "hexagonal"
+    elif a_equal(alpha, 90, thr) or a_equal(beta, 90, thr) or a_equal(gamma, 90, thr):
+        if not a_equal(a, b, thr) and not a_equal(b, c, thr) and not a_equal(a, c, thr):
+            return "monoclinic"
+    else:
+        return "triclinic"

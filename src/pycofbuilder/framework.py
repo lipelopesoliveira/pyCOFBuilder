@@ -153,18 +153,19 @@ class Framework():
         self.available_topologies = self.available_2D_top + self.available_3D_top
 
         # Define available stackings for all 2D topologies
-        self.available_stacking = {'HCB': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
-                                   'HCB_A': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
-                                   'SQL': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
-                                   'SQL_A': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
-                                   'KGD': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
-                                   'HXL_A': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
-                                   'KGM': ['AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
-                                   'KGM_A': ['AA', 'AB1x', 'AB1y', 'AB1xy', 'AB2', 'AAl', 'AAt'],
-                                   'FXT_A': ['AA', 'AB1x', 'AB1y', 'AB1xy', 'AB2', 'AAl', 'AAt'],
-                                   'DIA': [1, 2, 3, 4],  # Temporary
-                                   'BOR': [5, 8, 6, 7]  # Temporary
-                                   }
+        self.available_stacking = {
+            'HCB': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
+            'HCB_A': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
+            'SQL': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
+            'SQL_A': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
+            'KGD': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
+            'HXL_A': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
+            'KGM': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
+            'KGM_A': ['A', 'AA', 'AB1x', 'AB1y', 'AB1xy', 'AB2', 'AAl', 'AAt'],
+            'FXT_A': ['A', 'AA', 'AB1x', 'AB1y', 'AB1xy', 'AB2', 'AAl', 'AAt'],
+            'DIA': [0, 1, 2, 3, 4],  # Temporary
+            'BOR': [0, 5, 8, 6, 7]  # Temporary
+        }
 
         if name is None:
             self.name = ""
@@ -783,7 +784,8 @@ class Framework():
         # Detect the bond atom and replace "X" the building block
         BB_T3.replace_X(bond_atom)
 
-        # Remove the "X" atoms from the ther building block
+        # Remove the "X" atoms from the the building block
+        BB_T3.remove_X()
         BB_L2.remove_X()
 
         print_command(f'Bond atom detected: {bond_atom}', self.verbosity, ['debug', 'high'])
@@ -807,6 +809,9 @@ class Framework():
         alpha = topology_info['alpha']
         beta = topology_info['beta']
         gamma = topology_info['gamma']
+
+        if self.stacking == 'A':
+            c = slab
 
         # Create the lattice
         self.lattice = Lattice.from_parameters(a, b, c, alpha, beta, gamma)
@@ -865,6 +870,7 @@ class Framework():
         # Create A stacking. The slab is defined by the c_cell parameter
         if stacking == 'A':
             self.stacking = 'A'
+            print(StartingFramework.lattice)
             stacked_structure = StartingFramework
 
         # Create AA staking. By default one sheet per unitary cell is used
