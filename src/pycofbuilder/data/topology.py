@@ -95,7 +95,7 @@ TOPOLOGY_DICT = {
         'beta': 90,
         'gamma': 120,
         'vertice_connectivity': 6,
-        'edge_connectivity': 2,
+        'edge_connectivity': 0,
         'vertices': [
             {'position': [0, 0, 0], 'angle': 30},
             ],
@@ -119,6 +119,7 @@ TOPOLOGY_DICT = {
             {'position': [1/2, 0, 0], 'angle': -90},
             {'position': [-1/4, np.sqrt(3)/4, 0], 'angle': -30}
             ],
+        'edges': []
         },
     'KGM_A': {
         'a': 4,
@@ -143,9 +144,9 @@ TOPOLOGY_DICT = {
             {'position': [0, np.sqrt(3)/4, 0], 'angle': 90},
             ]
         },
-    'FXT_A': {
-        'a': 4,
-        'b': 4,
+    'FXT': {
+        'a': 1,
+        'b': 1,
         'c': 3.6,
         'alpha': 90,
         'beta': 90,
@@ -153,17 +154,33 @@ TOPOLOGY_DICT = {
         'vertice_connectivity': 4,
         'edge_connectivity': 2,
         'vertices': [
-            {'position': [1/4, np.sqrt(3)/4, 0], 'angle': -15},
-            {'position': [1/2, 0, 0], 'angle': 45},
-            {'position': [-1/4, np.sqrt(3)/4, 0], 'angle': 15}
+            {'position': [0.5, 0, 0], 'angle': 45},
+            {'position': [1/4, 3*np.sqrt(3)/12, 0], 'angle': -15},
+            {'position': [-1/4, 3*np.sqrt(3)/12, 0], 'angle': 15}
+            ],
+        'edges': []
+        },
+    'FXT_A': {
+        'a': 2,
+        'b': 2,
+        'c': 3.6,
+        'alpha': 90,
+        'beta': 90,
+        'gamma': 120,
+        'vertice_connectivity': 4,
+        'edge_connectivity': 2,
+        'vertices': [
+            {'position': [0.5, 0, 0], 'angle': 45},
+            {'position': [1/4, 3*np.sqrt(3)/12, 0], 'angle': -15},
+            {'position': [-1/4, 3*np.sqrt(3)/12, 0], 'angle': 15}
             ],
         'edges': [
             {'position': [22/64, 7*np.sqrt(3)/64, 0], 'angle': -30},
             {'position': [85/128, 7*np.sqrt(3)/64, 0], 'angle': 30},
-            {'position': [10/64, 24*np.sqrt(3)/64, 0], 'angle': -30},
-            {'position': [-10/64, 24*np.sqrt(3)/64, 0], 'angle': 30},
-            {'position': [4/8, 17*np.sqrt(3)/64, 0], 'angle': 90},
-            {'position': [0, 15*np.sqrt(3)/64, 0], 'angle': 90},
+            {'position': [4/8, 35*np.sqrt(3)/128, 0], 'angle': 90},
+            {'position': [0, 29*np.sqrt(3)/128, 0], 'angle': 90},
+            {'position': [21/128, 25*np.sqrt(3)/64, 0], 'angle': -30},
+            {'position': [-21/128, 25*np.sqrt(3)/64, 0], 'angle': 30},
             ]
         },
     }

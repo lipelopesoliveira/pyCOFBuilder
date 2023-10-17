@@ -145,8 +145,8 @@ class Framework():
                                  'SQL', 'SQL_A',
                                  'KGM', 'KGM_A',
                                  'KGD',
-                                 'HXL_A',
-                                 'FXT_A']
+                                 'HXL', 'HXL_A',
+                                 'FXT', 'FXT_A']
 
         # Falta add: ['dia', 'bor', 'srs', 'pts', 'ctn', 'rra', 'fcc', 'lon', 'stp', 'acs', 'tbo', 'bcu', 'fjh', 'ceq']
         self.available_3D_top = ['DIA', 'BOR']  # Temporary
@@ -162,7 +162,8 @@ class Framework():
             'HXL_A': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
             'KGM': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
             'KGM_A': ['A', 'AA', 'AB1x', 'AB1y', 'AB1xy', 'AB2', 'AAl', 'AAt'],
-            'FXT_A': ['A', 'AA', 'AB1x', 'AB1y', 'AB1xy', 'AB2', 'AAl', 'AAt'],
+            'FXT': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
+            'FXT_A': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
             'DIA': [0, 1, 2, 3, 4],  # Temporary
             'BOR': [0, 5, 8, 6, 7]  # Temporary
         }
@@ -275,7 +276,7 @@ class Framework():
             'KGD': self._create_kgd_structure,
             # 'HXL': self._create_hxl_structure,
             'HXL_A': self._create_hxl_a_structure,
-            # 'FXT': self._create_fxt_structure,
+            'FXT': self._create_fxt_structure,
             'FXT_A': self._create_fxt_a_structure,
             # 'BEX': self._create_bex_structure
             }
@@ -445,13 +446,13 @@ class Framework():
         self.lattice = Lattice.from_parameters(a, b, c, alpha, beta, gamma)
 
         # Create the structure
-        final_types = []
-        final_labels = []
-        final_pos = []
+        self.atom_types = []
+        self.atom_labels = []
+        self.atom_pos = []
 
-        # Add the building blocks to the structure
+        # Add the A1 building blocks to the structure
         vertice_data = topology_info['vertices'][0]
-        final_types += BB_T3_A.atom_types
+        self.atom_types += BB_T3_A.atom_types
         vertice_pos = np.array(vertice_data['position'])*a
 
         R_Matrix = R.from_euler('z',
@@ -459,12 +460,13 @@ class Framework():
                                 degrees=True).as_matrix()
 
         rotated_pos = np.dot(BB_T3_A.atom_pos, R_Matrix) + vertice_pos
-        final_pos += rotated_pos.tolist()
+        self.atom_pos += rotated_pos.tolist()
 
-        final_labels += ['C1' if i == 'C' else i for i in BB_T3_A.atom_labels]
+        self.atom_labels += ['C1' if i == 'C' else i for i in BB_T3_A.atom_labels]
 
+        # Add the A2 building block to the structure
         vertice_data = topology_info['vertices'][1]
-        final_types += BB_T3_B.atom_types
+        self.atom_types += BB_T3_B.atom_types
         vertice_pos = np.array(vertice_data['position'])*a
 
         R_Matrix = R.from_euler('z',
@@ -472,14 +474,11 @@ class Framework():
                                 degrees=True).as_matrix()
 
         rotated_pos = np.dot(BB_T3_B.atom_pos, R_Matrix) + vertice_pos
-        final_pos += rotated_pos.tolist()
+        self.atom_pos += rotated_pos.tolist()
 
-        final_labels += ['C2' if i == 'C' else i for i in BB_T3_B.atom_labels]
+        self.atom_labels += ['C2' if i == 'C' else i for i in BB_T3_B.atom_labels]
 
-        self.atom_types = final_types
-        self.atom_labels = final_labels
-        self.atom_pos = final_pos
-
+        # Creates a pymatgen structure
         StartingFramework = Structure(
             self.lattice,
             self.atom_types,
@@ -495,112 +494,166 @@ class Framework():
             frac_coords=True,
             to_unit_cell=True)
 
-        # Create A stacking, a 2D isolated sheet with slab
-        if stacking == 'A':
-            stacked_structure = StartingFramework
+        dict_structure = StartingFramework.as_dict()
 
-        # Create AA staking. By default one sheet per unitary cell is used
-        if stacking == 'AA':
+        self.lattice = np.array(dict_structure['lattice']['matrix']).astype(float)
+
+        self.atom_types = [i['label'] for i in dict_structure['sites']]
+        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
+        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
+
+        if stacking == 'A' or stacking == 'AA':
             stacked_structure = StartingFramework
 
         if stacking == 'AB1':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['xyz'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
+            self.lattice *= (1, 1, 2)
 
-            cell = np.array(dist_str['lattice']['matrix'])*(1, 1, 2)
-
-            A = ion_conv_crystal
-            B = ion_conv_crystal
-
-            AB = np.concatenate((A, B))
-            AB_types = [i[0] for i in types_conv_crystal]
-            AB_labels = labels_conv_crystal + labels_conv_crystal
-
-            lattice = Lattice(cell)
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
 
             stacked_structure = Structure(
-                lattice,
-                AB_types + AB_types,
-                AB,
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': AB_labels}
+                site_properties={'source': self.atom_labels}
             )
 
-            B_list = np.arange(len(AB_types)) + len(AB_types)
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
 
-            stacked_structure.translate_sites(B_list, [2/3, 1/3, 0.5], frac_coords=True, to_unit_cell=True)
+            # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [2/3, 1/3, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
+                )
 
         if stacking == 'AB2':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['xyz'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
+            self.lattice *= (1, 1, 2)
 
-            cell = np.array(dist_str['lattice']['matrix'])*(1, 1, 2)
-
-            A = ion_conv_crystal
-            B = ion_conv_crystal
-
-            AB = np.concatenate((A, B))
-            AB_types = [i[0] for i in types_conv_crystal]
-            AB_labels = labels_conv_crystal + labels_conv_crystal
-
-            lattice = Lattice(cell)
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
 
             stacked_structure = Structure(
-                lattice,
-                AB_types + AB_types,
-                AB,
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': AB_labels}
+                site_properties={'source': self.atom_labels}
             )
 
-            B_list = np.arange(len(AB_types)) + len(AB_types)
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
 
-            stacked_structure.translate_sites(B_list, [1/2, 0, 0.5], frac_coords=True, to_unit_cell=True)
+            # Translate the second sheet by the vector [1/2, 0, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [1/2, 0, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
+                )
 
-        # Create AAl stacking.
-        # Hexagonal cell with two sheets per cell shifited by the shift_vector in angstroms.
-        if stacking == 'AAl':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['xyz'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
+        if stacking == 'ABC1':
+            self.lattice *= (1, 1, 3)
 
-            cell = np.array(dist_str['lattice']['matrix'])*(1, 1, 2)
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
 
-            # Shift the first sheet to be at 0.25 * c
-            A = ion_conv_crystal * np.array([1, 1, 0.5])
-
-            # Calculates the shift vector in crystal units
-            r = get_cartesian_to_fractional_matrix(*cell_to_cellpar(cell))
-            shift_vector = np.dot(r, np.array(shift_vector))
-
-            # Shift the first sheet to be at 0.75 * c and translate by the shift_vector
-            B = ion_conv_crystal * np.array([1, 1, 1.5]) + shift_vector
-
-            AB = np.concatenate((A, B))
-            AB_types = [i[0] for i in types_conv_crystal]
-            AB_labels = labels_conv_crystal + labels_conv_crystal
-
-            lattice = Lattice(cell)
             stacked_structure = Structure(
-                lattice,
-                AB_types + AB_types,
-                AB,
-                coords_are_cartesian=False,
-                site_properties={'source': AB_labels}
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
+            )
+
+            # Get the index of the atoms in the second sheet
+            _, B_list, C_list = np.split(np.arange(len(self.atom_types)), 3)
+
+            # Translate the second sheet by the vector (2/3, 1/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                (2/3, 1/3, 1/3),
+                frac_coords=True,
+                to_unit_cell=True
+                )
+
+            # Translate the third sheet by the vector (2/3, 1/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                C_list,
+                (4/3, 2/3, 2/3),
+                frac_coords=True,
+                to_unit_cell=True
+            )
+
+        if stacking == 'ABC2':
+            self.lattice *= (1, 1, 3)
+
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
+
+            stacked_structure = Structure(
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
+            )
+
+            # Get the index of the atoms in the second sheet
+            _, B_list, C_list = np.split(np.arange(len(self.atom_types)), 3)
+
+            # Translate the second sheet by the vector (2/3, 1/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                (1/3, 0, 1/3),
+                frac_coords=True,
+                to_unit_cell=True
+                )
+
+            # Translate the third sheet by the vector (2/3, 1/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                C_list,
+                (2/3, 0, 2/3),
+                frac_coords=True,
+                to_unit_cell=True
+            )
+
+        if stacking == 'AAl':
+            self.lattice *= (1, 1, 2)
+
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            sv = np.array(shift_vector)
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos + sv))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
+
+            stacked_structure = Structure(
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
+            )
+
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
+
+            # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [0, 0, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
                 )
 
         # Create AA tilted stacking.
-        # Tilted Hexagonal cell with two sheets per cell tilted by tilt_angle.
         if stacking == 'AAt':
-            types_conv_crystal = np.array(
-                [[i['label']] for i in StartingFramework.as_dict()['sites']])
-            ion_conv_crystal = np.array(
-                [i['xyz'] for i in StartingFramework.as_dict()['sites']])
             cell = StartingFramework.as_dict()['lattice']
 
             # Shift the cell by the tilt angle
@@ -611,72 +664,29 @@ class Framework():
             beta = cell['beta'] - tilt_angle
             gamma = cell['gamma']
 
-            new_cell = cellpar_to_cell(
-                [a_cell, b_cell, c_cell, alpha, beta, gamma])
+            self.lattice = cellpar_to_cell([a_cell, b_cell, c_cell, alpha, beta, gamma])
 
-            # Shift the first sheet to be at 0.25 * c
-            A = ion_conv_crystal
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
 
-            # Shift the first sheet to be at 0.75 * c and translate by the shift_vector
-            B = ion_conv_crystal + np.array([0, 0, 0.5*c_cell]) + shift_vector
-
-            AB = np.concatenate((A, B))
-            AB_types = [i[0] for i in types_conv_crystal]
-
-            lattice = Lattice(new_cell)
             stacked_structure = Structure(
-                lattice,
-                AB_types + AB_types,
-                AB,
-                coords_are_cartesian=True
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
             )
 
-        if stacking == 'ABC1':
-            types_conv_crystal = np.array(
-                [[i['label']] for i in StartingFramework.as_dict()['sites']])
-            ion_conv_crystal = np.array(
-                [i['abc'] for i in StartingFramework.as_dict()['sites']])
-            cell = np.array(StartingFramework.as_dict()[
-                            'lattice']['matrix'])*(1, 1, 3)
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
 
-            A = ion_conv_crystal*(1, 1, 5/3)
-            B = translate_inside(ion_conv_crystal*(1, 1, 1) + (2/3, 1/3, 0))
-            C = translate_inside(ion_conv_crystal*(1, 1, 1/3) + (4/3, 2/3, 0))
-
-            ABC = np.concatenate((A, B, C))
-            ABC_label = [i[0] for i in types_conv_crystal]
-
-            lattice = Lattice(cell)
-
-            stacked_structure = Structure(
-                lattice,
-                ABC_label + ABC_label + ABC_label,
-                ABC,
-                coords_are_cartesian=False
-            )
-
-        if stacking == 'ABC2':
-            types_conv_crystal = np.array(
-                [[i['label']] for i in StartingFramework.as_dict()['sites']])
-            ion_conv_crystal = np.array(
-                [i['abc'] for i in StartingFramework.as_dict()['sites']])
-            cell = np.array(StartingFramework.as_dict()[
-                            'lattice']['matrix'])*(1, 1, 3)
-
-            A = ion_conv_crystal*(1, 1, 5/3)
-            B = translate_inside(ion_conv_crystal*(1, 1, 1) + (1/3, 0, 0))
-            C = translate_inside(ion_conv_crystal*(1, 1, 1/3) + (2/3, 0, 0))
-
-            ABC = np.concatenate((A, B, C))
-            ABC_label = [i[0] for i in types_conv_crystal]
-
-            lattice = Lattice(cell)
-
-            stacked_structure = Structure(
-                lattice,
-                ABC_label + ABC_label + ABC_label,
-                ABC,
-                coords_are_cartesian=False
+            # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [0, 0, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
                 )
 
         dict_structure = stacked_structure.as_dict()
@@ -691,16 +701,27 @@ class Framework():
 
         # Get the simmetry information of the generated structure
         symm = SpacegroupAnalyzer(stacked_structure, symprec=0.1, angle_tolerance=.5)
-        self.prim_structure = symm.get_refined_structure(keep_site_properties=True)
 
-        print_command(self.prim_structure, self.verbosity, ['debug'])
+        try:
+            self.prim_structure = symm.get_refined_structure(keep_site_properties=True)
 
-        self.lattice_type = symm.get_lattice_type()
-        self.space_group = symm.get_space_group_symbol()
-        self.space_group_n = symm.get_space_group_number()
+            print_command(self.prim_structure, self.verbosity, ['debug'])
 
-        symm_op = symm.get_point_group_operations()
-        self.hall = symm.get_hall()
+            self.lattice_type = symm.get_lattice_type()
+            self.space_group = symm.get_space_group_symbol()
+            self.space_group_n = symm.get_space_group_number()
+
+            symm_op = symm.get_point_group_operations()
+            self.hall = symm.get_hall()
+        except Exception as e:
+            print_command(e, self.verbosity, ['debug'])
+
+            self.lattice_type = 'Triclinic'
+            self.space_group = 'P1'
+            self.space_group_n = '1'
+
+            symm_op = [1]
+            self.hall = 'P 1'
 
         if print_result is True:
             print_framework_name(self.name,
@@ -813,37 +834,33 @@ class Framework():
         self.lattice = Lattice.from_parameters(a, b, c, alpha, beta, gamma)
 
         # Create the structure
-        final_types = []
-        final_labels = []
-        final_pos = []
+        self.atom_types = []
+        self.atom_labels = []
+        self.atom_pos = []
 
         # Add the building blocks to the structure
         for vertice_data in topology_info['vertices']:
-            final_types += BB_T3.atom_types
+            self.atom_types += BB_T3.atom_types
             vertice_pos = np.array(vertice_data['position'])*a
 
             R_Matrix = R.from_euler('z', vertice_data['angle'], degrees=True).as_matrix()
 
             rotated_pos = np.dot(BB_T3.atom_pos, R_Matrix) + vertice_pos
-            final_pos += rotated_pos.tolist()
+            self.atom_pos += rotated_pos.tolist()
 
-            final_labels += ['C1' if i == 'C' else i for i in BB_T3.atom_labels]
+            self.atom_labels += ['C1' if i == 'C' else i for i in BB_T3.atom_labels]
 
         # Add the building blocks to the structure
         for edge_data in topology_info['edges']:
-            final_types += BB_L2.atom_types
+            self.atom_types += BB_L2.atom_types
 
             R_Matrix = R.from_euler('z', edge_data['angle'], degrees=True).as_matrix()
 
             rotated_pos = np.dot(BB_L2.atom_pos, R_Matrix) + np.array(edge_data['position'])*a
 
-            final_pos += rotated_pos.tolist()
+            self.atom_pos += rotated_pos.tolist()
 
-            final_labels += ['C2' if i == 'C' else i for i in BB_L2.atom_labels]
-
-        self.atom_types = final_types
-        self.atom_labels = final_labels
-        self.atom_pos = final_pos
+            self.atom_labels += ['C2' if i == 'C' else i for i in BB_L2.atom_labels]
 
         StartingFramework = Structure(
             self.lattice,
@@ -861,112 +878,167 @@ class Framework():
             to_unit_cell=True
         )
 
-        # Create A stacking. The slab is defined by the c_cell parameter
-        if stacking == 'A':
-            stacked_structure = StartingFramework
+        dict_structure = StartingFramework.as_dict()
 
-        # Create AA staking. By default one sheet per unitary cell is used
-        if stacking == 'AA':
+        self.lattice = np.array(dict_structure['lattice']['matrix']).astype(float)
+
+        self.atom_types = [i['label'] for i in dict_structure['sites']]
+        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
+        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
+
+        if stacking == 'A' or stacking == 'AA':
             stacked_structure = StartingFramework
 
         if stacking == 'AB1':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['xyz'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
+            self.lattice *= (1, 1, 2)
 
-            cell = np.array(dist_str['lattice']['matrix'])*(1, 1, 2)
-
-            A = ion_conv_crystal
-            B = ion_conv_crystal
-
-            AB = np.concatenate((A, B))
-            AB_types = [i[0] for i in types_conv_crystal]
-            AB_labels = labels_conv_crystal + labels_conv_crystal
-
-            lattice = Lattice(cell)
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
 
             stacked_structure = Structure(
-                lattice,
-                AB_types + AB_types,
-                AB,
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': AB_labels}
+                site_properties={'source': self.atom_labels}
             )
 
-            B_list = np.arange(len(AB_types)) + len(AB_types)
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
 
-            stacked_structure.translate_sites(B_list, [2/3, 1/3, 0.5], frac_coords=True, to_unit_cell=True)
+            # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [2/3, 1/3, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
+                )
 
         if stacking == 'AB2':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['xyz'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
+            self.lattice *= (1, 1, 2)
 
-            cell = np.array(dist_str['lattice']['matrix'])*(1, 1, 2)
-
-            A = ion_conv_crystal
-            B = ion_conv_crystal
-
-            AB = np.concatenate((A, B))
-            AB_types = [i[0] for i in types_conv_crystal]
-            AB_labels = labels_conv_crystal + labels_conv_crystal
-
-            lattice = Lattice(cell)
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
 
             stacked_structure = Structure(
-                lattice,
-                AB_types + AB_types,
-                AB,
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': AB_labels}
+                site_properties={'source': self.atom_labels}
             )
 
-            B_list = np.arange(len(AB_types)) + len(AB_types)
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
 
-            stacked_structure.translate_sites(B_list, [1/2, 0, 0.5], frac_coords=True, to_unit_cell=True)
+            # Translate the second sheet by the vector [1/2, 0, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [1/2, 0, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
+                )
 
-        # Create AAl stacking.
-        # Hexagonal cell with two sheets per cell shifited by the shift_vector in angstroms.
-        if stacking == 'AAl':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['xyz'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
+        if stacking == 'ABC1':
+            self.lattice *= (1, 1, 3)
 
-            cell = np.array(dist_str['lattice']['matrix'])*(1, 1, 2)
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
 
-            # Shift the first sheet to be at 0.25 * c
-            A = ion_conv_crystal * np.array([1, 1, 0.5])
-
-            # Calculates the shift vector in crystal units
-            r = get_cartesian_to_fractional_matrix(*cell_to_cellpar(cell))
-            shift_vector = np.dot(r, np.array(shift_vector))
-
-            # Shift the first sheet to be at 0.75 * c and translate by the shift_vector
-            B = ion_conv_crystal * np.array([1, 1, 1.5]) + shift_vector
-
-            AB = np.concatenate((A, B))
-            AB_types = [i[0] for i in types_conv_crystal]
-            AB_labels = labels_conv_crystal + labels_conv_crystal
-
-            lattice = Lattice(cell)
             stacked_structure = Structure(
-                lattice,
-                AB_types + AB_types,
-                AB,
-                coords_are_cartesian=False,
-                site_properties={'source': AB_labels}
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
+            )
+
+            # Get the index of the atoms in the second sheet
+            _, B_list, C_list = np.split(np.arange(len(self.atom_types)), 3)
+
+            # Translate the second sheet by the vector (2/3, 1/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                (2/3, 1/3, 1/3),
+                frac_coords=True,
+                to_unit_cell=True
+                )
+
+            # Translate the third sheet by the vector (2/3, 1/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                C_list,
+                (4/3, 2/3, 2/3),
+                frac_coords=True,
+                to_unit_cell=True
+            )
+
+        if stacking == 'ABC2':
+            self.lattice *= (1, 1, 3)
+
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
+
+            stacked_structure = Structure(
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
+            )
+
+            # Get the index of the atoms in the second sheet
+            _, B_list, C_list = np.split(np.arange(len(self.atom_types)), 3)
+
+            # Translate the second sheet by the vector (2/3, 1/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                (1/3, 0, 1/3),
+                frac_coords=True,
+                to_unit_cell=True
+                )
+
+            # Translate the third sheet by the vector (2/3, 1/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                C_list,
+                (2/3, 0, 2/3),
+                frac_coords=True,
+                to_unit_cell=True
+            )
+
+        if stacking == 'AAl':
+            self.lattice *= (1, 1, 2)
+
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            sv = np.array(shift_vector)
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos + sv))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
+
+            stacked_structure = Structure(
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
+            )
+
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
+
+            # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [0, 0, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
                 )
 
         # Create AA tilted stacking.
-        # Tilted Hexagonal cell with two sheets per cell tilted by tilt_angle.
         if stacking == 'AAt':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['xyz'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
+            cell = StartingFramework.as_dict()['lattice']
 
             # Shift the cell by the tilt angle
             a_cell = cell['a']
@@ -976,78 +1048,30 @@ class Framework():
             beta = cell['beta'] - tilt_angle
             gamma = cell['gamma']
 
-            new_cell = cellpar_to_cell([a_cell, b_cell, c_cell, alpha, beta, gamma])
+            self.lattice = cellpar_to_cell([a_cell, b_cell, c_cell, alpha, beta, gamma])
 
-            # Shift the first sheet to be at 0.25 * c
-            A = ion_conv_crystal
-
-            # Shift the first sheet to be at 0.75 * c and translate by the shift_vector
-            B = ion_conv_crystal + np.array([0, 0, 0.5*c_cell]) + shift_vector
-
-            AB = np.concatenate((A, B))
-            AB_types = [i[0] for i in types_conv_crystal]
-
-            lattice = Lattice(new_cell)
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
 
             stacked_structure = Structure(
-                lattice,
-                AB_types + AB_types,
-                AB,
-                coords_are_cartesian=False,
-                site_properties={'source': AB_labels}
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
             )
 
-        if stacking == 'ABC1':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['abc'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
 
-            cell = np.array(dist_str['lattice']['matrix'])*(1, 1, 3)
-
-            A = ion_conv_crystal*(1, 1, 5/3)
-            B = translate_inside(ion_conv_crystal*(1, 1, 1) + (2/3, 1/3, 0))
-            C = translate_inside(ion_conv_crystal*(1, 1, 1/3) + (4/3, 2/3, 0))
-
-            ABC = np.concatenate((A, B, C))
-            ABC_type = [i[0] for i in labels_conv_crystal]
-            ABC_labels = labels_conv_crystal + labels_conv_crystal + labels_conv_crystal
-
-            lattice = Lattice(cell)
-
-            stacked_structure = Structure(
-                lattice,
-                ABC_type + ABC_type + ABC_type,
-                ABC,
-                coords_are_cartesian=False,
-                site_properties={'source': ABC_labels}
-            )
-
-        if stacking == 'ABC2':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['abc'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
-
-            cell = np.array(dist_str['lattice']['matrix'])*(1, 1, 3)
-
-            A = ion_conv_crystal*(1, 1, 5/3)
-            B = translate_inside(ion_conv_crystal*(1, 1, 1) + (1/3, 0, 0))
-            C = translate_inside(ion_conv_crystal*(1, 1, 1/3) + (2/3, 0, 0))
-
-            ABC = np.concatenate((A, B, C))
-            ABC_type = [i[0] for i in labels_conv_crystal]
-            ABC_labels = labels_conv_crystal + labels_conv_crystal + labels_conv_crystal
-
-            lattice = Lattice(cell)
-
-            stacked_structure = Structure(
-                lattice,
-                ABC_type + ABC_type + ABC_type,
-                ABC,
-                coords_are_cartesian=False,
-                site_properties={'source': ABC_labels}
-            )
+            # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [0, 0, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
+                )
 
         dict_structure = stacked_structure.as_dict()
 
@@ -1061,16 +1085,27 @@ class Framework():
 
         # Get the simmetry information of the generated structure
         symm = SpacegroupAnalyzer(stacked_structure, symprec=0.05, angle_tolerance=.5)
-        self.prim_structure = symm.get_refined_structure(keep_site_properties=True)
+        try:
+            self.prim_structure = symm.get_refined_structure(keep_site_properties=True)
 
-        print_command(self.prim_structure, self.verbosity, ['debug'])
+            print_command(self.prim_structure, self.verbosity, ['debug'])
 
-        self.lattice_type = symm.get_lattice_type()
-        self.space_group = symm.get_space_group_symbol()
-        self.space_group_n = symm.get_space_group_number()
+            self.lattice_type = symm.get_lattice_type()
+            self.space_group = symm.get_space_group_symbol()
+            self.space_group_n = symm.get_space_group_number()
 
-        symm_op = symm.get_point_group_operations()
-        self.hall = symm.get_hall()
+            symm_op = symm.get_point_group_operations()
+            self.hall = symm.get_hall()
+
+        except Exception as e:
+            print_command(e, self.verbosity, ['debug'])
+
+            self.lattice_type = 'Triclinic'
+            self.space_group = 'P1'
+            self.space_group_n = '1'
+
+            symm_op = [1]
+            self.hall = 'P 1'
 
         if print_result is True:
             print_framework_name(self.name,
@@ -1178,40 +1213,36 @@ class Framework():
             c = slab
 
         # Create the lattice
-        lattice = Lattice.from_parameters(a, b, c, alpha, beta, gamma)
+        self.lattice = Lattice.from_parameters(a, b, c, alpha, beta, gamma)
 
         # Create the structure
-        final_types = []
-        final_labels = []
-        final_pos = []
+        self.atom_types = []
+        self.atom_labels = []
+        self.atom_pos = []
 
         # Add the first building block to the structure
         vertice_data = topology_info['vertices'][0]
-        final_types += BB_S4_A.atom_types
+        self.atom_types += BB_S4_A.atom_types
         vertice_pos = np.array(vertice_data['position'])*a
 
         R_Matrix = R.from_euler('z', vertice_data['angle'], degrees=True).as_matrix()
 
         rotated_pos = np.dot(BB_S4_A.atom_pos, R_Matrix) + vertice_pos
-        final_pos += rotated_pos.tolist()
+        self.atom_pos += rotated_pos.tolist()
 
-        final_labels += ['C1' if i == 'C' else i for i in BB_S4_A.atom_labels]
+        self.atom_labels += ['C1' if i == 'C' else i for i in BB_S4_A.atom_labels]
 
         # Add the second building block to the structure
         vertice_data = topology_info['vertices'][1]
-        final_types += BB_S4_B.atom_types
+        self.atom_types += BB_S4_B.atom_types
         vertice_pos = np.array(vertice_data['position'])*a
 
         R_Matrix = R.from_euler('z', vertice_data['angle'], degrees=True).as_matrix()
 
         rotated_pos = np.dot(BB_S4_B.atom_pos, R_Matrix) + vertice_pos
-        final_pos += rotated_pos.tolist()
+        self.atom_pos += rotated_pos.tolist()
 
-        final_labels += ['C2' if i == 'C' else i for i in BB_S4_B.atom_labels]
-
-        self.atom_types = final_types
-        self.atom_labels = final_labels
-        self.atom_pos = final_pos
+        self.atom_labels += ['C2' if i == 'C' else i for i in BB_S4_B.atom_labels]
 
         StartingFramework = Structure(
             self.lattice,
@@ -1229,106 +1260,172 @@ class Framework():
             to_unit_cell=True
         )
 
-        # Create A stacking, a 2D isolated sheet with slab
-        if stacking == 'A':
-            stacked_structure = StartingFramework
+        dict_structure = StartingFramework.as_dict()
 
-        if stacking == 'AA':
+        self.lattice = np.array(dict_structure['lattice']['matrix']).astype(float)
+
+        self.atom_types = [i['label'] for i in dict_structure['sites']]
+        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
+        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
+
+        if stacking == 'A' or stacking == 'AA':
             stacked_structure = StartingFramework
 
         if stacking == 'AB1':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['abc'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
 
-            cell = np.array(dist_str['lattice']['matrix'])*(1, 1, 2)
+            self.lattice *= (1, 1, 2)
 
-            A = ion_conv_crystal*(1, 1, 0.5)
-            B = translate_inside(ion_conv_crystal*(1, 1, 1.5) + (1/4, 1/4, 0))
-
-            AB = np.concatenate((A, B))
-            AB_types = [i[0] for i in types_conv_crystal]
-            AB_labels = labels_conv_crystal + labels_conv_crystal
-
-            lattice = Lattice(cell)
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
 
             stacked_structure = Structure(
-                lattice,
-                AB_types + AB_types,
-                AB,
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': AB_labels}
+                site_properties={'source': self.atom_labels}
             )
 
-            B_list = np.arange(len(AB_types)) + len(AB_types)
-            stacked_structure.translate_sites(B_list, [2/3, 1/3, 0.5], frac_coords=True, to_unit_cell=True)
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
+
+            # Translate the second sheet by the vector [1/4, 1/4, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [1/4, 1/4, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
+                )
 
         if stacking == 'AB2':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['abc'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
+            self.lattice *= (1, 1, 2)
 
-            cell = np.array(dist_str['lattice']['matrix'])*(1, 1, 2)
-
-            A = ion_conv_crystal*(1, 1, 0.5)
-            B = translate_inside(ion_conv_crystal*(1, 1, 1.5) + (1/2, 0, 0))
-
-            AB = np.concatenate((A, B))
-            AB_types = [i[0] for i in labels_conv_crystal]
-
-            lattice = Lattice(cell)
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
 
             stacked_structure = Structure(
-                lattice,
-                AB_types + AB_types,
-                AB,
-                coords_are_cartesian=False,
-                site_properties={'source': AB_labels}
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
+            )
+
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
+
+            # Translate the second sheet by the vector [1/2, 0, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [1/2, 0, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
+                )
+
+        if stacking == 'ABC1':
+
+            self.lattice *= (1, 1, 3)
+
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
+
+            stacked_structure = Structure(
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
+            )
+
+            # Get the index of the atoms in the second sheet
+            _, B_list, C_list = np.split(np.arange(len(self.atom_types)), 3)
+
+            # Translate the second sheet by the vector (1/3, 1/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                (1/3, 1/3, 1/3),
+                frac_coords=True,
+                to_unit_cell=True
+                )
+
+            # Translate the third sheet by the vector (2/3, 2/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                C_list,
+                (2/3, 2/3, 2/3),
+                frac_coords=True,
+                to_unit_cell=True
+            )
+
+        if stacking == 'ABC2':
+            self.lattice *= (1, 1, 3)
+
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
+
+            stacked_structure = Structure(
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
+            )
+
+            # Get the index of the atoms in the second sheet
+            _, B_list, C_list = np.split(np.arange(len(self.atom_types)), 3)
+
+            # Translate the second sheet by the vector (1/3, 1/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                (1/3, 0, 1/3),
+                frac_coords=True,
+                to_unit_cell=True
+                )
+
+            # Translate the third sheet by the vector (2/3, 2/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                C_list,
+                (2/3, 0, 2/3),
+                frac_coords=True,
+                to_unit_cell=True
             )
 
         # Create AAl stacking. Tetragonal cell with two sheets
         # per cell shifited by the shift_vector in angstroms.
         if stacking == 'AAl':
-            dist_str = StartingFramework.as_dict()
-            labels_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['abc'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
+            self.lattice *= (1, 1, 2)
 
-            cell = np.array(dist_str['lattice']['matrix'])*(1, 1, 2)
-
-            # Shift the first sheet to be at 0.25 * c
-            A = ion_conv_crystal * np.array([1, 1, 0.5])
-
-            # Calculates the shift vector in crystal units
-            r = get_cartesian_to_fractional_matrix(*cell_to_cellpar(cell))
-            shift_vector = np.dot(r, np.array(shift_vector))
-
-            # Shift the first sheet to be at 0.75 * c and translate by the shift_vector
-            B = ion_conv_crystal * np.array([1, 1, 1.5]) + shift_vector
-
-            AB = np.concatenate((A, B))
-            AB_types = [i[0] for i in labels_conv_crystal]
-            AB_labels = labels_conv_crystal + labels_conv_crystal
-
-            lattice = Lattice(cell)
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            sv = np.array(shift_vector)
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos + sv))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
 
             stacked_structure = Structure(
-                lattice,
-                AB_types + AB_types,
-                AB,
-                coords_are_cartesian=False,
-                site_properties={'source': AB_labels}
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
             )
+
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
+
+            # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [0, 0, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
+                )
 
         # Create AA tilted stacking.
         # Tilted tetragonal cell with two sheets per cell tilted by tilt_angle.
         if stacking == 'AAt':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['xyz'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
+            cell = StartingFramework.as_dict()['lattice']
 
             # Shift the cell by the tilt angle
             a_cell = cell['a']
@@ -1338,79 +1435,30 @@ class Framework():
             beta = cell['beta'] - tilt_angle
             gamma = cell['gamma']
 
-            new_cell = cellpar_to_cell([a_cell, b_cell, c_cell, alpha, beta, gamma])
+            self.lattice = cellpar_to_cell([a_cell, b_cell, c_cell, alpha, beta, gamma])
 
-            # Shift the first sheet to be at 0.25 * c
-            A = ion_conv_crystal
-
-            # Shift the first sheet to be at 0.75 * c and translate by the shift_vector
-            B = ion_conv_crystal + np.array([0, 0, 0.5*c_cell]) + shift_vector
-
-            AB = np.concatenate((A, B))
-            AB_types = [i[0] for i in types_conv_crystal]
-            AB_labels = labels_conv_crystal + labels_conv_crystal
-
-            lattice = Lattice(new_cell)
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
 
             stacked_structure = Structure(
-                lattice,
-                AB_types + AB_types,
-                AB,
-                coords_are_cartesian=False,
-                site_properties={'source': AB_labels}
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
+            )
+
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
+
+            # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [0, 0, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
                 )
-
-        if stacking == 'ABC1':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['abc'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
-
-            cell = np.array(dist_str['lattice']['matrix'])*(1, 1, 3)
-
-            A = ion_conv_crystal*(1, 1, 5/3)
-            B = translate_inside(ion_conv_crystal*(1, 1, 1) + (2/3, 1/3, 0))
-            C = translate_inside(ion_conv_crystal*(1, 1, 1/3) + (4/3, 2/3, 0))
-
-            ABC = np.concatenate((A, B, C))
-            ABC_type = [i[0] for i in labels_conv_crystal]
-            ABC_labels = labels_conv_crystal + labels_conv_crystal + labels_conv_crystal
-
-            lattice = Lattice(cell)
-
-            stacked_structure = Structure(
-                lattice,
-                ABC_type + ABC_type + ABC_type,
-                ABC,
-                coords_are_cartesian=False,
-                site_properties={'source': ABC_labels}
-            )
-
-        if stacking == 'ABC2':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['abc'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
-
-            cell = np.array(dist_str['lattice']['matrix'])*(1, 1, 3)
-
-            A = ion_conv_crystal*(1, 1, 5/3)
-            B = translate_inside(ion_conv_crystal*(1, 1, 1) + (1/3, 0, 0))
-            C = translate_inside(ion_conv_crystal*(1, 1, 1/3) + (2/3, 0, 0))
-
-            ABC = np.concatenate((A, B, C))
-            ABC_type = [i[0] for i in labels_conv_crystal]
-            ABC_labels = labels_conv_crystal + labels_conv_crystal + labels_conv_crystal
-
-            lattice = Lattice(cell)
-
-            stacked_structure = Structure(
-                lattice,
-                ABC_type + ABC_type + ABC_type,
-                ABC,
-                coords_are_cartesian=False,
-                site_properties={'source': ABC_labels}
-            )
 
         dict_structure = stacked_structure.as_dict()
 
@@ -1424,16 +1472,27 @@ class Framework():
 
         # Get the simmetry information of the generated structure
         symm = SpacegroupAnalyzer(stacked_structure, symprec=0.05, angle_tolerance=.5)
-        self.prim_structure = symm.get_refined_structure(keep_site_properties=True)
+        try:
+            self.prim_structure = symm.get_refined_structure(keep_site_properties=True)
 
-        print_command(self.prim_structure, self.verbosity, ['debug'])
+            print_command(self.prim_structure, self.verbosity, ['debug'])
 
-        self.lattice_type = symm.get_lattice_type()
-        self.space_group = symm.get_space_group_symbol()
-        self.space_group_n = symm.get_space_group_number()
+            self.lattice_type = symm.get_lattice_type()
+            self.space_group = symm.get_space_group_symbol()
+            self.space_group_n = symm.get_space_group_number()
 
-        symm_op = symm.get_point_group_operations()
-        self.hall = symm.get_hall()
+            symm_op = symm.get_point_group_operations()
+            self.hall = symm.get_hall()
+
+        except Exception as e:
+            print_command(e, self.verbosity, ['debug'])
+
+            self.lattice_type = 'Triclinic'
+            self.space_group = 'P1'
+            self.space_group_n = '1'
+
+            symm_op = [1]
+            self.hall = 'P 1'
 
         if print_result is True:
             print_framework_name(self.name,
@@ -1545,37 +1604,33 @@ class Framework():
         self.lattice = Lattice.from_parameters(a, b, c, alpha, beta, gamma)
 
         # Create the structure
-        final_types = []
-        final_labels = []
-        final_pos = []
+        self.atom_types = []
+        self.atom_labels = []
+        self.atom_pos = []
 
         # Add the building blocks to the structure
         for vertice_data in topology_info['vertices']:
-            final_types += BB_S4.atom_types
+            self.atom_types += BB_S4.atom_types
             vertice_pos = np.array(vertice_data['position'])*a
 
             R_Matrix = R.from_euler('z', vertice_data['angle'], degrees=True).as_matrix()
 
             rotated_pos = np.dot(BB_S4.atom_pos, R_Matrix) + vertice_pos
-            final_pos += rotated_pos.tolist()
+            self.atom_pos += rotated_pos.tolist()
 
-            final_labels += ['C1' if i == 'C' else i for i in BB_S4.atom_labels]
+            self.atom_labels += ['C1' if i == 'C' else i for i in BB_S4.atom_labels]
 
         # Add the building blocks to the structure
         for edge_data in topology_info['edges']:
-            final_types += BB_L2.atom_types
+            self.atom_types += BB_L2.atom_types
             edge_pos = np.array(edge_data['position'])*a
 
             R_Matrix = R.from_euler('z', edge_data['angle'], degrees=True).as_matrix()
 
             rotated_pos = np.dot(BB_L2.atom_pos, R_Matrix) + edge_pos
-            final_pos += rotated_pos.tolist()
+            self.atom_pos += rotated_pos.tolist()
 
-            final_labels += ['C2' if i == 'C' else i for i in BB_L2.atom_labels]
-
-        self.atom_types = final_types
-        self.atom_labels = final_labels
-        self.atom_pos = final_pos
+            self.atom_labels += ['C2' if i == 'C' else i for i in BB_L2.atom_labels]
 
         StartingFramework = Structure(
             self.lattice,
@@ -1585,104 +1640,180 @@ class Framework():
             site_properties={'source': self.atom_labels}
         ).get_sorted_structure()
 
-        # Create A stacking, a 2D isolated sheet with slab
-        if stacking == 'A':
-            self.prim_structure = StartingFramework
+        # Translates the structure to the center of the cell
+        StartingFramework.translate_sites(
+            range(len(StartingFramework.as_dict()['sites'])),
+            [0, 0, 0.5],
+            frac_coords=True,
+            to_unit_cell=True
+        )
 
-        if stacking == 'AA':
-            self.prim_structure = StartingFramework
+        dict_structure = StartingFramework.as_dict()
+
+        self.lattice = np.array(dict_structure['lattice']['matrix']).astype(float)
+
+        self.atom_types = [i['label'] for i in dict_structure['sites']]
+        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
+        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
+
+        if stacking == 'A' or stacking == 'AA':
+            stacked_structure = StartingFramework
 
         if stacking == 'AB1':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['xyz'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
 
-            cell = np.array(dist_str['lattice']['matrix'])*(1, 1, 2)
+            self.lattice *= (1, 1, 2)
 
-            A = ion_conv_crystal*(1, 1, 0.5)
-            B = translate_inside(ion_conv_crystal*(1, 1, 1.5) + (1/4, 1/4, 0))
-
-            AB = np.concatenate((A, B))
-            AB_types = [i[0] for i in labels_conv_crystal]
-            AB_labels = labels_conv_crystal + labels_conv_crystal
-
-            lattice = Lattice(cell)
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
 
             stacked_structure = Structure(
-                lattice,
-                AB_types + AB_types,
-                AB,
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': AB_labels}
+                site_properties={'source': self.atom_labels}
             )
+
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
+
+            # Translate the second sheet by the vector [1/4, 1/4, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [1/4, 1/4, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
+                )
 
         if stacking == 'AB2':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['xyz'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
+            self.lattice *= (1, 1, 2)
 
-            cell = np.array(dist_str['lattice']['matrix'])*(1, 1, 2)
-
-            A = ion_conv_crystal*(1, 1, 0.5)
-            B = translate_inside(ion_conv_crystal*(1, 1, 1.5) + (1/2, 0, 0))
-
-            AB = np.concatenate((A, B))
-            AB_types = [i[0] for i in labels_conv_crystal]
-            AB_labels = labels_conv_crystal + labels_conv_crystal
-
-            lattice = Lattice(cell)
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
 
             stacked_structure = Structure(
-                lattice,
-                AB_types + AB_types,
-                AB,
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': AB_labels}
+                site_properties={'source': self.atom_labels}
             )
 
-        # Create AAl stacking.
-        # Tetragonal cell with two sheets per cell shifited by the shift_vector in angstroms.
-        if stacking == 'AAl':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['xyz'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
 
-            cell = np.array(dist_str['lattice']['matrix'])*(1, 1, 2)
+            # Translate the second sheet by the vector [1/2, 0, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [1/2, 0, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
+                )
 
-            # Shift the first sheet to be at 0.25 * c
-            A = ion_conv_crystal * np.array([1, 1, 0.5])
+        if stacking == 'ABC1':
 
-            # Calculates the shift vector in crystal units
-            r = get_cartesian_to_fractional_matrix(
-                *cell_to_cellpar(cell))
-            shift_vector = np.dot(r, np.array(shift_vector))
+            self.lattice *= (1, 1, 3)
 
-            # Shift the first sheet to be at 0.75 * c and translate by the shift_vector
-            B = ion_conv_crystal * np.array([1, 1, 1.5]) + shift_vector
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
 
-            AB = np.concatenate((A, B))
-            AB_types = [i[0] for i in types_conv_crystal]
-            AB_labels = labels_conv_crystal + labels_conv_crystal
-
-            lattice = Lattice(cell)
             stacked_structure = Structure(
-                lattice,
-                AB_types + AB_types,
-                AB,
-                coords_are_cartesian=False,
-                site_properties={'source': AB_labels}
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
+            )
+
+            # Get the index of the atoms in the second sheet
+            _, B_list, C_list = np.split(np.arange(len(self.atom_types)), 3)
+
+            # Translate the second sheet by the vector (1/3, 1/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                (1/3, 1/3, 1/3),
+                frac_coords=True,
+                to_unit_cell=True
+                )
+
+            # Translate the third sheet by the vector (2/3, 2/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                C_list,
+                (2/3, 2/3, 2/3),
+                frac_coords=True,
+                to_unit_cell=True
+            )
+
+        if stacking == 'ABC2':
+            self.lattice *= (1, 1, 3)
+
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
+
+            stacked_structure = Structure(
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
+            )
+
+            # Get the index of the atoms in the second sheet
+            _, B_list, C_list = np.split(np.arange(len(self.atom_types)), 3)
+
+            # Translate the second sheet by the vector (1/3, 1/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                (1/3, 0, 1/3),
+                frac_coords=True,
+                to_unit_cell=True
+                )
+
+            # Translate the third sheet by the vector (2/3, 2/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                C_list,
+                (2/3, 0, 2/3),
+                frac_coords=True,
+                to_unit_cell=True
+            )
+
+        # Create AAl stacking. Tetragonal cell with two sheets
+        # per cell shifited by the shift_vector in angstroms.
+        if stacking == 'AAl':
+            self.lattice *= (1, 1, 2)
+
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            sv = np.array(shift_vector)
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos + sv))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
+
+            stacked_structure = Structure(
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
+            )
+
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
+
+            # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [0, 0, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
                 )
 
         # Create AA tilted stacking.
         # Tilted tetragonal cell with two sheets per cell tilted by tilt_angle.
         if stacking == 'AAt':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['xyz'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
+            cell = StartingFramework.as_dict()['lattice']
 
             # Shift the cell by the tilt angle
             a_cell = cell['a']
@@ -1692,78 +1823,30 @@ class Framework():
             beta = cell['beta'] - tilt_angle
             gamma = cell['gamma']
 
-            new_cell = cellpar_to_cell([a_cell, b_cell, c_cell, alpha, beta, gamma])
+            self.lattice = cellpar_to_cell([a_cell, b_cell, c_cell, alpha, beta, gamma])
 
-            # Shift the first sheet to be at 0.25 * c
-            A = ion_conv_crystal
-
-            # Shift the first sheet to be at 0.75 * c and translate by the shift_vector
-            B = ion_conv_crystal + np.array([0, 0, 0.5*c_cell]) + shift_vector
-
-            AB = np.concatenate((A, B))
-            AB_types = [i[0] for i in types_conv_crystal]
-
-            lattice = Lattice(new_cell)
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
 
             stacked_structure = Structure(
-                lattice,
-                AB_types + AB_types,
-                AB,
-                coords_are_cartesian=False,
-                site_properties={'source': AB_labels}
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
             )
 
-        if stacking == 'ABC1':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['abc'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
 
-            cell = np.array(dist_str['lattice']['matrix'])*(1, 1, 3)
-
-            A = ion_conv_crystal*(1, 1, 5/3)
-            B = translate_inside(ion_conv_crystal*(1, 1, 1) + (2/3, 1/3, 0))
-            C = translate_inside(ion_conv_crystal*(1, 1, 1/3) + (4/3, 2/3, 0))
-
-            ABC = np.concatenate((A, B, C))
-            ABC_type = [i[0] for i in labels_conv_crystal]
-            ABC_labels = labels_conv_crystal + labels_conv_crystal + labels_conv_crystal
-
-            lattice = Lattice(cell)
-
-            stacked_structure = Structure(
-                lattice,
-                ABC_type + ABC_type + ABC_type,
-                ABC,
-                coords_are_cartesian=False,
-                site_properties={'source': ABC_labels}
-            )
-
-        if stacking == 'ABC2':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['abc'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
-
-            cell = np.array(dist_str['lattice']['matrix'])*(1, 1, 3)
-
-            A = ion_conv_crystal*(1, 1, 5/3)
-            B = translate_inside(ion_conv_crystal*(1, 1, 1) + (1/3, 0, 0))
-            C = translate_inside(ion_conv_crystal*(1, 1, 1/3) + (2/3, 0, 0))
-
-            ABC = np.concatenate((A, B, C))
-            ABC_type = [i[0] for i in labels_conv_crystal]
-            ABC_labels = labels_conv_crystal + labels_conv_crystal + labels_conv_crystal
-
-            lattice = Lattice(cell)
-
-            stacked_structure = Structure(
-                lattice,
-                ABC_type + ABC_type + ABC_type,
-                ABC,
-                coords_are_cartesian=False,
-                site_properties={'source': ABC_labels}
-            )
+            # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [0, 0, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
+                )
 
         dict_structure = stacked_structure.as_dict()
 
@@ -1777,16 +1860,27 @@ class Framework():
 
         # Get the simmetry information of the generated structure
         symm = SpacegroupAnalyzer(stacked_structure, symprec=0.05, angle_tolerance=.5)
-        self.prim_structure = symm.get_refined_structure(keep_site_properties=True)
+        try:
+            self.prim_structure = symm.get_refined_structure(keep_site_properties=True)
 
-        print_command(self.prim_structure, self.verbosity, ['debug'])
+            print_command(self.prim_structure, self.verbosity, ['debug'])
 
-        self.lattice_type = symm.get_lattice_type()
-        self.space_group = symm.get_space_group_symbol()
-        self.space_group_n = symm.get_space_group_number()
+            self.lattice_type = symm.get_lattice_type()
+            self.space_group = symm.get_space_group_symbol()
+            self.space_group_n = symm.get_space_group_number()
 
-        symm_op = symm.get_point_group_operations()
-        self.hall = symm.get_hall()
+            symm_op = symm.get_point_group_operations()
+            self.hall = symm.get_hall()
+
+        except Exception as e:
+            print_command(e, self.verbosity, ['debug'])
+
+            self.lattice_type = 'Triclinic'
+            self.space_group = 'P1'
+            self.space_group_n = '1'
+
+            symm_op = [1]
+            self.hall = 'P 1'
 
         if print_result is True:
             print_framework_name(self.name,
@@ -1895,16 +1989,16 @@ class Framework():
             c = slab
 
         # Create the lattice
-        lattice = Lattice.from_parameters(a, b, c, alpha, beta, gamma)
+        self.lattice = Lattice.from_parameters(a, b, c, alpha, beta, gamma)
 
         # Create the structure
-        final_types = []
-        final_labels = []
-        final_pos = []
+        self.atom_types = []
+        self.atom_labels = []
+        self.atom_pos = []
 
         # Add the building blocks to the structure
         for vertice_data in topology_info['vertices']:
-            final_types += BB_H6.atom_types
+            self.atom_types += BB_H6.atom_types
             vertice_pos = np.array(vertice_data['position'])*a
 
             R_Matrix = R.from_euler('z',
@@ -1912,13 +2006,13 @@ class Framework():
                                     degrees=True).as_matrix()
 
             rotated_pos = np.dot(BB_H6.atom_pos, R_Matrix) + vertice_pos
-            final_pos += rotated_pos.tolist()
+            self.atom_pos += rotated_pos.tolist()
 
-            final_labels += ['C1' if i == 'C' else i for i in BB_H6.atom_labels]
+            self.atom_labels += ['C1' if i == 'C' else i for i in BB_H6.atom_labels]
 
         # Add the building blocks to the structure
         for edge_data in topology_info['edges']:
-            final_types += BB_T3.atom_types
+            self.atom_types += BB_T3.atom_types
             edge_pos = np.array(edge_data['position'])*a
 
             R_Matrix = R.from_euler('z',
@@ -1926,13 +2020,9 @@ class Framework():
                                     degrees=True).as_matrix()
 
             rotated_pos = np.dot(BB_T3.atom_pos, R_Matrix) + edge_pos
-            final_pos += rotated_pos.tolist()
+            self.atom_pos += rotated_pos.tolist()
 
-            final_labels += ['C2' if i == 'C' else i for i in BB_T3.atom_labels]
-
-        self.atom_types = final_types
-        self.atom_labels = final_labels
-        self.atom_pos = final_pos
+            self.atom_labels += ['C2' if i == 'C' else i for i in BB_T3.atom_labels]
 
         StartingFramework = Structure(
             self.lattice,
@@ -1950,114 +2040,167 @@ class Framework():
             to_unit_cell=True
         )
 
-        # Create A stacking. The slab is defined by the c_cell parameter
-        if stacking == 'A':
+        dict_structure = StartingFramework.as_dict()
+
+        self.lattice = np.array(dict_structure['lattice']['matrix']).astype(float)
+
+        self.atom_types = [i['label'] for i in dict_structure['sites']]
+        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
+        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
+
+        if stacking == 'A' or stacking == 'AA':
             stacked_structure = StartingFramework
 
-        # Create AA staking. By default one sheet per unitary cell is used
-        if stacking == 'AA':
-            stacked_structure = StartingFramework
-
-        # Create AB1 staking.
         if stacking == 'AB1':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['xyz'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
+            self.lattice *= (1, 1, 2)
 
-            cell = np.array(dist_str['lattice']['matrix'])*(1, 1, 2)
-
-            A = ion_conv_crystal
-            B = ion_conv_crystal
-
-            AB = np.concatenate((A, B))
-            AB_types = [i[0] for i in labels_conv_crystal]
-            AB_labels = labels_conv_crystal + labels_conv_crystal
-
-            lattice = Lattice(cell)
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
 
             stacked_structure = Structure(
-                lattice,
-                AB_types + AB_types,
-                AB,
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': AB_labels}
+                site_properties={'source': self.atom_labels}
             )
 
-            B_list = np.arange(len(AB_types)) + len(AB_types)
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
 
-            stacked_structure.translate_sites(B_list, [2/3, 1/3, 0.5], frac_coords=True, to_unit_cell=True)
+            # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [2/3, 1/3, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
+                )
 
-        # Create AB2 stacking
         if stacking == 'AB2':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['xyz'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
+            self.lattice *= (1, 1, 2)
 
-            cell = np.array(dist_str['lattice']['matrix'])*(1, 1, 2)
-
-            A = ion_conv_crystal
-            B = ion_conv_crystal
-
-            AB = np.concatenate((A, B))
-            AB_types = [i[0] for i in types_conv_crystal]
-            AB_labels = labels_conv_crystal + labels_conv_crystal
-
-            lattice = Lattice(cell)
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
 
             stacked_structure = Structure(
-                lattice,
-                AB_types + AB_types,
-                AB,
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': AB_labels}
+                site_properties={'source': self.atom_labels}
             )
 
-            B_list = np.arange(len(AB_types)) + len(AB_types)
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
 
-            stacked_structure.translate_sites(B_list, [1/2, 0, 0.5], frac_coords=True, to_unit_cell=True)
+            # Translate the second sheet by the vector [1/2, 0, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [1/2, 0, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
+                )
 
-        # Create AAl stacking.
-        # Hexagonal cell with two sheets per cell shifited by the shift_vector in angstroms.
-        if stacking == 'AAl':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['xyz'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
+        if stacking == 'ABC1':
+            self.lattice *= (1, 1, 3)
 
-            cell = np.array(dist_str['lattice']['matrix'])*(1, 1, 2)
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
 
-            # Shift the first sheet to be at 0.25 * c
-            A = ion_conv_crystal * np.array([1, 1, 0.5])
-
-            # Calculates the shift vector in crystal units
-            r = get_cartesian_to_fractional_matrix(*cell_to_cellpar(cell))
-            shift_vector = np.dot(r, np.array(shift_vector))
-
-            # Shift the first sheet to be at 0.75 * c and translate by the shift_vector
-            B = ion_conv_crystal * np.array([1, 1, 1.5]) + shift_vector
-
-            AB = np.concatenate((A, B))
-            AB_types = [i[0] for i in types_conv_crystal]
-            AB_labels = labels_conv_crystal + labels_conv_crystal
-
-            lattice = Lattice(cell)
             stacked_structure = Structure(
-                lattice,
-                AB_types + AB_types,
-                AB,
-                coords_are_cartesian=False,
-                site_properties={'source': AB_labels}
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
+            )
+
+            # Get the index of the atoms in the second sheet
+            _, B_list, C_list = np.split(np.arange(len(self.atom_types)), 3)
+
+            # Translate the second sheet by the vector (2/3, 1/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                (2/3, 1/3, 1/3),
+                frac_coords=True,
+                to_unit_cell=True
+                )
+
+            # Translate the third sheet by the vector (2/3, 1/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                C_list,
+                (4/3, 2/3, 2/3),
+                frac_coords=True,
+                to_unit_cell=True
+            )
+
+        if stacking == 'ABC2':
+            self.lattice *= (1, 1, 3)
+
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
+
+            stacked_structure = Structure(
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
+            )
+
+            # Get the index of the atoms in the second sheet
+            _, B_list, C_list = np.split(np.arange(len(self.atom_types)), 3)
+
+            # Translate the second sheet by the vector (2/3, 1/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                (1/3, 0, 1/3),
+                frac_coords=True,
+                to_unit_cell=True
+                )
+
+            # Translate the third sheet by the vector (2/3, 1/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                C_list,
+                (2/3, 0, 2/3),
+                frac_coords=True,
+                to_unit_cell=True
+            )
+
+        if stacking == 'AAl':
+            self.lattice *= (1, 1, 2)
+
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            sv = np.array(shift_vector)
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos + sv))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
+
+            stacked_structure = Structure(
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
+            )
+
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
+
+            # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [0, 0, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
                 )
 
         # Create AA tilted stacking.
-        # Tilted Hexagonal cell with two sheets per cell tilted by tilt_angle.
         if stacking == 'AAt':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['xyz'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
+            cell = StartingFramework.as_dict()['lattice']
 
             # Shift the cell by the tilt angle
             a_cell = cell['a']
@@ -2067,78 +2210,30 @@ class Framework():
             beta = cell['beta'] - tilt_angle
             gamma = cell['gamma']
 
-            new_cell = cellpar_to_cell([a_cell, b_cell, c_cell, alpha, beta, gamma])
+            self.lattice = cellpar_to_cell([a_cell, b_cell, c_cell, alpha, beta, gamma])
 
-            # Shift the first sheet to be at 0.25 * c
-            A = ion_conv_crystal
-
-            # Shift the first sheet to be at 0.75 * c and translate by the shift_vector
-            B = ion_conv_crystal + np.array([0, 0, 0.5*c_cell]) + shift_vector
-
-            AB = np.concatenate((A, B))
-            AB_types = [i[0] for i in types_conv_crystal]
-
-            lattice = Lattice(new_cell)
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
 
             stacked_structure = Structure(
-                lattice,
-                AB_types + AB_types,
-                AB,
-                coords_are_cartesian=False,
-                site_properties={'source': AB_labels}
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
             )
 
-        if stacking == 'ABC1':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['abc'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
 
-            cell = np.array(dist_str['lattice']['matrix'])*(1, 1, 3)
-
-            A = ion_conv_crystal*(1, 1, 5/3)
-            B = translate_inside(ion_conv_crystal*(1, 1, 1) + (2/3, 1/3, 0))
-            C = translate_inside(ion_conv_crystal*(1, 1, 1/3) + (4/3, 2/3, 0))
-
-            ABC = np.concatenate((A, B, C))
-            ABC_type = [i[0] for i in labels_conv_crystal]
-            ABC_labels = labels_conv_crystal + labels_conv_crystal + labels_conv_crystal
-
-            lattice = Lattice(cell)
-
-            stacked_structure = Structure(
-                lattice,
-                ABC_type + ABC_type + ABC_type,
-                ABC,
-                coords_are_cartesian=False,
-                site_properties={'source': ABC_labels}
-            )
-
-        if stacking == 'ABC2':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['abc'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
-
-            cell = np.array(dist_str['lattice']['matrix'])*(1, 1, 3)
-
-            A = ion_conv_crystal*(1, 1, 5/3)
-            B = translate_inside(ion_conv_crystal*(1, 1, 1) + (1/3, 0, 0))
-            C = translate_inside(ion_conv_crystal*(1, 1, 1/3) + (2/3, 0, 0))
-
-            ABC = np.concatenate((A, B, C))
-            ABC_type = [i[0] for i in labels_conv_crystal]
-            ABC_labels = labels_conv_crystal + labels_conv_crystal + labels_conv_crystal
-
-            lattice = Lattice(cell)
-
-            stacked_structure = Structure(
-                lattice,
-                ABC_type + ABC_type + ABC_type,
-                ABC,
-                coords_are_cartesian=False,
-                site_properties={'source': ABC_labels}
-            )
+            # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [0, 0, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
+                )
 
         dict_structure = stacked_structure.as_dict()
 
@@ -2151,17 +2246,28 @@ class Framework():
         self.composition = stacked_structure.formula
 
         # Get the simmetry information of the generated structure
-        symm = SpacegroupAnalyzer(stacked_structure, symprec=0.05, angle_tolerance=.5)
-        self.prim_structure = symm.get_refined_structure(keep_site_properties=True)
+        symm = SpacegroupAnalyzer(stacked_structure, symprec=0.1, angle_tolerance=.5)
 
-        print_command(self.prim_structure, self.verbosity, ['debug'])
+        try:
+            self.prim_structure = symm.get_refined_structure(keep_site_properties=True)
 
-        self.lattice_type = symm.get_lattice_type()
-        self.space_group = symm.get_space_group_symbol()
-        self.space_group_n = symm.get_space_group_number()
+            print_command(self.prim_structure, self.verbosity, ['debug'])
 
-        symm_op = symm.get_point_group_operations()
-        self.hall = symm.get_hall()
+            self.lattice_type = symm.get_lattice_type()
+            self.space_group = symm.get_space_group_symbol()
+            self.space_group_n = symm.get_space_group_number()
+
+            symm_op = symm.get_point_group_operations()
+            self.hall = symm.get_hall()
+        except Exception as e:
+            print_command(e, self.verbosity, ['debug'])
+
+            self.lattice_type = 'Triclinic'
+            self.space_group = 'P1'
+            self.space_group_n = '1'
+
+            symm_op = [1]
+            self.hall = 'P 1'
 
         if print_result is True:
             print_framework_name(self.name,
@@ -2269,16 +2375,16 @@ class Framework():
             c = slab
 
         # Create the lattice
-        lattice = Lattice.from_parameters(a, b, c, alpha, beta, gamma)
+        self.lattice = Lattice.from_parameters(a, b, c, alpha, beta, gamma)
 
         # Create the structure
-        final_types = []
-        final_labels = []
-        final_pos = []
+        self.atom_types = []
+        self.atom_labels = []
+        self.atom_pos = []
 
         # Add the building blocks to the structure
         for vertice_data in topology_info['vertices']:
-            final_types += BB_H6.atom_types
+            self.atom_types += BB_H6.atom_types
             vertice_pos = np.array(vertice_data['position'])*a
 
             R_Matrix = R.from_euler('z',
@@ -2286,13 +2392,13 @@ class Framework():
                                     degrees=True).as_matrix()
 
             rotated_pos = np.dot(BB_H6.atom_pos, R_Matrix) + vertice_pos
-            final_pos += rotated_pos.tolist()
+            self.atom_pos += rotated_pos.tolist()
 
-            final_labels += ['C1' if i == 'C' else i for i in BB_H6.atom_labels]
+            self.atom_labels += ['C1' if i == 'C' else i for i in BB_H6.atom_labels]
 
         # Add the building blocks to the structure
         for edge_data in topology_info['edges']:
-            final_types += BB_L2.atom_types
+            self.atom_types += BB_L2.atom_types
             edge_pos = np.array(edge_data['position'])*a
 
             R_Matrix = R.from_euler('z',
@@ -2300,13 +2406,9 @@ class Framework():
                                     degrees=True).as_matrix()
 
             rotated_pos = np.dot(BB_L2.atom_pos, R_Matrix) + edge_pos
-            final_pos += rotated_pos.tolist()
+            self.atom_pos += rotated_pos.tolist()
 
-            final_labels += ['C2' if i == 'C' else i for i in BB_L2.atom_labels]
-
-        self.atom_types = final_types
-        self.atom_labels = final_labels
-        self.atom_pos = final_pos
+            self.atom_labels += ['C2' if i == 'C' else i for i in BB_L2.atom_labels]
 
         StartingFramework = Structure(
             self.lattice,
@@ -2324,113 +2426,167 @@ class Framework():
             to_unit_cell=True
         )
 
-        # Create A stacking. The slab is defined by the c_cell parameter
-        if stacking == 'A':
+        dict_structure = StartingFramework.as_dict()
+
+        self.lattice = np.array(dict_structure['lattice']['matrix']).astype(float)
+
+        self.atom_types = [i['label'] for i in dict_structure['sites']]
+        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
+        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
+
+        if stacking == 'A' or stacking == 'AA':
             stacked_structure = StartingFramework
 
-        # Create AA staking. By default one sheet per unitary cell is used
-        if stacking == 'AA':
-            stacked_structure = StartingFramework
-
-        # Create AB1 staking.
         if stacking == 'AB1':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['xyz'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
+            self.lattice *= (1, 1, 2)
 
-            cell = np.array(dist_str['lattice']['matrix'])*(1, 1, 2)
-
-            A = ion_conv_crystal
-            B = ion_conv_crystal
-
-            AB = np.concatenate((A, B))
-            AB_types = [i[0] for i in types_conv_crystal]
-            AB_labels = labels_conv_crystal + labels_conv_crystal
-
-            lattice = Lattice(cell)
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
 
             stacked_structure = Structure(
-                lattice,
-                AB_types + AB_types,
-                AB,
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': AB_labels}
+                site_properties={'source': self.atom_labels}
             )
 
-            B_list = np.arange(len(AB_types)) + len(AB_types)
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
 
-            stacked_structure.translate_sites(B_list, [2/3, 1/3, 0.5], frac_coords=True, to_unit_cell=True)
+            # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [2/3, 1/3, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
+                )
 
         if stacking == 'AB2':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['xyz'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
+            self.lattice *= (1, 1, 2)
 
-            cell = np.array(dist_str['lattice']['matrix'])*(1, 1, 2)
-
-            A = ion_conv_crystal
-            B = ion_conv_crystal
-
-            AB = np.concatenate((A, B))
-            AB_types = [i[0] for i in types_conv_crystal]
-            AB_labels = labels_conv_crystal + labels_conv_crystal
-
-            lattice = Lattice(cell)
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
 
             stacked_structure = Structure(
-                lattice,
-                AB_types + AB_types,
-                AB,
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': AB_labels}
+                site_properties={'source': self.atom_labels}
             )
 
-            B_list = np.arange(len(AB_types)) + len(AB_types)
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
 
-            stacked_structure.translate_sites(B_list, [1/2, 0, 0.5], frac_coords=True, to_unit_cell=True)
+            # Translate the second sheet by the vector [1/2, 0, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [1/2, 0, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
+                )
 
-        # Create AAl stacking.
-        # Hexagonal cell with two sheets per cell shifited by the shift_vector in angstroms.
-        if stacking == 'AAl':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['xyz'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
+        if stacking == 'ABC1':
+            self.lattice *= (1, 1, 3)
 
-            cell = np.array(dist_str['lattice']['matrix'])*(1, 1, 2)
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
 
-            # Shift the first sheet to be at 0.25 * c
-            A = ion_conv_crystal * np.array([1, 1, 0.5])
-
-            # Calculates the shift vector in crystal units
-            r = get_cartesian_to_fractional_matrix(*cell_to_cellpar(cell))
-            shift_vector = np.dot(r, np.array(shift_vector))
-
-            # Shift the first sheet to be at 0.75 * c and translate by the shift_vector
-            B = ion_conv_crystal * np.array([1, 1, 1.5]) + shift_vector
-
-            AB = np.concatenate((A, B))
-            AB_types = [i[0] for i in types_conv_crystal]
-            AB_labels = labels_conv_crystal + labels_conv_crystal
-
-            lattice = Lattice(cell)
             stacked_structure = Structure(
-                lattice,
-                AB_types + AB_types,
-                AB,
-                coords_are_cartesian=False,
-                site_properties={'source': AB_labels}
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
+            )
+
+            # Get the index of the atoms in the second sheet
+            _, B_list, C_list = np.split(np.arange(len(self.atom_types)), 3)
+
+            # Translate the second sheet by the vector (2/3, 1/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                (2/3, 1/3, 1/3),
+                frac_coords=True,
+                to_unit_cell=True
+                )
+
+            # Translate the third sheet by the vector (2/3, 1/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                C_list,
+                (4/3, 2/3, 2/3),
+                frac_coords=True,
+                to_unit_cell=True
+            )
+
+        if stacking == 'ABC2':
+            self.lattice *= (1, 1, 3)
+
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
+
+            stacked_structure = Structure(
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
+            )
+
+            # Get the index of the atoms in the second sheet
+            _, B_list, C_list = np.split(np.arange(len(self.atom_types)), 3)
+
+            # Translate the second sheet by the vector (2/3, 1/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                (1/3, 0, 1/3),
+                frac_coords=True,
+                to_unit_cell=True
+                )
+
+            # Translate the third sheet by the vector (2/3, 1/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                C_list,
+                (2/3, 0, 2/3),
+                frac_coords=True,
+                to_unit_cell=True
+            )
+
+        if stacking == 'AAl':
+            self.lattice *= (1, 1, 2)
+
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            sv = np.array(shift_vector)
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos + sv))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
+
+            stacked_structure = Structure(
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
+            )
+
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
+
+            # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [0, 0, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
                 )
 
         # Create AA tilted stacking.
-        # Tilted Hexagonal cell with two sheets per cell tilted by tilt_angle.
         if stacking == 'AAt':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['xyz'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
+            cell = StartingFramework.as_dict()['lattice']
 
             # Shift the cell by the tilt angle
             a_cell = cell['a']
@@ -2440,78 +2596,418 @@ class Framework():
             beta = cell['beta'] - tilt_angle
             gamma = cell['gamma']
 
-            new_cell = cellpar_to_cell([a_cell, b_cell, c_cell, alpha, beta, gamma])
+            self.lattice = cellpar_to_cell([a_cell, b_cell, c_cell, alpha, beta, gamma])
 
-            # Shift the first sheet to be at 0.25 * c
-            A = ion_conv_crystal
-
-            # Shift the first sheet to be at 0.75 * c and translate by the shift_vector
-            B = ion_conv_crystal + np.array([0, 0, 0.5*c_cell]) + shift_vector
-
-            AB = np.concatenate((A, B))
-            AB_types = [i[0] for i in types_conv_crystal]
-
-            lattice = Lattice(new_cell)
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
 
             stacked_structure = Structure(
-                lattice,
-                AB_types + AB_types,
-                AB,
-                coords_are_cartesian=False,
-                site_properties={'source': AB_labels}
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
             )
 
-        if stacking == 'ABC1':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['abc'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
 
-            cell = np.array(dist_str['lattice']['matrix'])*(1, 1, 3)
+            # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [0, 0, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
+                )
 
-            A = ion_conv_crystal*(1, 1, 5/3)
-            B = translate_inside(ion_conv_crystal*(1, 1, 1) + (2/3, 1/3, 0))
-            C = translate_inside(ion_conv_crystal*(1, 1, 1/3) + (4/3, 2/3, 0))
+        dict_structure = stacked_structure.as_dict()
 
-            ABC = np.concatenate((A, B, C))
-            ABC_type = [i[0] for i in labels_conv_crystal]
-            ABC_labels = labels_conv_crystal + labels_conv_crystal + labels_conv_crystal
+        self.lattice = np.array(dict_structure['lattice']['matrix']).astype(float)
 
-            lattice = Lattice(cell)
+        self.atom_types = [i['label'] for i in dict_structure['sites']]
+        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
+        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
+        self.n_atoms = len(dict_structure['sites'])
+        self.composition = stacked_structure.formula
+
+        # Get the simmetry information of the generated structure
+        symm = SpacegroupAnalyzer(stacked_structure, symprec=0.1, angle_tolerance=.5)
+
+        try:
+            self.prim_structure = symm.get_refined_structure(keep_site_properties=True)
+
+            print_command(self.prim_structure, self.verbosity, ['debug'])
+
+            self.lattice_type = symm.get_lattice_type()
+            self.space_group = symm.get_space_group_symbol()
+            self.space_group_n = symm.get_space_group_number()
+
+            symm_op = symm.get_point_group_operations()
+            self.hall = symm.get_hall()
+        except Exception as e:
+            print_command(e, self.verbosity, ['debug'])
+
+            self.lattice_type = 'Triclinic'
+            self.space_group = 'P1'
+            self.space_group_n = '1'
+
+            symm_op = [1]
+            self.hall = 'P 1'
+
+        if print_result is True:
+            print_framework_name(self.name,
+                                 str(self.lattice_type),
+                                 str(self.hall[0:2]),
+                                 str(self.space_group),
+                                 str(self.space_group_n),
+                                 len(symm_op))
+
+        return [self.name,
+                str(self.lattice_type),
+                str(self.hall[0:2]),
+                str(self.space_group),
+                str(self.space_group_n),
+                len(symm_op)]
+
+    def _create_fxt_structure(self,
+                              BB_S4_A: str,
+                              BB_S4_B: str,
+                              stacking: str = 'AA',
+                              print_result: bool = True,
+                              slab: float = 10.0,
+                              shift_vector: list = [1.0, 1.0, 0],
+                              tilt_angle: float = 5.0):
+        """Creates a COF with SQL network.
+
+        The SQL net is composed of two tetrapodal building blocks.
+
+        Parameters
+        ----------
+        BB_S4_A : BuildingBlock, required
+            The BuildingBlock object of the tetrapodal Buiding Block A
+        BB_S4_B : BuildingBlock, required
+            The BuildingBlock object of the tetrapodal Buiding Block B
+        stacking : str, optional
+            The stacking pattern of the COF layers (default is 'AA')
+        print_result : bool, optional
+            Parameter for the control for printing the result (default is True)
+        slab : float, optional
+            Default parameter for the interlayer slab (default is 10.0)
+        shift_vector: list, optional
+            Shift vector for the AAl and AAt stakings (defatult is [1.0,1.0,0])
+        tilt_angle: float, optional
+            Tilt angle for the AAt staking in degrees (default is 5.0)
+
+        Returns
+        -------
+        list
+            A list of strings containing:
+                1. the structure name,
+                2. lattice type,
+                3. hall symbol of the cristaline structure,
+                4. space group,
+                5. number of the space group,
+                6. number of operation symmetry
+        """
+
+        connectivity_error = 'Building block {} must present connectivity {}'
+        assert BB_S4_A.connectivity == 4, connectivity_error.format('A', 4)
+        assert BB_S4_B.connectivity == 4, connectivity_error.format('B', 4)
+
+        self.name = f'{BB_S4_A.name}-{BB_S4_B.name}-SQL-{stacking}'
+        self.topology = 'FXT'
+        self.staking = stacking
+        self.dimension = 2
+
+        self.charge = BB_S4_A.charge + BB_S4_B.charge
+        self.chirality = BB_S4_A.chirality or BB_S4_B.chirality
+
+        print_command(f'Starting the creation of {self.name}', self.verbosity, ['debug', 'high'])
+
+        # Detect the bond atom from the connection groups type
+        bond_atom = get_bond_atom(BB_S4_A.conector, BB_S4_B.conector)
+
+        # Replace "X" the building block
+        BB_S4_A.replace_X(bond_atom)
+
+        # Remove the "X" atoms from the the building block
+        BB_S4_A.remove_X()
+        BB_S4_B.remove_X()
+
+        print_command(f'Bond atom detected: {bond_atom}', self.verbosity, ['debug', 'high'])
+
+        # Get the topology information
+        topology_info = TOPOLOGY_DICT[self.topology]
+
+        # Measure the base size of the building blocks
+        size = 2 * (BB_S4_A.size[0] + BB_S4_B.size[0])
+
+        # Calculate the delta size to add to the c parameter
+        delta_a = abs(max(np.transpose(BB_S4_A.atom_pos)[2])) + abs(min(np.transpose(BB_S4_B.atom_pos)[2]))
+        delta_b = abs(max(np.transpose(BB_S4_A.atom_pos)[2])) + abs(min(np.transpose(BB_S4_B.atom_pos)[2]))
+
+        delta_max = max([delta_a, delta_b])
+
+        # Calculate the cell parameters
+        a = topology_info['a'] * size
+        b = topology_info['b'] * size
+        c = topology_info['c'] + delta_max
+        alpha = topology_info['alpha']
+        beta = topology_info['beta']
+        gamma = topology_info['gamma']
+
+        if self.stacking == 'A':
+            c = slab
+
+        # Create the lattice
+        self.lattice = Lattice.from_parameters(a, b, c, alpha, beta, gamma)
+
+        # Create the structure
+        self.atom_types = []
+        self.atom_labels = []
+        self.atom_pos = []
+
+        # Add the first building block to the structure
+        vertice_data = topology_info['vertices'][1]
+        self.atom_types += BB_S4_A.atom_types
+        vertice_pos = np.array(vertice_data['position'])*a
+
+        R_Matrix = R.from_euler('z', vertice_data['angle'], degrees=True).as_matrix()
+
+        rotated_pos = np.dot(BB_S4_A.atom_pos, R_Matrix) + vertice_pos
+        self.atom_pos += rotated_pos.tolist()
+
+        self.atom_labels += ['C1' if i == 'C' else i for i in BB_S4_A.atom_labels]
+
+        # Add the second building block to the structure
+        for n in [0, 2]:
+            vertice_data = topology_info['vertices'][n]
+            self.atom_types += BB_S4_B.atom_types
+            vertice_pos = np.array(vertice_data['position'])*a
+
+            R_Matrix = R.from_euler('z', vertice_data['angle'], degrees=True).as_matrix()
+
+            rotated_pos = np.dot(BB_S4_B.atom_pos, R_Matrix) + vertice_pos
+            self.atom_pos += rotated_pos.tolist()
+
+            self.atom_labels += ['C2' if i == 'C' else i for i in BB_S4_B.atom_labels]
+
+        StartingFramework = Structure(
+            self.lattice,
+            self.atom_types,
+            self.atom_pos,
+            coords_are_cartesian=True,
+            site_properties={'source': self.atom_labels}
+        ).get_sorted_structure()
+
+        # Translates the structure to the center of the cell
+        StartingFramework.translate_sites(
+            range(len(StartingFramework.as_dict()['sites'])),
+            [0, 0, 0.5],
+            frac_coords=True,
+            to_unit_cell=True
+        )
+
+        dict_structure = StartingFramework.as_dict()
+
+        self.lattice = np.array(dict_structure['lattice']['matrix']).astype(float)
+
+        self.atom_types = [i['label'] for i in dict_structure['sites']]
+        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
+        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
+
+        if stacking == 'A' or stacking == 'AA':
+            stacked_structure = StartingFramework
+
+        if stacking == 'AB1':
+
+            self.lattice *= (1, 1, 2)
+
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
 
             stacked_structure = Structure(
-                lattice,
-                ABC_type + ABC_type + ABC_type,
-                ABC,
-                coords_are_cartesian=False,
-                site_properties={'source': ABC_labels}
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
+            )
+
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
+
+            # Translate the second sheet by the vector [1/4, 1/4, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [1/4, 1/4, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
+                )
+
+        if stacking == 'AB2':
+            self.lattice *= (1, 1, 2)
+
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
+
+            stacked_structure = Structure(
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
+            )
+
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
+
+            # Translate the second sheet by the vector [1/2, 0, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [1/2, 0, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
+                )
+
+        if stacking == 'ABC1':
+
+            self.lattice *= (1, 1, 3)
+
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
+
+            stacked_structure = Structure(
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
+            )
+
+            # Get the index of the atoms in the second sheet
+            _, B_list, C_list = np.split(np.arange(len(self.atom_types)), 3)
+
+            # Translate the second sheet by the vector (1/3, 1/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                (1/3, 1/3, 1/3),
+                frac_coords=True,
+                to_unit_cell=True
+                )
+
+            # Translate the third sheet by the vector (2/3, 2/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                C_list,
+                (2/3, 2/3, 2/3),
+                frac_coords=True,
+                to_unit_cell=True
             )
 
         if stacking == 'ABC2':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['abc'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
+            self.lattice *= (1, 1, 3)
 
-            cell = np.array(dist_str['lattice']['matrix'])*(1, 1, 3)
-
-            A = ion_conv_crystal*(1, 1, 5/3)
-            B = translate_inside(ion_conv_crystal*(1, 1, 1) + (1/3, 0, 0))
-            C = translate_inside(ion_conv_crystal*(1, 1, 1/3) + (2/3, 0, 0))
-
-            ABC = np.concatenate((A, B, C))
-            ABC_type = [i[0] for i in labels_conv_crystal]
-            ABC_labels = labels_conv_crystal + labels_conv_crystal + labels_conv_crystal
-
-            lattice = Lattice(cell)
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
 
             stacked_structure = Structure(
-                lattice,
-                ABC_type + ABC_type + ABC_type,
-                ABC,
-                coords_are_cartesian=False,
-                site_properties={'source': ABC_labels}
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
             )
+
+            # Get the index of the atoms in the second sheet
+            _, B_list, C_list = np.split(np.arange(len(self.atom_types)), 3)
+
+            # Translate the second sheet by the vector (1/3, 1/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                (1/3, 0, 1/3),
+                frac_coords=True,
+                to_unit_cell=True
+                )
+
+            # Translate the third sheet by the vector (2/3, 2/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                C_list,
+                (2/3, 0, 2/3),
+                frac_coords=True,
+                to_unit_cell=True
+            )
+
+        # Create AAl stacking. Tetragonal cell with two sheets
+        # per cell shifited by the shift_vector in angstroms.
+        if stacking == 'AAl':
+            self.lattice *= (1, 1, 2)
+
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            sv = np.array(shift_vector)
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos + sv))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
+
+            stacked_structure = Structure(
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
+            )
+
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
+
+            # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [0, 0, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
+                )
+
+        # Create AA tilted stacking.
+        # Tilted tetragonal cell with two sheets per cell tilted by tilt_angle.
+        if stacking == 'AAt':
+            cell = StartingFramework.as_dict()['lattice']
+
+            # Shift the cell by the tilt angle
+            a_cell = cell['a']
+            b_cell = cell['b']
+            c_cell = cell['c'] * 2
+            alpha = cell['alpha'] - tilt_angle
+            beta = cell['beta'] - tilt_angle
+            gamma = cell['gamma']
+
+            self.lattice = cellpar_to_cell([a_cell, b_cell, c_cell, alpha, beta, gamma])
+
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
+
+            stacked_structure = Structure(
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
+            )
+
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
+
+            # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [0, 0, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
+                )
 
         dict_structure = stacked_structure.as_dict()
 
@@ -2525,16 +3021,27 @@ class Framework():
 
         # Get the simmetry information of the generated structure
         symm = SpacegroupAnalyzer(stacked_structure, symprec=0.05, angle_tolerance=.5)
-        self.prim_structure = symm.get_refined_structure(keep_site_properties=True)
+        try:
+            self.prim_structure = symm.get_refined_structure(keep_site_properties=True)
 
-        print_command(self.prim_structure, self.verbosity, ['debug'])
+            print_command(self.prim_structure, self.verbosity, ['debug'])
 
-        self.lattice_type = symm.get_lattice_type()
-        self.space_group = symm.get_space_group_symbol()
-        self.space_group_n = symm.get_space_group_number()
+            self.lattice_type = symm.get_lattice_type()
+            self.space_group = symm.get_space_group_symbol()
+            self.space_group_n = symm.get_space_group_number()
 
-        symm_op = symm.get_point_group_operations()
-        self.hall = symm.get_hall()
+            symm_op = symm.get_point_group_operations()
+            self.hall = symm.get_hall()
+
+        except Exception as e:
+            print_command(e, self.verbosity, ['debug'])
+
+            self.lattice_type = 'Triclinic'
+            self.space_group = 'P1'
+            self.space_group_n = '1'
+
+            symm_op = [1]
+            self.hall = 'P 1'
 
         if print_result is True:
             print_framework_name(self.name,
@@ -2562,7 +3069,7 @@ class Framework():
                                 tilt_angle: float = 5.0):
         """Creates a COF with FXT-A network.
 
-        The SQL-A net is composed of one tetrapodal and one linear building blocks.
+        The FXT-A net is composed of one tetrapodal and one linear building blocks.
 
         Parameters
         ----------
@@ -2597,15 +3104,13 @@ class Framework():
         assert BB_S4.connectivity == 4, connectivity_error.format('A', 4)
         assert BB_L2.connectivity == 2, connectivity_error.format('B', 2)
 
-        self.name = f'{BB_S4.name}-{BB_L2.name}-FXT_A-{stacking}'
+        self.name = f'{BB_S4.name}-{BB_L2.name}-SQL_A-{stacking}'
         self.topology = 'FXT_A'
         self.staking = stacking
         self.dimension = 2
 
         self.charge = BB_S4.charge + BB_L2.charge
         self.chirality = BB_S4.chirality or BB_L2.chirality
-
-        self.name = f'{BB_S4.name}-{BB_L2.name}-{self.topology}-{stacking}'
 
         print_command(f'Starting the creation of {self.name}', self.verbosity, ['debug', 'high'])
 
@@ -2625,7 +3130,7 @@ class Framework():
         topology_info = TOPOLOGY_DICT[self.topology]
 
         # Measure the base size of the building blocks
-        size = BB_S4.size[0] + BB_L2.size[0]
+        size = 2 * (BB_S4.size[0] + BB_L2.size[0])
 
         # Calculate the delta size to add to the c parameter
         delta_a = abs(max(np.transpose(BB_S4.atom_pos)[2])) + abs(min(np.transpose(BB_S4.atom_pos)[2]))
@@ -2645,40 +3150,36 @@ class Framework():
             c = slab
 
         # Create the lattice
-        lattice = Lattice.from_parameters(a, b, c, alpha, beta, gamma)
+        self.lattice = Lattice.from_parameters(a, b, c, alpha, beta, gamma)
 
         # Create the structure
-        final_types = []
-        final_labels = []
-        final_pos = []
+        self.atom_types = []
+        self.atom_labels = []
+        self.atom_pos = []
 
         # Add the building blocks to the structure
         for vertice_data in topology_info['vertices']:
-            final_types += BB_S4.atom_types
+            self.atom_types += BB_S4.atom_types
             vertice_pos = np.array(vertice_data['position'])*a
 
             R_Matrix = R.from_euler('z', vertice_data['angle'], degrees=True).as_matrix()
 
             rotated_pos = np.dot(BB_S4.atom_pos, R_Matrix) + vertice_pos
-            final_pos += rotated_pos.tolist()
+            self.atom_pos += rotated_pos.tolist()
 
-            final_labels += ['C1' if i == 'C' else i for i in BB_S4.atom_labels]
+            self.atom_labels += ['C1' if i == 'C' else i for i in BB_S4.atom_labels]
 
         # Add the building blocks to the structure
         for edge_data in topology_info['edges']:
-            final_types += BB_L2.atom_types
+            self.atom_types += BB_L2.atom_types
             edge_pos = np.array(edge_data['position'])*a
 
             R_Matrix = R.from_euler('z', edge_data['angle'], degrees=True).as_matrix()
 
             rotated_pos = np.dot(BB_L2.atom_pos, R_Matrix) + edge_pos
-            final_pos += rotated_pos.tolist()
+            self.atom_pos += rotated_pos.tolist()
 
-            final_labels += ['C2' if i == 'C' else i for i in BB_L2.atom_labels]
-
-        self.atom_types = final_types
-        self.atom_labels = final_labels
-        self.atom_pos = final_pos
+            self.atom_labels += ['C2' if i == 'C' else i for i in BB_L2.atom_labels]
 
         StartingFramework = Structure(
             self.lattice,
@@ -2688,104 +3189,175 @@ class Framework():
             site_properties={'source': self.atom_labels}
         ).get_sorted_structure()
 
-        # Create A stacking, a 2D isolated sheet with slab
-        if stacking == 'A':
-            self.prim_structure = StartingFramework
+        # Translates the structure to the center of the cell
+        StartingFramework.translate_sites(
+            range(len(StartingFramework.as_dict()['sites'])),
+            [0, 0, 0.5],
+            frac_coords=True,
+            to_unit_cell=True
+        )
 
-        if stacking == 'AA':
-            self.prim_structure = StartingFramework
+        dict_structure = StartingFramework.as_dict()
+
+        self.lattice = np.array(dict_structure['lattice']['matrix']).astype(float)
+
+        self.atom_types = [i['label'] for i in dict_structure['sites']]
+        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
+        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
+
+        if stacking == 'A' or stacking == 'AA':
+            stacked_structure = StartingFramework
 
         if stacking == 'AB1':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['xyz'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
+            self.lattice *= (1, 1, 2)
 
-            cell = np.array(dist_str['lattice']['matrix'])*(1, 1, 2)
-
-            A = ion_conv_crystal*(1, 1, 0.5)
-            B = translate_inside(ion_conv_crystal*(1, 1, 1.5) + (1/4, 1/4, 0))
-
-            AB = np.concatenate((A, B))
-            AB_types = [i[0] for i in labels_conv_crystal]
-            AB_labels = labels_conv_crystal + labels_conv_crystal
-
-            lattice = Lattice(cell)
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
 
             stacked_structure = Structure(
-                lattice,
-                AB_types + AB_types,
-                AB,
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': AB_labels}
+                site_properties={'source': self.atom_labels}
             )
+
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
+
+            # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [2/3, 1/3, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
+                )
 
         if stacking == 'AB2':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['xyz'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
+            self.lattice *= (1, 1, 2)
 
-            cell = np.array(dist_str['lattice']['matrix'])*(1, 1, 2)
-
-            A = ion_conv_crystal*(1, 1, 0.5)
-            B = translate_inside(ion_conv_crystal*(1, 1, 1.5) + (1/2, 0, 0))
-
-            AB = np.concatenate((A, B))
-            AB_types = [i[0] for i in labels_conv_crystal]
-            AB_labels = labels_conv_crystal + labels_conv_crystal
-
-            lattice = Lattice(cell)
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
 
             stacked_structure = Structure(
-                lattice,
-                AB_types + AB_types,
-                AB,
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': AB_labels}
+                site_properties={'source': self.atom_labels}
             )
 
-        # Create AAl stacking.
-        # Tetragonal cell with two sheets per cell shifited by the shift_vector in angstroms.
-        if stacking == 'AAl':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['xyz'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
 
-            cell = np.array(dist_str['lattice']['matrix'])*(1, 1, 2)
+            # Translate the second sheet by the vector [1/2, 0, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [1/2, 0, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
+                )
 
-            # Shift the first sheet to be at 0.25 * c
-            A = ion_conv_crystal * np.array([1, 1, 0.5])
+        if stacking == 'ABC1':
+            self.lattice *= (1, 1, 3)
 
-            # Calculates the shift vector in crystal units
-            r = get_cartesian_to_fractional_matrix(
-                *cell_to_cellpar(cell))
-            shift_vector = np.dot(r, np.array(shift_vector))
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
 
-            # Shift the first sheet to be at 0.75 * c and translate by the shift_vector
-            B = ion_conv_crystal * np.array([1, 1, 1.5]) + shift_vector
-
-            AB = np.concatenate((A, B))
-            AB_types = [i[0] for i in types_conv_crystal]
-            AB_labels = labels_conv_crystal + labels_conv_crystal
-
-            lattice = Lattice(cell)
             stacked_structure = Structure(
-                lattice,
-                AB_types + AB_types,
-                AB,
-                coords_are_cartesian=False,
-                site_properties={'source': AB_labels}
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
+            )
+
+            # Get the index of the atoms in the second sheet
+            _, B_list, C_list = np.split(np.arange(len(self.atom_types)), 3)
+
+            # Translate the second sheet by the vector (2/3, 1/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                (2/3, 1/3, 1/3),
+                frac_coords=True,
+                to_unit_cell=True
+                )
+
+            # Translate the third sheet by the vector (2/3, 1/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                C_list,
+                (4/3, 2/3, 2/3),
+                frac_coords=True,
+                to_unit_cell=True
+            )
+
+        if stacking == 'ABC2':
+            self.lattice *= (1, 1, 3)
+
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
+
+            stacked_structure = Structure(
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
+            )
+
+            # Get the index of the atoms in the second sheet
+            _, B_list, C_list = np.split(np.arange(len(self.atom_types)), 3)
+
+            # Translate the second sheet by the vector (2/3, 1/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                (1/3, 0, 1/3),
+                frac_coords=True,
+                to_unit_cell=True
+                )
+
+            # Translate the third sheet by the vector (2/3, 1/3, 0) to generate the B positions
+            stacked_structure.translate_sites(
+                C_list,
+                (2/3, 0, 2/3),
+                frac_coords=True,
+                to_unit_cell=True
+            )
+
+        if stacking == 'AAl':
+            self.lattice *= (1, 1, 2)
+
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            sv = np.array(shift_vector)
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos + sv))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
+
+            stacked_structure = Structure(
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
+            )
+
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
+
+            # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [0, 0, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
                 )
 
         # Create AA tilted stacking.
-        # Tilted tetragonal cell with two sheets per cell tilted by tilt_angle.
         if stacking == 'AAt':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['xyz'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
+            cell = StartingFramework.as_dict()['lattice']
 
             # Shift the cell by the tilt angle
             a_cell = cell['a']
@@ -2795,78 +3367,30 @@ class Framework():
             beta = cell['beta'] - tilt_angle
             gamma = cell['gamma']
 
-            new_cell = cellpar_to_cell([a_cell, b_cell, c_cell, alpha, beta, gamma])
+            self.lattice = cellpar_to_cell([a_cell, b_cell, c_cell, alpha, beta, gamma])
 
-            # Shift the first sheet to be at 0.25 * c
-            A = ion_conv_crystal
-
-            # Shift the first sheet to be at 0.75 * c and translate by the shift_vector
-            B = ion_conv_crystal + np.array([0, 0, 0.5*c_cell]) + shift_vector
-
-            AB = np.concatenate((A, B))
-            AB_types = [i[0] for i in types_conv_crystal]
-
-            lattice = Lattice(new_cell)
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
+            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
 
             stacked_structure = Structure(
-                lattice,
-                AB_types + AB_types,
-                AB,
-                coords_are_cartesian=False,
-                site_properties={'source': AB_labels}
+                self.lattice,
+                self.atom_types,
+                self.atom_pos,
+                coords_are_cartesian=True,
+                site_properties={'source': self.atom_labels}
             )
 
-        if stacking == 'ABC1':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['abc'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
+            # Get the index of the atoms in the second sheet
+            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
 
-            cell = np.array(dist_str['lattice']['matrix'])*(1, 1, 3)
-
-            A = ion_conv_crystal*(1, 1, 5/3)
-            B = translate_inside(ion_conv_crystal*(1, 1, 1) + (2/3, 1/3, 0))
-            C = translate_inside(ion_conv_crystal*(1, 1, 1/3) + (4/3, 2/3, 0))
-
-            ABC = np.concatenate((A, B, C))
-            ABC_type = [i[0] for i in labels_conv_crystal]
-            ABC_labels = labels_conv_crystal + labels_conv_crystal + labels_conv_crystal
-
-            lattice = Lattice(cell)
-
-            stacked_structure = Structure(
-                lattice,
-                ABC_type + ABC_type + ABC_type,
-                ABC,
-                coords_are_cartesian=False,
-                site_properties={'source': ABC_labels}
-            )
-
-        if stacking == 'ABC2':
-            dist_str = StartingFramework.as_dict()
-            types_conv_crystal = np.array([[i['label']] for i in dist_str['sites']])
-            ion_conv_crystal = np.array([i['abc'] for i in dist_str['sites']])
-            labels_conv_crystal = [i['properties']['source'] for i in dist_str['sites']]
-
-            cell = np.array(dist_str['lattice']['matrix'])*(1, 1, 3)
-
-            A = ion_conv_crystal*(1, 1, 5/3)
-            B = translate_inside(ion_conv_crystal*(1, 1, 1) + (1/3, 0, 0))
-            C = translate_inside(ion_conv_crystal*(1, 1, 1/3) + (2/3, 0, 0))
-
-            ABC = np.concatenate((A, B, C))
-            ABC_type = [i[0] for i in labels_conv_crystal]
-            ABC_labels = labels_conv_crystal + labels_conv_crystal + labels_conv_crystal
-
-            lattice = Lattice(cell)
-
-            stacked_structure = Structure(
-                lattice,
-                ABC_type + ABC_type + ABC_type,
-                ABC,
-                coords_are_cartesian=False,
-                site_properties={'source': ABC_labels}
-            )
+            # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
+            stacked_structure.translate_sites(
+                B_list,
+                [0, 0, 0.5],
+                frac_coords=True,
+                to_unit_cell=True
+                )
 
         dict_structure = stacked_structure.as_dict()
 
@@ -2880,16 +3404,27 @@ class Framework():
 
         # Get the simmetry information of the generated structure
         symm = SpacegroupAnalyzer(stacked_structure, symprec=0.05, angle_tolerance=.5)
-        self.prim_structure = symm.get_refined_structure(keep_site_properties=True)
+        try:
+            self.prim_structure = symm.get_refined_structure(keep_site_properties=True)
 
-        print_command(self.prim_structure, self.verbosity, ['debug'])
+            print_command(self.prim_structure, self.verbosity, ['debug'])
 
-        self.lattice_type = symm.get_lattice_type()
-        self.space_group = symm.get_space_group_symbol()
-        self.space_group_n = symm.get_space_group_number()
+            self.lattice_type = symm.get_lattice_type()
+            self.space_group = symm.get_space_group_symbol()
+            self.space_group_n = symm.get_space_group_number()
 
-        symm_op = symm.get_point_group_operations()
-        self.hall = symm.get_hall()
+            symm_op = symm.get_point_group_operations()
+            self.hall = symm.get_hall()
+
+        except Exception as e:
+            print_command(e, self.verbosity, ['debug'])
+
+            self.lattice_type = 'Triclinic'
+            self.space_group = 'P1'
+            self.space_group_n = '1'
+
+            symm_op = [1]
+            self.hall = 'P 1'
 
         if print_result is True:
             print_framework_name(self.name,
