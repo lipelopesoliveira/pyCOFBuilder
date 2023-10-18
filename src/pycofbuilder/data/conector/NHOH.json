@@ -1,5 +1,5 @@
 {
-  "name": "nitrile",
+  "name": "hidroxylamine",
   "code": "NHOH",
   "smiles": "[Q]NO",
   "xsmiles": "[*]NO",
@@ -29,7 +29,7 @@
           0.80826423,
           1.33288775,
           0.0
-        ]    
+        ]
       ]
     }
   }

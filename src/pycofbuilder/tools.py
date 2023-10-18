@@ -622,14 +622,17 @@ def get_bond_atom(connector_1: str, connector_2: str) -> str:
     Get the atom that will be used to bond two building blocks.
     '''
 
-    bond_dict = {'NH2': 'N',
-                 'NHOH': 'N',
-                 'CONHNH2': 'N',
-                 'CHNNH2': 'N',
-                 'BOH2': 'B',
-                 'Cl': 'X',
-                 'Br': 'X',
-                 'CHCN': 'C'}
+    bond_dict = {
+        'NH2': 'N',
+        'NHOH': 'N',
+        'COCHCHOH': 'N',
+        'CONHNH2': 'N',
+        'CHNNH2': 'N',
+        'BOH2': 'B',
+        'Cl': 'X',
+        'Br': 'X',
+        'CHCN': 'C'
+    }
 
     bond_atom = None
     for group in list(bond_dict.keys()):
