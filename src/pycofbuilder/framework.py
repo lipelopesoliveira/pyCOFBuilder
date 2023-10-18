@@ -143,7 +143,6 @@ class Framework():
         # Falta adicionar: 'HXL', 'KGD_A'
         self.available_2D_top = ['HCB', 'HCB_A',
                                  'SQL', 'SQL_A',
-                                 'KGM', 'KGM_A',
                                  'KGD',
                                  'HXL', 'HXL_A',
                                  'FXT', 'FXT_A']
@@ -162,8 +161,6 @@ class Framework():
             'HXL_A': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
             'FXT': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
             'FXT_A': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
-            'KGM': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
-            'KGM_A': ['A', 'AA', 'AB1x', 'AB1y', 'AB1xy', 'AB2', 'AAl', 'AAt'],
             'DIA': [0, 1, 2, 3, 4],  # Temporary
             'BOR': [0, 5, 8, 6, 7]  # Temporary
         }
@@ -271,14 +268,11 @@ class Framework():
             'HCB_A': self._create_hcb_a_structure,
             'SQL': self._create_sql_structure,
             'SQL_A': self._create_sql_a_structure,
-            'KGM': self._create_kgm_structure,
-            'KGM_A': self._create_kgm_a_structure,
             'KGD': self._create_kgd_structure,
             # 'HXL': self._create_hxl_structure,
             'HXL_A': self._create_hxl_a_structure,
             'FXT': self._create_fxt_structure,
             'FXT_A': self._create_fxt_a_structure,
-            # 'BEX': self._create_bex_structure
             }
 
         result = net_build_dict[Net](BB1, BB2, stacking=Stacking, **kwargs)
