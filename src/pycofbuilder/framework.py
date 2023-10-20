@@ -793,7 +793,7 @@ class Framework():
         bond_atom = get_bond_atom(BB_T3.conector, BB_L2.conector)
 
         # Replace "X" the building block
-        BB_T3.replace_X(bond_atom)
+        BB_L2.replace_X(bond_atom)
 
         # Remove the "X" atoms from the the building block
         BB_T3.remove_X()
@@ -1563,7 +1563,7 @@ class Framework():
         bond_atom = get_bond_atom(BB_S4.conector, BB_L2.conector)
 
         # Replace "X" the building block
-        BB_S4.replace_X(bond_atom)
+        BB_L2.replace_X(bond_atom)
 
         # Remove the "X" atoms from the the building block
         BB_S4.remove_X()
@@ -2337,7 +2337,7 @@ class Framework():
         bond_atom = get_bond_atom(BB_H6.conector, BB_L2.conector)
 
         # Replace "X" the building block
-        BB_H6.replace_X(bond_atom)
+        BB_L2.replace_X(bond_atom)
 
         # Remove the "X" atoms from the the building block
         BB_H6.remove_X()
@@ -3112,7 +3112,7 @@ class Framework():
         bond_atom = get_bond_atom(BB_S4.conector, BB_L2.conector)
 
         # Replace "X" the building block
-        BB_S4.replace_X(bond_atom)
+        BB_L2.replace_X(bond_atom)
 
         # Remove the "X" atoms from the the building block
         BB_S4.remove_X()
