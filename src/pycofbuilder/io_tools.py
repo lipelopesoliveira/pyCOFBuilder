@@ -1237,12 +1237,8 @@ def generate_mol_dict(path, file_name, name, code, smiles):
         "xsmiles_label": xsmiles_label,
         "formula": composition,
         "atoms": {
-            "elements": {
-                "elementType": atom_types,
-                "coords": {
-                    "3d": atom_pos.tolist()
-                }
-            }
+            "elements": {"elementType": atom_types},
+            "coords": {"3d": atom_pos.tolist()}
         }
     }
 
