@@ -114,8 +114,8 @@ class Framework():
 
         self.lib_path = os.path.join(self.out_path, 'building_blocks')
 
-        self.BB1_name = None
-        self.BB2_name = None
+        self.bb1_name = None
+        self.bb2_name = None
         self.topology = None
         self.stacking = None
         self.smiles = None
@@ -139,14 +139,13 @@ class Framework():
         self.symm_tol = 0.1
         self.angle_tol = 0.1
 
-        # Falta adicionar: 'HXL', 'KGD_A'
         self.available_2D_top = ['HCB', 'HCB_A',
                                  'SQL', 'SQL_A',
                                  'KGD',
                                  'HXL', 'HXL_A',
                                  'FXT', 'FXT_A']
 
-        # Falta add: ['dia', 'bor', 'srs', 'pts', 'ctn', 'rra', 'fcc', 'lon', 'stp', 'acs', 'tbo', 'bcu', 'fjh', 'ceq']
+        # To add: ['dia', 'bor', 'srs', 'pts', 'ctn', 'rra', 'fcc', 'lon', 'stp', 'acs', 'tbo', 'bcu', 'fjh', 'ceq']
         self.available_3D_top = ['DIA', 'BOR']  # Temporary
         self.available_topologies = self.available_2D_top + self.available_3D_top
 
@@ -174,7 +173,7 @@ class Framework():
         return self.name
 
     def __repr__(self) -> str:
-        return f'Reticulum({self.BB1_name}, {self.BB2_name}, {self.topology}, {self.stacking})'
+        return f'Reticulum({self.bb1_name}, {self.bb2_name}, {self.topology}, {self.stacking})'
 
     def _get_n_atoms(self) -> int:
         ''' Returns the number of atoms in the unitary cell'''
@@ -201,7 +200,7 @@ class Framework():
         name_error = 'FrameworkName must be in the format: BB1_BB2_Net_Stacking'
         assert len(FrameworkName.split('-')) == 4, name_error
 
-        BB1_name, BB2_name, Net, Stacking = FrameworkName.split('-')
+        bb1_name, bb2_name, Net, Stacking = FrameworkName.split('-')
 
         net_error = f'Net must be one of the following: {self.available_topologies}'
         assert Net in self.available_topologies, net_error
@@ -209,7 +208,7 @@ class Framework():
         stacking_error = f'Stacking must be one of the following: {self.available_stacking[Net]}'
         assert Stacking in self.available_stacking[Net], stacking_error
 
-        return BB1_name, BB2_name, Net, Stacking
+        return bb1_name, bb2_name, Net, Stacking
 
     def from_name(self, FrameworkName, **kwargs) -> None:
         """Creates a COF from a given FrameworkName.
@@ -224,14 +223,14 @@ class Framework():
         COF
             The COF object
         """
-        BB1_name, BB2_name, Net, Stacking = self.check_name_concistency(FrameworkName)
+        bb1_name, bb2_name, Net, Stacking = self.check_name_concistency(FrameworkName)
 
-        BB1 = BuildingBlock(name=BB1_name, save_dir=self.out_path, save_bb=self.save_bb)
-        BB2 = BuildingBlock(name=BB2_name, save_dir=self.out_path, save_bb=self.save_bb)
+        bb1 = BuildingBlock(name=bb1_name, save_dir=self.out_path, save_bb=self.save_bb)
+        bb2 = BuildingBlock(name=bb2_name, save_dir=self.out_path, save_bb=self.save_bb)
 
-        self.from_building_blocks(BB1, BB2, Net, Stacking, **kwargs)
+        self.from_building_blocks(bb1, bb2, Net, Stacking, **kwargs)
 
-    def from_building_blocks(self, BB1, BB2, Net, Stacking, **kwargs):
+    def from_building_blocks(self, bb1, bb2, Net, Stacking, **kwargs):
         """Creates a COF from the building blocks.
 
         Parameters
@@ -250,15 +249,15 @@ class Framework():
         COF
             The COF object
         """
-        self.name = f'{BB1.name}-{BB2.name}-{Net}-{Stacking}'
-        self.BB1_name = BB1.name
-        self.BB2_name = BB2.name
+        self.name = f'{bb1.name}-{bb2.name}-{Net}-{Stacking}'
+        self.bb1_name = bb1.name
+        self.bb2_name = bb2.name
         self.topology = Net
         self.stacking = Stacking
 
         # Check if the BB1 has the smiles attribute
-        if hasattr(BB1, 'smiles') and hasattr(BB2, 'smiles'):
-            self.smiles = f'{BB1.smiles}.{BB2.smiles}'
+        if hasattr(bb1, 'smiles') and hasattr(bb2, 'smiles'):
+            self.smiles = f'{bb1.smiles}.{bb2.smiles}'
         else:
             print('WARNING: The smiles attribute is not available for the building blocks')
 
@@ -274,7 +273,7 @@ class Framework():
             'FXT_A': self._create_fxt_a_structure,
             }
 
-        result = net_build_dict[Net](BB1, BB2, stacking=Stacking, **kwargs)
+        result = net_build_dict[Net](bb1, bb2, stacking=Stacking, **kwargs)
 
         return result
 
