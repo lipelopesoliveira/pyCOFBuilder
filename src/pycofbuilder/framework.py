@@ -36,7 +36,7 @@ from pycofbuilder.io_tools import (save_json,
                                    save_pqr,
                                    save_qe)
 
-from pycofbuilder.building_block import Building_Block
+from pycofbuilder.building_block import BuildingBlock
 
 from pycofbuilder.data.topology import TOPOLOGY_DICT
 
@@ -227,8 +227,8 @@ class Framework():
         """
         BB1_name, BB2_name, Net, Stacking = self.check_name_concistency(FrameworkName)
 
-        BB1 = Building_Block(name=BB1_name, save_dir=self.out_path, save_bb=self.save_bb)
-        BB2 = Building_Block(name=BB2_name, save_dir=self.out_path, save_bb=self.save_bb)
+        BB1 = BuildingBlock(name=BB1_name, save_dir=self.out_path, save_bb=self.save_bb)
+        BB2 = BuildingBlock(name=BB2_name, save_dir=self.out_path, save_bb=self.save_bb)
 
         self.from_building_blocks(BB1, BB2, Net, Stacking, **kwargs)
 
@@ -3484,13 +3484,13 @@ class Framework():
         self.topology = 'KGM'
         self.dimension = 2
 
-        bb_1 = Building_Block(name_bb_a,
-                              save_dir=self.lib_path,
-                              verbosity=self.verbosity)
+        bb_1 = BuildingBlock(name_bb_a,
+                             save_dir=self.lib_path,
+                             verbosity=self.verbosity)
 
-        bb_2 = Building_Block(name_bb_b,
-                              save_dir=self.lib_path,
-                              verbosity=self.verbosity)
+        bb_2 = BuildingBlock(name_bb_b,
+                             save_dir=self.lib_path,
+                             verbosity=self.verbosity)
 
         self.name = f'{bb_1.name}-{bb_2.name}-KGM-{stacking}'
         self.charge = bb_1.charge + bb_2.charge
@@ -3875,13 +3875,13 @@ class Framework():
         self.topology = 'KGM_A'
         self.dimension = 2
 
-        bb_1 = Building_Block(name_bb_a,
-                              save_dir=self.lib_path,
-                              verbosity=self.verbosity)
+        bb_1 = BuildingBlock(name_bb_a,
+                             save_dir=self.lib_path,
+                             verbosity=self.verbosity)
 
-        bb_2 = Building_Block(name_bb_b,
-                              save_dir=self.lib_path,
-                              verbosity=self.verbosity)
+        bb_2 = BuildingBlock(name_bb_b,
+                             save_dir=self.lib_path,
+                             verbosity=self.verbosity)
 
         self.name = f'{bb_1.name}-{bb_2.name}-KGM_A-{stacking}'
         self.charge = bb_1.charge + bb_2.charge

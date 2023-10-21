@@ -17,7 +17,7 @@ from pycofbuilder.io_tools import (read_xyz_file,
                                    save_xyz)
 
 
-class Building_Block():
+class BuildingBlock():
 
     def __init__(self, name=None, verbosity=False, save_dir=False, save_bb=True):
 
