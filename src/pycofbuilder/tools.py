@@ -60,7 +60,8 @@ def elements_dict(property='atomic_mass'):
 def unit_vector(vector):
     """Return a unit vector in the same direction as x."""
     y = np.array(vector, dtype='float')
-    return y / np.linalg.norm(y)
+    norm = y / np.linalg.norm(y)
+    return norm
 
 
 def angle(v1, v2, unit='degree'):
@@ -115,17 +116,6 @@ def rotation_matrix_from_vectors(vec1, vec2):
         return rotation_matrix
     else:
         return np.identity(3)
-
-
-def translate_inside(matrix):
-    """
-    Translate the matrix to the center of the cell
-    """
-    for i in range(len(matrix)):
-        for j in range(len(matrix[i])):
-            if matrix[i][j] >= 1:
-                matrix[i][j] -= 1
-    return matrix
 
 
 def rmsd(V, W):
@@ -579,27 +569,8 @@ def change_X_atoms(atom_labels, atom_pos, bond_atom):
     return label, pos
 
 
-def find_bond_atom(cof_name):
-    '''Finds the type of atom that the program heve
-    to substitute X based on the building blocks'''
-
-    bb1, bb2, net, stacking = cof_name.split('-')
-    conect_1 = bb1.split('_')[2]
-    conect_2 = bb2.split('_')[2]
-
-    bond_dict = {'NH2': 'N',
-                 'CONHNH2': 'N',
-                 'BOH2': 'B',
-                 'Cl': 'R',
-                 'Br': 'R'}
-
-    for group in list(bond_dict.keys()):
-        if group in [conect_1, conect_2]:
-            return bond_dict[group]
-
-
 def closest_atom(label_1, pos_1, labels, pos):
-    '''Finds the closest atom to a given atom'''
+    '''Find the closest atom to a given atom'''
 
     list_labels = []
     list_pos = []
@@ -651,6 +622,7 @@ def get_bond_atom(connector_1: str, connector_2: str) -> str:
         'CHNNH2': 'N',
         'COOH': 'N',
         'BOH2': 'B',
+        'OH2': 'B',
         'Cl': 'X',
         'Br': 'X',
         'CHCN': 'C'
@@ -812,7 +784,7 @@ def ibrav_to_cell(ibrav, celldm1, celldm2, celldm3, celldm4, celldm5, celldm6):
 
 def equal_value(val1, val2, threshold=1e-3) -> bool:
     '''
-    Determine if two values are equal based on a given threshold. 
+    Determine if two values are equal based on a given threshold.
     '''
     return abs(val1 - val2) <= threshold
 
@@ -843,6 +815,7 @@ def classify_unit_cell(cell, thr=1e-3) -> str:
         a, b, c, alpha, beta, gamma = cell_to_cellpar(cell)
 
     cell_type = None
+
     if equal_value(alpha, 90, thr) and equal_value(beta, 90, thr) and equal_value(gamma, 90, thr):
         if equal_value(a, b, thr) and equal_value(b, c, thr):
             cell_type = "cubic"

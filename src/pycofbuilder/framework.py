@@ -17,7 +17,6 @@ from scipy.spatial.transform import Rotation as R
 
 from pycofbuilder.tools import (print_command,
                                 get_bond_atom,
-                                translate_inside,
                                 get_cartesian_to_fractional_matrix,
                                 cell_to_cellpar,
                                 cellpar_to_cell,
@@ -3636,8 +3635,7 @@ class Framework():
                             'lattice']['matrix'])*(1, 1, 2)
 
             A = ion_conv_crystal*(1, 1, 0.5)
-            B = translate_inside(
-                ion_conv_crystal*(1, 1, 1.5) + (1/4, 1/4, 0))
+            B = ion_conv_crystal*(1, 1, 1.5) + (1/4, 1/4, 0)
 
             AB = np.concatenate((A, B))
             AB_label = [i[0] for i in labels_conv_crystal]
@@ -3660,8 +3658,7 @@ class Framework():
                             'lattice']['matrix'])*(1, 1, 2)
 
             A = ion_conv_crystal*(1, 1, 0.5)
-            B = translate_inside(
-                ion_conv_crystal*(1, 1, 1.5) + (1/2, 0, 0))
+            B = ion_conv_crystal*(1, 1, 1.5) + (1/2, 0, 0)
 
             AB = np.concatenate((A, B))
             AB_label = [i[0] for i in labels_conv_crystal]
@@ -3749,10 +3746,8 @@ class Framework():
                             'lattice']['matrix'])*(1, 1, 3)
 
             A = ion_conv_crystal*(1, 1, 5/3)
-            B = translate_inside(
-                ion_conv_crystal*(1, 1, 1) + (2/3, 1/3, 0))
-            C = translate_inside(
-                ion_conv_crystal*(1, 1, 1/3) + (4/3, 2/3, 0))
+            B = ion_conv_crystal*(1, 1, 1) + (2/3, 1/3, 0)
+            C = ion_conv_crystal*(1, 1, 1/3) + (4/3, 2/3, 0)
 
             ABC = np.concatenate((A, B, C))
             ABC_label = [i[0] for i in labels_conv_crystal]
@@ -3776,10 +3771,8 @@ class Framework():
                             'lattice']['matrix'])*(1, 1, 3)
 
             A = ion_conv_crystal*(1, 1, 5/3)
-            B = translate_inside(
-                ion_conv_crystal*(1, 1, 1) + (1/3, 0, 0))
-            C = translate_inside(
-                ion_conv_crystal*(1, 1, 1/3) + (2/3, 0, 0))
+            B = ion_conv_crystal*(1, 1, 1) + (1/3, 0, 0)
+            C = ion_conv_crystal*(1, 1, 1/3) + (2/3, 0, 0)
 
             ABC = np.concatenate((A, B, C))
             ABC_label = [i[0] for i in labels_conv_crystal]
