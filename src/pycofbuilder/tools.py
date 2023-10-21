@@ -673,6 +673,64 @@ def formula_from_atom_list(AtomLabels: list) -> str:
     return formula
 
 
+def smiles_to_xsmiles(smiles_string: str) -> str:
+    '''
+    Converts a SMILES string to an extended SMILES string with labels
+
+    Parameters
+    ----------
+    smiles_string : str
+        SMILES string to be converted
+
+    Returns
+    -------
+    xsmiles : str
+        Extended SMILES string with special labels
+    xsmiles_label : str
+        xsmiles labels for images with the special labels
+    composition : str
+        String containing the composition
+    '''
+    SPECIAL_ATOMS = ['Q', 'R', 'X']
+    REGULAR_ATOMS = ['C', 'N', 'H', 'O', 'S', 'B']
+
+    xsmiles = ''
+    labels = []
+    atom_list = []
+
+    for i, letter in enumerate(smiles_string):
+
+        if letter in SPECIAL_ATOMS:
+            xsmiles += '*'
+            labels.append(letter)
+            if letter == 'R':
+                atom_list.append(smiles_string[i:i+2])
+            else:
+                atom_list.append(letter)
+
+        elif letter.isnumeric():
+            if smiles_string[i-1] == 'R':
+                labels[-1] = labels[-1] + letter
+            else:
+                xsmiles += letter
+
+        elif letter in REGULAR_ATOMS:
+            xsmiles += letter
+            labels += ['']
+            atom_list.append(letter)
+
+        else:
+            xsmiles += letter
+
+    # Generate the xsmiles label
+    xsmiles_label = '|$' + ';'.join(labels) + '$|'
+
+    # Generate the composition
+    composition = formula_from_atom_list(atom_list)
+
+    return xsmiles, xsmiles_label, composition
+
+
 def ibrav_to_cell(ibrav, celldm1, celldm2, celldm3, celldm4, celldm5, celldm6):
     """
     Convert a value of ibrav to a cell.

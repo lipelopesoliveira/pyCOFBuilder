@@ -18,7 +18,8 @@ from pycofbuilder.tools import (elements_dict,
                                 get_fractional_to_cartesian_matrix,
                                 get_cartesian_to_fractional_matrix,
                                 get_kgrid,
-                                formula_from_atom_list)
+                                formula_from_atom_list,
+                                smiles_to_xsmiles)
 
 
 def save_csv(path, file_name, data, delimiter=',', head=False):
@@ -1217,3 +1218,32 @@ def create_structure_CJSON(StructureName: str,
     chemJSON['bonds']['order'] = BondOrders
 
     return chemJSON
+
+
+def generate_mol_dict(path, file_name, name, code, smiles):
+
+    xsmiles, xsmiles_label, composition = smiles_to_xsmiles(smiles)
+
+    if file_name.endswith('gjf'):
+        atom_types, atom_pos = read_gjf_file(path, file_name)
+    elif file_name.endswith('xyz'):
+        atom_types, atom_pos = read_xyz_file(path, file_name)
+
+    mol_dict = {
+        "name": name,
+        "smiles": smiles,
+        "code": code,
+        "xsmiles": xsmiles,
+        "xsmiles_label": xsmiles_label,
+        "formula": composition,
+        "atoms": {
+            "elements": {
+                "elementType": atom_types,
+                "coords": {
+                    "3d": atom_pos
+                }
+            }
+        }
+    }
+
+    write_json(path, file_name.split('.')[0], mol_dict)
