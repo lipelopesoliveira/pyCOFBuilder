@@ -810,24 +810,53 @@ def ibrav_to_cell(ibrav, celldm1, celldm2, celldm3, celldm4, celldm5, celldm6):
     return cell
 
 
-def a_equal(val1, val2, threshold=1e-3) -> bool:
+def equal_value(val1, val2, threshold=1e-3) -> bool:
+    '''
+    Determine if two values are equal based on a given threshold. 
+    '''
     return abs(val1 - val2) <= threshold
 
 
-def classify_unit_cell(a, b, c, alpha, beta, gamma, thr=1e-3):
-    # Determine the type of unit cell based on the angles and edge lengths
-    if a_equal(alpha, 90, thr) and a_equal(beta, 90, thr) and a_equal(gamma, 90, thr):
-        if a_equal(a, b, thr) and a_equal(b, c, thr):
-            return "cubic"
-        if a_equal(a, b, thr) and not a_equal(a, c, thr):
-            return "tetragonal"
+def classify_unit_cell(cell, thr=1e-3) -> str:
+    '''
+    Determine the bravais lattice based on the cell lattice.
+    The cell lattice can be the cell parameters as (6,1) array or
+    the cell vectors as (3x3) array.
+
+    Bravais lattice can be cubic, tetragonal, orthorhombic, hexagonal,
+    monoclinic, or triclinic.
+
+    Parameters
+    ----------
+    cell : array
+        Array with the cell vectors or parameters
+    threshold: float
+        Numeric threshold for the analysis. Default: 1e-3
+
+    Returns
+    -------
+    cell_type : string
+        Bravais lattice.
+    '''
+
+    if len(cell) == 3:
+        a, b, c, alpha, beta, gamma = cell_to_cellpar(cell)
+
+    cell_type = None
+    if equal_value(alpha, 90, thr) and equal_value(beta, 90, thr) and equal_value(gamma, 90, thr):
+        if equal_value(a, b, thr) and equal_value(b, c, thr):
+            cell_type = "cubic"
+        if equal_value(a, b, thr) and not equal_value(a, c, thr):
+            cell_type = "tetragonal"
         else:
-            return "orthorhombic"
-    elif a_equal(alpha, 90, thr) and a_equal(beta, 90, thr) and a_equal(gamma, 120, thr):
-        if a_equal(a, b, thr):
-            return "hexagonal"
-    elif a_equal(alpha, 90, thr) or a_equal(beta, 90, thr) or a_equal(gamma, 90, thr):
-        if not a_equal(a, b, thr) and not a_equal(b, c, thr) and not a_equal(a, c, thr):
-            return "monoclinic"
+            cell_type = "orthorhombic"
+    elif equal_value(alpha, 90, thr) and equal_value(beta, 90, thr) and equal_value(gamma, 120, thr):
+        if equal_value(a, b, thr):
+            cell_type = "hexagonal"
+    elif equal_value(alpha, 90, thr) or equal_value(beta, 90, thr) or equal_value(gamma, 90, thr):
+        if not equal_value(a, b, thr) and not equal_value(b, c, thr) and not equal_value(a, c, thr):
+            cell_type = "monoclinic"
     else:
-        return "triclinic"
+        cell_type = "triclinic"
+
+    return cell_type
