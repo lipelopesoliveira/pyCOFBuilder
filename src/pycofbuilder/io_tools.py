@@ -768,7 +768,7 @@ def convert_cif_2_qe(out_path, file_name):
             k_dist=0.3)
 
 
-def save_json(path, file_name, cell, atom_types, atom_pos, frac_coords=False):
+def save_json(path, file_name, cell, atom_types, atom_pos, atom_labels, frac_coords=False):
     """
     Save a file in format `.json` on the `path`.
 
@@ -798,7 +798,7 @@ def save_json(path, file_name, cell, atom_types, atom_pos, frac_coords=False):
         cell_par = np.array(cell).astype(float).tolist()
         cell_matrix = cellpar_to_cell(cell_par).tolist()
 
-    cof_json['system']['geo_opt'] = False
+    cof_json['system']['geo_opt'] = True
 
     cof_json['geometry']['cell_matrix'] = cell_matrix
     cof_json['geometry']['cell_parameters'] = cell_par
@@ -1078,7 +1078,7 @@ def create_COF_json(name) -> dict:
 
     COF_json = {'system': {'description': system_info,
                            'name': name,
-                           'geo_opt': False,
+                           'geo_opt': True,
                            'execution_times_seconds': {}},
                 'geometry': {'description': geometry_info},
                 'optimization': {'description': optimization_info},

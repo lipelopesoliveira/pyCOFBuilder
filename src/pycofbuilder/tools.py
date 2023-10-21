@@ -788,7 +788,7 @@ def ibrav_to_cell(ibrav, celldm1, celldm2, celldm3, celldm4, celldm5, celldm6):
     return cell
 
 
-def a_equal(val1, val2, threshold=1e-3):
+def a_equal(val1, val2, threshold=1e-3) -> bool:
     return abs(val1 - val2) <= threshold
 
 
