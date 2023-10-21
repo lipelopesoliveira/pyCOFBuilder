@@ -9,7 +9,7 @@ if sys.version_info[0] != 3:
     sys.exit(1)
 
 # Import BuildingBlocks class
-from pycofbuilder.building_block import Building_Block
+from pycofbuilder.building_block import BuildingBlock
 
 # Import Framework class
 from pycofbuilder.framework import Framework
@@ -18,7 +18,7 @@ from pycofbuilder.framework import Framework
 import pycofbuilder.tools as Tools
 import pycofbuilder.io_tools as IO_Tools
 
-__all__ = ['Building_Block',
+__all__ = ['BuildingBlock',
            'Framework',
            'Tools',
            'IO_Tools'

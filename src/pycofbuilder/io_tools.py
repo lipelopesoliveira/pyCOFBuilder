@@ -1240,10 +1240,12 @@ def generate_mol_dict(path, file_name, name, code, smiles):
             "elements": {
                 "elementType": atom_types,
                 "coords": {
-                    "3d": atom_pos
+                    "3d": atom_pos.tolist()
                 }
             }
         }
     }
+
+    print(mol_dict)
 
     write_json(path, file_name.split('.')[0], mol_dict)
