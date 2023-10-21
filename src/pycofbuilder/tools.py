@@ -628,6 +628,7 @@ def get_bond_atom(connector_1: str, connector_2: str) -> str:
         'COCHCHOH': 'N',
         'CONHNH2': 'N',
         'CHNNH2': 'N',
+        'COOH': 'N',
         'BOH2': 'B',
         'Cl': 'X',
         'Br': 'X',
