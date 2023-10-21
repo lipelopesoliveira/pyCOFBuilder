@@ -149,9 +149,21 @@ def rmsd(V, W):
 
 def cell_to_cellpar(cell, radians=False):
     """Returns the cell parameters [a, b, c, alpha, beta, gamma]
-    given a 3x3 cell matrix [v1, v2, v3]
+    given a 3x3 cell matrix.
 
     Angles are in degrees unless radian=True is used.
+
+    Parameters
+    ----------
+    cell : array
+        (3,3) matrix of cell vectors v1, v2, and v3
+    radians : bool
+        Return the cell angles in radians
+
+    Returns
+    -------
+    cellpar : array
+        (6,1) vector with the cell parameters
     """
     lengths = [np.linalg.norm(v) for v in cell]
     angles = []
@@ -165,19 +177,21 @@ def cell_to_cellpar(cell, radians=False):
         else:
             angle = 90.0
         angles.append(angle)
+
+    # Corvet to radians if radians is True
     if radians:
         angles = [angle * np.pi / 180 for angle in angles]
+
     return np.array(lengths + angles)
 
 
 def cellpar_to_cell(cellpar, ab_normal=(0, 0, 1), a_direction=None):
-    """Return a 3x3 cell matrix from cellpar=[a,b,c,alpha,beta,gamma].
+    """Return a 3x3 cell matrix from cell parameters (a,b,c,alpha,beta, and gamma).
 
     Angles must be in degrees.
 
-    The returned cell is orientated such that a and b
-    are normal to `ab_normal` and a is parallel to the projection of
-    `a_direction` in the a-b plane.
+    The returned cell is orientated such that a and b are normal to `ab_normal` and a is
+    parallel to the projection of `a_direction` in the a-b plane.
 
     Default `a_direction` is (1,0,0), unless this is parallel to
     `ab_normal`, in which case default `a_direction` is (0,0,1).
@@ -186,12 +200,19 @@ def cellpar_to_cell(cellpar, ab_normal=(0, 0, 1), a_direction=None):
     cell will be oriented such that va and vb are normal to `ab_normal`
     and va will be along the projection of `a_direction` onto the a-b
     plane.
-    Example:
-    >>> cell = cellpar_to_cell([1, 2, 4, 10, 20, 30], (0, 1, 1), (1, 2, 3))
-    >>> np.round(cell, 3)
-    array([[ 0.816, -0.408,  0.408],
-            [ 1.992, -0.13 ,  0.13 ],
-            [ 3.859, -0.745,  0.745]])
+
+    Parameters
+    ----------
+    cellpar : array
+        (6,1) vector with the cell parameters
+    ab_normal : array
+        Normal vector between a and b cell vectors. Default: (0, 0, 1)
+    a_direction : array
+        Specific direction for the a vector. Default: None
+    Returns
+    -------
+    cell : array
+        (3,3) matrix of cell vectors v1, v2, and v3
     """
     if a_direction is None:
         if np.linalg.norm(np.cross(ab_normal, (1, 0, 0))) < 1e-5:
@@ -199,8 +220,8 @@ def cellpar_to_cell(cellpar, ab_normal=(0, 0, 1), a_direction=None):
         else:
             a_direction = (1, 0, 0)
 
-    # Define rotated X,Y,Z-system, with Z along ab_normal and X along
-    # the projection of a_direction onto the normal plane of Z.
+    # Define rotated X,Y,Z-system, with Z along ab_normal and X along the
+    # projection of a_direction onto the normal plane of Z.
     ad = np.array(a_direction)
     Z = unit_vector(ab_normal)
     X = unit_vector(ad - np.dot(ad, Z) * Z)
