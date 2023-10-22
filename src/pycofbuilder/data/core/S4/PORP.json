@@ -1,7 +1,7 @@
 {
   "name":"porphyrin",
   "smiles":"[Q]/C(C1=C([R2])C([R1])=C(/C([Q])=C2C([R2])=C([R1])C3=N/2)N1)=C4N=C(/C([Q])=C(C([R1])=C/5[R2])\\NC5=C3\\[Q])C([R2])=C/4[R1]",
-  "code":"porp",
+  "code":"PORP",
   "xsmiles":"[*]/C(C1=C([*])C([*])=C(/C([*])=C2C([*])=C([*])C3=N/2)N1)=C4N=C(/C([*])=C(C([*])=C/5[*])\\NC5=C3\\[*])C([*])=C/4[*]",
   "xsmiles_label":"|$Q;;;;R2;;R1;;;Q;;;R2;;R1;;;;;;;;Q;;;R1;;R2;;;;Q;;R2;;R1$|",
   "formula":"R24Q4R14C20N4",
