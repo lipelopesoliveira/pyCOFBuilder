@@ -1,13 +1,13 @@
 {
-  "name": "Hexaphenylbenzene",
-  "smiles": "[Q]C1=C([R1])C([R3])=C(C2=NC([R2])=C([Q])C([R1])=C2[R3])N=C1[R2]",
-  "code": "HEXB",
-  "xsmiles": "[*]C1=C([*])C([*])=C(C2=NC([*])=C([*])C([*])=C2[*])N=C1[*]",
-  "xsmiles_label": "|$Q;;;R1;;R3;;;;;R2;;Q;;R1;;R3;;;R2$|",
-  "formula": "C10R22R12N2R32Q2",
-  "atoms": {
-    "elements": {
-      "elementType": [
+  "name":"Hexaphenylbenzene",
+  "smiles":"[R3]C(C([R1])=C([Q])C([R2])=C1[R4])=C1C2=C(C3=C([R3])C([R1])=C([Q])C([R2])=C3[R4])C(C4=C([R3])C([R1])=C([Q])C([R2])=C4[R34])=C(C5=C([R3])C([R1])=C([Q])C([R2])=C5[R4])C(C6=C([R3])C([R1])=C([Q])C([R2])=C6[R4])=C2C7=C([R3])C([R1])=C([Q])C([R2])=C7[R4]",
+  "code":"HEXB",
+  "xsmiles":"[*]C(C([*])=C([*])C([*])=C1[*])=C1C2=C(C3=C([*])C([*])=C([*])C([*])=C3[*])C(C4=C([*])C([*])=C([*])C([*])=C4[*4])=C(C5=C([*])C([*])=C([*])C([*])=C5[*])C(C6=C([*])C([*])=C([*])C([*])=C6[*])=C2C7=C([*])C([*])=C([*])C([*])=C7[*]",
+  "xsmiles_label":"|$R3;;;R1;;Q;;R2;;R4;;;;;;R3;;R1;;Q;;R2;;R4;;;;R3;;R1;;Q;;R2;;R3;;;;R3;;R1;;Q;;R2;;R4;;;;R3;;R1;;Q;;R2;;R4;;;;R3;;R1;;Q;;R2;;R4$|",
+  "formula":"R26Q6R37R16C42R45",
+  "atoms":{
+    "elements":{
+      "elementType":[
         "C",
         "C",
         "C",
@@ -82,8 +82,8 @@
         "R4"
       ]
     },
-      "coords": {
-      "3d": [
+    "coords":{
+      "3d":[
         [
           -1.20808242,
           0.69748671,
