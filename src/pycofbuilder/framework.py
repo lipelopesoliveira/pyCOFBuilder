@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-topology
 # Copyright (c) Felipe Lopes de Oliveira
 # Distributed under the terms of the MIT License.
 
@@ -2286,7 +2286,7 @@ class Framework():
                                 tilt_angle: float = 5.0):
         """Creates a COF with HXL-A network.
 
-        The HXK-A net is composed of one hexapodal and one linear building blocks.
+        The HXL-A net is composed of one hexapodal and one linear building blocks.
 
         Parameters
         ----------
@@ -2670,9 +2670,9 @@ class Framework():
                               slab: float = 10.0,
                               shift_vector: list = [1.0, 1.0, 0],
                               tilt_angle: float = 5.0):
-        """Creates a COF with SQL network.
+        """Creates a COF with FXT network.
 
-        The SQL net is composed of two tetrapodal building blocks.
+        The FXT net is composed of two tetrapodal building blocks.
 
         Parameters
         ----------
@@ -2707,7 +2707,7 @@ class Framework():
         assert BB_S4_A.connectivity == 4, connectivity_error.format('A', 4)
         assert BB_S4_B.connectivity == 4, connectivity_error.format('B', 4)
 
-        self.name = f'{BB_S4_A.name}-{BB_S4_B.name}-SQL-{stacking}'
+        self.name = f'{BB_S4_A.name}-{BB_S4_B.name}-FXT-{stacking}'
         self.topology = 'FXT'
         self.staking = stacking
         self.dimension = 2
@@ -3096,7 +3096,7 @@ class Framework():
         assert BB_S4.connectivity == 4, connectivity_error.format('A', 4)
         assert BB_L2.connectivity == 2, connectivity_error.format('B', 2)
 
-        self.name = f'{BB_S4.name}-{BB_L2.name}-SQL_A-{stacking}'
+        self.name = f'{BB_S4.name}-{BB_L2.name}-FXT_A-{stacking}'
         self.topology = 'FXT_A'
         self.staking = stacking
         self.dimension = 2
