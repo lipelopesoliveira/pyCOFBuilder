@@ -1,8 +1,8 @@
 {
   "name":"phthalocyanine",
-  "smiles":"[Q]C1=C([R1])C2=C(/N=C3C4=C(C([R1])=C([Q])C([R2])=C4[R3])C5=N/3)NC(/N=C6N=C(/N=C(C7=C/8C([R3])=C([R2])C([Q])=C7[R1])\\NC8=N/5)C9=C\u0006C([R1])=C([Q])C([R2])=C9[R3])=C2C([R3])=C1[R2]",
+  "smiles":"[Q]C1=C([R1])C2=C(/N=C3C4=C(C([R1])=C([Q])C([R2])=C4[R3])C5=N/3)NC(/N=C6N=C(/N=C(C7=C/8C([R3])=C([R2])C([Q])=C7[R1])\\NC8=N/5)C9=C\\6C([R1])=C([Q])C([R2])=C9[R3])=C2C([R3])=C1[R2]",
   "code":"PTCA",
-  "xsmiles":"[*]C1=C([*])C2=C(/N=C3C4=C(C([*])=C([*])C([*])=C4[*])C5=N/3)NC(/N=C6N=C(/N=C(C7=C/8C([*])=C([*])C([*])=C7[*])\\NC8=N/5)C9=C\u0006C([*])=C([*])C([*])=C9[*])=C2C([*])=C1[*]",
+  "xsmiles":"[*]C1=C([*])C2=C(/N=C3C4=C(C([*])=C([*])C([*])=C4[*])C5=N/3)NC(/N=C6N=C(/N=C(C7=C/8C([*])=C([*])C([*])=C7[*])\\NC8=N/5)C9=C\\6C([*])=C([*])C([*])=C9[*])=C2C([*])=C1[*]",
   "xsmiles_label":"|$Q;;;R1;;;;;;;;R1;;Q;;R2;;R3;;;;;;;;;;;;;;R3;;R2;;Q;;R1;;;;;;;R1;;Q;;R2;;R3;;;R3;;R2$|",
   "formula":"C32N8R14R24R34Q4",
   "atoms":{
