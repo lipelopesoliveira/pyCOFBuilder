@@ -8,27 +8,26 @@ if sys.version_info[0] != 3:
     raise Exception("Sorry but pyCOFBuilder requires Python 3.")
     sys.exit(1)
 
-# Import tools class
-import pycofbuilder.tools as Tools
-
 # Import BuildingBlocks class
-from pycofbuilder.building_block import Building_Block
+from pycofbuilder.building_block import BuildingBlock
 
-# Import BuildingBlocks class
+# Import Framework class
 from pycofbuilder.framework import Framework
 
-# Import Core class
-#from pycofbuilder.core import *
+# Import Tools
+import pycofbuilder.tools as Tools
+import pycofbuilder.io_tools as IO_Tools
 
-__all__ = ['Tools',
-           'Building_Block',
-           'Framework'
+__all__ = ['BuildingBlock',
+           'Framework',
+           'Tools',
+           'IO_Tools'
            ]
 
 _ROOT = os.path.abspath(os.path.dirname(__file__))
 
-__author__  = "Felipe Lopes de Oliveira"
+__author__ = "Felipe Lopes de Oliveira"
 __license__ = "MIT"
-__version__ = '0.0.4'
-__email__   = "felipe.lopes@nano.ufrj.br"
-__status__  = "Development"
+__version__ = '0.0.5'
+__email__ = "felipe.lopes@nano.ufrj.br"
+__status__ = "Development"

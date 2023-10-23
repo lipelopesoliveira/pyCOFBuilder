@@ -1,0 +1,36 @@
+{
+  "name": "hidroxylamine",
+  "code": "NHOH",
+  "smiles": "[Q]NO",
+  "xsmiles": "[*]NO",
+  "xsmiles_label": "|$Q;;$|",
+  "formula": "X1Q1O1",
+  "atoms": {
+    "elements": {
+      "elementType": [
+        "Q",
+        "X",
+        "O"
+      ]
+    },
+    "coords": {
+      "3d": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.38100000,
+          0.0,
+          0.0
+        ],
+        [
+          0.80826423,
+          1.33288775,
+          0.0
+        ]
+      ]
+    }
+  }
+}

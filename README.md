@@ -2,7 +2,9 @@
 
 ![puCOFBuilder](docs/header.png)
 
-**pyCOFBuilder** is a simple and powerful python package to automatically assembly COF structures with specifics building blocks, topologies, and functionalizations. The project was developed to address the need for generation of COFs structures in a high-throughput style, based on a nomenclature tha allows direct sctructural feature interpretation from a simple name. The package uses[pymatgen](https://pymatgen.org/) to create the structures. The package is still under development, but it is already possible to create a large number of COFs structures.
+**pyCOFBuilder** is a simple and powerful python package to automatically assembly COF structures with specifics building blocks, topologies, and functionalizations. The project was developed to address the need for generation of COFs structures in a high-throughput style, based on a nomenclature tha allows direct sctructural feature interpretation from a simple name. The package uses [pymatgen](https://pymatgen.org/) to create the structures. 
+
+This package is still under development and currently on beta version, but it is already possible to create a large number of COFs structures.
 
 Learn more at [ToNano&Beyond](https://tonanoandbeyondblog.wordpress.com/)
 
@@ -11,18 +13,27 @@ Learn more at [ToNano&Beyond](https://tonanoandbeyondblog.wordpress.com/)
 For detailed instructions see the [installation instructions](https://tonanoandbeyondblog.wordpress.com/).
 If the requirements are already satisfied `[WILL BE UPDATED!!!!]`
 
-```bash
-pip install pycofbuilder
+Currently the best way to use pyCOFBuilder is to manually import it using the `sys` module, as exemplified below:
+
+```python
+# importing module
+import sys
+ 
+# appending a path
+sys.path.append('{PATH_TO_PYCOFBUILDER}/pyCOFBuilder/src')
+
+import pycofbuilder as pcb
 ```
+
+Just remember to change the `{PATH_TO_PYCOFBUILDER}` to the directory where you download the pyCOFBuilder package. 
 
 ### Requirements
 
-0. Python >= 3.7
+0. Python >= 3.10
 1. pymatgen >= 2022.0.0
 2. numpy >= 1.2
 3. scipy >= 1.6.3
 4. simplejson
-5. tqdm
 
 The Python dependencies are most easily satisfied using a conda
 ([anaconda](https://www.anaconda.com/distribution)/[miniconda](https://docs.conda.io/en/latest/miniconda.html))
@@ -34,14 +45,14 @@ conda env create --file environment.yml
 
 ## Basic Usage
 
-To create a specific COF, like `T3_BENZ_NH2_OH-L2_BENZ_CHO_H-HCB_A-AA`:
+To create a specific COF, such as `T3_BENZ_NH2_OH-L2_BENZ_CHO_H-HCB_A-AA`:
 
 ```python
 >>> import pycofbuilder as cof
 
 >>> cof.Framework('T3_BENZ_CHO_OH-L2_BENZ_NH2_H-HCB_A-AA')
 T3_BENZ_NH2_OH-L2_BENZ_CHO_H_H-HCB_A-AA                       hexagonal   P    P6/m # 175    12 sym. op.
->>> cof.save(fmt='cif', supercell = [1, 1, 2])
+>>> cof.save(fmt='cif', supercell = [1, 1, 2], save_dir = '.')
 ```
 
 A `.cif` file (the default save format is CIF, but it can be easily changed by setting other value on the `fmt` option) will be created in the `out` folder. The code will print out some information about the structure created.
@@ -62,72 +73,6 @@ array([[ 22.49540055,   0.        ,   0.        ],
 >>> cof.space_group
 'P6/m'
 ```
-
-## Creating multiple COFs
-
-You can also create multiple building blocks and then construct all available COFs from the connection of those blocks.
-
-```python
-import pycofbuilder as COF
-
-for BB1 in ['C3_BENZ_CHO_H', 'C3_BENZ_CHO_OH', 'C3_BENZ_CHO_CH3', 'C3_BENZ_CHO_F']:
-    COF.Building_Block(BB1)
-
-for BB2 in ['C2_BENZ_NH2_H', 'C2_BENZ_NH2_OH', 'C2_BENZ_NH2_CH3', 'C2_BENZ_NH2_F']:
-    COF.Building_Block(BB2)
-
-COF.build_all_available_COFs()
-
-```
-
-You should see this output, where the code will calculate how many COFs will be created and ask for confirmation. Once you type `y` to confirm, a progress bar will indicate the creation of the structures as well as the estimated time for concluding the task. After the creation, the code will print some information about the COFs created, how many of the structures were created successfully, and the elapsed time.
-
-```python
->>> 20 COFs will be created. Do you want to proceed? Type [y] to continue.
-y
-                      COF Name                              |    Lattice    | Point Group | N° of symmetry op. |
-C3_BENZ_CHO_CH3-C2_BENZ_NH2_CH3_H-HCB_A-AA                    hexagonal   P     P6  # 168    6  sym. op.
-C3_BENZ_CHO_CH3-C2_BENZ_NH2_F_H-HCB_A-AA                      hexagonal   P     P6  # 168    6  sym. op.
-C3_BENZ_CHO_CH3-C2_BENZ_NH2_H_H-HCB_A-AA                      hexagonal   P     P6  # 168    6  sym. op.
-C3_BENZ_CHO_CH3-C2_BENZ_NH2_OH_H-HCB_A-AA                     hexagonal   P     P6  # 168    6  sym. op.
-C3_BENZ_CHO_CH3-C2_HDZ_NH2-HCB_A-AA                           hexagonal   P     P6  # 168    6  sym. op.
-C3_BENZ_CHO_F-C2_BENZ_NH2_CH3_H-HCB_A-AA                      hexagonal   P     P6  # 168    6  sym. op.
-C3_BENZ_CHO_F-C2_BENZ_NH2_F_H-HCB_A-AA                        hexagonal   P    P6/m # 175    12 sym. op.
-C3_BENZ_CHO_F-C2_BENZ_NH2_H_H-HCB_A-AA                        hexagonal   P    P6/m # 175    12 sym. op.
-C3_BENZ_CHO_F-C2_BENZ_NH2_OH_H-HCB_A-AA                       hexagonal   P    P6/m # 175    12 sym. op.
-C3_BENZ_CHO_F-C2_HDZ_NH2-HCB_A-AA                             hexagonal   P    P6/m # 175    12 sym. op.
-C3_BENZ_CHO_H-C2_BENZ_NH2_CH3_H-HCB_A-AA                      hexagonal   P     P6  # 168    6  sym. op.
-C3_BENZ_CHO_H-C2_BENZ_NH2_F_H-HCB_A-AA                        hexagonal   P    P6/m # 175    12 sym. op.
-C3_BENZ_CHO_H-C2_BENZ_NH2_H_H-HCB_A-AA                        hexagonal   P    P6/m # 175    12 sym. op.
-C3_BENZ_CHO_H-C2_BENZ_NH2_OH_H-HCB_A-AA                       hexagonal   P    P6/m # 175    12 sym. op.
-C3_BENZ_CHO_H-C2_HDZ_NH2-HCB_A-AA                             hexagonal   P    P6/m # 175    12 sym. op.
-C3_BENZ_CHO_OH-C2_BENZ_NH2_CH3_H-HCB_A-AA                     hexagonal   P     P6  # 168    6  sym. op.
-C3_BENZ_CHO_OH-C2_BENZ_NH2_F_H-HCB_A-AA                       hexagonal   P    P6/m # 175    12 sym. op.
-C3_BENZ_CHO_OH-C2_BENZ_NH2_H_H-HCB_A-AA                       hexagonal   P    P6/m # 175    12 sym. op.
-C3_BENZ_CHO_OH-C2_BENZ_NH2_OH_H-HCB_A-AA                      hexagonal   P    P6/m # 175    12 sym. op.
-C3_BENZ_CHO_OH-C2_HDZ_NH2-HCB_A-AA                            hexagonal   P    P6/m # 175    12 sym. op.
-20 sucessful. 0 failled (100.0 % success rate)
-Enlapsed time: 1.476 s
-```
-
-All the structures created will be saved as `.cif` file on the `out`folder.  
-Finally, it is possible to clean all the building blocks created
-
-```python
->>> COF.clean_bb_list()
-Deleted data\bb_lib\C2_BENZ_NH2_CH3_H.xyz
-Deleted data\bb_lib\C2_BENZ_NH2_F_H.xyz
-Deleted data\bb_lib\C2_BENZ_NH2_H_H.xyz
-Deleted data\bb_lib\C2_BENZ_NH2_OH_H.xyz
-Deleted data\bb_lib\C2_HDZ_NH2.xyz
-Deleted data\bb_lib\C3_BENZ_CHO_CH3.xyz
-Deleted data\bb_lib\C3_BENZ_CHO_F.xyz
-Deleted data\bb_lib\C3_BENZ_CHO_H.xyz
-Deleted data\bb_lib\C3_BENZ_CHO_OH.xyz
-```
-
-For more examples see _examples/_ and the [docs](https://github.com/lipelopesoliveira/pyCOFBuilder/examples.html)
-for the complete explanation of implementation and functionalities.
 
 ## COFs and Building Blocks nomenclature
 
@@ -157,24 +102,25 @@ Note that every "card" for the building block name is separated by an underline 
 
 ## Current available Building Blocks
 
-![Bipodal](https://github.com/lipelopesoliveira/pyCOFBuilder/blob/master/docs/BB_C2.png)
-![Tripodal](https://github.com/lipelopesoliveira/pyCOFBuilder/blob/master/docs/BB_C3.png)
-![Tetrapodal_2D](https://github.com/lipelopesoliveira/pyCOFBuilder/blob/master/docs/BB_C4.png)
+![Ditopic](https://github.com/lipelopesoliveira/pyCOFBuilder/blob/master/docs/L2_1.png)
+![Ditopic](https://github.com/lipelopesoliveira/pyCOFBuilder/blob/master/docs/L2_2.png)
+![Tritopic](https://github.com/lipelopesoliveira/pyCOFBuilder/blob/master/docs/T3.png)
+![Tetratopic](https://github.com/lipelopesoliveira/pyCOFBuilder/blob/master/docs/S4.png)
+![Hexatopic](https://github.com/lipelopesoliveira/pyCOFBuilder/blob/master/docs/H6.png)
 
 ## Current available Connector Groups
 
-- NH2
-- CHO
+![Connection groups](https://github.com/lipelopesoliveira/pyCOFBuilder/blob/master/docs/Q_GROUPS.png)
 
 ## Current available R Groups
 
-![R_groups](https://github.com/lipelopesoliveira/pyCOFBuilder/blob/master/docs/R_GROUPS.png)
+![Functional Groups](https://github.com/lipelopesoliveira/pyCOFBuilder/blob/master/docs/R_GROUPS.png)
 
 ## Citation
 
 If you find **pyCOFBuilder** useful in your research please consider citing the following papers:
 
 > F. L. Oliveira and P. M. Esteves,
-> _pyCOFBuilder: A Python Module for Automated Assembly of Covalent Organic Frameworks_
+> _pyCOFBuilder: A python package for automated assembly of Covalent Organic Framework structures_
 >
-> _Manuscript in preparation._ [DOI](https://doi.org/)
+> _arxiv.org/abs/2210.09456._ [DOI](https://arxiv.org/abs/XXXX)
