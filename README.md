@@ -121,6 +121,6 @@ Note that every "card" for the building block name is separated by an underline 
 If you find **pyCOFBuilder** useful in your research please consider citing the following papers:
 
 > F. L. Oliveira and P. M. Esteves,
-> _pyCOFBuilder: A Python Module for Automated Assembly of Covalent Organic Frameworks_
+> _pyCOFBuilder: A python package for automated assembly of Covalent Organic Framework structures_
 >
-> _Manuscript in preparation._ [DOI](https://doi.org/)
+> _arxiv.org/abs/2210.09456._ [DOI](https://arxiv.org/abs/XXXX)
