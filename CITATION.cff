@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Lopes Oliveira"
+  given-names: "Felipe"
+  orcid: "https://orcid.org/0000-0002-2231-4567"
+- family-names: "Mothé Esteves"
+  given-names: "Pierre"
+  orcid: "https://orcid.org/0000-0001-6048-4690"
+title: "pyCOFBuilder: A python package for automated assembly of Covalent Organic Framework structures"
+version: 0.0.4
+doi: 10.48550/arXiv.2310.14822
+date-released: 2023-10-23
+url: "https://arxiv.org/abs/2310.14822"
+preferred-citation:
+  type: article
+  authors:
+  - family-names: "Lopes Oliveira"
+    given-names: "Felipe"
+    orcid: "https://orcid.org/0000-0002-2231-4567"
+  - family-names: "Mothé Esteves"
+    given-names: "Pierre"
+    orcid: "https://orcid.org/0000-0001-6048-4690"
+  doi: "10.48550/arXiv.2310.14822"
+  journal: "arXiv preprint arXiv:2310.14822"
+  title: "pyCOFBuilder: A python package for automated assembly of Covalent Organic Framework structures"
+  year: 2023

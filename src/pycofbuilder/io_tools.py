@@ -799,7 +799,7 @@ def save_json(path, file_name, cell, atom_types, atom_pos, atom_labels, frac_coo
         cell_par = np.array(cell).astype(float).tolist()
         cell_matrix = cellpar_to_cell(cell_par).tolist()
 
-    cof_json['system']['geo_opt'] = True
+    cof_json['system']['geo_opt'] = False
 
     cof_json['geometry']['cell_matrix'] = cell_matrix
     cof_json['geometry']['cell_parameters'] = cell_par
