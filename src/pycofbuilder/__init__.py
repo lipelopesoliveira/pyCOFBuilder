@@ -20,11 +20,13 @@ from pycofbuilder.framework import Framework
 import pycofbuilder.tools as Tools
 import pycofbuilder.io_tools as IO_Tools
 
-__all__ = ['BuildingBlock',
-           'Framework',
-           'Tools',
-           'IO_Tools'
-           ]
+__all__ = [
+    'BuildingBlock',
+    'Framework',
+    'Tools',
+    'IO_Tools',
+    'ChemJSON'
+    ]
 
 _ROOT = os.path.abspath(os.path.dirname(__file__))
 
