@@ -7,14 +7,14 @@ assignees: ''
 
 ---
 
-### Motivação 
+### Motivation
 
-### O que deve ser feito?
+### What should be done?
 
-### Etapas para a realização desta tarefa:
+### Steps for the realization of the task:
 
-### O que será obtido ao final dessa tarefa?
+### What will be obtained?
 
-### Possui prazo limite de conclusão?
+### Is ther any deadline?
 
-### Mais alguma outra coisa?
+### Any other thing?
