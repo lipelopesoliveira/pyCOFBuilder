@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# Created by Felipe Lopes de Oliveira
+# Distributed under the terms of the MIT License.
 
 import os
 import sys

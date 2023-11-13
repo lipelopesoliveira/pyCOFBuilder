@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Dec 17 11:31:19 2020
+# Created by Felipe Lopes de Oliveira
+# Distributed under the terms of the MIT License.
 
-@author: Felipe Lopes de Oliveira
+"""
+The BuildingBlock class is used to create the building blocks for the Framework class.
 """
 
 import os

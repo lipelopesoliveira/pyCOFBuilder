@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Dec 17 11:31:19 2020
+# Created by Felipe Lopes de Oliveira
+# Distributed under the terms of the MIT License.
 
-@author: Felipe Lopes de Oliveira
+"""
+This module contains the tools used by pyCOFBuilder.
 """
 
 import os
