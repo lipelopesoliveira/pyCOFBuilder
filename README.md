@@ -47,16 +47,21 @@ Just remember to change the `{PATH_TO_PYCOFBUILDER}` to the directory where you 
 To create a specific COF, such as `T3_BENZ_NH2_OH-L2_BENZ_CHO_H-HCB_A-AA`:
 
 ```python
->>> import pycofbuilder as cof
+import pycofbuilder as pcb
 
->>> cof.Framework('T3_BENZ_CHO_OH-L2_BENZ_NH2_H-HCB_A-AA')
+cof = pcb.Framework('T3_BENZ_CHO_OH-L2_BENZ_NH2_H-HCB_A-AA')
+cof.save(fmt='cif', supercell = [1, 1, 2], save_dir = '.')
+```
+
+You should see an output such as:
+
+```python
 T3_BENZ_NH2_OH-L2_BENZ_CHO_H_H-HCB_A-AA                       hexagonal   P    P6/m # 175    12 sym. op.
->>> cof.save(fmt='cif', supercell = [1, 1, 2], save_dir = '.')
 ```
 
 A `.cif` file (the default save format is CIF, but it can be easily changed by setting other value on the `fmt` option) will be created in the `out` folder. The code will print out some information about the structure created.
 
-Besides, the variable `structure` now is a `Reticulum` object. This object has some attributes that can be accessed:
+Besides, the variable `structure` now is a `Framework` object. This object has some attributes that can be accessed:
 
 ```python
 >>> cof.name
