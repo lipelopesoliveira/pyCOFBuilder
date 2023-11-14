@@ -8,23 +8,7 @@ This package is still under development and, but it is already possible to creat
 
 Learn more at [ToNano&Beyond](https://tonanoandbeyondblog.wordpress.com/)
 
-## Installation
-
-Currently the best way to use pyCOFBuilder is to manually import it using the `sys` module, as exemplified below:
-
-```python
-# importing module
-import sys
- 
-# appending a path
-sys.path.append('{PATH_TO_PYCOFBUILDER}/pyCOFBuilder/src')
-
-import pycofbuilder as pcb
-```
-
-Just remember to change the `{PATH_TO_PYCOFBUILDER}` to the directory where you download the pyCOFBuilder package.
-
-### Requirements
+## Requirements
 
 0. Python >= 3.10
 1. pymatgen >= 2022.0.0
@@ -41,6 +25,23 @@ installation by running
 ```Shell
 conda env create --file environment.yml
 ```
+
+## Installation
+
+Currently the best way to use pyCOFBuilder is to manually import it using the `sys` module, as exemplified below:
+
+```python
+# importing module
+import sys
+ 
+# appending a path
+sys.path.append('{PATH_TO_PYCOFBUILDER}/pyCOFBuilder/src')
+
+import pycofbuilder as pcb
+```
+
+Just remember to change the `{PATH_TO_PYCOFBUILDER}` to the directory where you download the pyCOFBuilder package.
+
 
 ## Basic Usage
 
