@@ -2,7 +2,7 @@ import os
 import simplejson
 import numpy as np
 
-from tools import elements_dict
+from pycofbuilder.tools import elements_dict
 
 import gemmi
 from ase.cell import Cell
@@ -349,7 +349,7 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
         if self.partial_charges is not None:
             structure_dict['partialCharges'] = self.partial_charges
 
-        structure_dict['properties']: self.properties
+        structure_dict['properties'] = self.properties
 
         return structure_dict
 
@@ -357,6 +357,6 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
         '''
         Writes a ChemJSON file to a given path and file_name.
         '''
-        self.file_name = os.path.join(path, file_name)
+        self.file_name = os.path.join(path, file_name.split('.')[0])
         with open(self.file_name, 'w') as file:
             simplejson.dump(self.as_dict(), file, indent=4)
