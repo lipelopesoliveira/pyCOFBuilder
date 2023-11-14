@@ -42,7 +42,6 @@ import pycofbuilder as pcb
 
 Just remember to change the `{PATH_TO_PYCOFBUILDER}` to the directory where you download the pyCOFBuilder package.
 
-
 ## Basic Usage
 
 To create a specific COF, such as `T3_BENZ_NH2_OH-L2_BENZ_CHO_H-HCB_A-AA`:
@@ -102,19 +101,19 @@ Note that every "card" for the building block name is separated by an underline 
 
 ## Current available Building Blocks
 
-![Ditopic](https://github.com/lipelopesoliveira/pyCOFBuilder/blob/master/docs/L2_1.png)
-![Ditopic](https://github.com/lipelopesoliveira/pyCOFBuilder/blob/master/docs/L2_2.png)
-![Tritopic](https://github.com/lipelopesoliveira/pyCOFBuilder/blob/master/docs/T3.png)
-![Tetratopic](https://github.com/lipelopesoliveira/pyCOFBuilder/blob/master/docs/S4.png)
-![Hexatopic](https://github.com/lipelopesoliveira/pyCOFBuilder/blob/master/docs/H6.png)
+![Ditopic](docs/L2_1.png)
+![Ditopic](docs/L2_2.png)
+![Tritopic](docs/T3.png)
+![Tetratopic](docs/S4.png)
+![Hexatopic](H6.png)
 
 ## Current available Connector Groups
 
-![Connection groups](https://github.com/lipelopesoliveira/pyCOFBuilder/blob/master/docs/Q_GROUPS.png)
+![Connection groups](docs/Q_GROUPS.png)
 
 ## Current available R Groups
 
-![Functional Groups](https://github.com/lipelopesoliveira/pyCOFBuilder/blob/master/docs/R_GROUPS.png)
+![Functional Groups](docs/R_GROUPS.png)
 
 ## Citation
 
