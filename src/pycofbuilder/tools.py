@@ -927,14 +927,14 @@ def cell_to_ibrav(cell):
                   'celldm(1)': a / 0.5291772105638411,
                   'celldm(2)': b / a,
                   'celldm(3)': c / a,
-                  'celldm(4)': np.cos(beta)}
-    elif cell_type == 'triclinic':
+                  'celldm(4)': np.cos(np.deg2rad(beta))}
+    else:
         celldm = {'ibrav': 14,
                   'celldm(1)': a / 0.5291772105638411,
                   'celldm(2)': b / a,
                   'celldm(3)': c / a,
-                  'celldm(4)': np.cos(alpha),
-                  'celldm(5)': np.cos(beta),
-                  'celldm(6)': np.cos(gamma)}
+                  'celldm(4)': np.cos(np.deg2rad(alpha)),
+                  'celldm(5)': np.cos(np.deg2rad(beta)),
+                  'celldm(6)': np.cos(np.deg2rad(gamma))}
 
     return celldm
