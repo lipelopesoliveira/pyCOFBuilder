@@ -462,30 +462,30 @@ class BuildingBlock():
     def get_available_core(self):
         '''Get the list of available cores'''
         L2_PATH = os.path.join(self.main_path, 'core', 'L2')
-        L2_list = [i.rstrip('.json') for i in os.listdir(L2_PATH) if '.json' in i]
+        L2_list = [i.rstrip('.cjson') for i in os.listdir(L2_PATH) if '.cjson' in i]
 
         T3_PATH = os.path.join(self.main_path, 'core', 'T3')
-        T3_list = [i.rstrip('.json') for i in os.listdir(T3_PATH) if '.json' in i]
+        T3_list = [i.rstrip('.cjson') for i in os.listdir(T3_PATH) if '.cjson' in i]
 
         S4_PATH = os.path.join(self.main_path, 'core', 'S4')
-        S4_list = [i.rstrip('.json') for i in os.listdir(S4_PATH) if '.json' in i]
+        S4_list = [i.rstrip('.cjson') for i in os.listdir(S4_PATH) if '.cjson' in i]
 
         H6_PATH = os.path.join(self.main_path, 'core', 'H6')
-        H6_list = [i.rstrip('.json') for i in os.listdir(H6_PATH) if '.json' in i]
+        H6_list = [i.rstrip('.cjson') for i in os.listdir(H6_PATH) if '.cjson' in i]
 
         return L2_list, T3_list, S4_list, H6_list
 
     def get_available_R(self):
         '''Get the list of available functional groups'''
         R_PATH = os.path.join(self.main_path, 'func_groups')
-        R_list = [i.rstrip('.json') for i in os.listdir(R_PATH) if '.json' in i]
+        R_list = [i.rstrip('.cjson') for i in os.listdir(R_PATH) if '.cjson' in i]
 
         return R_list
 
     def get_available_conector(self):
         '''Get the list of available conectores'''
         C_PATH = os.path.join(self.main_path, 'conector')
-        C_list = [i.rstrip('.json') for i in os.listdir(C_PATH) if '.json' in i]
+        C_list = [i.rstrip('.cjson') for i in os.listdir(C_PATH) if '.cjson' in i]
 
         return C_list
 

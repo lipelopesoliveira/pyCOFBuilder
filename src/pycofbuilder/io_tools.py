@@ -720,10 +720,10 @@ def save_qe(path: str = None,
             f.write(f" {atom}   {elements_dict()[atom]:>9.5f}  {atom}.PSEUDO.UPF\n")
         f.write('\n')
 
-        f.write('CELL_PARAMETERS (angstrom) \n')
-        for v in cell_matrix:
-            f.write(f'{v[0]:>15.9f}      {v[1]:>15.9f}      {v[2]:>15.9f}\n')
-        f.write('\n')
+        # f.write('CELL_PARAMETERS (angstrom) \n')
+        # for v in cell_matrix:
+        #     f.write(f'{v[0]:>15.9f}      {v[1]:>15.9f}      {v[2]:>15.9f}\n')
+        # f.write('\n')
 
         if frac_coords:
             coords_type = 'crystal'
