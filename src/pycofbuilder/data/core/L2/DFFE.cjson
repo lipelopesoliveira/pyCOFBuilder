@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "1,5c-dihydrofluoreno[4,3-c]fluorene",
-    "formula": "Q2 R22 R12 C24 R42 R52 R62 R32",
+    "formula": "R12R42R62R32C24Q2R52R22",
     "atoms": {
         "elements": {
             "type": [

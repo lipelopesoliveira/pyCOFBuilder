@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "keto",
-    "formula": "O1 R1",
+    "formula": "O1R1",
     "atoms": {
         "elements": {
             "type": [

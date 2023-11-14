@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "4,4-dimethyl-3,4-dihydro-2H-pyrrol-1-ium-5-ide",
-    "formula": "H10 N1 C6 R1",
+    "formula": "R1C6N1H10",
     "atoms": {
         "elements": {
             "type": [

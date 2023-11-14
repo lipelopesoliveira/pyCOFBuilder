@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "Hexaphenylbenzene",
-    "formula": "Q6 R26 R16 C42 R46 R36",
+    "formula": "R16R46R36C42Q6R26",
     "atoms": {
         "elements": {
             "type": [

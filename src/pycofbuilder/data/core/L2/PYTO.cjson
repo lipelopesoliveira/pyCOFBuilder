@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "pyrene-1,3,6,8(2H,7H)-tetraone",
-    "formula": "Q2 R22 R12 C14 O4",
+    "formula": "O4R12C14Q2R22",
     "atoms": {
         "elements": {
             "type": [

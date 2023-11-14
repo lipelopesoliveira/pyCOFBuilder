@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "1,5-dihydropyrrolo[2,3-f]indole",
-    "formula": "N2 Q2 R22 H2 R12 C10",
+    "formula": "R12C10Q2R22N2H2",
     "atoms": {
         "elements": {
             "type": [

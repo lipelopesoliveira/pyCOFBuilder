@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "hexabenzo[bc,ef,hi,kl,no,qr]coronene",
-    "formula": "Q6 R26 R16 C42",
+    "formula": "R26C42R16Q6",
     "atoms": {
         "elements": {
             "type": [

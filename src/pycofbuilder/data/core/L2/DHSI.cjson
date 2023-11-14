@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "1,7-dihydro-s-indacene",
-    "formula": "Q2 R22 R12 C12 R32",
+    "formula": "R12R32C12Q2R22",
     "atoms": {
         "elements": {
             "type": [

@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "fluorine",
-    "formula": "F1 R1",
+    "formula": "R1F1",
     "atoms": {
         "elements": {
             "type": [

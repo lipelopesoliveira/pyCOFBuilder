@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "4b,4c,5,6-tetrahydropentaleno[1,2-a:4,5-a']diindene",
-    "formula": "Q2 R22 R12 C22 R42 R52 R32",
+    "formula": "R12R42R32C22Q2R52R22",
     "atoms": {
         "elements": {
             "type": [

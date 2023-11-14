@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "methyl",
-    "formula": "H3 R1 C1",
+    "formula": "C1R1H3",
     "atoms": {
         "elements": {
             "type": [

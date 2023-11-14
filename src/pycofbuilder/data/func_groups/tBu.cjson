@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "tert-butyl",
-    "formula": "H9 C4 R1",
+    "formula": "R1C4H9",
     "atoms": {
         "elements": {
             "type": [

@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "indeno[1,2-b]fluorene",
-    "formula": "Q2 R22 R12 C20 R42 R52 R32",
+    "formula": "R12R42R32C20Q2R52R22",
     "atoms": {
         "elements": {
             "type": [

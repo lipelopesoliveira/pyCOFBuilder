@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "benzo[1,2-d:4,5-d']bis(thiazole)",
-    "formula": "N2 Q2 S2 R12 C8",
+    "formula": "R12C8Q2S2N2",
     "atoms": {
         "elements": {
             "type": [

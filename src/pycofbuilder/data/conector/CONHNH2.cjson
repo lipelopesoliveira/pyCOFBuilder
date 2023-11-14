@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "acetohydrazide",
-    "formula": "N1 Q1 H1 C1 X1 O1",
+    "formula": "O1X1C1Q1N1H1",
     "atoms": {
         "elements": {
             "type": [

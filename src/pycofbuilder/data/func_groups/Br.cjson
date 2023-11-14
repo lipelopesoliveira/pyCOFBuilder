@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "bromine",
-    "formula": "Br1 R1",
+    "formula": "R1Br1",
     "atoms": {
         "elements": {
             "type": [

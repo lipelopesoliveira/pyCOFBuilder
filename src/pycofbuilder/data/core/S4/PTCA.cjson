@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "phthalocyanine",
-    "formula": "N8 Q4 R24 H2 R14 C32 R34",
+    "formula": "R14R34C32Q4R24N8H2",
     "atoms": {
         "elements": {
             "type": [

@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "naphthalene",
-    "formula": "Q2 R22 R12 C10 R32",
+    "formula": "R12R32C10Q2R22",
     "atoms": {
         "elements": {
             "type": [

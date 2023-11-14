@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "methoxy",
-    "formula": "H3 C1 O1 R1",
+    "formula": "O1R1C1H3",
     "atoms": {
         "elements": {
             "type": [

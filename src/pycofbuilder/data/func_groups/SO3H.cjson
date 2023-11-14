@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "sulfonic acid",
-    "formula": "H1 S1 O3 R1",
+    "formula": "O3R1S1H1",
     "atoms": {
         "elements": {
             "type": [

@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "10,15-dihydro-5H-diindolo[3,2-a:3',2'-c]carbazole",
-    "formula": "N3 Q3 R23 H6 R13 C24",
+    "formula": "R13C24Q3R23N3H6",
     "atoms": {
         "elements": {
             "type": [

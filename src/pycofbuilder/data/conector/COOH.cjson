@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "aldehyde",
-    "formula": "Q1 X1 O1 C1",
+    "formula": "O1C1X1Q1",
     "atoms": {
         "elements": {
             "type": [

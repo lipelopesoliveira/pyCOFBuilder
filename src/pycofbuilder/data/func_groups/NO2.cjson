@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "nitro",
-    "formula": "N1 O2 R1",
+    "formula": "O2R1N1",
     "atoms": {
         "elements": {
             "type": [

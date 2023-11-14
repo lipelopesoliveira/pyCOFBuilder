@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "indeno[2,1-b]indeno[1',2':4,5]thieno[2,3-d]thiophene",
-    "formula": "Q2 R22 S2 R12 C20 R42 R32",
+    "formula": "R12R42R32C20Q2R22S2",
     "atoms": {
         "elements": {
             "type": [

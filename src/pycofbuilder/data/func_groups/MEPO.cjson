@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "methyl epoxide",
-    "formula": "H5 O1 C3 R1",
+    "formula": "O1R1C3H5",
     "atoms": {
         "elements": {
             "type": [

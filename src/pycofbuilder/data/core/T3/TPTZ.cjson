@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "2,4,6-triphenyl-1,3,5-triazine",
-    "formula": "N3 Q3 R23 R13 C21 R43 R33",
+    "formula": "R13R43R33C21Q3R23N3",
     "atoms": {
         "elements": {
             "type": [

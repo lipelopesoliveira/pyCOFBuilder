@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "nitrile",
-    "formula": "N1 Q1 X1 C1",
+    "formula": "C1N1Q1X1",
     "atoms": {
         "elements": {
             "type": [

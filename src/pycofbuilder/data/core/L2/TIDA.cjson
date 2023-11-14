@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "(E)-4,4'-dimethyl-[6,6'-bithieno[3,2-b]pyrrolylidene]-5,5'(4H,4'H)-dione",
-    "formula": "N2 Q2 H6 S2 R12 C14 O2",
+    "formula": "O2R12C14Q2S2N2H6",
     "atoms": {
         "elements": {
             "type": [

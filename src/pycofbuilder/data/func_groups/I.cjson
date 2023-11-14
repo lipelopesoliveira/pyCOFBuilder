@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "iodine",
-    "formula": "I1 R1",
+    "formula": "R1I1",
     "atoms": {
         "elements": {
             "type": [

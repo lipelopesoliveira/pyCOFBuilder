@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "amine",
-    "formula": "H2 N1 R1",
+    "formula": "R1N1H2",
     "atoms": {
         "elements": {
             "type": [

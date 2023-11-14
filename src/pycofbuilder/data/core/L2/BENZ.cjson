@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "benzene",
-    "formula": "Q2 R22 R12 C6",
+    "formula": "R22C6R12Q2",
     "atoms": {
         "elements": {
             "type": [

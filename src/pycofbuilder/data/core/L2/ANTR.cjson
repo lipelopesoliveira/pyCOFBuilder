@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "anthracene",
-    "formula": "Q2 R22 R12 C14 R42 R32",
+    "formula": "R12R42R32C14Q2R22",
     "atoms": {
         "elements": {
             "type": [

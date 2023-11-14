@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "2,2'-bithiophene",
-    "formula": "Q2 R22 S2 R12 C8",
+    "formula": "R12C8Q2R22S2",
     "atoms": {
         "elements": {
             "type": [

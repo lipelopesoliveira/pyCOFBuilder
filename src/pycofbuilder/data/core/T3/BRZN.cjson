@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "borazine",
-    "formula": "N3 Q3 R13 B3",
+    "formula": "R13N3Q3B3",
     "atoms": {
         "elements": {
             "type": [

@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "ethoxy",
-    "formula": "H5 C2 O1 R1",
+    "formula": "O1R1C2H5",
     "atoms": {
         "elements": {
             "type": [

@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "thial",
-    "formula": "H1 S1 C1 R1",
+    "formula": "R1C1S1H1",
     "atoms": {
         "elements": {
             "type": [

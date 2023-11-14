@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "porphyrin",
-    "formula": "N4 Q4 R24 H2 R14 C20",
+    "formula": "R14C20Q4R24N4H2",
     "atoms": {
         "elements": {
             "type": [

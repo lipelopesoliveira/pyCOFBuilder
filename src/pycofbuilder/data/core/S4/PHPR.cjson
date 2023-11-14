@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "5,10,15,20-tetraphenylporphyrin",
-    "formula": "N4 Q4 R24 H2 R14 C44 R44 R54 R64 R34",
+    "formula": "R14R44R64R34C44Q4R54R24N4H2",
     "atoms": {
         "elements": {
             "type": [

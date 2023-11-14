@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "3a,9a-dihydro-s-indaceno[2,1-b:6,5-b']dithiophene",
-    "formula": "Q2 R22 S2 R12 C16 R32",
+    "formula": "R12R32C16Q2R22S2",
     "atoms": {
         "elements": {
             "type": [

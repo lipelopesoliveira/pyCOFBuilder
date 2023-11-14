@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "naphtho[1,2-b:5,6-b']dithiophene",
-    "formula": "Q2 R22 S2 R12 C14 R32",
+    "formula": "R12R32C14Q2R22S2",
     "atoms": {
         "elements": {
             "type": [

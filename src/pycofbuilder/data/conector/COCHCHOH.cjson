@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "betacetoenol",
-    "formula": "Q1 H3 C3 X1 O1",
+    "formula": "O1C3Q1X1H3",
     "atoms": {
         "elements": {
             "type": [

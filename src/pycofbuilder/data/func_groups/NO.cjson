@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "nitroso",
-    "formula": "N1 O1 R1",
+    "formula": "O1R1N1",
     "atoms": {
         "elements": {
             "type": [

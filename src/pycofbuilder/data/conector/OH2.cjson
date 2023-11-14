@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "dihydroxy",
-    "formula": "Q1 X1 O2",
+    "formula": "O2X1Q1",
     "atoms": {
         "elements": {
             "type": [

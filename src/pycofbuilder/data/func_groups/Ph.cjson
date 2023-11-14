@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "benzene",
-    "formula": "H5 C6 R1",
+    "formula": "R1C6H5",
     "atoms": {
         "elements": {
             "type": [

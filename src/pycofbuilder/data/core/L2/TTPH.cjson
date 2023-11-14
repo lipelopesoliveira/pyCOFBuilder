@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "thieno[3,2-b]thiophene",
-    "formula": "S2 Q2 R12 C6",
+    "formula": "C6S2R12Q2",
     "atoms": {
         "elements": {
             "type": [

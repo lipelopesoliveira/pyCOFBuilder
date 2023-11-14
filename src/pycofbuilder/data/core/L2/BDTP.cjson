@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "benzo[1,2-b:4,5-b']dithiophene",
-    "formula": "Q2 R22 S2 R12 C10",
+    "formula": "R12C10Q2R22S2",
     "atoms": {
         "elements": {
             "type": [

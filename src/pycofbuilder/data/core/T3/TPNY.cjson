@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "triphenylene",
-    "formula": "Q3 R23 H3 R13 C18",
+    "formula": "R13C18Q3R23H3",
     "atoms": {
         "elements": {
             "type": [

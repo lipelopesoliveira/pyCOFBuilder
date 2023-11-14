@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "ethyl epoxide",
-    "formula": "H7 O1 C4 R1",
+    "formula": "O1R1C4H7",
     "atoms": {
         "elements": {
             "type": [

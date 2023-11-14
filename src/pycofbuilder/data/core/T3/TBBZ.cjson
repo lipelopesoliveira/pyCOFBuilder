@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "5''-([1,1'-biphenyl]-4-yl)-1,1':4',1'':3'',1''':4''',1''''-quinquephenyl",
-    "formula": "R83 Q3 R23 R13 C42 R43 R53 R93 R73 R63 R33",
+    "formula": "R73R13R93R43R63R33C42Q3R53R23R83",
     "atoms": {
         "elements": {
             "type": [

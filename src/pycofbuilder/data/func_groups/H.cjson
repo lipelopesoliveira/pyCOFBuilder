@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "hydrogen",
-    "formula": "H1 R1",
+    "formula": "R1H1",
     "atoms": {
         "elements": {
             "type": [

@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "13,14-dihydro-1,2,3(3,6)-triphenanthrenacyclopropaphane",
-    "formula": "Q3 R23 R13 C42 R43 R53 R73 R63 R33",
+    "formula": "R73R13R43R63R33C42Q3R53R23",
     "atoms": {
         "elements": {
             "type": [

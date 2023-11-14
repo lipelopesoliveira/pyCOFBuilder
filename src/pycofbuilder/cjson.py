@@ -142,7 +142,7 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
         symbol_dict = elements_dict('atomic_number')
         self.atomic_numbers = [symbol_dict[i] for i in atomic_types]
 
-        self.formula = ' '.join([f'{atom}{self.atomic_types.count(atom)}' for atom in set(self.atomic_types)])
+        self.formula = ''.join([f'{atom}{self.atomic_types.count(atom)}' for atom in set(self.atomic_types)])
 
     def set_atomic_numbers(self, atomic_numbers):
         '''
@@ -158,7 +158,7 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
 
         self.atomic_labels = [f"{atom}{i+1}" for i, atom in enumerate(self.atomic_types)]
 
-        self.formula = ' '.join([f'{atom}{self.atomic_types.count(atom)}' for atom in set(self.atomic_types)])
+        self.formula = ''.join([f'{atom}{self.atomic_types.count(atom)}' for atom in set(self.atomic_types)])
 
     def from_cjson(self, path, file_name):
         '''

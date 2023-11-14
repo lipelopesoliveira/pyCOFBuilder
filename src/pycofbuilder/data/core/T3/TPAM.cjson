@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "triphenylamine",
-    "formula": "N1 Q3 R23 H6 R13 C18",
+    "formula": "R13C18Q3R23N1H6",
     "atoms": {
         "elements": {
             "type": [

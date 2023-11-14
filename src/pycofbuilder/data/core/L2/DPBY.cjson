@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "1,4-diphenylbuta-1,3-diyne",
-    "formula": "Q2 R22 R12 C16 R42 R32",
+    "formula": "R12R42R32C16Q2R22",
     "atoms": {
         "elements": {
             "type": [

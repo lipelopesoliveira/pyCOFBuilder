@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "oxigem",
-    "formula": "Q1 X1",
+    "formula": "X1Q1",
     "atoms": {
         "elements": {
             "type": [

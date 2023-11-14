@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "(E)-1,2-diphenylethene",
-    "formula": "Q2 R22 H2 R12 C14 R42 R32",
+    "formula": "R12R42R32C14Q2R22H2",
     "atoms": {
         "elements": {
             "type": [

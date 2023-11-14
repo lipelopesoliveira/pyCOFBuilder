@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "chlorine",
-    "formula": "Cl1 R1",
+    "formula": "R1Cl1",
     "atoms": {
         "elements": {
             "type": [

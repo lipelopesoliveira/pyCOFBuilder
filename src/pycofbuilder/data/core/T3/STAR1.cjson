@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "None",
-    "formula": "Q3 R23 R13 C48 R43 R53 R73 R63 R33",
+    "formula": "R73R13R43R63R33C48Q3R53R23",
     "atoms": {
         "elements": {
             "type": [

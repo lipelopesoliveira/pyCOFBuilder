@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "1,3,5-triphenoxybenzene",
-    "formula": "N3 Q3 R23 H6 R13 C21 O3",
+    "formula": "O3R13C21Q3R23N3H6",
     "atoms": {
         "elements": {
             "type": [
