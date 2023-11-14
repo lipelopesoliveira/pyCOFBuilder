@@ -2,16 +2,13 @@
 
 ![puCOFBuilder](docs/header.png)
 
-**pyCOFBuilder** is a simple and powerful python package to automatically assembly COF structures with specifics building blocks, topologies, and functionalizations. The project was developed to address the need for generation of COFs structures in a high-throughput style, based on a nomenclature tha allows direct sctructural feature interpretation from a simple name. The package uses [pymatgen](https://pymatgen.org/) to create the structures. 
+**pyCOFBuilder** is a simple and powerful python package to automatically assembly COF structures with specifics building blocks, topologies, and functionalizations following the reticular approach to build and represent COF structures. The project was developed to address the need for generation of COFs structures in a high-throughput style, based on a nomenclature tha allows direct sctructural feature interpretation from a simple name. The package uses [pymatgen](https://pymatgen.org/) to create the structures.
 
-This package is still under development and currently on beta version, but it is already possible to create a large number of COFs structures.
+This package is still under development and, but it is already possible to create a large number of COFs structures.
 
 Learn more at [ToNano&Beyond](https://tonanoandbeyondblog.wordpress.com/)
 
 ## Installation
-
-For detailed instructions see the [installation instructions](https://tonanoandbeyondblog.wordpress.com/).
-If the requirements are already satisfied `[WILL BE UPDATED!!!!]`
 
 Currently the best way to use pyCOFBuilder is to manually import it using the `sys` module, as exemplified below:
 
@@ -25,7 +22,7 @@ sys.path.append('{PATH_TO_PYCOFBUILDER}/pyCOFBuilder/src')
 import pycofbuilder as pcb
 ```
 
-Just remember to change the `{PATH_TO_PYCOFBUILDER}` to the directory where you download the pyCOFBuilder package. 
+Just remember to change the `{PATH_TO_PYCOFBUILDER}` to the directory where you download the pyCOFBuilder package.
 
 ### Requirements
 
@@ -34,6 +31,8 @@ Just remember to change the `{PATH_TO_PYCOFBUILDER}` to the directory where you 
 2. numpy >= 1.2
 3. scipy >= 1.6.3
 4. simplejson
+5. ase
+6. gemmi
 
 The Python dependencies are most easily satisfied using a conda
 ([anaconda](https://www.anaconda.com/distribution)/[miniconda](https://docs.conda.io/en/latest/miniconda.html))
