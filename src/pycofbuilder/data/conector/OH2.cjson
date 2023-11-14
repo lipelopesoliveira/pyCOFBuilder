@@ -1,0 +1,43 @@
+{
+    "chemical json": 1,
+    "name": "dihydroxy",
+    "formula": "Q1 X1 O2",
+    "atoms": {
+        "elements": {
+            "type": [
+                "Q",
+                "O",
+                "O",
+                "X"
+            ],
+            "number": [
+                0.0,
+                8,
+                8,
+                0.0
+            ]
+        },
+        "coords": {
+            "3d": [
+                0.0,
+                0.0,
+                0.0,
+                0.39015262,
+                -0.0015828,
+                0.0,
+                -0.69278986,
+                2.10924734,
+                0.0,
+                0.56297283,
+                1.42029309,
+                0.0
+            ]
+        }
+    },
+    "properties": {
+        "smiles": "[Q]O[B]O1",
+        "code": "OH2",
+        "xsmiles": "[*]O[B]O1",
+        "xsmiles_label": "|$Q;;B;$|"
+    }
+}

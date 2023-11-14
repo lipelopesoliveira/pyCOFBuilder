@@ -114,7 +114,7 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
         Sets the cartesian positions of the structure. The fractional
         positions will be calculated and also updated.
         '''
-        self.cartesian_positions = cartesian_positions
+        self.cartesian_positions = np.array(cartesian_positions).astype(float)
 
         if self.cell_parameters is not None:
             aseCell = Cell.fromcellpar(self.cell_parameters)
@@ -125,7 +125,7 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
         Sets the fractional positions of the structure. The cartesian
         positions will be calculated and also updated.
         '''
-        self.fractional_positions = fractional_positions
+        self.fractional_positions = np.array(fractional_positions).astype(float)
 
         if self.cell_parameters is not None:
             aseCell = Cell.fromcellpar(self.cell_parameters)
@@ -160,19 +160,14 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
 
         self.formula = ' '.join([f'{atom}{self.atomic_types.count(atom)}' for atom in set(self.atomic_types)])
 
-    def from_cjson_file(self, path, file_name):
+    def from_cjson(self, path, file_name):
         '''
         Reads a ChemJSON file from a given path and file_name.
         '''
-        self.file_name = os.path.join(path, file_name)
-        try:
-            with open(self.file_name, 'r') as file:
-                cjson_data = simplejson.load(file)
-        except FileNotFoundError:
-            print(f"Error: The file '{self.file_name}' was not found.")
+        self.file_name = os.path.join(path, file_name.split('.')[0] + '.cjson')
 
-        except simplejson.JSONDecodeError:
-            print(f"Error: Invalid JSON format in '{self.file_name}'.")
+        with open(self.file_name, 'r') as file:
+            cjson_data = simplejson.load(file)
 
         if "name" in cjson_data:
             self.name = cjson_data['name']
@@ -199,14 +194,12 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
                     )
 
             if "elements" in cjson_data['atoms']:
-                if 'number' in cjson_data['atoms']['elements']:
-                    self.set_atomic_numbers(
-                        cjson_data['atoms']['elements']['number']
-                    )
-                elif 'type' in cjson_data['atoms']['elements']:
-                    self.set_atomic_numbers(
-                        [elements_dict('symbol')[i] for i in cjson_data['atoms']['elements']['type']]
-                    )
+                if 'type' in cjson_data['atoms']['elements']:
+                    self.set_atomic_types(cjson_data['atoms']['elements']['type'])
+
+                elif 'number' in cjson_data['atoms']['elements']:
+                    self.set_atomic_numbers(cjson_data['atoms']['elements']['number'])
+
                 if 'label' in cjson_data['atoms']['elements']:
                     self.atomic_labels = cjson_data['atoms']['elements']['label']
                 else:
@@ -222,7 +215,7 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
         Reads a XYZ file from a given path and file_name.
         '''
 
-        self.file_name = os.path.join(path, file_name)
+        self.file_name = os.path.join(path, file_name.split('.')[0] + '.xyz')
         self.name = file_name.split('.')[0]
 
         with open(self.file_name, 'r') as file:
@@ -245,7 +238,7 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
         Reads a Gaussian input file from a given path and file_name.
         '''
 
-        self.file_name = os.path.join(path, file_name)
+        self.file_name = os.path.join(path, file_name.split('.')[0] + '.gjf')
         self.name = file_name.split('.')[0]
 
         with open(self.file_name, 'r') as file:
@@ -280,7 +273,7 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
         '''
 
         # Read the cif file and get the lattice parameters and atomic positions
-        cif_filename = os.path.join(path, file_name)
+        cif_filename = os.path.join(path, file_name.split('.')[0] + '.cif')
 
         cif = gemmi.cif.read_file(cif_filename).sole_block()
 
@@ -353,10 +346,10 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
 
         return structure_dict
 
-    def write_cjson_file(self, path, file_name):
+    def write_cjson(self, path, file_name):
         '''
         Writes a ChemJSON file to a given path and file_name.
         '''
-        self.file_name = os.path.join(path, file_name.split('.')[0])
+        self.file_name = os.path.join(path, file_name.split('.')[0] + '.cjson')
         with open(self.file_name, 'w') as file:
             simplejson.dump(self.as_dict(), file, indent=4)

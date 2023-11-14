@@ -1,0 +1,33 @@
+{
+    "chemical json": 1,
+    "name": "oxigem",
+    "formula": "Q1 X1",
+    "atoms": {
+        "elements": {
+            "type": [
+                "Q",
+                "X"
+            ],
+            "number": [
+                0.0,
+                0.0
+            ]
+        },
+        "coords": {
+            "3d": [
+                0.0,
+                0.0,
+                0.0,
+                0.081,
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "properties": {
+        "smiles": "[Q]O",
+        "code": "O",
+        "xsmiles": "[*]O",
+        "xsmiles_label": "|$Q;$|"
+    }
+}
