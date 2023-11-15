@@ -581,6 +581,9 @@ def closest_atom(label_1, pos_1, labels, pos):
             list_labels += [labels[i]]
             list_pos += [pos[i]]
 
+    if len(list_pos) == 0:
+        return None, np.array([0, 0, 0]), None
+
     closest_index = distance.cdist([pos_1], list_pos).argmin()
 
     closest_label = list_labels[closest_index]

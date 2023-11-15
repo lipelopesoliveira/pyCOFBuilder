@@ -247,15 +247,11 @@ class BuildingBlock():
             n_conector_label = conector_label.copy()
             n_conector_pos = conector_pos.copy()
 
-            if self.core == 'HDZN' or self.core == 'TRZN':
-                # Set the closest position to origin for building blocks as HDZN
-                close_Q_struct = [0, 0, 0]
-            else:
-                # Get the position of the closest atom to Q in the structure
-                close_Q_struct = closest_atom('Q',
-                                              location_Q_struct[1][i],
-                                              self.atom_types,
-                                              self.atom_pos)[1]
+            # Get the position of the closest atom to Q in the structure
+            close_Q_struct = closest_atom('Q',
+                                          location_Q_struct[1][i],
+                                          self.atom_types,
+                                          self.atom_pos)[1]
 
             # Get the position of Q in the conection group
             location_Q_connector = self._get_Q_points(n_conector_label, n_conector_pos)

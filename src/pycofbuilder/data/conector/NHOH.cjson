@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "hidroxylamine",
-    "formula": "O1X1Q1",
+    "formula": "X1O1Q1",
     "atoms": {
         "elements": {
             "type": [
@@ -20,10 +20,10 @@
                 0.0,
                 0.0,
                 0.0,
-                0.381,
+                0.881,
                 0.0,
                 0.0,
-                0.80826423,
+                1.30826423,
                 1.33288775,
                 0.0
             ]
