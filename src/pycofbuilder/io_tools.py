@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Dec 17 11:31:19 2020
+# Created by Felipe Lopes de Oliveira
+# Distributed under the terms of the MIT License.
 
-@author: Felipe Lopes de Oliveira
+"""
+This module contains tools for input and output file manipulation used by pyCOFBuilder.
 """
 
 import os
@@ -19,7 +20,8 @@ from pycofbuilder.tools import (elements_dict,
                                 get_cartesian_to_fractional_matrix,
                                 get_kgrid,
                                 formula_from_atom_list,
-                                smiles_to_xsmiles)
+                                smiles_to_xsmiles,
+                                cell_to_ibrav)
 
 
 def save_csv(path, file_name, data, delimiter=',', head=False):
@@ -639,6 +641,8 @@ def save_qe(path: str = None,
     else:
         cell_matrix = cell
 
+    ibrav_dict = cell_to_ibrav(cell_matrix)
+
     input_dict = {}
 
     input_dict['control'] = {
@@ -656,13 +660,13 @@ def save_qe(path: str = None,
         'nstep': 1000}
 
     input_dict['system'] = {
-        'ibrav': 0,
         'nat': len(atom_types),
         'ntyp': len(set(atom_types)),
         'ecutwfc': 40,
         'ecutrho': 360,
         'vdw_corr': "'grimme-d3'",
-        'occupations': "'smearing'"}
+        'occupations': "'smearing'",
+        **ibrav_dict}
 
     input_dict['electrons'] = {
         'conv_thr': 1.0e-9,
@@ -716,10 +720,10 @@ def save_qe(path: str = None,
             f.write(f" {atom}   {elements_dict()[atom]:>9.5f}  {atom}.PSEUDO.UPF\n")
         f.write('\n')
 
-        f.write('CELL_PARAMETERS (angstrom) \n')
-        for v in cell_matrix:
-            f.write(f'{v[0]:>15.9f}      {v[1]:>15.9f}      {v[2]:>15.9f}\n')
-        f.write('\n')
+        # f.write('CELL_PARAMETERS (angstrom) \n')
+        # for v in cell_matrix:
+        #     f.write(f'{v[0]:>15.9f}      {v[1]:>15.9f}      {v[2]:>15.9f}\n')
+        # f.write('\n')
 
         if frac_coords:
             coords_type = 'crystal'
@@ -729,7 +733,7 @@ def save_qe(path: str = None,
         f.write(f'ATOMIC_POSITIONS ({coords_type})\n')
 
         for i, atom in enumerate(atom_pos):
-            f.write('{:<5s}{:>15.9f}{:>15.9f}{:>15.9f}   " {:5}\n'.format(atom_types[i],
+            f.write('{:<5s}{:>15.9f}{:>15.9f}{:>15.9f}   ! {:5}\n'.format(atom_types[i],
                                                                           atom[0],
                                                                           atom[1],
                                                                           atom[2],

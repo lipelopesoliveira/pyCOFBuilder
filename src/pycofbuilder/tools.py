@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Dec 17 11:31:19 2020
+# Created by Felipe Lopes de Oliveira
+# Distributed under the terms of the MIT License.
 
-@author: Felipe Lopes de Oliveira
+"""
+This module contains the tools used by pyCOFBuilder.
 """
 
 import os
@@ -580,6 +581,9 @@ def closest_atom(label_1, pos_1, labels, pos):
             list_labels += [labels[i]]
             list_pos += [pos[i]]
 
+    if len(list_pos) == 0:
+        return None, np.array([0, 0, 0]), None
+
     closest_index = distance.cdist([pos_1], list_pos).argmin()
 
     closest_label = list_labels[closest_index]
@@ -891,3 +895,49 @@ def classify_unit_cell(cell, thr=1e-3) -> str:
         cell_type = "triclinic"
 
     return cell_type
+
+
+def cell_to_ibrav(cell):
+    '''
+    Return the ibrav number for a given cell.
+    '''
+
+    if len(cell) == 3:
+        a, b, c, alpha, beta, gamma = cell_to_cellpar(cell)
+    else:
+        a, b, c, alpha, beta, gamma = cell
+
+    cell_type = classify_unit_cell(cell)
+
+    if cell_type == 'cubic':
+        celldm = {'ibrav': 1,
+                  'celldm(1)': a / 0.5291772105638411}
+    elif cell_type == 'hexagonal':
+        celldm = {'ibrav': 4,
+                  'celldm(1)': a / 0.5291772105638411,
+                  'celldm(3)': c / a}
+    elif cell_type == 'tetragonal':
+        celldm = {'ibrav': 6,
+                  'celldm(1)': a / 0.5291772105638411,
+                  'celldm(3)': c / a}
+    elif cell_type == 'orthorhombic':
+        celldm = {'ibrav': 8,
+                  'celldm(1)': a / 0.5291772105638411,
+                  'celldm(2)': b / a,
+                  'celldm(3)': c / a}
+    elif cell_type == 'monoclinic':
+        celldm = {'ibrav': 12,
+                  'celldm(1)': a / 0.5291772105638411,
+                  'celldm(2)': b / a,
+                  'celldm(3)': c / a,
+                  'celldm(4)': np.cos(np.deg2rad(beta))}
+    else:
+        celldm = {'ibrav': 14,
+                  'celldm(1)': a / 0.5291772105638411,
+                  'celldm(2)': b / a,
+                  'celldm(3)': c / a,
+                  'celldm(4)': np.cos(np.deg2rad(alpha)),
+                  'celldm(5)': np.cos(np.deg2rad(beta)),
+                  'celldm(6)': np.cos(np.deg2rad(gamma))}
+
+    return celldm

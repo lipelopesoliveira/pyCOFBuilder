@@ -1,0 +1,33 @@
+{
+    "chemical json": 1,
+    "name": "bromine",
+    "formula": "R1Br1",
+    "atoms": {
+        "elements": {
+            "type": [
+                "Br",
+                "R"
+            ],
+            "number": [
+                35,
+                0.0
+            ]
+        },
+        "coords": {
+            "3d": [
+                0.91475,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "properties": {
+        "smiles": "[R]Br",
+        "code": "Br",
+        "xsmiles": "[*]Br",
+        "xsmiles_label": "|$R$|"
+    }
+}

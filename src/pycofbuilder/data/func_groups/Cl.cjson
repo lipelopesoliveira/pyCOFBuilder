@@ -1,0 +1,33 @@
+{
+    "chemical json": 1,
+    "name": "chlorine",
+    "formula": "R1Cl1",
+    "atoms": {
+        "elements": {
+            "type": [
+                "Cl",
+                "R"
+            ],
+            "number": [
+                17,
+                0.0
+            ]
+        },
+        "coords": {
+            "3d": [
+                0.73475,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "properties": {
+        "smiles": "[R]Cl",
+        "code": "Cl",
+        "xsmiles": "[*]Cl",
+        "xsmiles_label": "|$R;$|"
+    }
+}

@@ -1,0 +1,43 @@
+{
+    "chemical json": 1,
+    "name": "amine",
+    "formula": "R1N1H2",
+    "atoms": {
+        "elements": {
+            "type": [
+                "R",
+                "N",
+                "H",
+                "H"
+            ],
+            "number": [
+                0.0,
+                7,
+                1,
+                1
+            ]
+        },
+        "coords": {
+            "3d": [
+                0.0,
+                0.0,
+                0.0,
+                0.43,
+                0.0,
+                0.0,
+                0.93564026,
+                0.88708817,
+                0.0,
+                0.93564026,
+                -0.88708817,
+                0.0
+            ]
+        }
+    },
+    "properties": {
+        "smiles": "[R]N",
+        "code": "NH2",
+        "xsmiles": "[*]N",
+        "xsmiles_label": "|$R;$|"
+    }
+}

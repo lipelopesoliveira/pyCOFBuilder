@@ -1,0 +1,33 @@
+{
+    "chemical json": 1,
+    "name": "hydrazine",
+    "formula": "Q2",
+    "atoms": {
+        "elements": {
+            "type": [
+                "Q",
+                "Q"
+            ],
+            "number": [
+                0.0,
+                0.0
+            ]
+        },
+        "coords": {
+            "3d": [
+                -0.0,
+                0.05,
+                0.0,
+                0.0,
+                -0.05,
+                0.0
+            ]
+        }
+    },
+    "properties": {
+        "smiles": "[Q][Q]",
+        "code": "HDZN",
+        "xsmiles": "[*][*]",
+        "xsmiles_label": "|$Q;Q$|"
+    }
+}

@@ -15,6 +15,6 @@ assignees: ''
 
 ### What will be obtained?
 
-### Is ther any deadline?
+### Is there any deadline?
 
 ### Any other thing?

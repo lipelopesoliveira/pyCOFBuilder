@@ -1,0 +1,38 @@
+{
+    "chemical json": 1,
+    "name": "cyano",
+    "formula": "R1C1N1",
+    "atoms": {
+        "elements": {
+            "type": [
+                "R",
+                "C",
+                "N"
+            ],
+            "number": [
+                0.0,
+                6,
+                7
+            ]
+        },
+        "coords": {
+            "3d": [
+                0.0,
+                0.0,
+                0.0,
+                0.43389,
+                0.0,
+                0.0,
+                1.59042,
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "properties": {
+        "smiles": "[R]C#N",
+        "code": "CN",
+        "xsmiles": "[*]C#N",
+        "xsmiles_label": "|$R;;$|"
+    }
+}

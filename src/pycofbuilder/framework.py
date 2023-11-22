@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-topology
-# Copyright (c) Felipe Lopes de Oliveira
+# -*- coding: utf-8 -*-
+# Created by Felipe Lopes de Oliveira
 # Distributed under the terms of the MIT License.
 
 """
-This class implements definitions for a Framework buiding
+The Framework class implements definitions and methods for a Framework buiding
 """
 
 import os

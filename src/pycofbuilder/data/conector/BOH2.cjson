@@ -1,0 +1,33 @@
+{
+    "chemical json": 1,
+    "name": "boronic acid",
+    "formula": "X1Q1",
+    "atoms": {
+        "elements": {
+            "type": [
+                "Q",
+                "X"
+            ],
+            "number": [
+                0.0,
+                0.0
+            ]
+        },
+        "coords": {
+            "3d": [
+                0.0,
+                0.0,
+                0.0,
+                0.854,
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "properties": {
+        "smiles": "[Q]B(O)O",
+        "code": "BOH2",
+        "xsmiles": "[*]B(O)O",
+        "xsmiles_label": "|$Q;;$|"
+    }
+}

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Dec 17 11:31:19 2020
+# Created by Felipe Lopes de Oliveira
+# Distributed under the terms of the MIT License.
 
-@author: Felipe Lopes de Oliveira
+"""
+The BuildingBlock class is used to create the building blocks for the Framework class.
 """
 
 import os
@@ -12,9 +13,8 @@ from pycofbuilder.tools import (rotation_matrix_from_vectors,
                                 closest_atom,
                                 closest_atom_struc,
                                 find_index)
-from pycofbuilder.io_tools import (read_xyz_file,
-                                   read_json,
-                                   save_xyz)
+from pycofbuilder.io_tools import save_xyz
+from pycofbuilder.cjson import ChemJSON
 
 
 class BuildingBlock():
@@ -99,35 +99,6 @@ class BuildingBlock():
                                   *possible_funcGroups)
         if self.save_bb:
             self.save()
-
-    def from_structure(self, path, file_name):
-        '''
-        Read the building block structure from a xyz file
-        '''
-
-        # Try to read the xyz file
-        try:
-            self.name = file_name.split('.')[0]
-
-            self.atom_types, self.atom_pos = read_xyz_file(path, file_name)
-            self.connectivity = len([i for i in self.atom_types if 'X' in i])
-
-            self._align_to()
-            self._calculate_size()
-
-        except Exception:
-            print('Error reading the structure!')
-
-        # Try to decompose the building block nomenclature
-        try:
-            BB_name = self.name.split('_')
-            self.symmetry = BB_name[0]
-            self.core = BB_name[1]
-            self.conector = BB_name[2]
-            self.funcGroups = BB_name[3:]
-
-        except Exception:
-            print('Error on the definition of the BB nomenclature.')
 
     def n_atoms(self):
         ''' Returns the number of atoms in the unitary cell'''
@@ -259,13 +230,14 @@ class BuildingBlock():
     def _add_connection_group(self, conector_name):
         '''Adds the functional group by which the COF will be formed from the building blocks'''
 
-        conector_chem_json = read_json(os.path.join(self.main_path, 'conector'), conector_name)
+        connector = ChemJSON()
+        connector.from_cjson(os.path.join(self.main_path, 'conector'), conector_name)
 
-        conector_smiles = conector_chem_json['smiles'].replace('[Q]', '')
-        self.smiles = self.smiles.replace('[Q]', f'({conector_smiles})')
+        self.smiles = self.smiles.replace('[Q]',
+                                          f"{connector.properties['smiles'].replace('[Q]', '')}")
 
-        conector_label = conector_chem_json['atoms']['elements']['elementType']
-        conector_pos = conector_chem_json['atoms']['coords']['3d']
+        conector_label = connector.atomic_types
+        conector_pos = connector.cartesian_positions
 
         # Get the position of the Q points in the structure
         location_Q_struct = self._get_Q_points(self.atom_types, self.atom_pos)
@@ -275,15 +247,11 @@ class BuildingBlock():
             n_conector_label = conector_label.copy()
             n_conector_pos = conector_pos.copy()
 
-            if self.core == 'HDZN' or self.core == 'TRZN':
-                # Set the closest position to origin for building blocks as HDZN
-                close_Q_struct = [0, 0, 0]
-            else:
-                # Get the position of the closest atom to Q in the structure
-                close_Q_struct = closest_atom('Q',
-                                              location_Q_struct[1][i],
-                                              self.atom_types,
-                                              self.atom_pos)[1]
+            # Get the position of the closest atom to Q in the structure
+            close_Q_struct = closest_atom('Q',
+                                          location_Q_struct[1][i],
+                                          self.atom_types,
+                                          self.atom_pos)[1]
 
             # Get the position of Q in the conection group
             location_Q_connector = self._get_Q_points(n_conector_label, n_conector_pos)
@@ -337,14 +305,14 @@ class BuildingBlock():
     def _add_R_group(self, R_name, R_type):
         '''Adds group R in building blocks'''
 
-        # Read the R group
-        R_chem_json = read_json(os.path.join(self.main_path, 'func_groups'), R_name)
+        rgroup = ChemJSON()
+        rgroup.from_cjson(os.path.join(self.main_path, 'func_groups'), R_name)
 
-        r_smiles = R_chem_json['smiles'].replace('[R]', '')
-        self.smiles = self.smiles.replace(f'[{R_type}]', r_smiles)
+        self.smiles = self.smiles.replace(f'[{R_type}]',
+                                          f"{rgroup.properties['smiles'].replace('[Q]', '')}")
 
-        group_label = R_chem_json['atoms']['elements']['elementType']
-        group_pos = np.array(R_chem_json['atoms']['coords']['3d']).astype(float)
+        group_label = rgroup.atomic_types
+        group_pos = rgroup.cartesian_positions
 
         # Get the position of the R points in the structure
         location_R_struct = self._get_R_points(self.atom_types, self.atom_pos)[R_type]
@@ -432,14 +400,15 @@ class BuildingBlock():
 
         self.name = f'{symmetry}_{core_name}_{conector}'
 
-        chem_json = read_json(os.path.join(self.main_path, 'core', symmetry), core_name)
+        core = ChemJSON()
+        core.from_cjson(os.path.join(self.main_path, 'core', symmetry), core_name)
 
-        self.smiles = chem_json['smiles']
+        self.smiles = core.properties['smiles']
 
-        self.atom_types = chem_json['atoms']['elements']['elementType']
-        self.atom_pos = chem_json['atoms']['coords']['3d']
-        self.composition = chem_json['formula']
-        self.atom_labels = ['C']*len(chem_json['atoms']['elements']['elementType'])
+        self.atom_types = core.atomic_types
+        self.atom_pos = core.cartesian_positions
+        self.composition = core.formula
+        self.atom_labels = ['C']*len(self.atom_types)
 
         self._add_connection_group(conector)
 
@@ -489,30 +458,30 @@ class BuildingBlock():
     def get_available_core(self):
         '''Get the list of available cores'''
         L2_PATH = os.path.join(self.main_path, 'core', 'L2')
-        L2_list = [i.rstrip('.json') for i in os.listdir(L2_PATH) if '.json' in i]
+        L2_list = [i.rstrip('.cjson') for i in os.listdir(L2_PATH) if '.cjson' in i]
 
         T3_PATH = os.path.join(self.main_path, 'core', 'T3')
-        T3_list = [i.rstrip('.json') for i in os.listdir(T3_PATH) if '.json' in i]
+        T3_list = [i.rstrip('.cjson') for i in os.listdir(T3_PATH) if '.cjson' in i]
 
         S4_PATH = os.path.join(self.main_path, 'core', 'S4')
-        S4_list = [i.rstrip('.json') for i in os.listdir(S4_PATH) if '.json' in i]
+        S4_list = [i.rstrip('.cjson') for i in os.listdir(S4_PATH) if '.cjson' in i]
 
         H6_PATH = os.path.join(self.main_path, 'core', 'H6')
-        H6_list = [i.rstrip('.json') for i in os.listdir(H6_PATH) if '.json' in i]
+        H6_list = [i.rstrip('.cjson') for i in os.listdir(H6_PATH) if '.cjson' in i]
 
         return L2_list, T3_list, S4_list, H6_list
 
     def get_available_R(self):
         '''Get the list of available functional groups'''
         R_PATH = os.path.join(self.main_path, 'func_groups')
-        R_list = [i.rstrip('.json') for i in os.listdir(R_PATH) if '.json' in i]
+        R_list = [i.rstrip('.cjson') for i in os.listdir(R_PATH) if '.cjson' in i]
 
         return R_list
 
     def get_available_conector(self):
         '''Get the list of available conectores'''
         C_PATH = os.path.join(self.main_path, 'conector')
-        C_list = [i.rstrip('.json') for i in os.listdir(C_PATH) if '.json' in i]
+        C_list = [i.rstrip('.cjson') for i in os.listdir(C_PATH) if '.cjson' in i]
 
         return C_list
 

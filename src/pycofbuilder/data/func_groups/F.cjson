@@ -1,0 +1,33 @@
+{
+    "chemical json": 1,
+    "name": "fluorine",
+    "formula": "R1F1",
+    "atoms": {
+        "elements": {
+            "type": [
+                "F",
+                "R"
+            ],
+            "number": [
+                9,
+                0.0
+            ]
+        },
+        "coords": {
+            "3d": [
+                0.33475,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "properties": {
+        "smiles": "[R]F",
+        "code": "F",
+        "xsmiles": "[*]F",
+        "xsmiles_label": "|$R$|"
+    }
+}

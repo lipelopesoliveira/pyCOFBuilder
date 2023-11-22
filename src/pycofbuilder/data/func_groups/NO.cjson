@@ -1,0 +1,38 @@
+{
+    "chemical json": 1,
+    "name": "nitroso",
+    "formula": "O1R1N1",
+    "atoms": {
+        "elements": {
+            "type": [
+                "R",
+                "N",
+                "O"
+            ],
+            "number": [
+                0.0,
+                7,
+                8
+            ]
+        },
+        "coords": {
+            "3d": [
+                0.0,
+                0.0,
+                0.0,
+                0.45389,
+                0.0,
+                0.0,
+                1.02537385,
+                1.04253989,
+                0.0
+            ]
+        }
+    },
+    "properties": {
+        "smiles": "[R]N=O",
+        "code": "NO",
+        "xsmiles": "[*]N=O",
+        "xsmiles_label": "|$R;;$|"
+    }
+}
