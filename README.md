@@ -67,6 +67,18 @@ T3_BENZ_NH2_OH-L2_BENZ_CHO_H_H-HCB_A-AA                       hexagonal   P    P
 
 A `.cif` file (the default save format is CIF, but it can be easily changed by setting other value on the `fmt` option) will be created in the `out` folder. The code will print out some information about the structure created.
 
+Currently, it is possible to select the following formats:
+
+- `cif`
+- `xsf`
+- `pdb`
+- `cjson`
+- `vasp`
+- `turbomole`
+- `pqr`
+- `qe`
+- `xyz`
+  
 Besides, the variable `structure` now is a `Framework` object. This object has some attributes that can be accessed:
 
 ```python
