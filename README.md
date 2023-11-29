@@ -128,7 +128,7 @@ Note that every "card" for the building block name is separated by an underline 
 ![Ditopic](docs/L2_2.png)
 ![Tritopic](docs/T3.png)
 ![Tetratopic](docs/S4.png)
-![Hexatopic](H6.png)
+![Hexatopic](docs/H6.png)
 
 ## Current available Connector Groups
 
