@@ -47,6 +47,12 @@ Just remember to change the `{PATH_TO_PYCOFBUILDER}` to the directory where you 
 To create a specific COF, such as `T3_BENZ_NH2_OH-L2_BENZ_CHO_H-HCB_A-AA`:
 
 ```python
+# importing module
+import sys
+ 
+# appending a path
+sys.path.append('{PATH_TO_PYCOFBUILDER}/pyCOFBuilder/src')
+
 import pycofbuilder as pcb
 
 cof = pcb.Framework('T3_BENZ_CHO_OH-L2_BENZ_NH2_H-HCB_A-AA')
@@ -97,7 +103,7 @@ To name the building blocks I also developed a set of rules. The building block 
 
 where:
 
-- `Symmetry`: The general symmetry of the building block. Also represents the connectivity of the building block. For 2D building blocks can be `C2`, `C3` or `C4`, and for 3D building blocks can be `D4`.
+- `Symmetry`: The general symmetry of the building block. Also represents the connectivity of the building block. For 2D building blocks can be `L2`, `T3` or `S4`, and for 3D building blocks can be `D4`.
 - `Core`: The 4 letters code referring to the building block core.
 - `Connector`: The type of functional group that will be used to assembly the COF structure. Ex.: `NH2`, `CHO`, `CONHNH2`, etc.
 - `RadicalGroupRN`: The Nth radical group in the structure. The number of Radical groups will change according to the availability of the core.
