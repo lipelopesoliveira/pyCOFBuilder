@@ -382,7 +382,7 @@ def save_pdb(path: str = None,
 
 def save_gjf(path: str = None,
              file_name: str = None,
-             cell: np.ndarray = np.eye(3),
+             cell: list = None,
              atom_types: list = None,
              atom_pos: list = None,
              atom_labels: list = None,
@@ -408,7 +408,7 @@ def save_gjf(path: str = None,
         Parameters for Gaussian calculations.
     """
 
-    if cell.shape == 6:
+    if len(cell) == 6:
         cell = cellpar_to_cell(cell)
 
     if frac_coords:
@@ -418,7 +418,7 @@ def save_gjf(path: str = None,
 
     file_name = file_name.split('.')[0]
 
-    temp_file = open(os.path.join(path, file_name), 'w')
+    temp_file = open(os.path.join(path, file_name + '.gjf'), 'w')
     temp_file.write(f'%chk={file_name}.chk \n')
     temp_file.write(f'# {text}\n')
     temp_file.write('\n')
@@ -433,10 +433,9 @@ def save_gjf(path: str = None,
                                                                      atom_pos[i][2]))
     if cell is not None:
         for i in range(len(cell)):
-            temp_file.write('Tv {:>15.7f} {:>15.7f} {:>15.7f}'.format(*cell[i]))
+            temp_file.write('Tv   {:>15.7f}{:>15.7f}{:>15.7f}\n'.format(*cell[i]))
 
-    temp_file.write('\n')
-    temp_file.write('\n')
+    temp_file.write('\n\n')
     temp_file.close()
 
 

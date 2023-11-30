@@ -33,7 +33,8 @@ from pycofbuilder.io_tools import (save_json,
                                    save_xsf,
                                    save_pdb,
                                    save_pqr,
-                                   save_qe)
+                                   save_qe,
+                                   save_gjf)
 
 from pycofbuilder.building_block import BuildingBlock
 
@@ -302,7 +303,8 @@ class Framework():
             'xsf': save_xsf,
             'pdb': save_pdb,
             'pqr': save_pqr,
-            'qe': save_qe
+            'qe': save_qe,
+            'gjf': save_gjf
          }
 
         file_format_error = f'Format must be one of the following: {save_dict.keys()}'

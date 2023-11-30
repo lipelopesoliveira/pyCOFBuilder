@@ -77,6 +77,7 @@ Currently, it is possible to select the following formats:
 - `turbomole`
 - `pqr`
 - `qe`
+- `gjf`
 - `xyz`
   
 Besides, the variable `structure` now is a `Framework` object. This object has some attributes that can be accessed:
