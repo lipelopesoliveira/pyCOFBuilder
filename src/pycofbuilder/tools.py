@@ -629,7 +629,8 @@ def get_bond_atom(connector_1: str, connector_2: str) -> str:
         'OH2': 'B',
         'Cl': 'X',
         'Br': 'X',
-        'CHCN': 'C'
+        'CHCN': 'C',
+        'CH3': 'C'
     }
 
     bond_atom = None
