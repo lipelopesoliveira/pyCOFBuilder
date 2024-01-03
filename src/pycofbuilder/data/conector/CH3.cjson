@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "methyl",
-    "formula": "X1H1Q1",
+    "formula": "Q1H1X1",
     "atoms": {
         "elements": {
             "type": [
