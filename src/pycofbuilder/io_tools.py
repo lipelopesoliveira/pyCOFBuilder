@@ -1136,7 +1136,7 @@ def create_empty_CJSON() -> dict:
         "properties": {
             "molecularMass": 0,
             "totalCharge": 0,
-            "spinMultiplicity": 0,
+            "spinMultiplicity": 1,
             "totalEnergy": 0,
             "bandGap": 0,
         },
