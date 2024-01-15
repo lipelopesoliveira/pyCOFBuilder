@@ -1,6 +1,6 @@
 # pyCOFBuilder
 
-![puCOFBuilder](docs/header.png)
+![puCOFBuilder](docs/img/header.png)
 
 **pyCOFBuilder** is a simple and powerful python package to automatically assembly COF structures with specifics building blocks, topologies, and functionalizations following the reticular approach to build and represent COF structures. The project was developed to address the need for generation of COFs structures in a high-throughput style, based on a nomenclature tha allows direct sctructural feature interpretation from a simple name. The package uses [pymatgen](https://pymatgen.org/) to create the structures.
 
@@ -125,19 +125,19 @@ Note that every "card" for the building block name is separated by an underline 
 
 ## Current available Building Blocks
 
-![Ditopic](docs/L2_1.png)
-![Ditopic](docs/L2_2.png)
-![Tritopic](docs/T3.png)
-![Tetratopic](docs/S4.png)
-![Hexatopic](docs/H6.png)
+![Ditopic](docs/img/L2_1.png)
+![Ditopic](docs/img/L2_2.png)
+![Tritopic](docs/img/T3.png)
+![Tetratopic](docs/img/S4.png)
+![Hexatopic](docs/img/H6.png)
 
 ## Current available Connector Groups
 
-![Connection groups](docs/Q_GROUPS.png)
+![Connection groups](docs/img/Q_GROUPS.png)
 
 ## Current available R Groups
 
-![Functional Groups](docs/R_GROUPS.png)
+![Functional Groups](docs/img/R_GROUPS.png)
 
 ## Citation
 
