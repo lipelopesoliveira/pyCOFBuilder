@@ -18,7 +18,7 @@ The package also provides  a set of tools to manipulate the generated structures
 functional groups or changing  the stacking pattern (for 2D structures) and interpenetration degree (for 3D structures). 
 The package is designed to be easily integrated with other Python-based packages for further analysis and simulation of COFs.
 
-Here you will find tutorials and examples on how to use pyCOFBuilder to generate and manipulate COF 
+Here you will find tutorials and examples on how to install and use pyCOFBuilder to generate and manipulate COF 
 structures. These are aimed for new users and people with more experience on molecular modeling.
 
 First steps
