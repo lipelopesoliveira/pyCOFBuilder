@@ -48,7 +48,7 @@ jobs:
           git branch -m gh-pages
 
       - name: Deploy to GitHub Pages
-        uses: ad-m/github-push-action@v0.5.0
+        uses: ad-m/github-push-action@v0.8.0
         with:
           publish_branch: gh-pages
           github_token: ${{ secrets.GITHUB_TOKEN }}
