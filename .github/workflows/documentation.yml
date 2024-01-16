@@ -24,10 +24,10 @@ jobs:
     # Builds docs using sphinx
     - uses: ammaraskar/sphinx-action@master
       with:
-        docs-folder: "doc/"
+        docs-folder: "docs/"
         pre-build-command: pip3 install sphinx_markdown_builder
     # Create an artifact out of the generated HTML
     - uses: actions/upload-artifact@v3
       with:
         name: UserGuideHTML
-        path: "doc/_build/html/"
+        path: "docs/_build/html/"
