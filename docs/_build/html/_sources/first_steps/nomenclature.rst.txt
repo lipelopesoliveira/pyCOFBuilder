@@ -102,12 +102,14 @@ Functional groups
 Nets
 ----
 
-The nets are described a four letter code representing the underlying net. The nets are described as below
+The nets are described a three letter code representing the underlying net. The augmented nets are represented by the three letter code followed by a ``_A``. The nets are described as below
 
 .. image:: ../img/2D_nets.png
    :width: 700
    :align: center
    :alt: pyCOFBuilder 2D nets
+
+
 
 
 

@@ -19,9 +19,6 @@ the stacking pattern (for 2D structures) and interpenetration degree (for 3D str
 is designed to be easily integrated with other Python-based packages for further analysis and simulation 
 of COFs.
 
-pyCOFBuilder tutorials
-========================================
-
 Here you will find tutorials and examples on how to use pyCOFBuilder to generate and manipulate COF 
 structures. These are aimed for new users and people with more experience on molecular modeling.
 
@@ -31,15 +28,15 @@ First steps
 Some very basic information. If you are not familiar with Python, COFs or molecular simulations, 
 maybe it is best to start here, otherwise you can just skip and go to the next sections.
 
-* **How to install?** :doc:`first_steps/install`
+* :doc:`first_steps/install`
 
-* **Creating COF structures** :doc:`first_steps/simple_use`
+* :doc:`first_steps/simple_use`
 
-* **Understanding the pyCOFBuilder nomenclature** :doc:`first_steps/nomenclature`
+* :doc:`first_steps/nomenclature`
 
 * **Chosing the file format** :doc:`first_steps/file_formats`
 
-* **Help with visualizing?** :doc:`first_steps/visualization`
+* **Visualizing the structures** :doc:`first_steps/visualization`
 
 .. toctree::
    :caption: First steps
