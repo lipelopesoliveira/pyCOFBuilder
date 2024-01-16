@@ -45,10 +45,12 @@ jobs:
           git config --local user.name "GitHub Action"
           git config --global --add safe.directory /github/workspace/docs/_build/html
           git commit -m 'deploy'
+          git branch -m gh-pages
+
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: ad-m/github-push-action@v0.5.0
         with:
           publish_branch: gh-pages
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: /github/workspace/docs/_build
-          force_orphan: true
+          publish_dir: ./docs/_build
+          force: true
