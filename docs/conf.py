@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.abspath('../src'))
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'pycofbuilder'
+project = 'pyCOFBuilder'
 copyright = '2024, Felipe L. Oliveira'
 author = 'Felipe L. Oliveira'
 release = '0.0.6'

@@ -33,9 +33,9 @@ maybe it is best to start here, otherwise you can just skip and go to the next s
 
 * :doc:`first_steps/nomenclature`
 
-* **Chosing the file format** :doc:`first_steps/file_formats`
+* :doc:`first_steps/file_formats`
 
-* **Visualizing the structures** :doc:`first_steps/visualization`
+* :doc:`first_steps/visualization`
 
 .. toctree::
    :caption: First steps
@@ -47,6 +47,13 @@ maybe it is best to start here, otherwise you can just skip and go to the next s
    first_steps/nomenclature
    first_steps/file_formats
    first_steps/visualization
+
+.. toctree::
+   :caption: Tutorials
+   :hidden:
+   :maxdepth: 1
+
+   tutorials/bb_creation
 
 .. toctree::
    :maxdepth: 2
