@@ -49,30 +49,20 @@ class Framework():
 
     Attributes
     ----------
-    verbosity : bool
-        control the printing options
-    available_2D_topologies : list
-        List of available 2D topologies
-    available_3D_topologies : list
-        List of available 3D topologies
-    available_topologies : list
-        List of all available topologies
-    available_stacking : list
-        List of available stakings for all 2D topologies
-    lib_bb : str
-        String with the name of the folder containing the building block files
-        Default: bb_lib
-    main_path : str
-        String containing the data folder.
-        Defailt: os.path.join(_ROOT, 'data')
-    lib_path : str
-        Path for the building block files.
-        Default: os.path.join(self.main_path, bb_lib)
-    out_path : str
-        Path to save the results.
-        Default: os.path.join(os.getcwd(), 'out')
     name : str
         Name of the material
+    out_dir : str
+        Path to save the results.
+        If not defined, a `out` folder will be created in the current directory.
+    verbosity : str
+        Control the printing options. Can be 'None', 'Normal', 'High', or 'Debug'.
+        Default: 'Normal'
+    save_bb : bool
+        Control the saving of the building blocks.
+        Default: True
+    lib_path : str
+        Path for saving the building block files.
+        If not defined, a `building_blocks` folder will be created in the current directory.
     topology : str = None
     dimention : str = None
     lattice : str = None
@@ -90,30 +80,39 @@ class Framework():
     lattice : list = [[], [], []]
     symm_tol : float = 0.2
     angle_tol : float = 0.2
+    available_2D_topologies : list
+        List of available 2D topologies
+    available_3D_topologies : list
+        List of available 3D topologies
+    available_topologies : list
+        List of all available topologies
+    available_stacking : list
+        List of available stakings for all 2D topologies
+    lib_bb : str
+        String with the name of the folder containing the building block files
+        Default: bb_lib
 
     Methods
     -------
+    get_available_topologies()
+        Prints the available topologies.
+    check_name_concistency()
+        Checks if the name is in the correct format.
+        Returns a tuple with the building blocks names, the net and the stacking.
     from_name()
-        Creates a reticulum from a name
+        Creates a COF structure from a reticular name.
     from_building_blocks()
-        Creates a reticulum from two building blocks
+        Creates a COF structure from two building block objects.
+    save()
+        Saves the structure in a specif file format.
     """
 
-    def __init__(self, name=None, verbosity=False, out_dir=None, save_bb=False):
+    def __init__(self, name=None, out_dir=None, verbosity=False, save_bb=True):
 
-        _ROOTDIR = os.path.abspath(os.path.dirname(__file__))
-
-        self.verbosity = verbosity
-        self.main_path = os.path.join(_ROOTDIR, 'data')
-
-        if out_dir is None:
-            self.out_path = os.path.join(os.getcwd(), 'out')
-        else:
-            self.out_path = out_dir
-
-        self.save_bb = save_bb
-
-        self.lib_path = os.path.join(self.out_path, 'building_blocks')
+        self.verbosity: str = verbosity.lower()
+        self.out_path: str = os.path.join(os.getcwd(), 'out') if out_dir is None else out_dir
+        self.save_bb: bool = save_bb
+        self.lib_path: str = os.path.join(self.out_path, 'building_blocks')
 
         self.bb1_name = None
         self.bb2_name = None
@@ -193,7 +192,22 @@ class Framework():
                 print(i.upper())
 
     def check_name_concistency(self, FrameworkName) -> tuple[str, str, str, str]:
-        """Checks if the name is in the correct format."""
+        """
+        Checks if the name is in the correct format and returns a 
+        tuple with the building blocks names, the net and the stacking.
+
+        In case the name is not in the correct format, an error is raised.
+
+        Parameters
+        ----------
+        FrameworkName : str, required
+            The name of the COF to be created
+        
+        Returns
+        -------
+        tuple[str, str, str, str]
+            A tuple with the building blocks names, the net and the stacking.
+        """
 
         string_error = 'FrameworkName must be in the format: BB1_BB2_Net_Stacking'
         assert isinstance(FrameworkName, str), string_error
@@ -221,7 +235,7 @@ class Framework():
 
         Returns
         -------
-        COF
+        COF : Framework
             The COF object
         """
         bb1_name, bb2_name, Net, Stacking = self.check_name_concistency(FrameworkName)
@@ -247,7 +261,7 @@ class Framework():
 
         Returns
         -------
-        COF
+        COF : Framework
             The COF object
         """
         self.name = f'{bb1.name}-{bb2.name}-{Net}-{Stacking}'
@@ -284,13 +298,19 @@ class Framework():
 
         Parameters
         ----------
-        save_format : str, optional
+        fmt : str, optional
             The file format to be saved
             Can be `json`, `cif`, `xyz`, `turbomole`, `vasp`, `xsf`, `pdb`, `pqr`, `qe`.
             Default: 'cif'
         supercell : list, optional
             The supercell to be used to save the structure.
             Default: [1,1,1]
+        save_dir : str, optional
+            The path to save the structure. By default, the structure is saved in a 
+            `out` folder created in the current directory.
+        primitive : bool, optional
+            If True, the primitive cell is saved. Otherwise, the conventional cell is saved.
+            Default: False
         '''
 
         save_dict = {
@@ -3496,16 +3516,14 @@ class Framework():
         self.charge = bb_1.charge + bb_2.charge
         self.chirality = bb_1.chirality or bb_2.chirality
 
-        if self.verbosity is True:
-            print('Starting the creation of a KGM net')
-
+        print_command('Starting the creation of a KGM net', self.verbosity, ['high', 'debug'])
+  
         if bb_1.connectivity != 4:
-            print('Building block A must present connectivity 4 insted of',
-                  len(bb_1.connectivity))
+            print('Building block A must present connectivity 4 insted of', len(bb_1.connectivity))
             return None
+
         if bb_2.connectivity != 4:
-            print('Building block B must present connectivity 4 insted of',
-                  len(bb_2.connectivity))
+            print('Building block B must present connectivity 4 insted of', len(bb_2.connectivity))
             return None
 
         # Detect the bond atom from the connection groups type

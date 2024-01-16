@@ -1,0 +1,7 @@
+pycofbuilder
+============
+
+.. toctree::
+   :maxdepth: 4
+
+   pycofbuilder
