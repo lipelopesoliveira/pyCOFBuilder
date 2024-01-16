@@ -202,7 +202,7 @@ class Framework():
         ----------
         FrameworkName : str, required
             The name of the COF to be created
-        
+
         Returns
         -------
         tuple[str, str, str, str]
@@ -306,7 +306,7 @@ class Framework():
             The supercell to be used to save the structure.
             Default: [1,1,1]
         save_dir : str, optional
-            The path to save the structure. By default, the structure is saved in a 
+            The path to save the structure. By default, the structure is saved in a
             `out` folder created in the current directory.
         primitive : bool, optional
             If True, the primitive cell is saved. Otherwise, the conventional cell is saved.
@@ -3517,7 +3517,7 @@ class Framework():
         self.chirality = bb_1.chirality or bb_2.chirality
 
         print_command('Starting the creation of a KGM net', self.verbosity, ['high', 'debug'])
-  
+
         if bb_1.connectivity != 4:
             print('Building block A must present connectivity 4 insted of', len(bb_1.connectivity))
             return None
@@ -3525,7 +3525,6 @@ class Framework():
         if bb_2.connectivity != 4:
             print('Building block B must present connectivity 4 insted of', len(bb_2.connectivity))
             return None
-
         # Detect the bond atom from the connection groups type
         bond_atom = get_bond_atom(bb_1.conector, bb_2.conector)
 
