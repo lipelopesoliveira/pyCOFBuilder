@@ -12,12 +12,11 @@ Welcome to pyCOFBuilder's documentation!
 ========================================
 
 The Python-based Covalent Organic Framework builder (pyCOFBuilder) is an open-source tool to generate 
-and manipulate COF structures. The package provides a simple, lightweight, and fast method for creating 
-structures with different topologies, building blocks, connection chemistry. The package also provides 
-a set of tools to manipulate the generated structures,  such as adding functional groups or changing 
-the stacking pattern (for 2D structures) and interpenetration degree (for 3D structures). The package 
-is designed to be easily integrated with other Python-based packages for further analysis and simulation 
-of COFs.
+and manipulate COF structures based on the reticular approach. The package provides a simple, lightweight, 
+and fast method for creating structures with different topologies, building blocks, connection chemistry.
+The package also provides  a set of tools to manipulate the generated structures, such as adding 
+functional groups or changing  the stacking pattern (for 2D structures) and interpenetration degree (for 3D structures). 
+The package is designed to be easily integrated with other Python-based packages for further analysis and simulation of COFs.
 
 Here you will find tutorials and examples on how to use pyCOFBuilder to generate and manipulate COF 
 structures. These are aimed for new users and people with more experience on molecular modeling.
