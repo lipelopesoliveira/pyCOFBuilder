@@ -6,7 +6,7 @@ with open('LICENSE') as f:
     license = f.read()
 
 
-VERSION = '0.0.5'
+VERSION = '0.0.6'
 DESCRIPTION = 'A package for Covalent Organic Frameworks sturcture assembly.'
 
 setup(
@@ -22,9 +22,15 @@ setup(
     install_requires=['os',
                       'math',
                       'simplejason',
-                      'numpy>=1.2',
-                      'scipy>=1.6.3',
-                      'pymatgen>=2022.0.8'],
+                      'numpy>=1.6.3',
+                      'scipy>=1.2',
+                      'pymatgen>=2022.0.8',
+                      'jupyter',
+                      'jupyterlab',
+                      'pandas',
+                      'tqdm',
+                      'gemmi',
+                      'ase',],
     classifiers=[
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',

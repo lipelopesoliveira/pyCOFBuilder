@@ -1,3 +1,11 @@
+# -*- coding: utf-8 -*-
+# Created by Felipe Lopes de Oliveira
+# Distributed under the terms of the MIT License.
+
+"""
+The CJSON package implements functions to read, create and manipulate Chemical JSON objects.
+"""
+
 import os
 import simplejson
 import numpy as np
@@ -9,10 +17,39 @@ from ase.cell import Cell
 
 
 class ChemJSON:
+    '''
+    Class to read, create and manupulate ChemJSON files.
+
+    Attributes
+    ----------
+
+    file_name : str
+        The name of the file.
+    name : str
+        The name of the structure.
+    cell_parameters : list
+        The cell parameters of the structure as a (1,6) list.
+    cell_matrix : list
+        The cell matrix of the structure as a (3,3) list.
+    cartesian_positions : list
+        The cartesian positions of the structure as a (n,3) list.
+    fractional_positions : list
+        The fractional positions of the structure as a (n,3) list.
+    atomic_numbers : list
+        The atomic numbers of the structure as a (n,1) list.
+    atomic_types : list
+        The atomic types of the structure as a (n,1) list.
+    atomic_labels : list
+        The atomic labels of the structure as a (n,1) list.
+    formula : str
+        The formula of the structure.
+    properties : dict
+        The properties of the structure.
+    partial_charges : dict
+        A dictionary contaning the partial charges of the atoms on the structure.
+        Example: {'DDEC': [0.1, 0.2, 0.15], 'EQeq': [0.05, 0.15, 0.19]}
+    '''
     def __init__(self):
-        '''
-        Class to read and write ChemJSON files.
-        '''
         self.file_name = ''
         self.name = ''
 

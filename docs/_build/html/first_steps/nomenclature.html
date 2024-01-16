@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>COFs and Building Blocks nomenclature &mdash; pycofbuilder 0.0.6 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=1fd71caa"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="pyCOFBuilder package" href="../pycofbuilder.html" />
+    <link rel="prev" title="Generating COF structures" href="simple_use.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            pycofbuilder
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">First steps</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installing pyCOFBuilder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simple_use.html">Generating COF structures</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">COFs and Building Blocks nomenclature</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#cof-nomenclature">COF nomenclature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#building-blocks">Building blocks</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#symmetry">Symmetry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cores">Cores</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#connector-groups">Connector groups</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#functional-groups">Functional groups</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#nets">Nets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stacking-interpenetration">Stacking / Interpenetration</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Code contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../pycofbuilder.html">pyCOFBuilder package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pycofbuilder</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">COFs and Building Blocks nomenclature</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/first_steps/nomenclature.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="cofs-and-building-blocks-nomenclature">
+<h1>COFs and Building Blocks nomenclature<a class="headerlink" href="#cofs-and-building-blocks-nomenclature" title="Link to this heading"></a></h1>
+<section id="cof-nomenclature">
+<h2>COF nomenclature<a class="headerlink" href="#cof-nomenclature" title="Link to this heading"></a></h2>
+<p>In order to ensure greater reproducibility as well as quickly and easily access to relevant information from the COFs, I’ve developed a simple nomenclature to name this structures.
+Generally speaking, a COF can be described as building blocks connected by covalent bonds following a underlying net and presenting a specific stacking pattern/interpenetration degree.
+In this way, the COF name is represented as</p>
+<p><code class="docutils literal notranslate"><span class="pre">BuildingBlock1-BuildingBlock2-Net-Stacking</span></code></p>
+<p>pyCOFBuilder expects the COF name to be in this fixed format, with each of these characterists represented by “cards” separated by a dash (<code class="docutils literal notranslate"><span class="pre">-</span></code>). The “cards” are described as follows:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">BuildingBlock1</span></code>: The building block with the greater connectivity.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">BuildingBlock2</span></code>: The building block with the smaller connectivity.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Net</span></code>: The net describing the reticular structure.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Stacking</span></code>: The stacking (for 2D structures) or interpenetrating degree (for 3D structures)</p></li>
+</ul>
+</section>
+<section id="building-blocks">
+<h2>Building blocks<a class="headerlink" href="#building-blocks" title="Link to this heading"></a></h2>
+<p>To name the building blocks we also developed a set of rules. The building block can be described as</p>
+<p><code class="docutils literal notranslate"><span class="pre">Symmetry_Core_Connector_FunctionalGroupR1_FunctionalGroupR2_FunctionalGroupR3_...</span></code></p>
+<p>where:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Symmetry</span></code>: The general symmetry of the building block. Also represents the connectivity of the building block. For 2D building blocks can be <code class="docutils literal notranslate"><span class="pre">L2</span></code>, <code class="docutils literal notranslate"><span class="pre">T3</span></code> or <code class="docutils literal notranslate"><span class="pre">S4</span></code>, and <code class="docutils literal notranslate"><span class="pre">H6</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Core</span></code>: The 4 letters code referring to the building block core.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Connector</span></code>: The type of functional group that will be used to assembly the COF structure. Ex.: <code class="docutils literal notranslate"><span class="pre">NH2</span></code>, <code class="docutils literal notranslate"><span class="pre">CHO</span></code>, <code class="docutils literal notranslate"><span class="pre">CONHNH2</span></code>, etc.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">FunctionalGroupRN</span></code>: The Nth functional group in the structure. The number of Functional groups will change according to the availability of the core.</p></li>
+</ul>
+<p>Note that every “card” for the building block name is separated by an underline (<code class="docutils literal notranslate"><span class="pre">_</span></code>) and every “card” for the COF name is separated by a dash (<code class="docutils literal notranslate"><span class="pre">-</span></code>).
+This makes it easy to split the COF name into useful information.</p>
+<section id="symmetry">
+<h3>Symmetry<a class="headerlink" href="#symmetry" title="Link to this heading"></a></h3>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">Title</span><a class="headerlink" href="#id1" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Symbol</p></th>
+<th class="head"><p>Connectivity</p></th>
+<th class="head"><p>Geometric Figure</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>L</p></td>
+<td><p>2</p></td>
+<td><p>Line</p></td>
+</tr>
+<tr class="row-odd"><td><p>T</p></td>
+<td><p>3</p></td>
+<td><p>Triangle</p></td>
+</tr>
+<tr class="row-even"><td><p>S</p></td>
+<td><p>4</p></td>
+<td><p>Square</p></td>
+</tr>
+<tr class="row-odd"><td><p>R</p></td>
+<td><p>4</p></td>
+<td><p>Rectangle</p></td>
+</tr>
+<tr class="row-even"><td><p>T</p></td>
+<td><p>4</p></td>
+<td><p>Tetrahedron</p></td>
+</tr>
+<tr class="row-odd"><td><p>O</p></td>
+<td><p>6</p></td>
+<td><p>Octahedron</p></td>
+</tr>
+<tr class="row-even"><td><p>P</p></td>
+<td><p>6</p></td>
+<td><p>Trigonal prism</p></td>
+</tr>
+<tr class="row-odd"><td><p>H</p></td>
+<td><p>6</p></td>
+<td><p>Hexagon</p></td>
+</tr>
+<tr class="row-even"><td><p>C</p></td>
+<td><p>8</p></td>
+<td><p>Cube</p></td>
+</tr>
+<tr class="row-odd"><td><p>A</p></td>
+<td><p>8</p></td>
+<td><p>Square antiprism</p></td>
+</tr>
+<tr class="row-even"><td><p>E</p></td>
+<td><p>8</p></td>
+<td><p>Octagon</p></td>
+</tr>
+<tr class="row-odd"><td><p>B</p></td>
+<td><p>12</p></td>
+<td><p>Cuboctahedron</p></td>
+</tr>
+<tr class="row-even"><td><p>I</p></td>
+<td><p>12</p></td>
+<td><p>Icosahedron</p></td>
+</tr>
+<tr class="row-odd"><td><p>U</p></td>
+<td><p>12</p></td>
+<td><p>Truncated tetrahedron</p></td>
+</tr>
+<tr class="row-even"><td><p>X</p></td>
+<td><p>12</p></td>
+<td><p>Hexagon prism</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="cores">
+<h3>Cores<a class="headerlink" href="#cores" title="Link to this heading"></a></h3>
+</section>
+<section id="connector-groups">
+<h3>Connector groups<a class="headerlink" href="#connector-groups" title="Link to this heading"></a></h3>
+</section>
+<section id="functional-groups">
+<h3>Functional groups<a class="headerlink" href="#functional-groups" title="Link to this heading"></a></h3>
+</section>
+</section>
+<section id="nets">
+<h2>Nets<a class="headerlink" href="#nets" title="Link to this heading"></a></h2>
+<p>The nets are described a three letter code representing the underlying net. The augmented nets are represented by the three letter code followed by a <code class="docutils literal notranslate"><span class="pre">_A</span></code>. The nets are described as below</p>
+<a class="reference internal image-reference" href="../_images/2D_nets.png"><img alt="pyCOFBuilder 2D nets" class="align-center" src="../_images/2D_nets.png" style="width: 700px;" /></a>
+</section>
+<section id="stacking-interpenetration">
+<h2>Stacking / Interpenetration<a class="headerlink" href="#stacking-interpenetration" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="simple_use.html" class="btn btn-neutral float-left" title="Generating COF structures" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../pycofbuilder.html" class="btn btn-neutral float-right" title="pyCOFBuilder package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Felipe L. Oliveira.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
