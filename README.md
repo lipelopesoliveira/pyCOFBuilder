@@ -6,7 +6,7 @@
 
 This package is still under development and, but it is already possible to create a large number of COFs structures.
 
-Learn more at [ToNano&Beyond](https://tonanoandbeyondblog.wordpress.com/)
+Learn more at the [Documentation](https://lipelopesoliveira.github.io/pyCOFBuilder/docs/_build/index.html)
 
 ## Requirements
 
@@ -141,9 +141,9 @@ Note that every "card" for the building block name is separated by an underline 
 
 ## Citation
 
-If you find **pyCOFBuilder** useful in your research please consider citing the following papers:
+If you find **pyCOFBuilder** useful in your research please consider citing the following paper:
 
 > F. L. Oliveira and P. M. Esteves,
-> _pyCOFBuilder: A python package for automated assembly of Covalent Organic Framework structures_
+> _pyCOFBuilder: A python package for automated creation of Covalent Organic Framework models based on the reticular approach_
 >
-> _arxiv.org/abs/2210.09456._ [DOI](https://arxiv.org/abs/XXXX)
+> _arxiv.org/abs/2310.14822_ [DOI](https://doi.org/10.48550/arXiv.2310.14822)
