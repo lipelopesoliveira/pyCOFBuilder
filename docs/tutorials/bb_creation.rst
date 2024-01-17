@@ -1,20 +1,23 @@
 Creation of new building blocks
 ===============================
 
-All the files required to generate a building block (organic core, connection group, and functional group) can be created in the same way:
+All the files required to generate a new building block (organic core, connection group, and functional group) can be created in the same way following the steps below:
 
-- First you need to create the structure file using you preferred software (e.g. Avogadro, GaussView, etc.)
-- Then, you need to convert it to a ChemicalJSON format (`.csjon`). Although this can be done it directly with the Avogadro software, we recommend to use the `ChemJSON` module avalilable within pyCOFBuilder. This module allows conversion from several molecular formats (*e.g.* `.xyz`, `.gjf`, etc) to `.cjson` in manner that is fully compatible with the pyCOFBuilder library.
-- You can add some aditional properties such as the smile code, the 4-letter code, and the xsmiles label for the structure that is being created.  
-- Save the `.cjson` file in the proper folder on the `pyCOFbuilder/src/pycofbuilder/data` folder.
+1. First you need to create the structure file using you preferred software (e.g. Avogadro, GaussView, etc.)
+2. Then, you need to convert it to a ChemicalJSON format (`.csjon`). Although this can be done directly with the Avogadro software, we recommend to use the `ChemJSON` module avalilable within pyCOFBuilder. This module allows conversion from several molecular formats (*e.g.* `.xyz`, `.gjf`, etc) to `.cjson` in manner that is fully compatible with the pyCOFBuilder library.
+3. Save the `.cjson` file in the proper folder at the `pyCOFbuilder/src/pycofbuilder/data` folder or in any other folder of your choice.
+4. (Optional) You can add some aditional properties such as the smile code, a 4-letter reference code, and a xsmiles label for the structure that is being created.
+
 
 .. role:: raw-html(raw)
    :format: html
 
 .. important::
-   Don't forget to add the special points (Q, X, or :raw-html:`R<sub>y</sub>`.) in the structure of the molecule you want to add as in the image below!
-   
-   
+   Don't forget to add the special points (Q, X, or :raw-html:`R<sub>y</sub>`.) in the structure of the molecule you want to add to pyCOFBuilder, as in the image below!
+
+
+Creating a new building block file
+----------------------------------
 
 For organic cores by default the distance ``Q-C`` should be set to 0.5 angstroms and the distance ``Ry-C`` should be set to 1.0 angstrom.
 

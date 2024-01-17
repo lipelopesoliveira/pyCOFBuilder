@@ -91,20 +91,6 @@ class Framework():
     lib_bb : str
         String with the name of the folder containing the building block files
         Default: bb_lib
-
-    Methods
-    -------
-    get_available_topologies()
-        Prints the available topologies.
-    check_name_concistency()
-        Checks if the name is in the correct format.
-        Returns a tuple with the building blocks names, the net and the stacking.
-    from_name()
-        Creates a COF structure from a reticular name.
-    from_building_blocks()
-        Creates a COF structure from two building block objects.
-    save()
-        Saves the structure in a specif file format.
     """
 
     def __init__(self, name=None, out_dir=None, verbosity=False, save_bb=True):
@@ -179,17 +165,47 @@ class Framework():
         ''' Returns the number of atoms in the unitary cell'''
         return len(self.atom_types)
 
-    def get_available_topologies(self, dimensionality='all'):
+    def get_available_topologies(self, dimensionality: str = 'all', print_result: bool = True):
+        """
+        Get the available topologies implemented in the class.
+
+        Parameters
+        ----------
+
+        dimensionality : str, optional
+            The dimensionality of the topologies to be printed. Can be 'all', '2D' or '3D'.
+            Default: 'all'
+        print_result: bool, optional
+            If True, the available topologies are printed.
+
+        Returns
+        -------
+        dimensionality_list: list
+            A list with the available topologies.
+        """
+
+        dimensionality_error = f'Dimensionality must be one of the following: all, 2D, 3D, not {dimensionality}'
+        assert dimensionality in ['all', '2D', '3D'], dimensionality_error
+
+        dimensionality_list = []
 
         if dimensionality == 'all' or dimensionality == '2D':
-            print('Available 2D Topologies:')
+            if print_result: 
+                print('Available 2D Topologies:')
             for i in self.available_2D_top:
-                print(i.upper())
+                if print_result:
+                    print(i.upper())
+                dimensionality_list.append(i)
 
         if dimensionality == 'all' or dimensionality == '3D':
-            print('Available 3D Topologies:')
+            if print_result: 
+                print('Available 3D Topologies:')
             for i in self.available_3D_top:
-                print(i.upper())
+                if print_result:
+                    print(i.upper())
+                dimensionality_list.append(i)
+
+        return dimensionality_list
 
     def check_name_concistency(self, FrameworkName) -> tuple[str, str, str, str]:
         """
