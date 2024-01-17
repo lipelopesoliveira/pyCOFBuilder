@@ -1,5 +1,5 @@
-File formats supported by pyCOFBuilder
-======================================
+Output formats supported by pyCOFBuilder
+========================================
 
 Currently, it is possible to select the following formats:
 

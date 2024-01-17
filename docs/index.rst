@@ -37,6 +37,27 @@ maybe it is best to start here, otherwise you can just skip and go to the next s
 
 * :doc:`first_steps/visualization`
 
+
+Available building blocks
+-------------------------
+
+Here you will find a list of the building blocks that are currently available in pyCOFBuilder.
+
+* :doc:`building_blocks/L2`
+* :doc:`building_blocks/T3`
+* :doc:`building_blocks/S4`
+* :doc:`building_blocks/H6`
+* :doc:`building_blocks/Q`
+* :doc:`building_blocks/Func`
+
+Tutorials
+---------
+
+Here you will find a list of tutorials on how to use pyCOFBuilder to generate and manipulate COF structures.
+
+* :doc:`tutorials/bb_creation`
+
+
 .. toctree::
    :caption: First steps
    :hidden:
