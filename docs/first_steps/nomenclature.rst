@@ -37,6 +37,11 @@ This makes it easy to split the COF name into useful information.
 Symmetry
 ~~~~~~~~
 
+The symmetry of the building block is represented by a code composed of a letter and a number. The letter represents the geometric 
+figure of the building block and the number represents the connectivity of the building block. The table below shows the symbols,
+connectivity numbers, and geometric figures used to represent the building blocks. *Please note that not all elements of the table are
+currently implemented in pyCOFBuilder.*
+
 .. list-table:: Symbols, connectivity numbers, and geometric figures used to represent the building blocks.
    :widths: 25 25 50
    :header-rows: 1
@@ -107,7 +112,6 @@ Triangular tritopic cores (T3)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. raw:: html
-    <hr width=50 size=10>
     :file: ../img/mol2grid_T3.html
 
 ----

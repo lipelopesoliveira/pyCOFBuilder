@@ -40,13 +40,25 @@ maybe it is best to start here, otherwise you can just skip and go to the next s
 .. toctree::
    :caption: First steps
    :hidden:
-   :maxdepth: 1
+   :maxdepth: 2
 
    first_steps/install
    first_steps/simple_use
    first_steps/nomenclature
    first_steps/file_formats
    first_steps/visualization
+   
+.. toctree::
+   :caption: Available building blocks
+   :hidden:
+   :maxdepth: 1
+
+   building_blocks/L2
+   building_blocks/T3
+   building_blocks/S4
+   building_blocks/H6
+   building_blocks/Q
+   building_blocks/Func
 
 .. toctree::
    :caption: Tutorials

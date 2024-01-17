@@ -1,0 +1,7 @@
+Hexagonal hexatopic cores (H6)
+==============================
+
+.. raw:: html
+    :file: ../img/mol2grid_H6.html
+
+

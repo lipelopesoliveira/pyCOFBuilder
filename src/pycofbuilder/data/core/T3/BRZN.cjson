@@ -76,7 +76,7 @@
     },
     "properties": {
         "smiles": "[R1]B1N([Q])B([R1])N([Q])B([R1])N1[Q]",
-        "code": "TRZN",
+        "code": "BRZN",
         "xsmiles": "[*]B1N([*])B([*])N([*])B([*])N1[*]",
         "xsmiles_label": "|$R1;;;Q;;R1;;Q;;R1;;Q$|"
     }
