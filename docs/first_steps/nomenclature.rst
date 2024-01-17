@@ -37,7 +37,7 @@ This makes it easy to split the COF name into useful information.
 Symmetry
 ~~~~~~~~
 
-.. list-table:: Title
+.. list-table:: Symbols, connectivity numbers, and geometric figures used to represent the building blocks.
    :widths: 25 25 50
    :header-rows: 1
 
@@ -90,14 +90,59 @@ Symmetry
      - 12
      - Hexagon prism
 
-Cores
-~~~~~
+Organic Cores
+~~~~~~~~~~~~~
+
+Linear ditopic cores (L2)
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+.. raw:: html
+    :file: ../img/mol2grid_L2.html
+
+----
+
+
+Triangular tritopic cores (T3)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. raw:: html
+    <hr width=50 size=10>
+    :file: ../img/mol2grid_T3.html
+
+----
+
+Squared tetratopic cores (S4)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. raw:: html
+    :file: ../img/mol2grid_S4.html
+
+----
+
+Hexagonal hexatopic cores (H6)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. raw:: html
+    :file: ../img/mol2grid_H6.html
+
+----
 
 Connector groups
 ~~~~~~~~~~~~~~~~
 
+.. raw:: html
+    :file: ../img/mol2grid_Q.html
+
+----
+
 Functional groups
 ~~~~~~~~~~~~~~~~~
+
+.. raw:: html
+    :file: ../img/mol2grid_R.html
+
+----
 
 Nets
 ----
