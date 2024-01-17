@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>File formats supported by pyCOFBuilder &mdash; pyCOFBuilder 0.0.6 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/tabs.css?v=a5c4661c" />
 
   
   <!--[if lt IE 9]>
@@ -87,44 +88,19 @@
              
   <section id="file-formats-supported-by-pycofbuilder">
 <h1>File formats supported by pyCOFBuilder<a class="headerlink" href="#file-formats-supported-by-pycofbuilder" title="Link to this heading"></a></h1>
-<p>All the files required to generate a building block (organic core, connection group, and functional group) can be created in the same way:</p>
+<p>Currently, it is possible to select the following formats:</p>
 <ul class="simple">
-<li><p>First you need to create the structure file using you preferred software (e.g. Avogadro, GaussView, etc.)</p></li>
-<li><p>Then, you need to convert it to a ChemicalJSON format (<cite>.csjon</cite>). Although this can be done it directly with the Avogadro software, we recommend to use the <cite>ChemJSON</cite> module avalilable within pyCOFBuilder. This module allows conversion from several molecular formats (<em>e.g.</em> <cite>.xyz</cite>, <cite>.gjf</cite>, etc) to <cite>.cjson</cite> in manner that is fully compatible with the pyCOFBuilder library.</p></li>
-<li><p>You can add some aditional properties such as the smile code, the 4-letter code, and the xsmiles label for the structure that is being created.</p></li>
-<li><p>Save the <cite>.cjson</cite> file in the proper folder on the <cite>pyCOFbuilder/src/pycofbuilder/data</cite> folder.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cif</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xsf</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pdb</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cjson</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">vasp</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">turbomole</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pqr</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">qe</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gjf</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xyz</span></code></p></li>
 </ul>
-<div class="admonition important">
-<p class="admonition-title">Important</p>
-<p>Don’t forget to add the special points (Q, X, or R&lt;sub&gt;y&lt;/sub&gt;) in the structure of the molecule you want to add as in the image below!</p>
-</div>
-<p>For organic cores by default the distance <code class="docutils literal notranslate"><span class="pre">Q-C</span></code> should be set to 0.5 angstroms and the distance <code class="docutils literal notranslate"><span class="pre">Ry-C</span></code> should be set to 1.0 angstrom.</p>
-<p>For the connection groups and functional groups by default the distance from the connection points, <code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">R</span></code> respectivelly, should be set in a way to get the final espected distance between the connection points of the building block and the linkers.</p>
-<p>Below there is an example of how to create a new building block using the <code class="docutils literal notranslate"><span class="pre">ChemicalJSON</span></code> module.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pycofbuilder.cjson</span> <span class="kn">import</span> <span class="n">ChemJSON</span>
-
-<span class="c1"># Create an empty ChemJSON object</span>
-<span class="n">new_BB</span> <span class="o">=</span> <span class="n">ChemJSON</span><span class="p">()</span>
-
-<span class="c1"># Read the file conatining the molecular structure</span>
-<span class="n">new_BB</span><span class="o">.</span><span class="n">from_gjf</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="s1">&#39;L2_BENZ.gjf&#39;</span><span class="p">)</span>
-
-<span class="c1"># Define the name of the molecule. This is just a label and it is not used in the creation of the building block</span>
-<span class="n">new_BB</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;benzene&#39;</span>
-
-<span class="c1"># Define the properties of the building block. Although this informations are not required to create the building block, it is</span>
-<span class="c1"># recomended to add them in order to take full advantage of the pyCOFBuilder capabilities</span>
-<span class="n">new_BB</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;smiles&quot;</span><span class="p">:</span> <span class="s2">&quot;[Q]C1=C([R2])C([R1])=C([Q])C([R2])=C1[R1]&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;code&quot;</span><span class="p">:</span> <span class="s2">&quot;BENZ&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;xsmiles&quot;</span><span class="p">:</span> <span class="s2">&quot;[*]C1=C([*])C([*])=C([*])C([*])=C1[*]&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;xsmiles_label&quot;</span><span class="p">:</span> <span class="s2">&quot;|$Q;;;R2;;R1;;Q;;R2;;R1$|&quot;</span><span class="p">,</span>
-<span class="p">}</span>
-
-<span class="c1"># Save the ChemJSON object as a cjson file</span>
-<span class="n">new_BB</span><span class="o">.</span><span class="n">write_cjson_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="s1">&#39;BENZ.cjson&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
 </section>
 
 

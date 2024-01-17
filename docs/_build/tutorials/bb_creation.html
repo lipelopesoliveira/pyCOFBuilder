@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Creation of new building blocks &mdash; pyCOFBuilder 0.0.6 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/tabs.css?v=a5c4661c" />
 
   
   <!--[if lt IE 9]>
@@ -18,6 +19,7 @@
         <script src="../_static/documentation_options.js?v=1fd71caa"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/tabs.js?v=3030b3cb"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -54,7 +56,17 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Creation of new building blocks</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Creation of new building blocks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#creating-a-new-building-block-structure-file">Creating a new building block structure file</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#organic-cores">Organic cores</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#connection-groups">Connection groups</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#functional-groups">Functional groups</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#creating-a-new-building-block-file-compatible-with-pycofbuilder">Creating a new building block file compatible with pyCOFBuilder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-the-new-building-block-in-pycofbuilder">Using the new building block in pyCOFBuilder</a></li>
+</ul>
+</li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Code contents:</span></p>
 <ul>
@@ -87,44 +99,201 @@
              
   <section id="creation-of-new-building-blocks">
 <h1>Creation of new building blocks<a class="headerlink" href="#creation-of-new-building-blocks" title="Link to this heading"></a></h1>
-<p>All the files required to generate a building block (organic core, connection group, and functional group) can be created in the same way:</p>
-<ul class="simple">
+<p>All the files required to generate a new building block (organic core, connection group, and functional group) can be created in the same way following the steps below:</p>
+<ol class="arabic simple">
 <li><p>First you need to create the structure file using you preferred software (e.g. Avogadro, GaussView, etc.)</p></li>
-<li><p>Then, you need to convert it to a ChemicalJSON format (<cite>.csjon</cite>). Although this can be done it directly with the Avogadro software, we recommend to use the <cite>ChemJSON</cite> module avalilable within pyCOFBuilder. This module allows conversion from several molecular formats (<em>e.g.</em> <cite>.xyz</cite>, <cite>.gjf</cite>, etc) to <cite>.cjson</cite> in manner that is fully compatible with the pyCOFBuilder library.</p></li>
-<li><p>You can add some aditional properties such as the smile code, the 4-letter code, and the xsmiles label for the structure that is being created.</p></li>
-<li><p>Save the <cite>.cjson</cite> file in the proper folder on the <cite>pyCOFbuilder/src/pycofbuilder/data</cite> folder.</p></li>
-</ul>
+<li><p>Then, you need to convert it to a ChemicalJSON format (<cite>.csjon</cite>). Although this can be done directly with the Avogadro software, we recommend to use the <cite>ChemJSON</cite> module avalilable within pyCOFBuilder. This module allows conversion from several molecular formats (<em>e.g.</em> <cite>.xyz</cite>, <cite>.gjf</cite>, etc) to <cite>.cjson</cite> in manner that is fully compatible with the pyCOFBuilder library.</p></li>
+<li><p>Save the <cite>.cjson</cite> file in the proper folder at the <cite>pyCOFbuilder/src/pycofbuilder/data</cite> folder or in any other folder of your choice.</p></li>
+<li><p>(Optional) You can add some aditional properties such as the smile code, a 4-letter reference code, and a xsmiles label for the structure that is being created.</p></li>
+</ol>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
-<p>Don’t forget to add the special points (Q, X, or <span class="raw-html">R<sub>y</sub></span>.) in the structure of the molecule you want to add as in the image below!</p>
+<p>Don’t forget to add the special points (Q, X, or <span class="raw-html">R<sub>y</sub></span>.) in the structure of the molecule you want to add to pyCOFBuilder, as in the image below</p>
+<a class="reference internal image-reference" href="../_images/new_buiding_block.jpeg"><img alt="Special points in the structure of the molecule" class="align-center" src="../_images/new_buiding_block.jpeg" style="width: 800px;" /></a>
 </div>
-<p>For organic cores by default the distance <code class="docutils literal notranslate"><span class="pre">Q-C</span></code> should be set to 0.5 angstroms and the distance <code class="docutils literal notranslate"><span class="pre">Ry-C</span></code> should be set to 1.0 angstrom.</p>
-<p>For the connection groups and functional groups by default the distance from the connection points, <code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">R</span></code> respectivelly, should be set in a way to get the final espected distance between the connection points of the building block and the linkers.</p>
-<p>Below there is an example of how to create a new building block using the <code class="docutils literal notranslate"><span class="pre">ChemicalJSON</span></code> module.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pycofbuilder.cjson</span> <span class="kn">import</span> <span class="n">ChemJSON</span>
-
-<span class="c1"># Create an empty ChemJSON object</span>
-<span class="n">new_BB</span> <span class="o">=</span> <span class="n">ChemJSON</span><span class="p">()</span>
-
-<span class="c1"># Read the file conatining the molecular structure</span>
-<span class="n">new_BB</span><span class="o">.</span><span class="n">from_gjf</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="s1">&#39;L2_BENZ.gjf&#39;</span><span class="p">)</span>
-
-<span class="c1"># Define the name of the molecule. This is just a label and it is not used in the creation of the building block</span>
-<span class="n">new_BB</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;benzene&#39;</span>
-
-<span class="c1"># Define the properties of the building block. Although this informations are not required to create the building block, it is</span>
-<span class="c1"># recomended to add them in order to take full advantage of the pyCOFBuilder capabilities</span>
-<span class="n">new_BB</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;smiles&quot;</span><span class="p">:</span> <span class="s2">&quot;[Q]C1=C([R2])C([R1])=C([Q])C([R2])=C1[R1]&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;code&quot;</span><span class="p">:</span> <span class="s2">&quot;BENZ&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;xsmiles&quot;</span><span class="p">:</span> <span class="s2">&quot;[*]C1=C([*])C([*])=C([*])C([*])=C1[*]&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;xsmiles_label&quot;</span><span class="p">:</span> <span class="s2">&quot;|$Q;;;R2;;R1;;Q;;R2;;R1$|&quot;</span><span class="p">,</span>
-<span class="p">}</span>
-
-<span class="c1"># Save the ChemJSON object as a cjson file</span>
-<span class="n">new_BB</span><span class="o">.</span><span class="n">write_cjson_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="s1">&#39;BENZ.cjson&#39;</span><span class="p">)</span>
+<section id="creating-a-new-building-block-structure-file">
+<h2>Creating a new building block structure file<a class="headerlink" href="#creating-a-new-building-block-structure-file" title="Link to this heading"></a></h2>
+<section id="organic-cores">
+<h3>Organic cores<a class="headerlink" href="#organic-cores" title="Link to this heading"></a></h3>
+<p>For organic cores by default the distance <code class="docutils literal notranslate"><span class="pre">Q-C</span></code> should be set to 0.5 Å. The presence of the <code class="docutils literal notranslate"><span class="pre">Q</span></code> point is mandatory, once it will be used to attach the connection group to the organic core.</p>
+<p>You don’t actually need to add any point for functionalization if you don’t want to functionalize the organic core. However, in case you want to add functionalization points to the organic core you
+it is necessary to add pseudoatoms <code class="docutils literal notranslate"><span class="pre">Ry</span></code>, where <code class="docutils literal notranslate"><span class="pre">y</span></code> is a number between 1 and 9, to the structure of the organic core. The distance between the <code class="docutils literal notranslate"><span class="pre">Ry</span></code> and the carbon (or any other atom it is attached)
+atom should be set to 0.5 Å.</p>
+<a class="reference internal image-reference" href="../_images/new_organic_core.jpeg"><img alt="Special points in the structure of the molecule for a organic core" class="align-center" src="../_images/new_organic_core.jpeg" style="width: 800px;" /></a>
+</section>
+<hr class="docutils" />
+<section id="connection-groups">
+<h3>Connection groups<a class="headerlink" href="#connection-groups" title="Link to this heading"></a></h3>
+<p>For the connection groups the distance from the connection points, <code class="docutils literal notranslate"><span class="pre">Q</span></code> and <code class="docutils literal notranslate"><span class="pre">X</span></code> respectivelly, should be set in a way to get the final espected distance between the connection points of
+the building block and the linkers.</p>
+<p>For example, if you want to create a connection group with a distance of 1.5 Å between the connection points, you should set the distance between the <code class="docutils literal notranslate"><span class="pre">Q</span></code> and the carbon atom to 1.0 Å
+once the distance between the <code class="docutils literal notranslate"><span class="pre">C</span></code> and the <code class="docutils literal notranslate"><span class="pre">Q</span></code> points in the organic core is 0.5 Å. The same applies to the <code class="docutils literal notranslate"><span class="pre">X</span></code> point.</p>
+<a class="reference internal image-reference" href="../_images/new_connection_group.jpeg"><img alt="Special points in the structure of the molecule for a connection group" class="align-center" src="../_images/new_connection_group.jpeg" style="width: 800px;" /></a>
+</section>
+<hr class="docutils" />
+<section id="functional-groups">
+<h3>Functional groups<a class="headerlink" href="#functional-groups" title="Link to this heading"></a></h3>
+<p>For the functional groups the distance from the pseudoatom <code class="docutils literal notranslate"><span class="pre">R</span></code> and the atom connected directly to it should be set in a way to get the final espected distance between the atoms after the functionalization.
+For example, if you want to add a <code class="docutils literal notranslate"><span class="pre">Cl</span></code> atom as functional group, you should set the distance between the <code class="docutils literal notranslate"><span class="pre">R</span></code> and the <code class="docutils literal notranslate"><span class="pre">Cl</span></code> atom to 1.27 Å to obtain a final distance of 1.77 Å between the
+<code class="docutils literal notranslate"><span class="pre">C</span></code> atom of the organic core and the <code class="docutils literal notranslate"><span class="pre">Cl</span></code> atoms.</p>
+<a class="reference internal image-reference" href="../_images/new_functional_group.jpeg"><img alt="Special points in the structure of the molecule for a functional group" class="align-center" src="../_images/new_functional_group.jpeg" style="width: 800px;" /></a>
+</section>
+</section>
+<hr class="docutils" />
+<section id="creating-a-new-building-block-file-compatible-with-pycofbuilder">
+<h2>Creating a new building block file compatible with pyCOFBuilder<a class="headerlink" href="#creating-a-new-building-block-file-compatible-with-pycofbuilder" title="Link to this heading"></a></h2>
+<p>Once you created the file with the structure for the new building block, it is only necessary to convert it to a <code class="docutils literal notranslate"><span class="pre">.cjson</span></code> file. Below there is an example of how to create a new building block using the <code class="docutils literal notranslate"><span class="pre">ChemicalJSON</span></code> module.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">from</span> <span class="nn">pycofbuilder.cjson</span> <span class="kn">import</span> <span class="n">ChemJSON</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="c1"># Create an empty ChemJSON object</span>
+<span class="linenos"> 4</span><span class="n">new_BB</span> <span class="o">=</span> <span class="n">ChemJSON</span><span class="p">()</span>
+<span class="linenos"> 5</span>
+<span class="linenos"> 6</span><span class="c1"># Read the file conatining the molecular structure</span>
+<span class="linenos"> 7</span><span class="n">new_BB</span><span class="o">.</span><span class="n">from_gjf</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="s1">&#39;L2_BENZ.gjf&#39;</span><span class="p">)</span>
+<span class="linenos"> 8</span>
+<span class="linenos"> 9</span><span class="c1"># Define the name of the molecule. This is just a label and it is not used in the creation of the building block</span>
+<span class="linenos">10</span><span class="n">new_BB</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;benzene&#39;</span>
+<span class="linenos">11</span>
+<span class="linenos">12</span><span class="c1"># Define the properties of the building block. Although this informations are not required to create the building block, it is</span>
+<span class="linenos">13</span><span class="c1"># recomended to add them in order to take full advantage of the pyCOFBuilder capabilities</span>
+<span class="linenos">14</span><span class="n">new_BB</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="p">{</span>
+<span class="linenos">15</span>   <span class="s2">&quot;smiles&quot;</span><span class="p">:</span> <span class="s2">&quot;[Q]C1=C([R2])C([R1])=C([Q])C([R2])=C1[R1]&quot;</span><span class="p">,</span>
+<span class="linenos">16</span>   <span class="s2">&quot;code&quot;</span><span class="p">:</span> <span class="s2">&quot;BENZ&quot;</span><span class="p">,</span>
+<span class="linenos">17</span>   <span class="s2">&quot;xsmiles&quot;</span><span class="p">:</span> <span class="s2">&quot;[*]C1=C([*])C([*])=C([*])C([*])=C1[*]&quot;</span><span class="p">,</span>
+<span class="linenos">18</span>   <span class="s2">&quot;xsmiles_label&quot;</span><span class="p">:</span> <span class="s2">&quot;|$Q;;;R2;;R1;;Q;;R2;;R1$|&quot;</span><span class="p">,</span>
+<span class="linenos">19</span><span class="p">}</span>
+<span class="linenos">20</span>
+<span class="linenos">21</span><span class="c1"># Save the ChemJSON object as a cjson file</span>
+<span class="linenos">22</span><span class="n">new_BB</span><span class="o">.</span><span class="n">write_cjson_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="s1">&#39;BENZ.cjson&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>This will generate a file that can be used to pyCOFBuilder. Below there is an example of the generated file compared with the same structure in other formats.</p>
+<div class="sphinx-tabs docutils container">
+<div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-0-Q2hlbWljYWxKU09OICguY2pzb24p" aria-selected="true" class="sphinx-tabs-tab group-tab" id="tab-0-Q2hlbWljYWxKU09OICguY2pzb24p" name="Q2hlbWljYWxKU09OICguY2pzb24p" role="tab" tabindex="0">ChemicalJSON (.cjson)</button><button aria-controls="panel-0-WFlaICgueHl6KQ==" aria-selected="false" class="sphinx-tabs-tab group-tab" id="tab-0-WFlaICgueHl6KQ==" name="WFlaICgueHl6KQ==" role="tab" tabindex="-1">XYZ (.xyz)</button><button aria-controls="panel-0-R2F1c3NWaWV3ICguZ2pmKQ==" aria-selected="false" class="sphinx-tabs-tab group-tab" id="tab-0-R2F1c3NWaWV3ICguZ2pmKQ==" name="R2F1c3NWaWV3ICguZ2pmKQ==" role="tab" tabindex="-1">GaussView (.gjf)</button></div><div aria-labelledby="tab-0-Q2hlbWljYWxKU09OICguY2pzb24p" class="sphinx-tabs-panel group-tab" id="panel-0-Q2hlbWljYWxKU09OICguY2pzb24p" name="Q2hlbWljYWxKU09OICguY2pzb24p" role="tabpanel" tabindex="0"><div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="nt">&quot;chemical json&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;benzene&quot;</span><span class="p">,</span>
+<span class="nt">&quot;formula&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Q2 C6 R22 R12&quot;</span><span class="p">,</span>
+<span class="nt">&quot;atoms&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="nt">&quot;elements&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="s2">&quot;C&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;C&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;C&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;C&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;C&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;C&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;R1&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;R1&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;R2&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;R2&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;Q&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;Q&quot;</span>
+<span class="w">         </span><span class="p">],</span>
+<span class="w">         </span><span class="nt">&quot;number&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="mi">6</span><span class="p">,</span>
+<span class="w">            </span><span class="mi">6</span><span class="p">,</span>
+<span class="w">            </span><span class="mi">6</span><span class="p">,</span>
+<span class="w">            </span><span class="mi">6</span><span class="p">,</span>
+<span class="w">            </span><span class="mi">6</span><span class="p">,</span>
+<span class="w">            </span><span class="mi">6</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span>
+<span class="w">         </span><span class="p">]</span>
+<span class="w">   </span><span class="p">},</span>
+<span class="w">   </span><span class="nt">&quot;coords&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;3d&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="mf">1.21383527</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.70080812</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">1.40161624</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">-1.21383527</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.70080812</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">-1.21383527</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">-0.70080812</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">-1.40161624</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">1.21383527</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">-0.70080812</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">2.07986067</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">1.20080812</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">-2.07986067</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">-1.20080812</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">2.07986067</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">-1.20080812</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">-2.07986067</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">1.20080812</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">2.40161624</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">-2.40161624</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span>
+<span class="w">         </span><span class="p">]</span>
+<span class="w">   </span><span class="p">}</span>
+<span class="p">},</span>
+<span class="nt">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="nt">&quot;smiles&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;[Q]C1=C([R2])C([R1])=C([Q])C([R2])=C1[R1]&quot;</span><span class="p">,</span>
+<span class="w">   </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;BENZ&quot;</span><span class="p">,</span>
+<span class="w">   </span><span class="nt">&quot;xsmiles&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;[*]C1=C([*])C([*])=C([*])C([*])=C1[*]&quot;</span><span class="p">,</span>
+<span class="w">   </span><span class="nt">&quot;xsmiles_label&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;|$Q;;;R2;;R1;;Q;;R2;;R1$|&quot;</span>
+<span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div><div aria-labelledby="tab-0-WFlaICgueHl6KQ==" class="sphinx-tabs-panel group-tab" hidden="true" id="panel-0-WFlaICgueHl6KQ==" name="WFlaICgueHl6KQ==" role="tabpanel" tabindex="0"><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="m">12</span>
+L2_BENZ<span class="w"> </span>building<span class="w"> </span>block
+C<span class="w">                  </span><span class="m">1</span>.21383527<span class="w">    </span><span class="m">0</span>.70080812<span class="w">    </span><span class="m">0</span>.00000000
+C<span class="w">                  </span><span class="m">0</span>.00000000<span class="w">    </span><span class="m">1</span>.40161624<span class="w">    </span><span class="m">0</span>.00000000
+C<span class="w">                 </span>-1.21383527<span class="w">    </span><span class="m">0</span>.70080812<span class="w">    </span><span class="m">0</span>.00000000
+C<span class="w">                 </span>-1.21383527<span class="w">   </span>-0.70080812<span class="w">    </span><span class="m">0</span>.00000000
+C<span class="w">                  </span><span class="m">0</span>.00000000<span class="w">   </span>-1.40161624<span class="w">    </span><span class="m">0</span>.00000000
+C<span class="w">                  </span><span class="m">1</span>.21383527<span class="w">   </span>-0.70080812<span class="w">    </span><span class="m">0</span>.00000000
+R1<span class="w">                 </span><span class="m">2</span>.07986067<span class="w">    </span><span class="m">1</span>.20080812<span class="w">    </span><span class="m">0</span>.00000000
+R1<span class="w">                </span>-2.07986067<span class="w">   </span>-1.20080812<span class="w">    </span><span class="m">0</span>.00000000
+R2<span class="w">                 </span><span class="m">2</span>.07986067<span class="w">   </span>-1.20080812<span class="w">    </span><span class="m">0</span>.00000000
+R2<span class="w">                </span>-2.07986067<span class="w">    </span><span class="m">1</span>.20080812<span class="w">    </span><span class="m">0</span>.00000000
+Q<span class="w">                  </span><span class="m">0</span>.00000000<span class="w">    </span><span class="m">2</span>.40161624<span class="w">    </span><span class="m">0</span>.00000000
+Q<span class="w">                  </span><span class="m">0</span>.00000000<span class="w">   </span>-2.40161624<span class="w">    </span><span class="m">0</span>.00000000
+</pre></div>
+</div>
+</div><div aria-labelledby="tab-0-R2F1c3NWaWV3ICguZ2pmKQ==" class="sphinx-tabs-panel group-tab" hidden="true" id="panel-0-R2F1c3NWaWV3ICguZ2pmKQ==" name="R2F1c3NWaWV3ICguZ2pmKQ==" role="tabpanel" tabindex="0"><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># hf/3-21g</span>
+
+L2_BENZ<span class="w"> </span>building<span class="w"> </span>block
+
+<span class="m">0</span><span class="w"> </span><span class="m">1</span>
+C<span class="w">                  </span><span class="m">1</span>.21383527<span class="w">    </span><span class="m">0</span>.70080812<span class="w">    </span><span class="m">0</span>.00000000
+C<span class="w">                  </span><span class="m">0</span>.00000000<span class="w">    </span><span class="m">1</span>.40161624<span class="w">    </span><span class="m">0</span>.00000000
+C<span class="w">                 </span>-1.21383527<span class="w">    </span><span class="m">0</span>.70080812<span class="w">    </span><span class="m">0</span>.00000000
+C<span class="w">                 </span>-1.21383527<span class="w">   </span>-0.70080812<span class="w">    </span><span class="m">0</span>.00000000
+C<span class="w">                  </span><span class="m">0</span>.00000000<span class="w">   </span>-1.40161624<span class="w">    </span><span class="m">0</span>.00000000
+C<span class="w">                  </span><span class="m">1</span>.21383527<span class="w">   </span>-0.70080812<span class="w">    </span><span class="m">0</span>.00000000
+R1<span class="w">                 </span><span class="m">2</span>.07986067<span class="w">    </span><span class="m">1</span>.20080812<span class="w">    </span><span class="m">0</span>.00000000
+R1<span class="w">                </span>-2.07986067<span class="w">   </span>-1.20080812<span class="w">    </span><span class="m">0</span>.00000000
+R2<span class="w">                 </span><span class="m">2</span>.07986067<span class="w">   </span>-1.20080812<span class="w">    </span><span class="m">0</span>.00000000
+R2<span class="w">                </span>-2.07986067<span class="w">    </span><span class="m">1</span>.20080812<span class="w">    </span><span class="m">0</span>.00000000
+Q<span class="w">                  </span><span class="m">0</span>.00000000<span class="w">    </span><span class="m">2</span>.40161624<span class="w">    </span><span class="m">0</span>.00000000
+Q<span class="w">                  </span><span class="m">0</span>.00000000<span class="w">   </span>-2.40161624<span class="w">    </span><span class="m">0</span>.00000000
+</pre></div>
+</div>
+</div></div>
+</section>
+<section id="using-the-new-building-block-in-pycofbuilder">
+<h2>Using the new building block in pyCOFBuilder<a class="headerlink" href="#using-the-new-building-block-in-pycofbuilder" title="Link to this heading"></a></h2>
+</section>
 </section>
 
 

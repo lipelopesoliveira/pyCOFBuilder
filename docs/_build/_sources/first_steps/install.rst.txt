@@ -1,5 +1,5 @@
 Installing pyCOFBuilder
-===============
+=======================
 
 Setting the environment
 -----------------------
@@ -44,7 +44,7 @@ The easiest way to install ``pyCOFBuilder`` is using ``pip``. To do so, run the 
     pip install pycofbuilder
 
 Option 2: Manually importing the module
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 It is possible to just download the package and manually import ``pyCOFBuilder`` it using the ``sys`` module, as exemplified below:
 

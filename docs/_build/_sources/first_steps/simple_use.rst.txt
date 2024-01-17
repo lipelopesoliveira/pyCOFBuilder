@@ -1,5 +1,5 @@
 Generating COF structures
-===============
+=========================
 
 To create a specific COF, such as ``T3_BENZ_NH2_OH-L2_BENZ_CHO_H-HCB_A-AA``:
 

@@ -178,20 +178,6 @@
 <span class="sd">    lib_bb : str</span>
 <span class="sd">        String with the name of the folder containing the building block files</span>
 <span class="sd">        Default: bb_lib</span>
-
-<span class="sd">    Methods</span>
-<span class="sd">    -------</span>
-<span class="sd">    get_available_topologies()</span>
-<span class="sd">        Prints the available topologies.</span>
-<span class="sd">    check_name_concistency()</span>
-<span class="sd">        Checks if the name is in the correct format.</span>
-<span class="sd">        Returns a tuple with the building blocks names, the net and the stacking.</span>
-<span class="sd">    from_name()</span>
-<span class="sd">        Creates a COF structure from a reticular name.</span>
-<span class="sd">    from_building_blocks()</span>
-<span class="sd">        Creates a COF structure from two building block objects.</span>
-<span class="sd">    save()</span>
-<span class="sd">        Saves the structure in a specif file format.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">save_bb</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -268,17 +254,47 @@
 
 <div class="viewcode-block" id="Framework.get_available_topologies">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.framework.Framework.get_available_topologies">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_available_topologies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimensionality</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_available_topologies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimensionality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">print_result</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the available topologies implemented in the class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        dimensionality : str, optional</span>
+<span class="sd">            The dimensionality of the topologies to be printed. Can be &#39;all&#39;, &#39;2D&#39; or &#39;3D&#39;.</span>
+<span class="sd">            Default: &#39;all&#39;</span>
+<span class="sd">        print_result: bool, optional</span>
+<span class="sd">            If True, the available topologies are printed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dimensionality_list: list</span>
+<span class="sd">            A list with the available topologies.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">dimensionality_error</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Dimensionality must be one of the following: all, 2D, 3D, not </span><span class="si">{</span><span class="n">dimensionality</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">assert</span> <span class="n">dimensionality</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="s1">&#39;2D&#39;</span><span class="p">,</span> <span class="s1">&#39;3D&#39;</span><span class="p">],</span> <span class="n">dimensionality_error</span>
+
+        <span class="n">dimensionality_list</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">if</span> <span class="n">dimensionality</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span> <span class="ow">or</span> <span class="n">dimensionality</span> <span class="o">==</span> <span class="s1">&#39;2D&#39;</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Available 2D Topologies:&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">print_result</span><span class="p">:</span> 
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Available 2D Topologies:&#39;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_2D_top</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+                <span class="k">if</span> <span class="n">print_result</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+                <span class="n">dimensionality_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">dimensionality</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span> <span class="ow">or</span> <span class="n">dimensionality</span> <span class="o">==</span> <span class="s1">&#39;3D&#39;</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Available 3D Topologies:&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">print_result</span><span class="p">:</span> 
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Available 3D Topologies:&#39;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_3D_top</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span></div>
+                <span class="k">if</span> <span class="n">print_result</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+                <span class="n">dimensionality_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">dimensionality_list</span></div>
 
 
 <div class="viewcode-block" id="Framework.check_name_concistency">

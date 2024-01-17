@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>pyCOFBuilder package &mdash; pyCOFBuilder 0.0.6 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/tabs.css?v=a5c4661c" />
 
   
   <!--[if lt IE 9]>
@@ -136,16 +137,11 @@
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.available_topologies"><code class="docutils literal notranslate"><span class="pre">Framework.available_topologies</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.available_stacking"><code class="docutils literal notranslate"><span class="pre">Framework.available_stacking</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.lib_bb"><code class="docutils literal notranslate"><span class="pre">Framework.lib_bb</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.get_available_topologies"><code class="docutils literal notranslate"><span class="pre">Framework.get_available_topologies()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.check_name_concistency"><code class="docutils literal notranslate"><span class="pre">Framework.check_name_concistency()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.from_name"><code class="docutils literal notranslate"><span class="pre">Framework.from_name()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.from_building_blocks"><code class="docutils literal notranslate"><span class="pre">Framework.from_building_blocks()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.from_name"><code class="docutils literal notranslate"><span class="pre">Framework.from_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.get_available_topologies"><code class="docutils literal notranslate"><span class="pre">Framework.get_available_topologies()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.save"><code class="docutils literal notranslate"><span class="pre">Framework.save()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id1"><code class="docutils literal notranslate"><span class="pre">Framework.check_name_concistency()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id2"><code class="docutils literal notranslate"><span class="pre">Framework.from_building_blocks()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id3"><code class="docutils literal notranslate"><span class="pre">Framework.from_name()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id4"><code class="docutils literal notranslate"><span class="pre">Framework.get_available_topologies()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id5"><code class="docutils literal notranslate"><span class="pre">Framework.save()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -244,7 +240,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.chirality"><code class="docutils literal notranslate"><span class="pre">Framework.chirality</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.atom_types"><code class="docutils literal notranslate"><span class="pre">Framework.atom_types</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.atom_pos"><code class="docutils literal notranslate"><span class="pre">Framework.atom_pos</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id6"><code class="docutils literal notranslate"><span class="pre">Framework.lattice</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id1"><code class="docutils literal notranslate"><span class="pre">Framework.lattice</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.symm_tol"><code class="docutils literal notranslate"><span class="pre">Framework.symm_tol</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.angle_tol"><code class="docutils literal notranslate"><span class="pre">Framework.angle_tol</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.available_2D_topologies"><code class="docutils literal notranslate"><span class="pre">Framework.available_2D_topologies</span></code></a></li>
@@ -252,16 +248,11 @@
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.available_topologies"><code class="docutils literal notranslate"><span class="pre">Framework.available_topologies</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.available_stacking"><code class="docutils literal notranslate"><span class="pre">Framework.available_stacking</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.lib_bb"><code class="docutils literal notranslate"><span class="pre">Framework.lib_bb</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.get_available_topologies"><code class="docutils literal notranslate"><span class="pre">Framework.get_available_topologies()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.check_name_concistency"><code class="docutils literal notranslate"><span class="pre">Framework.check_name_concistency()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.from_name"><code class="docutils literal notranslate"><span class="pre">Framework.from_name()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.from_building_blocks"><code class="docutils literal notranslate"><span class="pre">Framework.from_building_blocks()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.from_name"><code class="docutils literal notranslate"><span class="pre">Framework.from_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.get_available_topologies"><code class="docutils literal notranslate"><span class="pre">Framework.get_available_topologies()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.save"><code class="docutils literal notranslate"><span class="pre">Framework.save()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id7"><code class="docutils literal notranslate"><span class="pre">Framework.check_name_concistency()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id8"><code class="docutils literal notranslate"><span class="pre">Framework.from_building_blocks()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id9"><code class="docutils literal notranslate"><span class="pre">Framework.from_name()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id10"><code class="docutils literal notranslate"><span class="pre">Framework.get_available_topologies()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id11"><code class="docutils literal notranslate"><span class="pre">Framework.save()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -893,39 +884,8 @@ Default: bb_lib</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pycofbuilder.framework.Framework.get_available_topologies">
-<span class="sig-name descname"><span class="pre">get_available_topologies</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.get_available_topologies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.framework.Framework.get_available_topologies" title="Link to this definition"></a></dt>
-<dd><p>Prints the available topologies.</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="pycofbuilder.framework.Framework.check_name_concistency">
-<span class="sig-name descname"><span class="pre">check_name_concistency</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.check_name_concistency"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.framework.Framework.check_name_concistency" title="Link to this definition"></a></dt>
-<dd><p>Checks if the name is in the correct format.
-Returns a tuple with the building blocks names, the net and the stacking.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pycofbuilder.framework.Framework.from_name">
-<span class="sig-name descname"><span class="pre">from_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.from_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.framework.Framework.from_name" title="Link to this definition"></a></dt>
-<dd><p>Creates a COF structure from a reticular name.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pycofbuilder.framework.Framework.from_building_blocks">
-<span class="sig-name descname"><span class="pre">from_building_blocks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.from_building_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.framework.Framework.from_building_blocks" title="Link to this definition"></a></dt>
-<dd><p>Creates a COF structure from two building block objects.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pycofbuilder.framework.Framework.save">
-<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.framework.Framework.save" title="Link to this definition"></a></dt>
-<dd><p>Saves the structure in a specif file format.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="id1">
-<span class="sig-name descname"><span class="pre">check_name_concistency</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">FrameworkName</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.check_name_concistency"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id1" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">check_name_concistency</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">FrameworkName</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.check_name_concistency"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.framework.Framework.check_name_concistency" title="Link to this definition"></a></dt>
 <dd><p>Checks if the name is in the correct format and returns a
 tuple with the building blocks names, the net and the stacking.</p>
 <p>In case the name is not in the correct format, an error is raised.</p>
@@ -943,8 +903,8 @@ tuple with the building blocks names, the net and the stacking.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id2">
-<span class="sig-name descname"><span class="pre">from_building_blocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bb1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bb2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Stacking</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.from_building_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id2" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="pycofbuilder.framework.Framework.from_building_blocks">
+<span class="sig-name descname"><span class="pre">from_building_blocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bb1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bb2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Stacking</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.from_building_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.framework.Framework.from_building_blocks" title="Link to this definition"></a></dt>
 <dd><p>Creates a COF from the building blocks.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -965,8 +925,8 @@ tuple with the building blocks names, the net and the stacking.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id3">
-<span class="sig-name descname"><span class="pre">from_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">FrameworkName</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.from_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id3" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="pycofbuilder.framework.Framework.from_name">
+<span class="sig-name descname"><span class="pre">from_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">FrameworkName</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.from_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.framework.Framework.from_name" title="Link to this definition"></a></dt>
 <dd><p>Creates a COF from a given FrameworkName.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -982,13 +942,29 @@ tuple with the building blocks names, the net and the stacking.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id4">
-<span class="sig-name descname"><span class="pre">get_available_topologies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dimensionality</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.get_available_topologies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id4" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="pycofbuilder.framework.Framework.get_available_topologies">
+<span class="sig-name descname"><span class="pre">get_available_topologies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dimensionality</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.get_available_topologies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.framework.Framework.get_available_topologies" title="Link to this definition"></a></dt>
+<dd><p>Get the available topologies implemented in the class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dimensionality</strong> (<em>str</em><em>, </em><em>optional</em>) – The dimensionality of the topologies to be printed. Can be ‘all’, ‘2D’ or ‘3D’.
+Default: ‘all’</p></li>
+<li><p><strong>print_result</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the available topologies are printed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dimensionality_list</strong> – A list with the available topologies.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id5">
-<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fmt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'cif'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">supercell</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[1,</span> <span class="pre">1,</span> <span class="pre">1]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">primitive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id5" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="pycofbuilder.framework.Framework.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fmt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'cif'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">supercell</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[1,</span> <span class="pre">1,</span> <span class="pre">1]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">primitive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.framework.Framework.save" title="Link to this definition"></a></dt>
 <dd><p>Save the structure in a specif file format.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1397,25 +1373,22 @@ case the kpoints grid will be calculated automatically. By default, the kspacing
 <dl class="py function">
 <dt class="sig sig-object py" id="pycofbuilder.tools.angle">
 <span class="sig-prename descclassname"><span class="pre">pycofbuilder.tools.</span></span><span class="sig-name descname"><span class="pre">angle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'degree'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/tools.html#angle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.tools.angle" title="Link to this definition"></a></dt>
-<dd><section id="calculates-the-angle-between-two-vectors-v1-and-v2">
-<h3>Calculates the angle between two vectors v1 and v2.<a class="headerlink" href="#calculates-the-angle-between-two-vectors-v1-and-v2" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>v1<span class="classifier">array</span></dt><dd><p>(N,1) matrix with N dimensions</p>
-</dd>
-<dt>v2<span class="classifier">array</span></dt><dd><p>(N,1) matrix with N dimensions</p>
-</dd>
-<dt>unit<span class="classifier">str</span></dt><dd><p>Unit of the output. Could be ‘degree’, ‘radians’ or ‘cos’.</p>
-</dd>
-</dl>
+<dd><p>Calculates the angle between two vectors v1 and v2.</p>
 <dl class="field-list simple">
-<dt class="field-odd">returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>angle</strong> – Angle in the selected unit.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>v1</strong> (<em>array</em>) – (N,1) matrix with N dimensions</p></li>
+<li><p><strong>v2</strong> (<em>array</em>) – (N,1) matrix with N dimensions</p></li>
+<li><p><strong>unit</strong> (<em>str</em>) – Unit of the output. Could be ‘degree’, ‘radians’ or ‘cos’.</p></li>
+</ul>
 </dd>
-<dt class="field-even">rtype<span class="colon">:</span></dt>
-<dd class="field-even"><p>float</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>angle</strong> – Angle in the selected unit.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
 </dd>
 </dl>
-</section>
 </dd></dl>
 
 <dl class="py function">
@@ -1427,18 +1400,16 @@ twice the interaction potential cut-off radius.</p>
 and <cite>ca</cite> planes. Thus, the directions depend on who the crystallographic vectors <cite>a</cite>, <cite>b</cite>,
 and <cite>c</cite> are and the length in the perpendicular directions would be the projections
 of the crystallographic vectors on the vectors <cite>a x b</cite>, <cite>b x c</cite>, and <cite>c x a</cite>.
-(here <cite>x</cite> means cross product)
-———-
-cell_matrix : array</p>
-<blockquote>
-<div><p>(3,3) cell vectors or (6,1)</p>
-</div></blockquote>
+(here <cite>x</cite> means cross product)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>(3,1) list containg the number of repiting units in <cite>x</cite>, <cite>y</cite>, <cite>z</cite> directions.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cell_matrix</strong> (<em>array</em>) – (3,3) cell vectors or (6,1)</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>superCell</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>(3,1) list containg the number of repiting units in <cite>x</cite>, <cite>y</cite>, <cite>z</cite> directions.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>superCell</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1531,24 +1502,23 @@ plane.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pycofbuilder.tools.change_X_atoms">
-<span class="sig-prename descclassname"><span class="pre">pycofbuilder.tools.</span></span><span class="sig-name descname"><span class="pre">change_X_atoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">atom_labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom_pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bond_atom</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/tools.html#change_X_atoms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.tools.change_X_atoms" title="Link to this definition"></a></dt>
-<dd><section id="changes-the-x-atom-for-the-desired-bond-atom-or-remove-it-if-bond-atom-r">
-<h3>Changes the X atom for the desired bond_atom or remove it if bond_atom == ‘R’.<a class="headerlink" href="#changes-the-x-atom-for-the-desired-bond-atom-or-remove-it-if-bond-atom-r" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>atom_labels<span class="classifier">list</span></dt><dd><p>List containing the atom labels</p>
-</dd>
-<dt>atom_pos<span class="classifier">list</span></dt><dd><p>List containing the atom position</p>
-</dd>
-</dl>
+<span class="sig-prename descclassname"><span class="pre">pycofbuilder.tools.</span></span><span class="sig-name descname"><span class="pre">change_X_atoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">atom_labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom_pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bond_atom</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span></span></span><a class="reference internal" href="_modules/pycofbuilder/tools.html#change_X_atoms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.tools.change_X_atoms" title="Link to this definition"></a></dt>
+<dd><p>Changes the X atom for the desired bond_atom or remove it if bond_atom == ‘R’.</p>
 <dl class="field-list simple">
-<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>atom_labels</strong> (<em>list</em>) – List containing the atom labels</p></li>
+<li><p><strong>atom_pos</strong> (<em>list</em>) – List containing the atom position</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
 <li><p><strong>labels</strong> (<em>list</em>) – List containing the processed atom labels</p></li>
 <li><p><strong>pos</strong> (<em>list</em>) – List containing the processed atom position</p></li>
 </ul>
+</p>
 </dd>
 </dl>
-</section>
 </dd></dl>
 
 <dl class="py function">
@@ -1577,8 +1547,26 @@ monoclinic, or triclinic.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pycofbuilder.tools.closest_atom">
-<span class="sig-prename descclassname"><span class="pre">pycofbuilder.tools.</span></span><span class="sig-name descname"><span class="pre">closest_atom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/tools.html#closest_atom"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.tools.closest_atom" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pycofbuilder.tools.</span></span><span class="sig-name descname"><span class="pre">closest_atom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label_1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos_1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/tools.html#closest_atom"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.tools.closest_atom" title="Link to this definition"></a></dt>
 <dd><p>Find the closest atom to a given atom</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label_1</strong> (<em>string</em>) – String containing the label of the atom</p></li>
+<li><p><strong>pos_1</strong> (<em>list</em>) – Array containing the position of the atom</p></li>
+<li><p><strong>labels</strong> (<em>list</em>) – List containing the all the atom labels on the structure</p></li>
+<li><p><strong>pos</strong> (<em>list</em>) – List containing the all the atom positions on the structure</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>closest_label</strong> (<em>string</em>) – String containing the label of the closest atom</p></li>
+<li><p><strong>closest_position</strong> (<em>array</em>) – Array containing the position of the closest atom</p></li>
+<li><p><strong>euclidian_distance</strong> (<em>float</em>) – Euclidian distance between the two atoms</p></li>
+</ul>
+</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -1638,23 +1626,21 @@ monoclinic, or triclinic.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pycofbuilder.tools.find_index">
 <span class="sig-prename descclassname"><span class="pre">pycofbuilder.tools.</span></span><span class="sig-name descname"><span class="pre">find_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/tools.html#find_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.tools.find_index" title="Link to this definition"></a></dt>
-<dd><section id="finds-the-index-of-a-given-element-in-a-list">
-<h3>Finds the index of a given element in a list<a class="headerlink" href="#finds-the-index-of-a-given-element-in-a-list" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>element<span class="classifier">string</span></dt><dd><p>String containing the label of the element in e_list</p>
-</dd>
-<dt>e_list<span class="classifier">list</span></dt><dd><p>List with the atom labels</p>
-</dd>
-</dl>
+<dd><p>Finds the index of a given element in a list</p>
 <dl class="field-list simple">
-<dt class="field-odd">returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>i</strong> – The index of element in the e_list</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>element</strong> (<em>string</em>) – String containing the label of the element in e_list</p></li>
+<li><p><strong>e_list</strong> (<em>list</em>) – List with the atom labels</p></li>
+</ul>
 </dd>
-<dt class="field-even">rtype<span class="colon">:</span></dt>
-<dd class="field-even"><p>int</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>i</strong> – The index of element in the e_list</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
 </dd>
 </dl>
-</section>
 </dd></dl>
 
 <dl class="py function">
@@ -1682,36 +1668,33 @@ monoclinic, or triclinic.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pycofbuilder.tools.get_cartesian_to_fractional_matrix">
-<span class="sig-prename descclassname"><span class="pre">pycofbuilder.tools.</span></span><span class="sig-name descname"><span class="pre">get_cartesian_to_fractional_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle_in_degrees</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/tools.html#get_cartesian_to_fractional_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.tools.get_cartesian_to_fractional_matrix" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pycofbuilder.tools.</span></span><span class="sig-name descname"><span class="pre">get_cartesian_to_fractional_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a:</span> <span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b:</span> <span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c:</span> <span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha:</span> <span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta:</span> <span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma:</span> <span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle_in_degrees:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True)</span> <span class="pre">-&gt;</span> <span class="pre">array(&lt;class</span> <span class="pre">'float'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=object</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/tools.html#get_cartesian_to_fractional_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.tools.get_cartesian_to_fractional_matrix" title="Link to this definition"></a></dt>
 <dd><p>Return the transformation matrix that converts cartesian coordinates to
-fractional coordinates.
-:param a: The lengths of the edges.
-:type a: float
-:param b: The lengths of the edges.
-:type b: float
-:param c: The lengths of the edges.
-:type c: float
-:param alpha: The angles between the sides.
-:type alpha: float
-:param gamma: The angles between the sides.
-:type gamma: float
-:param beta: The angles between the sides.
-:type beta: float
-:param angle_in_degrees: True if alpha, beta and gamma are expressed in degrees.
-:type angle_in_degrees: bool</p>
+fractional coordinates.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>T_matrix</strong> – The 3x3 rotation matrix. <code class="docutils literal notranslate"><span class="pre">R_frac</span> <span class="pre">=</span> <span class="pre">np.dot(T_matrix,</span> <span class="pre">R_cart)</span></code>.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> (<em>float</em>) – The lengths of the edges.</p></li>
+<li><p><strong>b</strong> (<em>float</em>) – The lengths of the edges.</p></li>
+<li><p><strong>c</strong> (<em>float</em>) – The lengths of the edges.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em>) – The angles between the sides.</p></li>
+<li><p><strong>gamma</strong> (<em>float</em>) – The angles between the sides.</p></li>
+<li><p><strong>beta</strong> (<em>float</em>) – The angles between the sides.</p></li>
+<li><p><strong>angle_in_degrees</strong> (<em>bool</em>) – True if alpha, beta and gamma are expressed in degrees.</p></li>
+</ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>array_like</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>T_matrix</strong> – The 3x3 rotation matrix. <code class="docutils literal notranslate"><span class="pre">R_frac</span> <span class="pre">=</span> <span class="pre">np.dot(T_matrix,</span> <span class="pre">R_cart)</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.array</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pycofbuilder.tools.get_fractional_to_cartesian_matrix">
-<span class="sig-prename descclassname"><span class="pre">pycofbuilder.tools.</span></span><span class="sig-name descname"><span class="pre">get_fractional_to_cartesian_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_c</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle_in_degrees</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/tools.html#get_fractional_to_cartesian_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.tools.get_fractional_to_cartesian_matrix" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pycofbuilder.tools.</span></span><span class="sig-name descname"><span class="pre">get_fractional_to_cartesian_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_a:</span> <span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_b:</span> <span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_c:</span> <span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha:</span> <span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta:</span> <span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma:</span> <span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle_in_degrees:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True)</span> <span class="pre">-&gt;</span> <span class="pre">array(&lt;class</span> <span class="pre">'float'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=object</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/tools.html#get_fractional_to_cartesian_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.tools.get_fractional_to_cartesian_matrix" title="Link to this definition"></a></dt>
 <dd><p>Return the transformation matrix that converts fractional coordinates to
 cartesian coordinates.</p>
 <dl class="field-list simple">
@@ -1737,21 +1720,18 @@ cartesian coordinates.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pycofbuilder.tools.get_kgrid">
-<span class="sig-prename descclassname"><span class="pre">pycofbuilder.tools.</span></span><span class="sig-name descname"><span class="pre">get_kgrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/tools.html#get_kgrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.tools.get_kgrid" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pycofbuilder.tools.</span></span><span class="sig-name descname"><span class="pre">get_kgrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span></span></span><a class="reference internal" href="_modules/pycofbuilder/tools.html#get_kgrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.tools.get_kgrid" title="Link to this definition"></a></dt>
 <dd><p>Get the k-points grid in the reciprocal space with a given distance for a
-cell given in cell parameters of cell vectors.
-———-
-cell : array</p>
-<blockquote>
-<div><p>(3,1) array for cell vectors or (6,1) array for cell parameters</p>
-</div></blockquote>
-<dl class="simple">
-<dt>distance<span class="classifier">float</span></dt><dd><p>distance between the points in the reciprocal space</p>
-</dd>
-</dl>
+cell given in cell parameters of cell vectors.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cell</strong> (<em>array</em>) – (3,1) array for cell vectors or (6,1) array for cell parameters</p></li>
+<li><p><strong>distance</strong> (<em>float</em>) – distance between the points in the reciprocal space</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
 <li><p><strong>kx</strong> (<em>int</em>) – Number of points in the x direction on reciprocal space</p></li>
 <li><p><strong>ky</strong> (<em>int</em>) – Number of points in the y direction on reciprocal space</p></li>
 <li><p><strong>kz</strong> (<em>int</em>) – Number of points in the z direction on reciprocal space</p></li>
@@ -1763,23 +1743,21 @@ cell : array</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pycofbuilder.tools.get_reciprocal_vectors">
-<span class="sig-prename descclassname"><span class="pre">pycofbuilder.tools.</span></span><span class="sig-name descname"><span class="pre">get_reciprocal_vectors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/tools.html#get_reciprocal_vectors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.tools.get_reciprocal_vectors" title="Link to this definition"></a></dt>
-<dd><section id="get-the-reciprocal-vectors-of-a-cell-given-in-cell-parameters-of-cell-vectors">
-<h3>Get the reciprocal vectors of a cell given in cell parameters of cell vectors<a class="headerlink" href="#get-the-reciprocal-vectors-of-a-cell-given-in-cell-parameters-of-cell-vectors" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>cell<span class="classifier">array</span></dt><dd><p>(3,1) array for cell vectors or (6,1) array for cell parameters</p>
-</dd>
-</dl>
+<span class="sig-prename descclassname"><span class="pre">pycofbuilder.tools.</span></span><span class="sig-name descname"><span class="pre">get_reciprocal_vectors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span></span></span><a class="reference internal" href="_modules/pycofbuilder/tools.html#get_reciprocal_vectors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.tools.get_reciprocal_vectors" title="Link to this definition"></a></dt>
+<dd><p>Get the reciprocal vectors of a cell given in cell parameters of cell vectors.</p>
 <dl class="field-list simple">
-<dt class="field-odd">returns<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cell</strong> (<em>array</em>) – (3,1) array for cell vectors or (6,1) array for cell parameters</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
 <li><p><strong>b1</strong> (<em>array</em>) – (3,1) array containing b_1 vector in the reciprocal space</p></li>
 <li><p><strong>b2</strong> (<em>array</em>) – (3,1) array containing b_2 vector in the reciprocal space</p></li>
 <li><p><strong>b3</strong> (<em>array</em>) – (3,1) array containing b_3 vector in the reciprocal space</p></li>
 </ul>
+</p>
 </dd>
 </dl>
-</section>
 </dd></dl>
 
 <dl class="py function">
@@ -1834,23 +1812,21 @@ cell : array</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pycofbuilder.tools.rotation_matrix_from_vectors">
 <span class="sig-prename descclassname"><span class="pre">pycofbuilder.tools.</span></span><span class="sig-name descname"><span class="pre">rotation_matrix_from_vectors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vec1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vec2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/tools.html#rotation_matrix_from_vectors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.tools.rotation_matrix_from_vectors" title="Link to this definition"></a></dt>
-<dd><section id="find-the-rotation-matrix-that-aligns-vec1-to-vec2">
-<h3>Find the rotation matrix that aligns vec1 to vec2<a class="headerlink" href="#find-the-rotation-matrix-that-aligns-vec1-to-vec2" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>vec1<span class="classifier">array</span></dt><dd><p>(3,3) array</p>
-</dd>
-<dt>vec2<span class="classifier">array</span></dt><dd><p>(3,3) array</p>
-</dd>
-</dl>
+<dd><p>Find the rotation matrix that aligns vec1 to vec2</p>
 <dl class="field-list simple">
-<dt class="field-odd">returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>rotation_matrix</strong> – A transform matrix (3x3) which when applied to vec1, aligns it with vec2.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vec1</strong> (<em>array</em>) – (3,3) array</p></li>
+<li><p><strong>vec2</strong> (<em>array</em>) – (3,3) array</p></li>
+</ul>
 </dd>
-<dt class="field-even">rtype<span class="colon">:</span></dt>
-<dd class="field-even"><p>array</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>rotation_matrix</strong> – A transform matrix (3x3) which when applied to vec1, aligns it with vec2.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array</p>
 </dd>
 </dl>
-</section>
 </dd></dl>
 
 <dl class="py function">
@@ -2155,8 +2131,8 @@ If not defined, a <cite>building_blocks</cite> folder will be created in the cur
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id6">
-<span class="sig-name descname"><span class="pre">lattice</span></span><a class="headerlink" href="#id6" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">lattice</span></span><a class="headerlink" href="#id1" title="Link to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list = [[], [], []]</p>
@@ -2241,39 +2217,8 @@ Default: bb_lib</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pycofbuilder.Framework.get_available_topologies">
-<span class="sig-name descname"><span class="pre">get_available_topologies</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.get_available_topologies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.Framework.get_available_topologies" title="Link to this definition"></a></dt>
-<dd><p>Prints the available topologies.</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="pycofbuilder.Framework.check_name_concistency">
-<span class="sig-name descname"><span class="pre">check_name_concistency</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.check_name_concistency"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.Framework.check_name_concistency" title="Link to this definition"></a></dt>
-<dd><p>Checks if the name is in the correct format.
-Returns a tuple with the building blocks names, the net and the stacking.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pycofbuilder.Framework.from_name">
-<span class="sig-name descname"><span class="pre">from_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.from_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.Framework.from_name" title="Link to this definition"></a></dt>
-<dd><p>Creates a COF structure from a reticular name.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pycofbuilder.Framework.from_building_blocks">
-<span class="sig-name descname"><span class="pre">from_building_blocks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.from_building_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.Framework.from_building_blocks" title="Link to this definition"></a></dt>
-<dd><p>Creates a COF structure from two building block objects.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pycofbuilder.Framework.save">
-<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.Framework.save" title="Link to this definition"></a></dt>
-<dd><p>Saves the structure in a specif file format.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="id7">
-<span class="sig-name descname"><span class="pre">check_name_concistency</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">FrameworkName</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.check_name_concistency"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id7" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">check_name_concistency</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">FrameworkName</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.check_name_concistency"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.Framework.check_name_concistency" title="Link to this definition"></a></dt>
 <dd><p>Checks if the name is in the correct format and returns a
 tuple with the building blocks names, the net and the stacking.</p>
 <p>In case the name is not in the correct format, an error is raised.</p>
@@ -2291,8 +2236,8 @@ tuple with the building blocks names, the net and the stacking.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id8">
-<span class="sig-name descname"><span class="pre">from_building_blocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bb1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bb2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Stacking</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.from_building_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id8" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="pycofbuilder.Framework.from_building_blocks">
+<span class="sig-name descname"><span class="pre">from_building_blocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bb1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bb2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Stacking</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.from_building_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.Framework.from_building_blocks" title="Link to this definition"></a></dt>
 <dd><p>Creates a COF from the building blocks.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -2313,8 +2258,8 @@ tuple with the building blocks names, the net and the stacking.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id9">
-<span class="sig-name descname"><span class="pre">from_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">FrameworkName</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.from_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id9" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="pycofbuilder.Framework.from_name">
+<span class="sig-name descname"><span class="pre">from_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">FrameworkName</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.from_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.Framework.from_name" title="Link to this definition"></a></dt>
 <dd><p>Creates a COF from a given FrameworkName.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -2330,13 +2275,29 @@ tuple with the building blocks names, the net and the stacking.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id10">
-<span class="sig-name descname"><span class="pre">get_available_topologies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dimensionality</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.get_available_topologies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id10" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="pycofbuilder.Framework.get_available_topologies">
+<span class="sig-name descname"><span class="pre">get_available_topologies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dimensionality</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.get_available_topologies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.Framework.get_available_topologies" title="Link to this definition"></a></dt>
+<dd><p>Get the available topologies implemented in the class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dimensionality</strong> (<em>str</em><em>, </em><em>optional</em>) – The dimensionality of the topologies to be printed. Can be ‘all’, ‘2D’ or ‘3D’.
+Default: ‘all’</p></li>
+<li><p><strong>print_result</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the available topologies are printed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dimensionality_list</strong> – A list with the available topologies.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id11">
-<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fmt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'cif'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">supercell</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[1,</span> <span class="pre">1,</span> <span class="pre">1]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">primitive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id11" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="pycofbuilder.Framework.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fmt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'cif'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">supercell</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[1,</span> <span class="pre">1,</span> <span class="pre">1]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">primitive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.Framework.save" title="Link to this definition"></a></dt>
 <dd><p>Save the structure in a specif file format.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
