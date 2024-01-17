@@ -38,6 +38,9 @@ Currently, it is possible to select the following formats:
 - ``gjf``
 - ``xyz``
   
+For more details see :doc:`file_formats`.
+
+
 Besides, the variable ``cof`` now is a ``Framework`` object. This object has some attributes that can be accessed:
 
 .. code-block:: python
