@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Chemical JSON (CJSON) &mdash; pyCOFBuilder 0.0.6 documentation</title>
@@ -56,6 +56,7 @@
 <li class="toctree-l2"><a class="reference internal" href="pdb.html">Protein Data Bank (PDB)</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Chemical JSON (CJSON)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="vasp.html">PDB (Protein Data Bank)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="turbomole.html">Turbomole (coord)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pqr.html">Protein Data Bank with Charges and Radii (PQR)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qe.html">QuantumESPRESSO input (pwscf)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gjf.html">Gaussian Job File (GJF)</a></li>
@@ -112,6 +113,10 @@
 <p>Them Chemical JSON format is a adaptiation of the JSON file format to encode chemical information developed and mantained by the
 OpenChemistry project on the <a class="reference external" href="https://github.com/OpenChemistry/chemicaljson">repository</a>. The format is designed to be human readable and easy to parse by computers. The format is designed to be
 extensible, allowing for the addition of new properties and features without breaking existing code.</p>
+<p>The JSON format is a general container, and the work done in Chemical JSON was primarily aimed at developing a standard on top of
+the JSON (and BSON) format for chemical data. It was developed primarily to serve the needs of the Avogadro 2 application,
+but also to facilitate efficient storage in MongoDB (in the form of BSON), and to exchange data using JSON-RPC 2.0 and RESTful APIs.
+It has since been used in web applications, and with 3DMol.js.</p>
 <p>Below is a simplified example of a <code class="docutils literal notranslate"><span class="pre">cjson</span></code> file representing a crystal structure of Rutile:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="s2">&quot;chemical json&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
@@ -131,11 +136,11 @@ extensible, allowing for the addition of new properties and features without bre
    <span class="p">},</span>
    <span class="s2">&quot;coords&quot;</span><span class="p">:</span> <span class="p">{</span>
       <span class="s2">&quot;3d fractional&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="mf">0.00000</span><span class="p">,</span> <span class="mf">0.00000</span><span class="p">,</span> <span class="mf">0.00000</span><span class="p">,</span>
-                        <span class="mf">0.50000</span><span class="p">,</span> <span class="mf">0.50000</span><span class="p">,</span> <span class="mf">0.50000</span><span class="p">,</span>
-                        <span class="mf">0.00000</span><span class="p">,</span> <span class="mf">0.30530</span><span class="p">,</span> <span class="mf">0.30530</span><span class="p">,</span>
-                        <span class="mf">0.00000</span><span class="p">,</span> <span class="mf">0.69470</span><span class="p">,</span> <span class="mf">0.69470</span><span class="p">,</span>
-                        <span class="mf">0.50000</span><span class="p">,</span> <span class="mf">0.19470</span><span class="p">,</span> <span class="mf">0.80530</span><span class="p">,</span>
-                        <span class="mf">0.50000</span><span class="p">,</span> <span class="mf">0.80530</span><span class="p">,</span> <span class="mf">0.19470</span> <span class="p">]</span>
+                         <span class="mf">0.50000</span><span class="p">,</span> <span class="mf">0.50000</span><span class="p">,</span> <span class="mf">0.50000</span><span class="p">,</span>
+                         <span class="mf">0.00000</span><span class="p">,</span> <span class="mf">0.30530</span><span class="p">,</span> <span class="mf">0.30530</span><span class="p">,</span>
+                         <span class="mf">0.00000</span><span class="p">,</span> <span class="mf">0.69470</span><span class="p">,</span> <span class="mf">0.69470</span><span class="p">,</span>
+                         <span class="mf">0.50000</span><span class="p">,</span> <span class="mf">0.19470</span><span class="p">,</span> <span class="mf">0.80530</span><span class="p">,</span>
+                         <span class="mf">0.50000</span><span class="p">,</span> <span class="mf">0.80530</span><span class="p">,</span> <span class="mf">0.19470</span> <span class="p">]</span>
    <span class="p">}</span>
 <span class="p">}</span>
 <span class="p">}</span>

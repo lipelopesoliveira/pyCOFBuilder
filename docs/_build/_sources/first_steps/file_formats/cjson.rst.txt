@@ -3,7 +3,12 @@ Chemical JSON (CJSON)
 
 Them Chemical JSON format is a adaptiation of the JSON file format to encode chemical information developed and mantained by the
 OpenChemistry project on the `repository`_. The format is designed to be human readable and easy to parse by computers. The format is designed to be
-extensible, allowing for the addition of new properties and features without breaking existing code. 
+extensible, allowing for the addition of new properties and features without breaking existing code.
+
+The JSON format is a general container, and the work done in Chemical JSON was primarily aimed at developing a standard on top of
+the JSON (and BSON) format for chemical data. It was developed primarily to serve the needs of the Avogadro 2 application, 
+but also to facilitate efficient storage in MongoDB (in the form of BSON), and to exchange data using JSON-RPC 2.0 and RESTful APIs.
+It has since been used in web applications, and with 3DMol.js.
 
 .. _`repository`: https://github.com/OpenChemistry/chemicaljson
 
@@ -29,11 +34,11 @@ Below is a simplified example of a ``cjson`` file representing a crystal structu
       },
       "coords": {
          "3d fractional": [ 0.00000, 0.00000, 0.00000,
-                           0.50000, 0.50000, 0.50000,
-                           0.00000, 0.30530, 0.30530,
-                           0.00000, 0.69470, 0.69470,
-                           0.50000, 0.19470, 0.80530,
-                           0.50000, 0.80530, 0.19470 ]
+                            0.50000, 0.50000, 0.50000,
+                            0.00000, 0.30530, 0.30530,
+                            0.00000, 0.69470, 0.69470,
+                            0.50000, 0.19470, 0.80530,
+                            0.50000, 0.80530, 0.19470 ]
       }
    }
    }

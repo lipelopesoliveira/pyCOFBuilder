@@ -44,6 +44,7 @@ currently implemented in pyCOFBuilder.*
 
 .. list-table:: Symbols, connectivity numbers, and geometric figures used to represent the building blocks.
    :widths: 25 25 50
+   :align: center
    :header-rows: 1
 
    * - Symbol
@@ -95,13 +96,52 @@ currently implemented in pyCOFBuilder.*
      - 12
      - Hexagon prism
 
+
 Organic Cores
 ~~~~~~~~~~~~~
+
+The organic cores are denoted by a four-letter code designed to closely reflect the IUPAC name of the equivalent isolated molecule.
+For instance, both the building blocks 1,3,5-triformylphloroglucinol and 1,4-diaminobenzene share the same organic core, 
+representing a benzene molecule. Consequently, the code assigned to this organic core is ``BENZ``.
+
+Although constructing a consistent representation for the majority of COFs found in the literature is relatively straightforward, 
+certain types of covalent connections can pose a greater challenge due to their impact on the formation of the final structure. 
+For example, COFs formed through boronic condensation between a boronic diacid, such as COF-1 `cote2005porous`_, 
+feature only a linear building block, which directly constrains the way the string-based representation is constructed. 
+However, these materials can be perceived as being formed by an ``HCB_A`` network, wherein the tritopic building block corresponds 
+to the hexagon formed by O and B atoms (``BRXN``), while the linear ditopic block represents the benzene ring (``BENZ``) 
+present in the original diboronic acid, as illustrated in the figure below. Consequently, this structure can be represented 
+as ``T3_BRXN_BOH2-L2_BENZ_BOH2_H_H_HCB_A-AB``. 
+
+The identical approach can be applied to COFs synthesized through the trimerization of dicyanobenzene, resulting in the formation 
+of the triazine-based framework CTF-1. `kuhn2008porous`_ In this case, the structure can be constructed using the representation 
+``T3_TRZN_CN-L2_BENZ_CN_H_H_HCB_A-AA``. 
+
+.. image:: ../img/SBU.png
+   :width: 700
+   :align: center
+   :alt: SBU approach to determine the organic core of a building block
+
+Another challenge of this nomenclature approach arises when dealing with the representation of multicomponent structures. `huang2016multiple`_ 
+These structures are composed of three or more building blocks that can occupy the same reticular site, preventing a straightforward decomposition 
+into one of the existing topological networks. Thus, in the current version of pyCOFBuilder, such structures cannot be constructed.
+
+
+
+Connection groups and Functional Groups
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For connector groups and functional groups, which have fewer atoms and are chemically simpler, their composition is used for representation. 
+For instance, the amine group, which can function as both a connector and a functional group, is represented by the code ``NH2``. 
+The aldehyde group is denoted by the code ``CHO``, and so forth.
 
 Nets
 ----
 
-The nets are described a three letter code representing the underlying net. The augmented nets are represented by the three letter code followed by a ``_A``. The nets are described as below
+The nets are described a three letter code representing the underlying net adapted from the Reticular Chemistry Structure Resource (`RCSR`_).
+The augmented nets are represented by the three letter code followed by a ``_A``. The nets are described as below
+
+.. _`RCSR`: https://rcsr.anu.edu.au/
 
 .. image:: ../img/2D_nets.png
    :width: 700
@@ -111,4 +151,31 @@ The nets are described a three letter code representing the underlying net. The 
 
 Stacking / Interpenetration
 ---------------------------
+
+To represent the stacking pattern or interpenetrating class desired, the encoding string will depend on the selected net.
+For 2D nets, available stacking patterns include ``AA``, ``AB1``, ``AB2``, ``AAl``, and ``AAt``, among others deppending on the topology. 
+In the case of 3D nets, the encoding string is determined by the number of interpenetrating structures.
+
+.. image:: ../img/staking_hex.png
+   :width: 700
+   :align: center
+   :alt: Stacking patterns for hexagonal 2D nets
+
+
+.. image:: ../img/staking_square.png
+   :width: 700
+   :align: center
+   :alt: Stacking patterns for square 2D nets
+
+
+For the interpenetration degree of 3D nets, the encoding string is determined by the number of interpenetrating structures.
+
+
+.. rubric:: References
+
+.. [cote2005porous] Cote, A.P.; Benin, A.I.; Ockwig, N.W.; O’Keeffe, M.; Matzger, A.J.; and Yaghi, O.M. “Porous, crystalline, covalent organic frameworks.” science, 2005. 310(5751):1166–1170
+
+.. [kuhn2008porous] Kuhn, P.; Antonietti, M.; and Thomas, A. “Porous, covalent triazine-based frameworks prepared by ionothermal synthesis.” Angewandte Chemie International Edition, 2008. 47(18):3450–3453
+
+.. [huang2016multiple] Huang, N.; Zhai, L.; Coupry, D.E.; Addicoat, M.A.; Okushita, K.; Nishimura, K.; Heine, T.; and Jiang, D. “Multiple-component covalent organic frameworks.” Nature communications, 2016. 7(1):12325
 
