@@ -98,56 +98,6 @@ currently implemented in pyCOFBuilder.*
 Organic Cores
 ~~~~~~~~~~~~~
 
-Linear ditopic cores (L2)
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-.. raw:: html
-    :file: ../img/mol2grid_L2.html
-
-----
-
-
-Triangular tritopic cores (T3)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. raw:: html
-    :file: ../img/mol2grid_T3.html
-
-----
-
-Squared tetratopic cores (S4)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. raw:: html
-    :file: ../img/mol2grid_S4.html
-
-----
-
-Hexagonal hexatopic cores (H6)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. raw:: html
-    :file: ../img/mol2grid_H6.html
-
-----
-
-Connector groups
-~~~~~~~~~~~~~~~~
-
-.. raw:: html
-    :file: ../img/mol2grid_Q.html
-
-----
-
-Functional groups
-~~~~~~~~~~~~~~~~~
-
-.. raw:: html
-    :file: ../img/mol2grid_R.html
-
-----
-
 Nets
 ----
 
@@ -157,11 +107,6 @@ The nets are described a three letter code representing the underlying net. The 
    :width: 700
    :align: center
    :alt: pyCOFBuilder 2D nets
-
-
-
-
-
 
 
 Stacking / Interpenetration
