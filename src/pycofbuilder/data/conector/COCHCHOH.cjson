@@ -60,9 +60,9 @@
         }
     },
     "properties": {
-        "smiles": "[Q]C(NN)=O",
+        "smiles": "[Q]C(CCO)=O",
         "code": "COCHCHOH",
-        "xsmiles": "[*]C(NN)=O",
+        "xsmiles": "[*]C(CCO)=O",
         "xsmiles_label": "|$Q;;;;$|"
     }
 }
