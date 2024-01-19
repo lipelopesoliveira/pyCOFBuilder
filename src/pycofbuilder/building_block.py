@@ -49,7 +49,7 @@ class BuildingBlock():
 
         self.available_symmetry = ['L2',
                                    'T3',
-                                   'S4',  # 'R4', 'T4',
+                                   'S4',  # 'R4', 'D4',
                                    'H6',  # 'O6', 'P6'
                                    # 'C8', 'A8', 'E8'
                                    # 'B12', 'I12', 'U12', 'X12'
