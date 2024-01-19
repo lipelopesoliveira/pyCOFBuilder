@@ -62,7 +62,7 @@ currently implemented in pyCOFBuilder.*
    * - R
      - 4
      - Rectangle
-   * - T
+   * - D
      - 4
      - Tetrahedron
    * - O
