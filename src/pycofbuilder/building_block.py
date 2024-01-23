@@ -457,6 +457,8 @@ class BuildingBlock():
         self.composition = core.formula
         self.atom_labels = ['C']*len(self.atom_types)
 
+        pref_orientation = unit_vector(self._get_Q_points(core.atomic_types, core.cartesian_positions)[1][0])
+
         self._add_connection_group(conector)
 
         R_list_names = [R1, R2, R3, R4, R5, R6, R7, R8, R9]
@@ -473,7 +475,7 @@ class BuildingBlock():
 
         self.connectivity = len([i for i in self.atom_types if 'X' in i])
         self._centralize()
-        # self._align_to()
+        self._align_to(pref_orientation)
         self._calculate_size()
 
     def replace_X(self, target_type):

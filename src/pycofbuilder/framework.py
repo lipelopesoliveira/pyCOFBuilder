@@ -4544,8 +4544,6 @@ class Framework():
         bond_atom = get_bond_atom(BB_D4.conector, BB_L2.conector)
 
         # Replace "X" the building block
-        BB_L2.replace_X(bond_atom)
-
         print_command(f'Bond atom detected: {bond_atom}', self.verbosity, ['debug', 'high'])
 
         # Measure the base size of the building blocks
@@ -4585,11 +4583,12 @@ class Framework():
         # Add the building blocks to the structure
         for edge_data in topology_info['edges']:
             BB = BB_L2.copy()
+            print(BB)
             BB._align_to(edge_data['align_v'])
             BB._rotate_around(rotation_axis=edge_data['align_v'],
                               angle=edge_data['angle'])
             BB.shift(np.array(edge_data['position']) * a_conv)
-            BB.remove_X()
+            BB.replace_X(bond_atom)
 
             self.atom_types += BB.atom_types
             self.atom_pos += BB.atom_pos.tolist()
