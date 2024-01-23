@@ -8,11 +8,12 @@ The BuildingBlock class is used to create the building blocks for the Framework 
 
 import os
 import numpy as np
-
+from scipy.spatial.transform import Rotation as R
 from pycofbuilder.tools import (rotation_matrix_from_vectors,
                                 closest_atom,
                                 closest_atom_struc,
-                                find_index)
+                                find_index,
+                                unit_vector)
 from pycofbuilder.io_tools import save_xyz
 from pycofbuilder.cjson import ChemJSON
 
@@ -49,7 +50,7 @@ class BuildingBlock():
 
         self.available_symmetry = ['L2',
                                    'T3',
-                                   'S4',  # 'R4', 'D4',
+                                   'S4', 'D4',  # 'R4'
                                    'H6',  # 'O6', 'P6'
                                    # 'C8', 'A8', 'E8'
                                    # 'B12', 'I12', 'U12', 'X12'
@@ -71,6 +72,11 @@ class BuildingBlock():
                                                       self.core,
                                                       self.conector,
                                                       self.funcGroups)
+
+    def copy(self):
+        obj = type(self).__new__(self.__class__)
+        obj.__dict__.update(self.__dict__)
+        return obj
 
     def from_name(self, name):
         '''Automatically read or create a buiding block based on its name'''
@@ -112,7 +118,7 @@ class BuildingBlock():
 
         print(self._structure_as_string())
 
-    def _centralize_molecule(self, by_X=True):
+    def _centralize(self, by_X=True):
         ''' Centralize the molecule on its geometrical center'''
 
         transposed = np.transpose(self.atom_pos)
@@ -193,12 +199,41 @@ class BuildingBlock():
         _, X_pos = self._get_X_points()
         self.size = [np.linalg.norm(i) for i in X_pos]
 
-    def _align_to(self, vec=[0, 1, 0]):
-        '''Align the molecule to a given vector'''
+    def _align_to(self, vec: list = [0, 1, 0], n: int = 0):
+        '''
+        Align the first n-th X point to a given vector
+
+        Parameters
+        ----------
+        vec : list
+            Vector to align the molecule
+        n : int
+            Index of the X point to be aligned
+        '''
         _, X_pos = self._get_X_points()
-        R_matrix = rotation_matrix_from_vectors(X_pos[0], vec)
+        R_matrix = rotation_matrix_from_vectors(X_pos[n], vec)
 
         self.atom_pos = np.dot(self.atom_pos, np.transpose(R_matrix))
+
+    def _rotate_around(self, rotation_axis: list = [1, 0, 0], angle: float = 0.0, degree: bool = True):
+        '''
+        Rotate the molecule around a given axis
+
+        Parameters
+        ----------
+        rotation_axis : list
+            Rotation axis
+        angle : float
+            Rotation angle in degrees
+        degree : bool
+            If True, the angle is given in degrees.
+            Default is True.
+        '''
+
+        rotation_axis = unit_vector(rotation_axis)
+        rotation = R.from_rotvec(angle * rotation_axis, degrees=degree)
+
+        self.atom_pos = rotation.apply(self.atom_pos)
 
     def _rotate_to_xy_plane(self):
         '''Rotate the molecule to the xy plane'''
@@ -216,6 +251,18 @@ class BuildingBlock():
             if normal[0] != 0 and normal[1] != 0:
                 R_matrix = rotation_matrix_from_vectors(normal, [0, 0, 1])
                 self.atom_pos = np.dot(self.atom_pos, np.transpose(R_matrix))
+
+    def shift(self, shift_vector: list):
+        '''
+        Shift the molecule by a given vector
+
+        Parameters
+        ----------
+        shift_vector : list
+            Shift vector
+        '''
+
+        self.atom_pos = np.array(self.atom_pos) + np.array(shift_vector)
 
     def _structure_as_string(self):
         struct_string = ''
@@ -425,8 +472,8 @@ class BuildingBlock():
         self.funcGroups = funcGroup_string
 
         self.connectivity = len([i for i in self.atom_types if 'X' in i])
-        self._centralize_molecule()
-        self._align_to()
+        self._centralize()
+        # self._align_to()
         self._calculate_size()
 
     def replace_X(self, target_type):
@@ -444,7 +491,7 @@ class BuildingBlock():
                 atom_labels.append(self.atom_labels[i])
 
         self.atom_types = atom_types
-        self.atom_pos = atom_pos
+        self.atom_pos = np.array(atom_pos)
         self.atom_labels = atom_labels
 
     def save(self, extension='xyz'):
@@ -457,19 +504,14 @@ class BuildingBlock():
 
     def get_available_core(self):
         '''Get the list of available cores'''
-        L2_PATH = os.path.join(self.main_path, 'core', 'L2')
-        L2_list = [i.rstrip('.cjson') for i in os.listdir(L2_PATH) if '.cjson' in i]
 
-        T3_PATH = os.path.join(self.main_path, 'core', 'T3')
-        T3_list = [i.rstrip('.cjson') for i in os.listdir(T3_PATH) if '.cjson' in i]
+        available_cores = {}
 
-        S4_PATH = os.path.join(self.main_path, 'core', 'S4')
-        S4_list = [i.rstrip('.cjson') for i in os.listdir(S4_PATH) if '.cjson' in i]
+        for symm in self.available_symmetry:
+            symm_path = os.path.join(self.main_path, 'core', symm)
+            available_cores[symm] = [i.rstrip('.cjson') for i in os.listdir(symm_path) if '.cjson' in i]
 
-        H6_PATH = os.path.join(self.main_path, 'core', 'H6')
-        H6_list = [i.rstrip('.cjson') for i in os.listdir(H6_PATH) if '.cjson' in i]
-
-        return L2_list, T3_list, S4_list, H6_list
+        return available_cores
 
     def get_available_R(self):
         '''Get the list of available functional groups'''
@@ -498,7 +540,7 @@ class BuildingBlock():
         conector = name[2]
         funcGroups = name[3:]
 
-        BB_dict = {s: self.get_available_core()[i] for i, s in enumerate(self.available_symmetry)}
+        BB_dict = self.get_available_core()
 
         if symm in self.available_symmetry:
             symm_check = True

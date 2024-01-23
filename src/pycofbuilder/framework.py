@@ -93,7 +93,7 @@ class Framework():
         Default: bb_lib
     """
 
-    def __init__(self, name=None, out_dir=None, verbosity=False, save_bb=True):
+    def __init__(self, name=None, out_dir=None, verbosity='low', save_bb=True):
 
         self.verbosity: str = verbosity.lower()
         self.out_path: str = os.path.join(os.getcwd(), 'out') if out_dir is None else out_dir
@@ -132,7 +132,7 @@ class Framework():
                                  'FXT', 'FXT_A']
 
         # To add: ['dia', 'bor', 'srs', 'pts', 'ctn', 'rra', 'fcc', 'lon', 'stp', 'acs', 'tbo', 'bcu', 'fjh', 'ceq']
-        self.available_3D_top = ['DIA', 'BOR']  # Temporary
+        self.available_3D_top = ['DIA', 'DIA_A', 'BOR']  # Temporary
         self.available_topologies = self.available_2D_top + self.available_3D_top
 
         # Define available stackings for all 2D topologies
@@ -145,8 +145,9 @@ class Framework():
             'HXL_A': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
             'FXT': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
             'FXT_A': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
-            'DIA': [0, 1, 2, 3, 4],  # Temporary
-            'BOR': [0, 5, 8, 6, 7]  # Temporary
+            'DIA': ['0'],  # Temporary
+            'DIA_A': ['0'],  # Temporary
+            'BOR': ['0']  # Temporary
         }
 
         if name is None:
@@ -233,10 +234,10 @@ class Framework():
 
         bb1_name, bb2_name, Net, Stacking = FrameworkName.split('-')
 
-        net_error = f'Net must be one of the following: {self.available_topologies}'
+        net_error = f'{Net} not in the available list: {self.available_topologies}'
         assert Net in self.available_topologies, net_error
 
-        stacking_error = f'Stacking must be one of the following: {self.available_stacking[Net]}'
+        stacking_error = f'{Stacking} not in the available list: {self.available_stacking[Net]}'
         assert Stacking in self.available_stacking[Net], stacking_error
 
         return bb1_name, bb2_name, Net, Stacking
@@ -302,6 +303,8 @@ class Framework():
             'HXL_A': self._create_hxl_a_structure,
             'FXT': self._create_fxt_structure,
             'FXT_A': self._create_fxt_a_structure,
+            'DIA': self._create_dia_structure,
+            'DIA_A': self._create_dia_a_structure,
             }
 
         result = net_build_dict[Net](bb1, bb2, stacking=Stacking, **kwargs)
@@ -4310,6 +4313,348 @@ class Framework():
 
         symm_op = symm.get_point_group_operations()
         self.hall = symm.get_hall()
+
+        if print_result is True:
+            print_framework_name(self.name,
+                                 str(self.lattice_type),
+                                 str(self.hall[0:2]),
+                                 str(self.space_group),
+                                 str(self.space_group_n),
+                                 len(symm_op))
+
+        return [self.name,
+                str(self.lattice_type),
+                str(self.hall[0:2]),
+                str(self.space_group),
+                str(self.space_group_n),
+                len(symm_op)]
+
+    def _create_dia_structure(self,
+                              BB_D41: str,
+                              BB_D42: str,
+                              interp_dg: str = '1',
+                              print_result: bool = True,
+                              **kwargs):
+        """Creates a COF with DIA network.
+
+        The DIA net is composed of two tetrapodal tetrahedical building blocks.
+
+        Parameters
+        ----------
+        BB_D41 : BuildingBlock, required
+            The BuildingBlock object of the tetrapodal tetrahedical Buiding Block
+        BB_D42 : BuildingBlock, required
+            The BuildingBlock object of the tetrapodal tetrahedical Buiding Block
+        interp_dg : str, optional
+            The degree of interpenetration of the framework (default is '1')
+        print_result : bool, optional
+            Parameter for the control for printing the result (default is True)
+
+        Returns
+        -------
+        list
+            A list of strings containing:
+                1. the structure name,
+                2. lattice type,
+                3. hall symbol of the cristaline structure,
+                4. space group,
+                5. number of the space group,
+                6. number of operation symmetry
+        """
+        # Get the topology information
+        topology_info = TOPOLOGY_DICT[self.topology]
+
+        connectivity_error = 'Building block {} must present connectivity {}'
+        assert BB_D41.connectivity == topology_info['vertice_connectivity'], connectivity_error.format('A', 4)
+        assert BB_D42.connectivity == topology_info['edge_connectivity'], connectivity_error.format('B', 2)
+
+        self.name = f'{BB_D41.name}-{BB_D42.name}-DIA-{interp_dg}'
+        self.topology = 'DIA'
+        self.staking = interp_dg
+        self.dimension = 3
+
+        self.charge = BB_D41.charge + BB_D42.charge
+        self.chirality = BB_D41.chirality or BB_D42.chirality
+
+        print_command(f'Starting the creation of {self.name}', self.verbosity, ['debug', 'high'])
+
+        # Measure the base size of the building blocks
+        size = np.average(BB_D41.size) + np.average(BB_D42.size)
+
+        print_command(f'Starting the creation of {self.name}', self.verbosity, ['debug', 'high'])
+
+        # Calculate the primitive cell vector assuming tetrahedical building blocks
+        a_prim = np.sqrt(2)*size*np.sqrt((1 - np.cos(1.9106316646041868)))
+        a_conv = np.sqrt(2)*a_prim
+
+        # Create the primitive lattice
+        self.lattice = Lattice(a_conv/2*np.array(topology_info['lattice']))
+
+        # Create the structure
+        self.atom_types = []
+        self.atom_labels = []
+        self.atom_pos = []
+
+        # Detect the bond atom from the connection groups type
+        bond_atom = get_bond_atom(BB_D41.conector, BB_D42.conector)
+        print_command(f'Bond atom detected: {bond_atom}', self.verbosity, ['debug', 'high'])
+
+        # Align and rotate the building block 1 to their respective positions
+        BB_D41._align_to(np.ones(3))
+        BB_D41._rotate_around(rotation_axis=np.array(topology_info['vertices'][0]['align_v']),
+                              angle=topology_info['vertices'][0]['angle'])
+        BB_D41.remove_X()
+
+        # Add the building block 1 to the structure
+        self.atom_types += BB_D41.atom_types
+        self.atom_pos += list(np.array(BB_D41.atom_pos) + np.array(topology_info['vertices'][0]['position'])*a_conv)
+        self.atom_labels += ['C1' if i == 'C' else i for i in BB_D41.atom_labels]
+
+        # Align and rotate the building block 2 to their respective positions
+        BB_D42._align_to(np.ones(3))
+        BB_D42._rotate_around(rotation_axis=np.array(topology_info['vertices'][1]['align_v']),
+                              angle=topology_info['vertices'][1]['angle'])
+        BB_D42.replace_X(bond_atom)
+        BB_D42.remove_X()
+
+        # Add the building block 2 to the structure
+        self.atom_types += BB_D42.atom_types
+        self.atom_pos += list(-np.array(BB_D42.atom_pos) + np.array(topology_info['vertices'][1]['position'])*a_conv)
+        self.atom_labels += ['C2' if i == 'C' else i for i in BB_D42.atom_labels]
+
+        StartingFramework = Structure(
+            self.lattice,
+            self.atom_types,
+            self.atom_pos,
+            coords_are_cartesian=True,
+            site_properties={'source': self.atom_labels}
+        ).get_sorted_structure()
+
+        StartingFramework.to('teste_2.cif', fmt='cif')
+
+        dict_structure = StartingFramework.as_dict()
+
+        self.lattice = np.array(dict_structure['lattice']['matrix']).astype(float)
+
+        self.atom_types = [i['label'] for i in dict_structure['sites']]
+        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
+        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
+        self.n_atoms = len(dict_structure['sites'])
+        self.composition = StartingFramework.formula
+
+        # Get the simmetry information of the generated structure
+        symm = SpacegroupAnalyzer(StartingFramework, symprec=0.05, angle_tolerance=.5)
+        try:
+            self.prim_structure = symm.get_primitive_standard_structure(keep_site_properties=True)
+
+            dict_structure = symm.get_refined_structure(keep_site_properties=True).as_dict()
+
+            self.lattice = np.array(dict_structure['lattice']['matrix']).astype(float)
+
+            self.atom_types = [i['label'] for i in dict_structure['sites']]
+            self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
+            self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
+            self.n_atoms = len(dict_structure['sites'])
+            self.composition = self.prim_structure.formula
+
+            print_command(self.prim_structure, self.verbosity, ['debug'])
+
+            self.lattice_type = symm.get_lattice_type()
+            self.space_group = symm.get_space_group_symbol()
+            self.space_group_n = symm.get_space_group_number()
+
+            symm_op = symm.get_point_group_operations()
+            self.hall = symm.get_hall()
+
+        except Exception as e:
+            print_command(e, self.verbosity, ['debug'])
+
+            self.lattice_type = 'Triclinic'
+            self.space_group = 'P1'
+            self.space_group_n = '1'
+
+            symm_op = [1]
+            self.hall = 'P 1'
+
+        if print_result is True:
+            print_framework_name(self.name,
+                                 str(self.lattice_type),
+                                 str(self.hall[0:2]),
+                                 str(self.space_group),
+                                 str(self.space_group_n),
+                                 len(symm_op))
+
+        return [self.name,
+                str(self.lattice_type),
+                str(self.hall[0:2]),
+                str(self.space_group),
+                str(self.space_group_n),
+                len(symm_op)]
+
+    def _create_dia_a_structure(self,
+                                BB_D4: str,
+                                BB_L2: str,
+                                interp_dg: str = '1',
+                                print_result: bool = True,
+                                **kwargs):
+        """Creates a COF with DIA network.
+
+        The DIA net is composed of two tetrapodal tetrahedical building blocks.
+
+        Parameters
+        ----------
+        BB_D4 : BuildingBlock, required
+            The BuildingBlock object of the tetrapodal tetrahedical Buiding Block
+        BB_L2 : BuildingBlock, required
+            The BuildingBlock object of the dipodal linear Buiding Block
+        interp_dg : str, optional
+            The degree of interpenetration of the framework (default is '1')
+        print_result : bool, optional
+            Parameter for the control for printing the result (default is True)
+
+        Returns
+        -------
+        list
+            A list of strings containing:
+                1. the structure name,
+                2. lattice type,
+                3. hall symbol of the cristaline structure,
+                4. space group,
+                5. number of the space group,
+                6. number of operation symmetry
+        """
+        # Get the topology information
+        topology_info = TOPOLOGY_DICT[self.topology]
+
+        connectivity_error = 'Building block {} must present connectivity {}'
+        assert BB_D4.connectivity == topology_info['vertice_connectivity'], connectivity_error.format('A', 4)
+        assert BB_L2.connectivity == topology_info['edge_connectivity'], connectivity_error.format('B', 2)
+
+        self.name = f'{BB_D4.name}-{BB_L2.name}-DIA_A-{interp_dg}'
+        self.topology = 'DIA_A'
+        self.staking = interp_dg
+        self.dimension = 3
+
+        self.charge = BB_D4.charge + BB_L2.charge
+        self.chirality = BB_D4.chirality or BB_L2.chirality
+
+        print_command(f'Starting the creation of {self.name}', self.verbosity, ['debug', 'high'])
+
+        # Detect the bond atom from the connection groups type
+        bond_atom = get_bond_atom(BB_D4.conector, BB_L2.conector)
+
+        # Replace "X" the building block
+        BB_L2.replace_X(bond_atom)
+
+        print_command(f'Bond atom detected: {bond_atom}', self.verbosity, ['debug', 'high'])
+
+        # Measure the base size of the building blocks
+        size = 2 * (np.average(BB_D4.size) + np.average(BB_L2.size))
+
+        print_command(f'Starting the creation of {self.name}', self.verbosity, ['debug', 'high'])
+
+        # Calculate the primitive cell vector assuming tetrahedical building blocks
+        a_prim = np.sqrt(2)*size*np.sqrt((1 - np.cos(1.9106316646041868)))
+        a_conv = np.sqrt(2)*a_prim
+
+        # Create the primitive lattice
+        self.lattice = Lattice(a_conv/2*np.array(topology_info['lattice']))
+
+        # Create the structure
+        self.atom_types = []
+        self.atom_labels = []
+        self.atom_pos = []
+
+        # Align and rotate the building block 1 to their respective positions
+        BB_D4._align_to(topology_info['vertices'][0]['align_v'])
+        BB_D4._rotate_around(rotation_axis=np.array(topology_info['vertices'][0]['align_v']),
+                             angle=topology_info['vertices'][0]['angle'])
+        BB_D4.shift(np.array(topology_info['vertices'][0]['position'])*a_conv)
+        BB_D4.remove_X()
+
+        # Add the building block 1 to the structure
+        self.atom_types += BB_D4.atom_types
+        self.atom_pos += BB_D4.atom_pos.tolist()
+        self.atom_labels += ['C1' if i == 'C' else i for i in BB_D4.atom_labels]
+
+        # Add the building block 1 to the structure
+        self.atom_types += BB_D4.atom_types
+        self.atom_pos += list(-np.array(BB_D4.atom_pos) + np.array(topology_info['vertices'][1]['position'])*a_conv)
+        self.atom_labels += ['C1' if i == 'C' else i for i in BB_D4.atom_labels]
+
+        # Add the building blocks to the structure
+        for edge_data in topology_info['edges']:
+            BB = BB_L2.copy()
+            BB._align_to(edge_data['align_v'])
+            BB._rotate_around(rotation_axis=edge_data['align_v'],
+                              angle=edge_data['angle'])
+            BB.shift(np.array(edge_data['position']) * a_conv)
+            BB.remove_X()
+
+            self.atom_types += BB.atom_types
+            self.atom_pos += BB.atom_pos.tolist()
+            self.atom_labels += ['C2' if i == 'C' else i for i in BB.atom_labels]
+
+        StartingFramework = Structure(
+            self.lattice,
+            self.atom_types,
+            self.atom_pos,
+            coords_are_cartesian=True,
+            site_properties={'source': self.atom_labels}
+        ).get_sorted_structure()
+
+        StartingFramework.translate_sites(
+            np.ones(len(self.atom_types)).astype(int).tolist(),
+            [0, 0, 0],
+            frac_coords=True,
+            to_unit_cell=True
+            )
+
+        dict_structure = StartingFramework.as_dict()
+
+        self.lattice = np.array(dict_structure['lattice']['matrix']).astype(float)
+
+        self.atom_types = [i['label'] for i in dict_structure['sites']]
+        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
+        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
+        self.n_atoms = len(dict_structure['sites'])
+        self.composition = StartingFramework.formula
+
+        StartingFramework.to('teste2.cif', fmt='cif')
+
+        # Get the simmetry information of the generated structure
+        symm = SpacegroupAnalyzer(StartingFramework, symprec=0.05, angle_tolerance=.5)
+        try:
+            self.prim_structure = symm.get_primitive_standard_structure(keep_site_properties=True)
+
+            dict_structure = symm.get_refined_structure(keep_site_properties=True).as_dict()
+
+            self.lattice = np.array(dict_structure['lattice']['matrix']).astype(float)
+
+            self.atom_types = [i['label'] for i in dict_structure['sites']]
+            self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
+            self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
+            self.n_atoms = len(dict_structure['sites'])
+            self.composition = self.prim_structure.formula
+
+            print_command(self.prim_structure, self.verbosity, ['debug'])
+
+            self.lattice_type = symm.get_lattice_type()
+            self.space_group = symm.get_space_group_symbol()
+            self.space_group_n = symm.get_space_group_number()
+
+            symm_op = symm.get_point_group_operations()
+            self.hall = symm.get_hall()
+
+        except Exception as e:
+            print_command(e, self.verbosity, ['debug'])
+
+            self.lattice_type = 'Triclinic'
+            self.space_group = 'P1'
+            self.space_group_n = '1'
+
+            symm_op = [1]
+            self.hall = 'P 1'
 
         if print_result is True:
             print_framework_name(self.name,

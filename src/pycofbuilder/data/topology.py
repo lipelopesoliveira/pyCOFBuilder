@@ -183,4 +183,41 @@ TOPOLOGY_DICT = {
             {'position': [-21/128, 25*np.sqrt(3)/64, 0], 'angle': 30},
             ]
         },
+    'DIA': {
+        'a': 1,
+        'b': 1,
+        'c': 1,
+        'alpha': 60,
+        'beta': 60,
+        'gamma': 60,
+        'lattice': [[0, 1, 1], [1, 0, 1], [1, 1, 0]],
+        'vertice_connectivity': 4,
+        'edge_connectivity': 4,
+        'vertices': [
+            {'position': [0, 0, 0], 'angle': -7.5, 'align_v': [1, 1, 1]},
+            {'position': [1/4, 1/4, 1/4], 'angle': 7.5, 'align_v': [-1, -1, -1]},
+            ],
+        'edges': []
+        },
+    'DIA_A': {
+        'a': 1,
+        'b': 1,
+        'c': 1,
+        'alpha': 60,
+        'beta': 60,
+        'gamma': 60,
+        'lattice': [[0, 1, 1], [1, 0, 1], [1, 1, 0]],
+        'vertice_connectivity': 4,
+        'edge_connectivity': 2,
+        'vertices': [
+            {'position': [0, 0, 0], 'angle': -7.5, 'align_v': [1, 1, 1]},
+            {'position': [1/4, 1/4, 1/4], 'angle': 7.5, 'align_v': [-1, -1, -1]},
+            ],
+        'edges': [
+            {'position': [1/8, 1/8, 1/8], 'angle': -15, 'align_v': [1, 1, 1]},
+            {'position': [1/8, 3/8, 3/8], 'angle': 15, 'align_v': [-1/4, 1/4, 1/4]},
+            {'position': [3/8, 1/8, 3/8], 'angle': -74.5, 'align_v': [1/4, -1/4, 1/4]},
+            {'position': [3/8, 3/8, 1/8], 'angle': 15, 'align_v': [1/4, 1/4, -1/4]},
+            ]
+        }
     }
