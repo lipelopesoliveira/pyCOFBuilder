@@ -8,6 +8,7 @@ The Framework class implements definitions and methods for a Framework buiding
 
 import os
 import numpy as np
+import copy
 
 # Import pymatgen
 from pymatgen.core import Lattice, Structure
@@ -814,9 +815,9 @@ class Framework():
                 6. number of operation symmetry
         """
 
-        connectivity_error = 'Building block {} must present connectivity {}'
-        assert BB_T3.connectivity == 3, connectivity_error.format('A', 3)
-        assert BB_L2.connectivity == 2, connectivity_error.format('B', 2)
+        connectivity_error = 'Building block {} must present connectivity {} not {}'
+        assert BB_T3.connectivity == 3, connectivity_error.format('A', 3, BB_T3.connectivity)
+        assert BB_L2.connectivity == 2, connectivity_error.format('B', 2, BB_L2.connectivity)
 
         self.name = f'{BB_T3.name}-{BB_L2.name}-HCB_A-{stacking}'
         self.topology = 'HCB_A'
@@ -4400,9 +4401,27 @@ class Framework():
         print_command(f'Bond atom detected: {bond_atom}', self.verbosity, ['debug', 'high'])
 
         # Align and rotate the building block 1 to their respective positions
-        BB_D41._align_to(np.ones(3))
+        BB_D41._align_to(topology_info['vertices'][0]['align_v'])
+
+        # Determine the angle that alings the X[1] to one of the vertices of the tetrahedron
+        vertice_pos = np.array([0, 1, 0])*a_conv
+        Q_vertice_pos = BB_D41._get_X_points()[1][1]
+
+        rotated_pos = [
+             R.from_rotvec(angle * np.ones(3), degrees=False).apply(Q_vertice_pos)
+             for angle in np.linspace(0, 2*np.pi, 360)
+             ]
+
+        # Calculate the angle between the vertice_pos and the elements of rotated_pos
+        angle_list = [np.arccos(np.dot(vertice_pos, i)/(np.linalg.norm(vertice_pos)*np.linalg.norm(i)))
+                      for i in rotated_pos]
+
+        angle = np.linspace(0, 2*np.pi, 360)[np.argmin(angle_list)]
+
         BB_D41._rotate_around(rotation_axis=np.array(topology_info['vertices'][0]['align_v']),
-                              angle=topology_info['vertices'][0]['angle'])
+                              angle=-angle,
+                              degree=False)
+
         BB_D41.remove_X()
 
         # Add the building block 1 to the structure
@@ -4411,15 +4430,16 @@ class Framework():
         self.atom_labels += ['C1' if i == 'C' else i for i in BB_D41.atom_labels]
 
         # Align and rotate the building block 2 to their respective positions
-        BB_D42._align_to(np.ones(3))
+        BB_D42._align_to(topology_info['vertices'][1]['align_v'])
         BB_D42._rotate_around(rotation_axis=np.array(topology_info['vertices'][1]['align_v']),
-                              angle=topology_info['vertices'][1]['angle'])
+                              angle=-angle,
+                              degree=False)
         BB_D42.replace_X(bond_atom)
         BB_D42.remove_X()
 
         # Add the building block 2 to the structure
         self.atom_types += BB_D42.atom_types
-        self.atom_pos += list(-np.array(BB_D42.atom_pos) + np.array(topology_info['vertices'][1]['position'])*a_conv)
+        self.atom_pos += list(np.array(BB_D42.atom_pos) + np.array(topology_info['vertices'][1]['position'])*a_conv)
         self.atom_labels += ['C2' if i == 'C' else i for i in BB_D42.atom_labels]
 
         StartingFramework = Structure(
@@ -4430,7 +4450,7 @@ class Framework():
             site_properties={'source': self.atom_labels}
         ).get_sorted_structure()
 
-        StartingFramework.to('teste_2.cif', fmt='cif')
+        StartingFramework.to('TESTE_DIA.cif', fmt='cif')
 
         dict_structure = StartingFramework.as_dict()
 
@@ -4443,7 +4463,7 @@ class Framework():
         self.composition = StartingFramework.formula
 
         # Get the simmetry information of the generated structure
-        symm = SpacegroupAnalyzer(StartingFramework, symprec=0.05, angle_tolerance=.5)
+        symm = SpacegroupAnalyzer(StartingFramework, symprec=0.5, angle_tolerance=5)
         try:
             self.prim_structure = symm.get_primitive_standard_structure(keep_site_properties=True)
 
@@ -4565,8 +4585,26 @@ class Framework():
 
         # Align and rotate the building block 1 to their respective positions
         BB_D4._align_to(topology_info['vertices'][0]['align_v'])
+
+        # Determine the angle that alings the X[1] to one of the vertices of the tetrahedron
+        vertice_pos = np.array([0, 1, 0])*a_conv
+        Q_vertice_pos = BB_D4._get_X_points()[1][1]
+
+        rotated_pos = [
+             R.from_rotvec(angle * np.ones(3), degrees=False).apply(Q_vertice_pos)
+             for angle in np.linspace(0, 2*np.pi, 360)
+             ]
+
+        # Calculate the angle between the vertice_pos and the elements of rotated_pos
+        angle_list = [np.arccos(np.dot(vertice_pos, i)/(np.linalg.norm(vertice_pos)*np.linalg.norm(i)))
+                      for i in rotated_pos]
+
+        angle = np.linspace(0, 2*np.pi, 360)[np.argmin(angle_list)]
+
         BB_D4._rotate_around(rotation_axis=np.array(topology_info['vertices'][0]['align_v']),
-                             angle=topology_info['vertices'][0]['angle'])
+                             angle=-angle,
+                             degree=False)
+
         BB_D4.shift(np.array(topology_info['vertices'][0]['position'])*a_conv)
         BB_D4.remove_X()
 
@@ -4582,14 +4620,20 @@ class Framework():
 
         # Add the building blocks to the structure
         for edge_data in topology_info['edges']:
-            BB = BB_L2.copy()
-            print(BB)
+            # Copy the building block 2 object
+            BB = copy.deepcopy(BB_L2)
+
+            # Align, rotate and shift the building block 2 to their respective positions
             BB._align_to(edge_data['align_v'])
             BB._rotate_around(rotation_axis=edge_data['align_v'],
                               angle=edge_data['angle'])
             BB.shift(np.array(edge_data['position']) * a_conv)
-            BB.replace_X(bond_atom)
 
+            # Replace "X" the building block with the correct atom dicated by the connection group
+            BB.replace_X(bond_atom)
+            BB.remove_X()
+
+            # Update the structure
             self.atom_types += BB.atom_types
             self.atom_pos += BB.atom_pos.tolist()
             self.atom_labels += ['C2' if i == 'C' else i for i in BB.atom_labels]
@@ -4619,10 +4663,10 @@ class Framework():
         self.n_atoms = len(dict_structure['sites'])
         self.composition = StartingFramework.formula
 
-        StartingFramework.to('teste2.cif', fmt='cif')
+        StartingFramework.to('TESTE_DIA-A.cif', fmt='cif')
 
         # Get the simmetry information of the generated structure
-        symm = SpacegroupAnalyzer(StartingFramework, symprec=0.05, angle_tolerance=.5)
+        symm = SpacegroupAnalyzer(StartingFramework, symprec=1, angle_tolerance=5)
         try:
             self.prim_structure = symm.get_primitive_standard_structure(keep_site_properties=True)
 

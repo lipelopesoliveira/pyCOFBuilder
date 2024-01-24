@@ -194,8 +194,8 @@ TOPOLOGY_DICT = {
         'vertice_connectivity': 4,
         'edge_connectivity': 4,
         'vertices': [
-            {'position': [0, 0, 0], 'angle': -7.5, 'align_v': [1, 1, 1]},
-            {'position': [1/4, 1/4, 1/4], 'angle': 7.5, 'align_v': [-1, -1, -1]},
+            {'position': [0, 0, 0], 'angle': 55, 'align_v': [1, 1, 1]},
+            {'position': [1/4, 1/4, 1/4], 'angle': -55, 'align_v': [-1, -1, -1]},
             ],
         'edges': []
         },

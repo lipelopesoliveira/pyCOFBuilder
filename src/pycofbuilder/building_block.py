@@ -9,6 +9,10 @@ The BuildingBlock class is used to create the building blocks for the Framework 
 import os
 import numpy as np
 from scipy.spatial.transform import Rotation as R
+
+from pymatgen.symmetry.analyzer import PointGroupAnalyzer
+from pymatgen.core import Molecule
+
 from pycofbuilder.tools import (rotation_matrix_from_vectors,
                                 closest_atom,
                                 closest_atom_struc,
@@ -349,6 +353,121 @@ class BuildingBlock():
 
             self.atom_labels = np.append(self.atom_labels, [['Q'] * len(n_conector_label)])
 
+    def _add_connection_group_symm(self, conector_name):
+        '''Adds the functional group by which the COF will be formed from the building blocks'''
+
+        connector = ChemJSON()
+        connector.from_cjson(os.path.join(self.main_path, 'conector'), conector_name)
+
+        self.smiles = self.smiles.replace('[Q]',
+                                          f"{connector.properties['smiles'].replace('[Q]', '')}")
+
+        conector_types = connector.atomic_types
+        conector_pos = connector.cartesian_positions
+
+        core_types, core_pos = self.atom_types, self.atom_pos
+
+        replaced_core_labels = []
+        Q_index = []
+
+        for i, atom in enumerate(core_types):
+            if atom == 'Q':
+                Q_index.append(i)
+                replaced_core_labels.append('H')
+            elif atom in ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9']:
+                replaced_core_labels.append('H')
+            else:
+                replaced_core_labels.append(atom)
+
+        #print('Index of Q points:', Q_index)
+        sym_mol = Molecule(species=replaced_core_labels, coords=core_pos)
+
+        pga = PointGroupAnalyzer(sym_mol)
+        #print('Point group:', pga.get_pointgroup())
+
+        # Keep only keys that are in Q_index
+        eq_sets = pga.symmetrize_molecule()['eq_sets']
+        eq_sets = {k: v for k, v in eq_sets.items() if k in Q_index}
+
+        # Get the symmetry operations for the Q_points
+        sym_ops_dict = {i: pga.get_equivalent_atoms()['sym_ops'][i] for i in Q_index if i in eq_sets.keys()}
+
+        # Get the position of the closest atom to Q in the structure
+        close_Q_struct = closest_atom('Q',
+                                      core_pos[Q_index[0]],
+                                      core_types,
+                                      core_pos)[1]
+
+        # Get the position of the closest atom to Q in the conection group
+        close_Q_connector = closest_atom('Q',
+                                         conector_pos[0],
+                                         conector_types,
+                                         conector_pos)
+
+        # Create the vector Q in the structure
+        QS_vector = close_Q_struct - core_pos[Q_index[0]]
+
+        # Create the vector Q in the conector
+        QC_vector = np.array(close_Q_connector[1]) - np.array(conector_pos[0])
+
+        # Find the rotation matrix that align v2 with v1
+        Rot_m = rotation_matrix_from_vectors(QC_vector, QS_vector)
+
+        # Rotate and translade the conector group to Q position in the strucutre
+        conn_pos = np.dot(conector_pos, -np.transpose(Rot_m))
+        conn_pos += core_pos[Q_index[0]]
+
+        # Rotate 90 degrees on the QC_vector - QS_vector axis
+        Rot_m = R.from_rotvec(np.pi/2 * unit_vector(QS_vector)).as_matrix()
+        conn_pos = np.dot(conn_pos, np.transpose(Rot_m))
+
+        # Remove the Q atom from the conector group
+        conn_pos = np.delete(conn_pos, 0, axis=0)
+        conector_types.pop(0)
+
+        molecule_types, molecule_pos = [], []
+
+        # Add the core atoms to the molecule
+        for i, atom in enumerate(core_types):
+            if atom != 'Q':
+                molecule_types.append(atom)
+                molecule_pos.append(core_pos[i])
+
+        n_ops = 0
+        for _, sym_ops in sym_ops_dict.items():
+            for _, sym_op in sym_ops.items():
+                Qsite_conn_pos = []
+                #print('Operation', n_ops + 1, sym_op)
+                for atom in conn_pos:
+                    Qsite_conn_pos.append([i.sum() for i in sym_op*atom])
+                molecule_types += conector_types
+                molecule_pos += Qsite_conn_pos
+                n_ops += 1
+
+        # Add the position of conector atoms to the main structure
+        self.atom_types = molecule_types
+        self.atom_pos = np.array(molecule_pos)
+        self.atom_labels = np.append(self.atom_labels, [['Q'] * len(conector_types)*n_ops])
+
+        temp_l, temp_p = [], []
+        for i, atom in enumerate(self.atom_types):
+            temp_p.append(self.atom_pos[i])
+            if atom == 'Q':
+                Q_index.append(i)
+                temp_l.append('H')
+            elif atom in ['X', 'R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9']:
+                temp_l.append('H')
+            else:
+                temp_l.append(atom)
+
+        #print('Index of Q points:', Q_index)
+        sym_mol_temp = Molecule(species=temp_l, coords=temp_p)
+
+        pga = PointGroupAnalyzer(sym_mol_temp)
+        #print('Point group:', pga.get_pointgroup())
+
+        #print(self._structure_as_string())
+
     def _add_R_group(self, R_name, R_type):
         '''Adds group R in building blocks'''
 
@@ -457,9 +576,13 @@ class BuildingBlock():
         self.composition = core.formula
         self.atom_labels = ['C']*len(self.atom_types)
 
-        pref_orientation = unit_vector(self._get_Q_points(core.atomic_types, core.cartesian_positions)[1][0])
+        pref_orientation = unit_vector(self._get_Q_points(core.atomic_types,
+                                                          core.cartesian_positions)[1][0])
 
-        self._add_connection_group(conector)
+        if symmetry == 'D4':
+            self._add_connection_group_symm(conector)
+        else:
+            self._add_connection_group(conector)
 
         R_list_names = [R1, R2, R3, R4, R5, R6, R7, R8, R9]
         R_list_labels = ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9']
