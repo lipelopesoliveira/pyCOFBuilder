@@ -148,8 +148,8 @@ class Framework():
             'HXL_A': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
             'FXT': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
             'FXT_A': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
-            'DIA': ['0'],  # Temporary
-            'DIA_A': ['0'],  # Temporary
+            'DIA': ['1', '2', '3', '4'],  # Temporary
+            'DIA_A': ['1', '2', '3', '4'],  # Temporary
             'BOR': ['0']  # Temporary
         }
 
@@ -310,7 +310,7 @@ class Framework():
             'DIA_A': self._create_dia_a_structure,
             }
 
-        result = net_build_dict[Net](bb1, bb2, stacking=Stacking, **kwargs)
+        result = net_build_dict[Net](bb1, bb2, Stacking, **kwargs)
 
         return result
 
@@ -4468,6 +4468,20 @@ class Framework():
         self.atom_pos += BB_D42.atom_pos.tolist()
         self.atom_labels += ['C2' if i == 'C' else i for i in BB_D42.atom_labels]
 
+        atom_types, atom_labels, atom_pos = [], [], []
+        for n_int in range(int(self.stacking)):
+            int_direction = np.array([0, 1, 0]) * 7.2 * n_int
+
+            atom_types += self.atom_types
+            atom_pos += (np.array(self.atom_pos) + int_direction).tolist()
+            atom_labels += self.atom_labels
+
+            n_int += 1
+
+        self.atom_types = atom_types
+        self.atom_pos = atom_pos
+        self.atom_labels = atom_labels
+
         StartingFramework = Structure(
             self.lattice,
             self.atom_types,
@@ -4664,6 +4678,20 @@ class Framework():
             self.atom_types += BB.atom_types
             self.atom_pos += BB.atom_pos.tolist()
             self.atom_labels += ['C2' if i == 'C' else i for i in BB.atom_labels]
+
+        atom_types, atom_labels, atom_pos = [], [], []
+        for n_int in range(int(self.stacking)):
+            int_direction = np.array([0, 1, 0]) * 7.2 * n_int
+
+            atom_types += self.atom_types
+            atom_pos += (np.array(self.atom_pos) + int_direction).tolist()
+            atom_labels += self.atom_labels
+
+            n_int += 1
+
+        self.atom_types = atom_types
+        self.atom_pos = atom_pos
+        self.atom_labels = atom_labels
 
         StartingFramework = Structure(
             self.lattice,
