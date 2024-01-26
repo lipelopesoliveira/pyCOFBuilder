@@ -200,7 +200,7 @@ class BuildingBlock():
         _, X_pos = self._get_X_points()
         self.size = [np.linalg.norm(i) for i in X_pos]
 
-    def _align_to(self, vec: list = [0, 1, 0], n: int = 0, align_to_y: bool = True):
+    def _align_to(self, vec: list = [0, 1, 0], n: int = 0):
         '''
         Align the first n-th X point to a given vector
 
@@ -217,25 +217,6 @@ class BuildingBlock():
         R_matrix = rotation_matrix_from_vectors(X_pos[n], vec)
 
         self.atom_pos = np.dot(self.atom_pos, np.transpose(R_matrix))
-
-        if self.symmetry == 'D4' and align_to_y is True:
-            # Get the position of the Q points in the structure
-            _, X_pos = self._get_X_points()
-            X_pos = X_pos[n + 1] if n + 1 < len(X_pos) else X_pos[n - 1]
-
-            # Determine the angle that alings the X[n +- 1] to y axis
-            y_axis = np.array([0, 1, 0])
-
-            rotated_list = [R.from_rotvec(a * np.array(vec), degrees=False).apply(X_pos)
-                            for a in np.linspace(0, 2*np.pi, 360)]
-
-            # Calculate the angle between the vertice_pos and the elements of rotated_list
-            angle_list = [np.arccos(np.dot(y_axis, i)/(np.linalg.norm(y_axis)*np.linalg.norm(i))) for i in rotated_list]
-
-            angle = np.linspace(0, 2*np.pi, 360)[np.argmin(angle_list)]
-
-            rotation = R.from_rotvec(angle * unit_vector(vec), degrees=False)
-            self.atom_pos = rotation.apply(self.atom_pos)
 
     def _rotate_around(self, rotation_axis: list = [1, 0, 0], angle: float = 0.0, degree: bool = True):
         '''

@@ -4651,7 +4651,7 @@ class Framework():
             BB = copy.deepcopy(BB_L2)
 
             # Align, rotate and shift the building block 2 to their respective positions
-            BB._align_to(edge_data['align_v'], align_to_y=False)
+            BB._align_to(edge_data['align_v'])
             BB._rotate_around(rotation_axis=edge_data['align_v'],
                               angle=edge_data['angle'])
             BB.shift(np.array(edge_data['position']) * a_conv)
