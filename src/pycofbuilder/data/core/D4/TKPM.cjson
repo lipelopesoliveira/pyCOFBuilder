@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "tetrakis-(4-methylphenyl)-methane",
-    "formula": "C25Q4H16",
+    "formula": "C25H16Q4",
     "atoms": {
         "elements": {
             "type": [

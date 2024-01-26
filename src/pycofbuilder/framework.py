@@ -23,7 +23,9 @@ from pycofbuilder.tools import (print_command,
                                 cellpar_to_cell,
                                 rotation_matrix_from_vectors,
                                 change_X_atoms,
-                                print_framework_name)
+                                print_framework_name,
+                                unit_vector,
+                                angle)
 
 from pycofbuilder.io_tools import (save_json,
                                    save_chemjson,
@@ -4404,42 +4406,66 @@ class Framework():
         BB_D41._align_to(topology_info['vertices'][0]['align_v'])
 
         # Determine the angle that alings the X[1] to one of the vertices of the tetrahedron
-        vertice_pos = np.array([0, 1, 0])*a_conv
+        vertice_pos = unit_vector(np.array([1, 0, 1]))
         Q_vertice_pos = BB_D41._get_X_points()[1][1]
 
-        rotated_pos = [
-             R.from_rotvec(angle * np.ones(3), degrees=False).apply(Q_vertice_pos)
+        rotated_list = [
+             R.from_rotvec(
+                 angle * unit_vector(topology_info['vertices'][0]['align_v']), degrees=False
+                 ).apply(Q_vertice_pos)
              for angle in np.linspace(0, 2*np.pi, 360)
              ]
 
-        # Calculate the angle between the vertice_pos and the elements of rotated_pos
-        angle_list = [np.arccos(np.dot(vertice_pos, i)/(np.linalg.norm(vertice_pos)*np.linalg.norm(i)))
-                      for i in rotated_pos]
+        # Calculate the angle between the vertice_pos and the elements of rotated_list
+        angle_list = [angle(vertice_pos, i) for i in rotated_list]
 
-        angle = np.linspace(0, 2*np.pi, 360)[np.argmin(angle_list)]
+        rot_angle = np.linspace(0, 360, 360)[np.argmax(angle_list)]
 
         BB_D41._rotate_around(rotation_axis=np.array(topology_info['vertices'][0]['align_v']),
-                              angle=-angle,
-                              degree=False)
+                              angle=rot_angle,
+                              degree=True)
 
+        BB_D41.shift(np.array(topology_info['vertices'][0]['position'])*a_conv)
         BB_D41.remove_X()
 
         # Add the building block 1 to the structure
         self.atom_types += BB_D41.atom_types
-        self.atom_pos += list(np.array(BB_D41.atom_pos) + np.array(topology_info['vertices'][0]['position'])*a_conv)
+        self.atom_pos += BB_D41.atom_pos.tolist()
         self.atom_labels += ['C1' if i == 'C' else i for i in BB_D41.atom_labels]
 
-        # Align and rotate the building block 2 to their respective positions
-        BB_D42._align_to(topology_info['vertices'][1]['align_v'])
-        BB_D42._rotate_around(rotation_axis=np.array(topology_info['vertices'][1]['align_v']),
-                              angle=-angle,
-                              degree=False)
+        # Align and rotate the building block 1 to their respective positions
+        BB_D42._align_to(topology_info['vertices'][0]['align_v'])
+
+        # Determine the angle that alings the X[1] to one of the vertices of the tetrahedron
+        vertice_pos = unit_vector(np.array([1, 0, 1]))
+        Q_vertice_pos = BB_D42._get_X_points()[1][1]
+
+        rotated_list = [
+             R.from_rotvec(
+                 angle * unit_vector(topology_info['vertices'][0]['align_v']), degrees=False
+                 ).apply(Q_vertice_pos)
+             for angle in np.linspace(0, 2*np.pi, 360)
+             ]
+
+        # Calculate the angle between the vertice_pos and the elements of rotated_list
+        angle_list = [angle(vertice_pos, i) for i in rotated_list]
+
+        rot_angle = np.linspace(0, 360, 360)[np.argmax(angle_list)]
+
+        BB_D42._rotate_around(rotation_axis=np.array(topology_info['vertices'][0]['align_v']),
+                              angle=rot_angle,
+                              degree=True)
+
+        BB_D42.atom_pos = -BB_D42.atom_pos
+
+        BB_D42.shift(np.array(topology_info['vertices'][1]['position'])*a_conv)
+
         BB_D42.replace_X(bond_atom)
         BB_D42.remove_X()
 
         # Add the building block 2 to the structure
         self.atom_types += BB_D42.atom_types
-        self.atom_pos += list(np.array(BB_D42.atom_pos) + np.array(topology_info['vertices'][1]['position'])*a_conv)
+        self.atom_pos += BB_D42.atom_pos.tolist()
         self.atom_labels += ['C2' if i == 'C' else i for i in BB_D42.atom_labels]
 
         StartingFramework = Structure(
@@ -4587,23 +4613,24 @@ class Framework():
         BB_D4._align_to(topology_info['vertices'][0]['align_v'])
 
         # Determine the angle that alings the X[1] to one of the vertices of the tetrahedron
-        vertice_pos = np.array([0, 1, 0])*a_conv
+        vertice_pos = unit_vector(np.array([1, 0, 1]))
         Q_vertice_pos = BB_D4._get_X_points()[1][1]
 
-        rotated_pos = [
-             R.from_rotvec(angle * np.ones(3), degrees=False).apply(Q_vertice_pos)
+        rotated_list = [
+             R.from_rotvec(
+                 angle * unit_vector(topology_info['vertices'][0]['align_v']), degrees=False
+                 ).apply(Q_vertice_pos)
              for angle in np.linspace(0, 2*np.pi, 360)
              ]
 
-        # Calculate the angle between the vertice_pos and the elements of rotated_pos
-        angle_list = [np.arccos(np.dot(vertice_pos, i)/(np.linalg.norm(vertice_pos)*np.linalg.norm(i)))
-                      for i in rotated_pos]
+        # Calculate the angle between the vertice_pos and the elements of rotated_list
+        angle_list = [angle(vertice_pos, i) for i in rotated_list]
 
-        angle = np.linspace(0, 2*np.pi, 360)[np.argmin(angle_list)]
+        rot_angle = np.linspace(0, 360, 360)[np.argmax(angle_list)]
 
         BB_D4._rotate_around(rotation_axis=np.array(topology_info['vertices'][0]['align_v']),
-                             angle=-angle,
-                             degree=False)
+                             angle=rot_angle,
+                             degree=True)
 
         BB_D4.shift(np.array(topology_info['vertices'][0]['position'])*a_conv)
         BB_D4.remove_X()
@@ -4624,7 +4651,7 @@ class Framework():
             BB = copy.deepcopy(BB_L2)
 
             # Align, rotate and shift the building block 2 to their respective positions
-            BB._align_to(edge_data['align_v'])
+            BB._align_to(edge_data['align_v'], align_to_y=False)
             BB._rotate_around(rotation_axis=edge_data['align_v'],
                               angle=edge_data['angle'])
             BB.shift(np.array(edge_data['position']) * a_conv)
