@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-.. image:: img/header.png
+.. image:: img/header-logo.png
    :width: 450
    :align: center
    :alt: pyCOFBuilder logo

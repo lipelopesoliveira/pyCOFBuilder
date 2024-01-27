@@ -1,0 +1,7 @@
+Triangular tritopic cores (T3)
+==============================
+
+.. raw:: html
+    :file: ../img/mol2grid_T3.html
+
+

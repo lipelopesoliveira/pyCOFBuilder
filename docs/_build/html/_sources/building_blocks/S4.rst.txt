@@ -1,0 +1,7 @@
+Square tetratopic cores (S4)
+=========================
+
+.. raw:: html
+    :file: ../img/mol2grid_S4.html
+
+

@@ -40,4 +40,12 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
-html_logo = '/img/header.png'
+
+html_logo = "img/header-logo.png"
+
+html_show_sourcelink = True
+
+html_theme_options = {
+    'logo_only': True,
+    'display_version': True,
+}
