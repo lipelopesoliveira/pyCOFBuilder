@@ -46,6 +46,6 @@ html_logo = "img/header-logo.png"
 html_show_sourcelink = True
 
 html_theme_options = {
-    'logo_only': True,
+    'logo_only': False,
     'display_version': True,
 }
