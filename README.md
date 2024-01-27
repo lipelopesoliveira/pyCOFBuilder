@@ -6,7 +6,7 @@
 
 This package is still under development and, but it is already possible to create a large number of COFs structures.
 
-Learn more at the [Documentation](https://lipelopesoliveira.github.io/pyCOFBuilder/docs/_build/index.html)
+Learn more at the [Documentation](https://lipelopesoliveira.github.io/pyCOFBuilder/index.html)
 
 ## Requirements
 
