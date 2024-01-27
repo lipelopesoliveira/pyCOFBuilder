@@ -118,7 +118,7 @@ class Framework():
         self.space_group_n = None
 
         self.dimention = None
-        self.n_atoms = self._get_n_atoms()
+        self.n_atoms = self.get_n_atoms()
         self.mass = None
         self.composition = None
         self.charge = 0
@@ -148,8 +148,8 @@ class Framework():
             'HXL_A': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
             'FXT': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
             'FXT_A': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
-            'DIA': ['1', '2', '3', '4'],  # Temporary
-            'DIA_A': ['1', '2', '3', '4'],  # Temporary
+            'DIA': [str(i + 1) for i in range(20)],
+            'DIA_A': [str(i + 1) for i in range(20)],
             'BOR': ['0']  # Temporary
         }
 
@@ -165,7 +165,7 @@ class Framework():
     def __repr__(self) -> str:
         return f'Reticulum({self.bb1_name}, {self.bb2_name}, {self.topology}, {self.stacking})'
 
-    def _get_n_atoms(self) -> int:
+    def get_n_atoms(self) -> int:
         ''' Returns the number of atoms in the unitary cell'''
         return len(self.atom_types)
 
@@ -3587,7 +3587,7 @@ class Framework():
         if self.verbosity is True:
             print('Unitary cell built:', lattice)
 
-        bb1_v1, bb1_v2, bb1_v3, bb1_v4 = bb_1._get_X_points()[1]
+        bb1_v1, bb1_v2, bb1_v3, bb1_v4 = bb_1.get_X_points()[1]
         bb1_lado1, _, _ = (
             bb1_v1 + bb1_v2) / 2, (bb1_v1 + bb1_v3) / 2, (bb1_v1 + bb1_v4) / 2
 
@@ -3972,7 +3972,7 @@ class Framework():
         if self.verbosity is True:
             print('Unitary cell built:', lattice)
 
-        bb1_v1, bb1_v2, bb1_v3, bb1_v4 = bb_1._get_X_points()[1]
+        bb1_v1, bb1_v2, bb1_v3, bb1_v4 = bb_1.get_X_points()[1]
         bb1_lado1, _, _ = (
             bb1_v1 + bb1_v2) / 2, (bb1_v1 + bb1_v3) / 2, (bb1_v1 + bb1_v4) / 2
 
@@ -4403,11 +4403,11 @@ class Framework():
         print_command(f'Bond atom detected: {bond_atom}', self.verbosity, ['debug', 'high'])
 
         # Align and rotate the building block 1 to their respective positions
-        BB_D41._align_to(topology_info['vertices'][0]['align_v'])
+        BB_D41.align_to(topology_info['vertices'][0]['align_v'])
 
         # Determine the angle that alings the X[1] to one of the vertices of the tetrahedron
         vertice_pos = unit_vector(np.array([1, 0, 1]))
-        Q_vertice_pos = BB_D41._get_X_points()[1][1]
+        Q_vertice_pos = BB_D41.get_X_points()[1][1]
 
         rotated_list = [
              R.from_rotvec(
@@ -4421,9 +4421,9 @@ class Framework():
 
         rot_angle = np.linspace(0, 360, 360)[np.argmax(angle_list)]
 
-        BB_D41._rotate_around(rotation_axis=np.array(topology_info['vertices'][0]['align_v']),
-                              angle=rot_angle,
-                              degree=True)
+        BB_D41.rotate_around(rotation_axis=np.array(topology_info['vertices'][0]['align_v']),
+                             angle=rot_angle,
+                             degree=True)
 
         BB_D41.shift(np.array(topology_info['vertices'][0]['position'])*a_conv)
         BB_D41.remove_X()
@@ -4434,11 +4434,11 @@ class Framework():
         self.atom_labels += ['C1' if i == 'C' else i for i in BB_D41.atom_labels]
 
         # Align and rotate the building block 1 to their respective positions
-        BB_D42._align_to(topology_info['vertices'][0]['align_v'])
+        BB_D42.align_to(topology_info['vertices'][0]['align_v'])
 
         # Determine the angle that alings the X[1] to one of the vertices of the tetrahedron
         vertice_pos = unit_vector(np.array([1, 0, 1]))
-        Q_vertice_pos = BB_D42._get_X_points()[1][1]
+        Q_vertice_pos = BB_D42.get_X_points()[1][1]
 
         rotated_list = [
              R.from_rotvec(
@@ -4452,9 +4452,9 @@ class Framework():
 
         rot_angle = np.linspace(0, 360, 360)[np.argmax(angle_list)]
 
-        BB_D42._rotate_around(rotation_axis=np.array(topology_info['vertices'][0]['align_v']),
-                              angle=rot_angle,
-                              degree=True)
+        BB_D42.rotate_around(rotation_axis=np.array(topology_info['vertices'][0]['align_v']),
+                             angle=rot_angle,
+                             degree=True)
 
         BB_D42.atom_pos = -BB_D42.atom_pos
 
@@ -4624,11 +4624,11 @@ class Framework():
         self.atom_pos = []
 
         # Align and rotate the building block 1 to their respective positions
-        BB_D4._align_to(topology_info['vertices'][0]['align_v'])
+        BB_D4.align_to(topology_info['vertices'][0]['align_v'])
 
         # Determine the angle that alings the X[1] to one of the vertices of the tetrahedron
         vertice_pos = unit_vector(np.array([1, 0, 1]))
-        Q_vertice_pos = BB_D4._get_X_points()[1][1]
+        Q_vertice_pos = BB_D4.get_X_points()[1][1]
 
         rotated_list = [
              R.from_rotvec(
@@ -4642,9 +4642,9 @@ class Framework():
 
         rot_angle = np.linspace(0, 360, 360)[np.argmax(angle_list)]
 
-        BB_D4._rotate_around(rotation_axis=np.array(topology_info['vertices'][0]['align_v']),
-                             angle=rot_angle,
-                             degree=True)
+        BB_D4.rotate_around(rotation_axis=np.array(topology_info['vertices'][0]['align_v']),
+                            angle=rot_angle,
+                            degree=True)
 
         BB_D4.shift(np.array(topology_info['vertices'][0]['position'])*a_conv)
         BB_D4.remove_X()
@@ -4665,9 +4665,8 @@ class Framework():
             BB = copy.deepcopy(BB_L2)
 
             # Align, rotate and shift the building block 2 to their respective positions
-            BB._align_to(edge_data['align_v'])
-            BB._rotate_around(rotation_axis=edge_data['align_v'],
-                              angle=edge_data['angle'])
+            BB.align_to(edge_data['align_v'])
+            BB.rotate_around(rotation_axis=edge_data['align_v'], angle=edge_data['angle'])
             BB.shift(np.array(edge_data['position']) * a_conv)
 
             # Replace "X" the building block with the correct atom dicated by the connection group

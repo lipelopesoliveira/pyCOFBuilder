@@ -66,7 +66,7 @@ class BuildingBlock():
             self.from_name(self.name)
 
     def __str__(self):
-        return self._structure_as_string()
+        return self.structure_as_string()
 
     def __repr__(self):
         return 'BuildingBlock({}, {}, {}, {})'.format(self.symmetry,
@@ -74,13 +74,16 @@ class BuildingBlock():
                                                       self.conector,
                                                       self.funcGroups)
 
-    def copy(self):
-        obj = type(self).__new__(self.__class__)
-        obj.__dict__.update(self.__dict__)
-        return obj
+    def from_name(self, name: str):
+        '''
+        Automatically create a buiding block based on its name.
 
-    def from_name(self, name):
-        '''Automatically read or create a buiding block based on its name'''
+        Parameters
+        ----------
+        name : str
+            Name of the building block. The name must follow the pattern:
+            `symmetry_core_conector_functional_group_1_functional_group_2_..._functional_group_n`
+        '''
 
         # Check the existence of the building block files
         symm_check, core_check, conector_check, funcGroup_check = self.check_existence(name)
@@ -98,12 +101,14 @@ class BuildingBlock():
         self.symmetry = BB_name[0]
         self.core = BB_name[1]
         self.conector = BB_name[2]
+
+        # Fill the vacant functional group possition with H
         possible_funcGroups = BB_name[3:] + ['H'] * (9 - len(BB_name[3:]))
 
-        self._create_BB_structure(self.symmetry,
-                                  self.core,
-                                  self.conector,
-                                  *possible_funcGroups)
+        self.create_BB_structure(self.symmetry,
+                                 self.core,
+                                 self.conector,
+                                 *possible_funcGroups)
         if self.save_bb:
             self.save()
 
@@ -117,14 +122,14 @@ class BuildingBlock():
         `atom_label     pos_x    pos_y    pos_z`
         """
 
-        print(self._structure_as_string())
+        print(self.structure_as_string())
 
-    def _centralize(self, by_X=True):
+    def centralize(self, by_X=True):
         ''' Centralize the molecule on its geometrical center'''
 
         transposed = np.transpose(self.atom_pos)
         if by_X is True:
-            x_transposed = np.transpose(self._get_X_points()[1])
+            x_transposed = np.transpose(self.get_X_points()[1])
         if by_X is False:
             x_transposed = transposed
         cm_x = transposed[0] - np.average(x_transposed[0])
@@ -134,7 +139,7 @@ class BuildingBlock():
         self.atom_pos = np.transpose([cm_x, cm_y, cm_z])
         return np.transpose([cm_x, cm_y, cm_z])
 
-    def _get_X_points(self):
+    def get_X_points(self):
         '''Get the X points in a molecule'''
 
         if 'X' in self.atom_types:
@@ -150,7 +155,7 @@ class BuildingBlock():
             print('No X ponts could be found!')
             return self.atom_types, self.atom_pos
 
-    def _get_Q_points(self, atom_types, atom_pos):
+    def get_Q_points(self, atom_types, atom_pos):
         '''Get the Q points in a molecule'''
 
         Q_labels, Q_pos = [], []
@@ -162,7 +167,7 @@ class BuildingBlock():
 
         return Q_labels, np.array(Q_pos)
 
-    def _get_R_points(self, atom_types, atom_pos):
+    def get_R_points(self, atom_types, atom_pos):
         """
         Get the R points in a molecule
         """
@@ -188,19 +193,12 @@ class BuildingBlock():
 
         return R_dict
 
-    def _add_X(self, label, pos, X='N'):
-
-        for i in range(len(label)):
-            if label[i] == 'X':
-                label[i] = X
-        return label, pos
-
-    def _calculate_size(self):
+    def calculate_size(self):
         '''Calculate the size of the building block'''
-        _, X_pos = self._get_X_points()
+        _, X_pos = self.get_X_points()
         self.size = [np.linalg.norm(i) for i in X_pos]
 
-    def _align_to(self, vec: list = [0, 1, 0], n: int = 0):
+    def align_to(self, vec: list = [0, 1, 0], n: int = 0):
         '''
         Align the first n-th X point to a given vector
 
@@ -213,12 +211,12 @@ class BuildingBlock():
         align_to_y : bool
             If True, the second point is aligned to the y axis
         '''
-        _, X_pos = self._get_X_points()
+        _, X_pos = self.get_X_points()
         R_matrix = rotation_matrix_from_vectors(X_pos[n], vec)
 
         self.atom_pos = np.dot(self.atom_pos, np.transpose(R_matrix))
 
-    def _rotate_around(self, rotation_axis: list = [1, 0, 0], angle: float = 0.0, degree: bool = True):
+    def rotate_around(self, rotation_axis: list = [1, 0, 0], angle: float = 0.0, degree: bool = True):
         '''
         Rotate the molecule around a given axis
 
@@ -238,9 +236,9 @@ class BuildingBlock():
 
         self.atom_pos = rotation.apply(self.atom_pos)
 
-    def _rotate_to_xy_plane(self):
+    def rotate_to_xy_plane(self):
         '''Rotate the molecule to the xy plane'''
-        _, X_pos = self._get_X_points()
+        _, X_pos = self.get_X_points()
 
         if len(X_pos) == 3:
 
@@ -267,7 +265,7 @@ class BuildingBlock():
 
         self.atom_pos = np.array(self.atom_pos) + np.array(shift_vector)
 
-    def _structure_as_string(self):
+    def structure_as_string(self):
         struct_string = ''
         for i, _ in enumerate(self.atom_types):
             struct_string += '{:<5s}{:>10.7f}{:>15.7f}{:>15.7f}\n'.format(self.atom_types[i],
@@ -277,7 +275,7 @@ class BuildingBlock():
 
         return struct_string
 
-    def _add_connection_group(self, conector_name):
+    def add_connection_group(self, conector_name):
         '''Adds the functional group by which the COF will be formed from the building blocks'''
 
         connector = ChemJSON()
@@ -290,7 +288,7 @@ class BuildingBlock():
         conector_pos = connector.cartesian_positions
 
         # Get the position of the Q points in the structure
-        location_Q_struct = self._get_Q_points(self.atom_types, self.atom_pos)
+        location_Q_struct = self.get_Q_points(self.atom_types, self.atom_pos)
 
         for i in range(len(location_Q_struct[0])):
 
@@ -304,7 +302,7 @@ class BuildingBlock():
                                           self.atom_pos)[1]
 
             # Get the position of Q in the conection group
-            location_Q_connector = self._get_Q_points(n_conector_label, n_conector_pos)
+            location_Q_connector = self.get_Q_points(n_conector_label, n_conector_pos)
 
             # Get the position of the closest atom to Q in the conection group
             close_Q_connector = closest_atom('Q',
@@ -352,7 +350,7 @@ class BuildingBlock():
 
             self.atom_labels = np.append(self.atom_labels, [['Q'] * len(n_conector_label)])
 
-    def _add_connection_group_symm(self, conector_name):
+    def add_connection_group_symm(self, conector_name):
         '''Adds the functional group by which the COF will be formed from the building blocks'''
 
         connector = ChemJSON()
@@ -365,7 +363,7 @@ class BuildingBlock():
         conector_pos = connector.cartesian_positions
 
         # Get the position of the Q points in the structure
-        _, Q_vec = self._get_Q_points(self.atom_types, self.atom_pos)
+        _, Q_vec = self.get_Q_points(self.atom_types, self.atom_pos)
 
         # Remove the Q atoms from structure
         self.atom_types = self.atom_types[:-4]
@@ -421,7 +419,7 @@ class BuildingBlock():
         self.atom_pos = list(self.atom_pos) + list(R3[1:])
         self.atom_labels = np.append(self.atom_labels, [['Q'] * len(conector_types[1:])])
 
-    def _add_R_group(self, R_name, R_type):
+    def add_R_group(self, R_name, R_type):
         '''Adds group R in building blocks'''
 
         rgroup = ChemJSON()
@@ -434,7 +432,7 @@ class BuildingBlock():
         group_pos = rgroup.cartesian_positions
 
         # Get the position of the R points in the structure
-        location_R_struct = self._get_R_points(self.atom_types, self.atom_pos)[R_type]
+        location_R_struct = self.get_R_points(self.atom_types, self.atom_pos)[R_type]
 
         # Get the position of the R points in the R group
         for i, _ in enumerate(location_R_struct):
@@ -448,7 +446,7 @@ class BuildingBlock():
                                                 self.atom_pos)[1]
 
             # Get the position of R in the R group
-            pos_R_group = self._get_R_points(n_group_label, n_group_pos)['R']
+            pos_R_group = self.get_R_points(n_group_label, n_group_pos)['R']
 
             # Get the position of the closest atom to R in the R group
             close_R_group = closest_atom('R', pos_R_group[0], n_group_label, n_group_pos)[1]
@@ -502,20 +500,35 @@ class BuildingBlock():
             self.atom_types = self.atom_types + n_group_label
             self.atom_labels = np.append(self.atom_labels, ['R'] * len(n_group_label))
 
-    def _create_BB_structure(self,
-                             symmetry='L2',
-                             core_name='BENZ',
-                             conector='CHO',
-                             R1='H',
-                             R2='H',
-                             R3='H',
-                             R4='H',
-                             R5='H',
-                             R6='H',
-                             R7='H',
-                             R8='H',
-                             R9='H'):
-        '''Create a building block'''
+    def create_BB_structure(self,
+                            symmetry='L2',
+                            core_name='BENZ',
+                            conector='CHO',
+                            R1='H',
+                            R2='H',
+                            R3='H',
+                            R4='H',
+                            R5='H',
+                            R6='H',
+                            R7='H',
+                            R8='H',
+                            R9='H'):
+        '''
+        Create a building block structure based on its symmetry, core, conector
+        and functional groups.
+
+        Parameters
+        ----------
+        symmetry : str
+            Symmetry of the building block. Available symmetries are:
+            L2, T3, S4, D4, H6, O6, P6, C8, A8, E8, B12, I12, U12, X12
+        core_name : str
+            Name of the core of the building block
+        conector : str
+            Name of the conector of the building block
+        RX : str
+            Name of the X-th functional group
+        '''
 
         self.name = f'{symmetry}_{core_name}_{conector}'
 
@@ -532,9 +545,9 @@ class BuildingBlock():
         # pref_orientation = unit_vector(self._get_Q_points(core.atomic_types, core.cartesian_positions)[1][0])
 
         if symmetry == 'D4':
-            self._add_connection_group_symm(conector)
+            self.add_connection_group_symm(conector)
         else:
-            self._add_connection_group(conector)
+            self.add_connection_group(conector)
 
         R_list_names = [R1, R2, R3, R4, R5, R6, R7, R8, R9]
         R_list_labels = ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9']
@@ -542,7 +555,7 @@ class BuildingBlock():
         funcGroup_string = []
         for i in range(len(R_list_names)):
             if R_list_labels[i] in self.atom_types:
-                self._add_R_group(R_list_names[i], R_list_labels[i])
+                self.add_R_group(R_list_names[i], R_list_labels[i])
                 self.name += f'_{R_list_names[i]}'
                 funcGroup_string.append(R_list_names[i])
 
@@ -551,7 +564,7 @@ class BuildingBlock():
         self.connectivity = len([i for i in self.atom_types if 'X' in i])
         # self._centralize()
         # self._align_to(pref_orientation)
-        self._calculate_size()
+        self.calculate_size()
 
     def replace_X(self, target_type):
         for i in range(len(self.atom_types)):
@@ -571,7 +584,15 @@ class BuildingBlock():
         self.atom_pos = np.array(atom_pos)
         self.atom_labels = atom_labels
 
-    def save(self, extension='xyz'):
+    def save(self, extension: str = 'xyz'):
+        '''
+        Save the building block molecule in a file.
+
+        Parameters
+        ----------
+        extension : str
+            File extension. Available extensions are: xyz
+        '''
 
         if extension == 'xyz':
             save_xyz(path=self.save_dir,
@@ -592,15 +613,15 @@ class BuildingBlock():
 
     def get_available_R(self):
         '''Get the list of available functional groups'''
-        R_PATH = os.path.join(self.main_path, 'func_groups')
-        R_list = [i.rstrip('.cjson') for i in os.listdir(R_PATH) if '.cjson' in i]
+        R_path = os.path.join(self.main_path, 'func_groups')
+        R_list = [i.rstrip('.cjson') for i in os.listdir(R_path) if '.cjson' in i]
 
         return R_list
 
     def get_available_conector(self):
         '''Get the list of available conectores'''
-        C_PATH = os.path.join(self.main_path, 'conector')
-        C_list = [i.rstrip('.cjson') for i in os.listdir(C_PATH) if '.cjson' in i]
+        C_path = os.path.join(self.main_path, 'conector')
+        C_list = [i.rstrip('.cjson') for i in os.listdir(C_path) if '.cjson' in i]
 
         return C_list
 
@@ -622,7 +643,7 @@ class BuildingBlock():
         if symm in self.available_symmetry:
             symm_check = True
         else:
-            print('ERROR!: Building Block symmetry must be L2, T3, S4, or H6.')
+            print('ERROR!: Building Block symmetry must be:', ','.join(self.available_symmetry))
             symm_check = False
 
         if core in BB_dict[symm]:
