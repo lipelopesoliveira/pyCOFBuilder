@@ -219,5 +219,27 @@ TOPOLOGY_DICT = {
             {'position': [3/8, 1/8, 3/8], 'angle': -78, 'align_v': [1/4, -1/4, 1/4]},
             {'position': [3/8, 3/8, 1/8], 'angle': 16, 'align_v': [1/4, 1/4, -1/4]},
             ]
+        },
+    'BOR': {
+        'a': 1,
+        'b': 1,
+        'c': 1,
+        'alpha': 90,
+        'beta': 90,
+        'gamma': 90,
+        'lattice': [[1, 0, 0], [0, 1, 0], [0, 0, 1]],
+        'vertice_connectivity': 4,
+        'edge_connectivity': 3,
+        'vertices': [
+            {'position': [1/2, 0, 0], 'angle': -10, 'align_v': [-1, 1, 1]},
+            {'position': [0, 1/2, 0], 'angle': 40, 'align_v': [1, -1, 1]},
+            {'position': [0, 0, 1/2], 'angle': -45, 'align_v': [1, 1, -1]},
+            ],
+        'edges': [
+            {'position': [1/6, 1/6, 1/6], 'angle': 15, 'align_v': [1, 1, 1]},
+            {'position': [1/6, 5/6, 5/6], 'angle': 0, 'align_v': [1/2, 1, 1]},
+            {'position': [5/6, 1/6, 5/6], 'angle': 0, 'align_v': [1, 1/2, 1]},
+            {'position': [5/6, 5/6, 1/6], 'angle': 15, 'align_v': [1, 1, 1]},
+            ]
         }
     }
