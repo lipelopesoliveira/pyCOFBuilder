@@ -1,3 +1,11 @@
+# -*- coding: utf-8 -*-
+# Created by Felipe Lopes de Oliveira
+# Distributed under the terms of the MIT License.
+
+"""
+The dictionary containing the definitions nets for a Framework buiding
+"""
+
 import numpy as np
 
 TOPOLOGY_DICT = {
