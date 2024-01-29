@@ -414,7 +414,7 @@ class BuildingBlock():
         self.atom_pos = list(self.atom_pos) + list(R3[1:])
         self.atom_labels = np.append(self.atom_labels, [['Q'] * len(conector_types[1:])])
 
-    def _add_R_group(self, R_name, R_type):
+    def add_R_group(self, R_name, R_type):
         '''Adds group R in building blocks'''
 
         rgroup = ChemJSON()
@@ -495,19 +495,19 @@ class BuildingBlock():
             self.atom_types = self.atom_types + n_group_label
             self.atom_labels = np.append(self.atom_labels, ['R'] * len(n_group_label))
 
-    def _create_BB_structure(self,
-                             symmetry='L2',
-                             core_name='BENZ',
-                             conector='CHO',
-                             R1='H',
-                             R2='H',
-                             R3='H',
-                             R4='H',
-                             R5='H',
-                             R6='H',
-                             R7='H',
-                             R8='H',
-                             R9='H'):
+    def create_BB_structure(self,
+                            symmetry='L2',
+                            core_name='BENZ',
+                            conector='CHO',
+                            R1='H',
+                            R2='H',
+                            R3='H',
+                            R4='H',
+                            R5='H',
+                            R6='H',
+                            R7='H',
+                            R8='H',
+                            R9='H'):
         '''Create a building block'''
 
         self.name = f'{symmetry}_{core_name}_{conector}'
