@@ -244,10 +244,10 @@ TOPOLOGY_DICT = {
             {'position': [0, 0, 1/2], 'angle': -45, 'align_v': [1, 1, -1]},
             ],
         'edges': [
-            {'position': [1/6, 1/6, 1/6], 'angle': 15, 'align_v': [1, 1, 1]},
+            {'position': [1/6, 1/6, 1/6], 'angle': 30, 'align_v': [1, 1, 1]},
             {'position': [1/6, 5/6, 5/6], 'angle': 0, 'align_v': [1/2, 1, 1]},
             {'position': [5/6, 1/6, 5/6], 'angle': 0, 'align_v': [1, 1/2, 1]},
-            {'position': [5/6, 5/6, 1/6], 'angle': 15, 'align_v': [1, 1, 1]},
+            {'position': [5/6, 5/6, 1/6], 'angle': 10, 'align_v': [1, 1, 1]},
             ]
         }
     }
