@@ -118,7 +118,7 @@ class Framework():
         self.space_group_n = None
 
         self.dimention = None
-        self.n_atoms = self._get_n_atoms()
+        self.n_atoms = self.get_n_atoms()
         self.mass = None
         self.composition = None
         self.charge = 0
@@ -165,7 +165,7 @@ class Framework():
     def __repr__(self) -> str:
         return f'Reticulum({self.bb1_name}, {self.bb2_name}, {self.topology}, {self.stacking})'
 
-    def _get_n_atoms(self) -> int:
+    def get_n_atoms(self) -> int:
         ''' Returns the number of atoms in the unitary cell'''
         return len(self.atom_types)
 
@@ -297,17 +297,17 @@ class Framework():
             print('WARNING: The smiles attribute is not available for the building blocks')
 
         net_build_dict = {
-            'HCB': self._create_hcb_structure,
-            'HCB_A': self._create_hcb_a_structure,
-            'SQL': self._create_sql_structure,
-            'SQL_A': self._create_sql_a_structure,
-            'KGD': self._create_kgd_structure,
-            # 'HXL': self._create_hxl_structure,
-            'HXL_A': self._create_hxl_a_structure,
-            'FXT': self._create_fxt_structure,
-            'FXT_A': self._create_fxt_a_structure,
-            'DIA': self._create_dia_structure,
-            'DIA_A': self._create_dia_a_structure,
+            'HCB': self.create_hcb_structure,
+            'HCB_A': self.create_hcb_a_structure,
+            'SQL': self.create_sql_structure,
+            'SQL_A': self.create_sql_a_structure,
+            'KGD': self.create_kgd_structure,
+            # 'HXL': self.create_hxl_structure,
+            'HXL_A': self.create_hxl_a_structure,
+            'FXT': self.create_fxt_structure,
+            'FXT_A': self.create_fxt_a_structure,
+            'DIA': self.create_dia_structure,
+            'DIA_A': self.create_dia_a_structure,
             }
 
         result = net_build_dict[Net](bb1, bb2, Stacking, **kwargs)
@@ -388,14 +388,14 @@ class Framework():
 
 # --------------- Net creation methods -------------------------- #
 
-    def _create_hcb_structure(self,
-                              BB_T3_A,
-                              BB_T3_B,
-                              stacking: str = 'AA',
-                              print_result: bool = True,
-                              slab: float = 10.0,
-                              shift_vector: list = [1.0, 1.0, 0],
-                              tilt_angle: float = 5.0):
+    def create_hcb_structure(self,
+                             BB_T3_A,
+                             BB_T3_B,
+                             stacking: str = 'AA',
+                             print_result: bool = True,
+                             slab: float = 10.0,
+                             shift_vector: list = [1.0, 1.0, 0],
+                             tilt_angle: float = 5.0):
         """Creates a COF with HCB network.
 
         The HCB net is composed of two tripodal building blocks.
@@ -774,14 +774,14 @@ class Framework():
                 str(self.space_group_n),
                 len(symm_op)]
 
-    def _create_hcb_a_structure(self,
-                                BB_T3: str,
-                                BB_L2: str,
-                                stacking: str = 'AA',
-                                print_result: bool = True,
-                                slab: float = 10.0,
-                                shift_vector: list = [1.0, 1.0, 0],
-                                tilt_angle: float = 5.0):
+    def create_hcb_a_structure(self,
+                               BB_T3: str,
+                               BB_L2: str,
+                               stacking: str = 'AA',
+                               print_result: bool = True,
+                               slab: float = 10.0,
+                               shift_vector: list = [1.0, 1.0, 0],
+                               tilt_angle: float = 5.0):
         """Creates a COF with HCB-A network.
 
         The HCB-A net is composed of one tripodal and one linear building blocks.
@@ -1158,14 +1158,14 @@ class Framework():
                 str(self.space_group_n),
                 len(symm_op)]
 
-    def _create_sql_structure(self,
-                              BB_S4_A: str,
-                              BB_S4_B: str,
-                              stacking: str = 'AA',
-                              print_result: bool = True,
-                              slab: float = 10.0,
-                              shift_vector: list = [1.0, 1.0, 0],
-                              tilt_angle: float = 5.0):
+    def create_sql_structure(self,
+                             BB_S4_A: str,
+                             BB_S4_B: str,
+                             stacking: str = 'AA',
+                             print_result: bool = True,
+                             slab: float = 10.0,
+                             shift_vector: list = [1.0, 1.0, 0],
+                             tilt_angle: float = 5.0):
         """Creates a COF with SQL network.
 
         The SQL net is composed of two tetrapodal building blocks.
@@ -1545,15 +1545,15 @@ class Framework():
                 str(self.space_group_n),
                 len(symm_op)]
 
-    def _create_sql_a_structure(self,
-                                BB_S4: str,
-                                BB_L2: str,
-                                stacking: str = 'AA',
-                                c_parameter_base: float = 3.6,
-                                print_result: bool = True,
-                                slab: float = 10.0,
-                                shift_vector: list = [1.0, 1.0, 0],
-                                tilt_angle: float = 5.0):
+    def create_sql_a_structure(self,
+                               BB_S4: str,
+                               BB_L2: str,
+                               stacking: str = 'AA',
+                               c_parameter_base: float = 3.6,
+                               print_result: bool = True,
+                               slab: float = 10.0,
+                               shift_vector: list = [1.0, 1.0, 0],
+                               tilt_angle: float = 5.0):
         """Creates a COF with SQL-A network.
 
         The SQL-A net is composed of one tetrapodal and one linear building blocks.
@@ -1933,14 +1933,14 @@ class Framework():
                 str(self.space_group_n),
                 len(symm_op)]
 
-    def _create_kgd_structure(self,
-                              BB_H6: str,
-                              BB_T3: str,
-                              stacking: str = 'AA',
-                              print_result: bool = True,
-                              slab: float = 10.0,
-                              shift_vector: list = [1.0, 1.0, 0],
-                              tilt_angle: float = 5.0):
+    def create_kgd_structure(self,
+                             BB_H6: str,
+                             BB_T3: str,
+                             stacking: str = 'AA',
+                             print_result: bool = True,
+                             slab: float = 10.0,
+                             shift_vector: list = [1.0, 1.0, 0],
+                             tilt_angle: float = 5.0):
         """Creates a COF with KGD network.
 
         The KGD net is composed of one hexapodal and one tripodal building blocks.
@@ -2320,14 +2320,14 @@ class Framework():
                 str(self.space_group_n),
                 len(symm_op)]
 
-    def _create_hxl_a_structure(self,
-                                BB_H6: str,
-                                BB_L2: str,
-                                stacking: str = 'AA',
-                                print_result: bool = True,
-                                slab: float = 10.0,
-                                shift_vector: list = [1.0, 1.0, 0],
-                                tilt_angle: float = 5.0):
+    def create_hxl_a_structure(self,
+                               BB_H6: str,
+                               BB_L2: str,
+                               stacking: str = 'AA',
+                               print_result: bool = True,
+                               slab: float = 10.0,
+                               shift_vector: list = [1.0, 1.0, 0],
+                               tilt_angle: float = 5.0):
         """Creates a COF with HXL-A network.
 
         The HXL-A net is composed of one hexapodal and one linear building blocks.
@@ -2706,14 +2706,14 @@ class Framework():
                 str(self.space_group_n),
                 len(symm_op)]
 
-    def _create_fxt_structure(self,
-                              BB_S4_A: str,
-                              BB_S4_B: str,
-                              stacking: str = 'AA',
-                              print_result: bool = True,
-                              slab: float = 10.0,
-                              shift_vector: list = [1.0, 1.0, 0],
-                              tilt_angle: float = 5.0):
+    def create_fxt_structure(self,
+                             BB_S4_A: str,
+                             BB_S4_B: str,
+                             stacking: str = 'AA',
+                             print_result: bool = True,
+                             slab: float = 10.0,
+                             shift_vector: list = [1.0, 1.0, 0],
+                             tilt_angle: float = 5.0):
         """Creates a COF with FXT network.
 
         The FXT net is composed of two tetrapodal building blocks.
@@ -3094,15 +3094,15 @@ class Framework():
                 str(self.space_group_n),
                 len(symm_op)]
 
-    def _create_fxt_a_structure(self,
-                                BB_S4: str,
-                                BB_L2: str,
-                                stacking: str = 'AA',
-                                c_parameter_base: float = 3.6,
-                                print_result: bool = True,
-                                slab: float = 10.0,
-                                shift_vector: list = [1.0, 1.0, 0],
-                                tilt_angle: float = 5.0):
+    def create_fxt_a_structure(self,
+                               BB_S4: str,
+                               BB_L2: str,
+                               stacking: str = 'AA',
+                               c_parameter_base: float = 3.6,
+                               print_result: bool = True,
+                               slab: float = 10.0,
+                               shift_vector: list = [1.0, 1.0, 0],
+                               tilt_angle: float = 5.0):
         """Creates a COF with FXT-A network.
 
         The FXT-A net is composed of one tetrapodal and one linear building blocks.
@@ -3477,15 +3477,15 @@ class Framework():
                 str(self.space_group_n),
                 len(symm_op)]
 
-    def _create_kgm_structure(self,
-                              name_bb_a: str,
-                              name_bb_b: str,
-                              stacking: str = 'AA',
-                              c_parameter_base: float = 3.6,
-                              print_result: bool = True,
-                              slab: float = 10.0,
-                              shift_vector: list = [1.0, 1.0, 0],
-                              tilt_angle: float = 5.0):
+    def create_kgm_structure(self,
+                             name_bb_a: str,
+                             name_bb_b: str,
+                             stacking: str = 'AA',
+                             c_parameter_base: float = 3.6,
+                             print_result: bool = True,
+                             slab: float = 10.0,
+                             shift_vector: list = [1.0, 1.0, 0],
+                             tilt_angle: float = 5.0):
         """Creates a COF with KGM network.
 
         The KGM net is composed of two tetrapodal building blocks.
@@ -3587,7 +3587,7 @@ class Framework():
         if self.verbosity is True:
             print('Unitary cell built:', lattice)
 
-        bb1_v1, bb1_v2, bb1_v3, bb1_v4 = bb_1._get_X_points()[1]
+        bb1_v1, bb1_v2, bb1_v3, bb1_v4 = bb_1.get_X_points()[1]
         bb1_lado1, _, _ = (
             bb1_v1 + bb1_v2) / 2, (bb1_v1 + bb1_v3) / 2, (bb1_v1 + bb1_v4) / 2
 
@@ -3861,15 +3861,15 @@ class Framework():
                 str(self.space_group_n),
                 len(symm_op)]
 
-    def _create_kgm_a_structure(self,
-                                name_bb_a: str,
-                                name_bb_b: str,
-                                stacking: str = 'AA',
-                                c_parameter_base: float = 3.6,
-                                print_result: bool = True,
-                                slab: float = 10.0,
-                                shift_vector: list = [1.0, 1.0, 0],
-                                tilt_angle: float = 5.0):
+    def create_kgm_a_structure(self,
+                               name_bb_a: str,
+                               name_bb_b: str,
+                               stacking: str = 'AA',
+                               c_parameter_base: float = 3.6,
+                               print_result: bool = True,
+                               slab: float = 10.0,
+                               shift_vector: list = [1.0, 1.0, 0],
+                               tilt_angle: float = 5.0):
         """Creates a COF with KGM-A network.
 
         The KGM-A net is composed of one tetrapodal and one linear building blocks.
@@ -3972,7 +3972,7 @@ class Framework():
         if self.verbosity is True:
             print('Unitary cell built:', lattice)
 
-        bb1_v1, bb1_v2, bb1_v3, bb1_v4 = bb_1._get_X_points()[1]
+        bb1_v1, bb1_v2, bb1_v3, bb1_v4 = bb_1.get_X_points()[1]
         bb1_lado1, _, _ = (
             bb1_v1 + bb1_v2) / 2, (bb1_v1 + bb1_v3) / 2, (bb1_v1 + bb1_v4) / 2
 
@@ -4332,12 +4332,12 @@ class Framework():
                 str(self.space_group_n),
                 len(symm_op)]
 
-    def _create_dia_structure(self,
-                              BB_D41: str,
-                              BB_D42: str,
-                              interp_dg: str = '1',
-                              print_result: bool = True,
-                              **kwargs):
+    def create_dia_structure(self,
+                             BB_D41: str,
+                             BB_D42: str,
+                             interp_dg: str = '1',
+                             print_result: bool = True,
+                             **kwargs):
         """Creates a COF with DIA network.
 
         The DIA net is composed of two tetrapodal tetrahedical building blocks.
@@ -4403,11 +4403,11 @@ class Framework():
         print_command(f'Bond atom detected: {bond_atom}', self.verbosity, ['debug', 'high'])
 
         # Align and rotate the building block 1 to their respective positions
-        BB_D41._align_to(topology_info['vertices'][0]['align_v'])
+        BB_D41.align_to(topology_info['vertices'][0]['align_v'])
 
         # Determine the angle that alings the X[1] to one of the vertices of the tetrahedron
         vertice_pos = unit_vector(np.array([1, 0, 1]))
-        Q_vertice_pos = BB_D41._get_X_points()[1][1]
+        Q_vertice_pos = BB_D41.get_X_points()[1][1]
 
         rotated_list = [
              R.from_rotvec(
@@ -4421,9 +4421,9 @@ class Framework():
 
         rot_angle = np.linspace(0, 360, 360)[np.argmax(angle_list)]
 
-        BB_D41._rotate_around(rotation_axis=np.array(topology_info['vertices'][0]['align_v']),
-                              angle=rot_angle,
-                              degree=True)
+        BB_D41.rotate_around(rotation_axis=np.array(topology_info['vertices'][0]['align_v']),
+                             angle=rot_angle,
+                             degree=True)
 
         BB_D41.shift(np.array(topology_info['vertices'][0]['position'])*a_conv)
         BB_D41.remove_X()
@@ -4434,11 +4434,11 @@ class Framework():
         self.atom_labels += ['C1' if i == 'C' else i for i in BB_D41.atom_labels]
 
         # Align and rotate the building block 1 to their respective positions
-        BB_D42._align_to(topology_info['vertices'][0]['align_v'])
+        BB_D42.align_to(topology_info['vertices'][0]['align_v'])
 
         # Determine the angle that alings the X[1] to one of the vertices of the tetrahedron
         vertice_pos = unit_vector(np.array([1, 0, 1]))
-        Q_vertice_pos = BB_D42._get_X_points()[1][1]
+        Q_vertice_pos = BB_D42.get_X_points()[1][1]
 
         rotated_list = [
              R.from_rotvec(
@@ -4452,9 +4452,9 @@ class Framework():
 
         rot_angle = np.linspace(0, 360, 360)[np.argmax(angle_list)]
 
-        BB_D42._rotate_around(rotation_axis=np.array(topology_info['vertices'][0]['align_v']),
-                              angle=rot_angle,
-                              degree=True)
+        BB_D42.rotate_around(rotation_axis=np.array(topology_info['vertices'][0]['align_v']),
+                             angle=rot_angle,
+                             degree=True)
 
         BB_D42.atom_pos = -BB_D42.atom_pos
 
@@ -4551,12 +4551,12 @@ class Framework():
                 str(self.space_group_n),
                 len(symm_op)]
 
-    def _create_dia_a_structure(self,
-                                BB_D4: str,
-                                BB_L2: str,
-                                interp_dg: str = '1',
-                                print_result: bool = True,
-                                **kwargs):
+    def create_dia_a_structure(self,
+                               BB_D4: str,
+                               BB_L2: str,
+                               interp_dg: str = '1',
+                               print_result: bool = True,
+                               **kwargs):
         """Creates a COF with DIA network.
 
         The DIA net is composed of two tetrapodal tetrahedical building blocks.
@@ -4624,11 +4624,11 @@ class Framework():
         self.atom_pos = []
 
         # Align and rotate the building block 1 to their respective positions
-        BB_D4._align_to(topology_info['vertices'][0]['align_v'])
+        BB_D4.align_to(topology_info['vertices'][0]['align_v'])
 
         # Determine the angle that alings the X[1] to one of the vertices of the tetrahedron
         vertice_pos = unit_vector(np.array([1, 0, 1]))
-        Q_vertice_pos = BB_D4._get_X_points()[1][1]
+        Q_vertice_pos = BB_D4.get_X_points()[1][1]
 
         rotated_list = [
              R.from_rotvec(
@@ -4642,9 +4642,9 @@ class Framework():
 
         rot_angle = np.linspace(0, 360, 360)[np.argmax(angle_list)]
 
-        BB_D4._rotate_around(rotation_axis=np.array(topology_info['vertices'][0]['align_v']),
-                             angle=rot_angle,
-                             degree=True)
+        BB_D4.rotate_around(rotation_axis=np.array(topology_info['vertices'][0]['align_v']),
+                            angle=rot_angle,
+                            degree=True)
 
         BB_D4.shift(np.array(topology_info['vertices'][0]['position'])*a_conv)
         BB_D4.remove_X()
@@ -4665,9 +4665,9 @@ class Framework():
             BB = copy.deepcopy(BB_L2)
 
             # Align, rotate and shift the building block 2 to their respective positions
-            BB._align_to(edge_data['align_v'])
-            BB._rotate_around(rotation_axis=edge_data['align_v'],
-                              angle=edge_data['angle'])
+            BB.align_to(edge_data['align_v'])
+            BB.rotate_around(rotation_axis=edge_data['align_v'],
+                             angle=edge_data['angle'])
             BB.shift(np.array(edge_data['position']) * a_conv)
 
             # Replace "X" the building block with the correct atom dicated by the connection group
