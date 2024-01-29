@@ -27,6 +27,8 @@ from pycofbuilder.tools import (print_command,
                                 unit_vector,
                                 angle)
 
+from pycofbuilder.exceptions import (BondLenghError)
+
 from pycofbuilder.io_tools import (save_json,
                                    save_chemjson,
                                    save_cif,
@@ -127,6 +129,7 @@ class Framework():
 
         self.symm_tol = 0.1
         self.angle_tol = 0.1
+        self.dist_threshold = 0.8
 
         self.available_2D_top = ['HCB', 'HCB_A',
                                  'SQL', 'SQL_A',
@@ -736,6 +739,14 @@ class Framework():
         self.n_atoms = len(dict_structure['sites'])
         self.composition = stacked_structure.formula
 
+        dist_matrix = StartingFramework.distance_matrix
+
+        # Check if there are any atoms closer than 0.8 A
+        for i in range(len(dist_matrix)):
+            for j in range(i+1, len(dist_matrix)):
+                if dist_matrix[i][j] < self.dist_threshold:
+                    raise BondLenghError(i, j, dist_matrix[i][j])
+
         # Get the simmetry information of the generated structure
         symm = SpacegroupAnalyzer(stacked_structure, symprec=0.1, angle_tolerance=.5)
 
@@ -1119,6 +1130,14 @@ class Framework():
         self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
         self.n_atoms = len(dict_structure['sites'])
         self.composition = stacked_structure.formula
+
+        dist_matrix = StartingFramework.distance_matrix
+
+        # Check if there are any atoms closer than 0.8 A
+        for i in range(len(dist_matrix)):
+            for j in range(i+1, len(dist_matrix)):
+                if dist_matrix[i][j] < self.dist_threshold
+                    raise BondLenghError(i, j, dist_matrix[i][j])
 
         # Get the simmetry information of the generated structure
         symm = SpacegroupAnalyzer(stacked_structure, symprec=0.05, angle_tolerance=.5)
@@ -1506,6 +1525,14 @@ class Framework():
         self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
         self.n_atoms = len(dict_structure['sites'])
         self.composition = stacked_structure.formula
+
+        dist_matrix = StartingFramework.distance_matrix
+
+        # Check if there are any atoms closer than 0.8 A
+        for i in range(len(dist_matrix)):
+            for j in range(i+1, len(dist_matrix)):
+                if dist_matrix[i][j] < self.dist_threshold
+                    raise BondLenghError(i, j, dist_matrix[i][j])
 
         # Get the simmetry information of the generated structure
         symm = SpacegroupAnalyzer(stacked_structure, symprec=0.05, angle_tolerance=.5)
@@ -1895,6 +1922,14 @@ class Framework():
         self.n_atoms = len(dict_structure['sites'])
         self.composition = stacked_structure.formula
 
+        dist_matrix = StartingFramework.distance_matrix
+
+        # Check if there are any atoms closer than 0.8 A
+        for i in range(len(dist_matrix)):
+            for j in range(i+1, len(dist_matrix)):
+                if dist_matrix[i][j] < self.dist_threshold
+                    raise BondLenghError(i, j, dist_matrix[i][j])
+
         # Get the simmetry information of the generated structure
         symm = SpacegroupAnalyzer(stacked_structure, symprec=0.05, angle_tolerance=.5)
         try:
@@ -2282,6 +2317,14 @@ class Framework():
         self.n_atoms = len(dict_structure['sites'])
         self.composition = stacked_structure.formula
 
+        dist_matrix = StartingFramework.distance_matrix
+
+        # Check if there are any atoms closer than 0.8 A
+        for i in range(len(dist_matrix)):
+            for j in range(i+1, len(dist_matrix)):
+                if dist_matrix[i][j] < self.dist_threshold
+                    raise BondLenghError(i, j, dist_matrix[i][j])
+
         # Get the simmetry information of the generated structure
         symm = SpacegroupAnalyzer(stacked_structure, symprec=0.1, angle_tolerance=.5)
 
@@ -2667,6 +2710,14 @@ class Framework():
         self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
         self.n_atoms = len(dict_structure['sites'])
         self.composition = stacked_structure.formula
+
+        dist_matrix = StartingFramework.distance_matrix
+
+        # Check if there are any atoms closer than 0.8 A
+        for i in range(len(dist_matrix)):
+            for j in range(i+1, len(dist_matrix)):
+                if dist_matrix[i][j] < self.dist_threshold
+                    raise BondLenghError(i, j, dist_matrix[i][j])
 
         # Get the simmetry information of the generated structure
         symm = SpacegroupAnalyzer(stacked_structure, symprec=0.1, angle_tolerance=.5)
@@ -3056,6 +3107,14 @@ class Framework():
         self.n_atoms = len(dict_structure['sites'])
         self.composition = stacked_structure.formula
 
+        dist_matrix = StartingFramework.distance_matrix
+
+        # Check if there are any atoms closer than 0.8 A
+        for i in range(len(dist_matrix)):
+            for j in range(i+1, len(dist_matrix)):
+                if dist_matrix[i][j] < self.dist_threshold
+                    raise BondLenghError(i, j, dist_matrix[i][j])
+
         # Get the simmetry information of the generated structure
         symm = SpacegroupAnalyzer(stacked_structure, symprec=0.05, angle_tolerance=.5)
         try:
@@ -3438,6 +3497,14 @@ class Framework():
         self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
         self.n_atoms = len(dict_structure['sites'])
         self.composition = stacked_structure.formula
+
+        dist_matrix = StartingFramework.distance_matrix
+
+        # Check if there are any atoms closer than 0.8 A
+        for i in range(len(dist_matrix)):
+            for j in range(i+1, len(dist_matrix)):
+                if dist_matrix[i][j] < self.dist_threshold
+                    raise BondLenghError(i, j, dist_matrix[i][j])
 
         # Get the simmetry information of the generated structure
         symm = SpacegroupAnalyzer(stacked_structure, symprec=0.05, angle_tolerance=.5)
@@ -3835,6 +3902,14 @@ class Framework():
         self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
         self.n_atoms = len(self.prim_structure)
         self.composition = self.prim_structure.formula
+
+        dist_matrix = self.prim_structure.distance_matrix
+
+        # Check if there are any atoms closer than 0.8 A
+        for i in range(len(dist_matrix)):
+            for j in range(i+1, len(dist_matrix)):
+                if dist_matrix[i][j] < self.dist_threshold
+                    raise BondLenghError(i, j, dist_matrix[i][j])
 
         if self.verbosity is True:
             print(self.prim_structure)
@@ -4307,6 +4382,14 @@ class Framework():
         self.n_atoms = len(self.prim_structure)
         self.composition = self.prim_structure.formula
 
+        dist_matrix = self.prim_structure.distance_matrix
+
+        # Check if there are any atoms closer than 0.8 A
+        for i in range(len(dist_matrix)):
+            for j in range(i+1, len(dist_matrix)):
+                if dist_matrix[i][j] < self.dist_threshold
+                    raise BondLenghError(i, j, dist_matrix[i][j])
+
         if self.verbosity is True:
             print(self.prim_structure)
 
@@ -4503,6 +4586,14 @@ class Framework():
         self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
         self.n_atoms = len(dict_structure['sites'])
         self.composition = StartingFramework.formula
+
+        dist_matrix = StartingFramework.distance_matrix
+
+        # Check if there are any atoms closer than 0.8 A
+        for i in range(len(dist_matrix)):
+            for j in range(i+1, len(dist_matrix)):
+                if dist_matrix[i][j] < self.dist_threshold
+                    raise BondLenghError(i, j, dist_matrix[i][j])
 
         # Get the simmetry information of the generated structure
         symm = SpacegroupAnalyzer(StartingFramework, symprec=0.5, angle_tolerance=5)
@@ -4720,6 +4811,14 @@ class Framework():
         self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
         self.n_atoms = len(dict_structure['sites'])
         self.composition = StartingFramework.formula
+
+        dist_matrix = StartingFramework.distance_matrix
+
+        # Check if there are any atoms closer than 0.8 A
+        for i in range(len(dist_matrix)):
+            for j in range(i+1, len(dist_matrix)):
+                if dist_matrix[i][j] < self.dist_threshold
+                    raise BondLenghError(i, j, dist_matrix[i][j])
 
         StartingFramework.to('TESTE_DIA-A.cif', fmt='cif')
 
@@ -4967,6 +5066,14 @@ class Framework():
         self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
         self.n_atoms = len(dict_structure['sites'])
         self.composition = StartingFramework.formula
+
+        dist_matrix = StartingFramework.distance_matrix
+
+        # Check if there are any atoms closer than 0.8 A
+        for i in range(len(dist_matrix)):
+            for j in range(i+1, len(dist_matrix)):
+                if dist_matrix[i][j] < self.dist_threshold
+                    raise BondLenghError(i, j, dist_matrix[i][j])
 
         StartingFramework.to('TESTE_BOR-A.cif', fmt='cif')
 
