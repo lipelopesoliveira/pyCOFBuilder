@@ -7,8 +7,8 @@ The Framework class implements definitions and methods for a Framework buiding
 """
 
 import os
-import numpy as np
 import copy
+import numpy as np
 
 # Import pymatgen
 from pymatgen.core import Lattice, Structure
@@ -16,6 +16,16 @@ from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 
 from scipy.spatial.transform import Rotation as R
 
+# Import pycofbuilder exceptions
+from pycofbuilder.exceptions import (BondLenghError)
+
+# Import pycofbuilder building_block
+from pycofbuilder.building_block import BuildingBlock
+
+# Import pycofbuilder topology data
+from pycofbuilder.data.topology import TOPOLOGY_DICT
+
+# Import pycofbuilder tools
 from pycofbuilder.tools import (print_command,
                                 get_bond_atom,
                                 get_cartesian_to_fractional_matrix,
@@ -27,8 +37,7 @@ from pycofbuilder.tools import (print_command,
                                 unit_vector,
                                 angle)
 
-from pycofbuilder.exceptions import (BondLenghError)
-
+# Import pycofbuilder io_tools
 from pycofbuilder.io_tools import (save_json,
                                    save_chemjson,
                                    save_cif,
@@ -40,10 +49,6 @@ from pycofbuilder.io_tools import (save_json,
                                    save_pqr,
                                    save_qe,
                                    save_gjf)
-
-from pycofbuilder.building_block import BuildingBlock
-
-from pycofbuilder.data.topology import TOPOLOGY_DICT
 
 
 class Framework():
@@ -197,7 +202,7 @@ class Framework():
         dimensionality_list = []
 
         if dimensionality == 'all' or dimensionality == '2D':
-            if print_result: 
+            if print_result:
                 print('Available 2D Topologies:')
             for i in self.available_2D_top:
                 if print_result:
@@ -205,7 +210,7 @@ class Framework():
                 dimensionality_list.append(i)
 
         if dimensionality == 'all' or dimensionality == '3D':
-            if print_result: 
+            if print_result:
                 print('Available 3D Topologies:')
             for i in self.available_3D_top:
                 if print_result:
