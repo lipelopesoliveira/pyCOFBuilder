@@ -118,7 +118,7 @@ class Framework():
         self.space_group_n = None
 
         self.dimention = None
-        self.n_atoms = self.get_n_atoms()
+        self.n_atoms = self._get_n_atoms()
         self.mass = None
         self.composition = None
         self.charge = 0
@@ -134,8 +134,8 @@ class Framework():
                                  'HXL', 'HXL_A',
                                  'FXT', 'FXT_A']
 
-        # To add: ['bor', 'srs', 'pts', 'ctn', 'rra', 'fcc', 'lon', 'stp', 'acs', 'tbo', 'bcu', 'fjh', 'ceq']
-        self.available_3D_top = ['DIA', 'DIA_A', 'BOR']
+        # To add: ['dia', 'bor', 'srs', 'pts', 'ctn', 'rra', 'fcc', 'lon', 'stp', 'acs', 'tbo', 'bcu', 'fjh', 'ceq']
+        self.available_3D_top = ['DIA', 'DIA_A', 'BOR']  # Temporary
         self.available_topologies = self.available_2D_top + self.available_3D_top
 
         # Define available stackings for all 2D topologies
@@ -148,9 +148,9 @@ class Framework():
             'HXL_A': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
             'FXT': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
             'FXT_A': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
-            'DIA': [str(i + 1) for i in range(20)],
-            'DIA_A': [str(i + 1) for i in range(20)],
-            'BOR': [str(i + 1) for i in range(20)]
+            'DIA': ['1', '2', '3', '4'],  # Temporary
+            'DIA_A': ['1', '2', '3', '4'],  # Temporary
+            'BOR': ['0']  # Temporary
         }
 
         if name is None:
@@ -165,7 +165,7 @@ class Framework():
     def __repr__(self) -> str:
         return f'Reticulum({self.bb1_name}, {self.bb2_name}, {self.topology}, {self.stacking})'
 
-    def get_n_atoms(self) -> int:
+    def _get_n_atoms(self) -> int:
         ''' Returns the number of atoms in the unitary cell'''
         return len(self.atom_types)
 
@@ -194,7 +194,7 @@ class Framework():
         dimensionality_list = []
 
         if dimensionality == 'all' or dimensionality == '2D':
-            if print_result:
+            if print_result: 
                 print('Available 2D Topologies:')
             for i in self.available_2D_top:
                 if print_result:
@@ -202,7 +202,7 @@ class Framework():
                 dimensionality_list.append(i)
 
         if dimensionality == 'all' or dimensionality == '3D':
-            if print_result:
+            if print_result: 
                 print('Available 3D Topologies:')
             for i in self.available_3D_top:
                 if print_result:
@@ -211,9 +211,9 @@ class Framework():
 
         return dimensionality_list
 
-    def check_name_concistency(self, FrameworkName: str) -> tuple[str, str, str, str]:
+    def check_name_concistency(self, FrameworkName) -> tuple[str, str, str, str]:
         """
-        Checks if the name is in the correct format and returns a
+        Checks if the name is in the correct format and returns a 
         tuple with the building blocks names, the net and the stacking.
 
         In case the name is not in the correct format, an error is raised.
@@ -3587,7 +3587,7 @@ class Framework():
         if self.verbosity is True:
             print('Unitary cell built:', lattice)
 
-        bb1_v1, bb1_v2, bb1_v3, bb1_v4 = bb_1.get_X_points()[1]
+        bb1_v1, bb1_v2, bb1_v3, bb1_v4 = bb_1._get_X_points()[1]
         bb1_lado1, _, _ = (
             bb1_v1 + bb1_v2) / 2, (bb1_v1 + bb1_v3) / 2, (bb1_v1 + bb1_v4) / 2
 
@@ -3972,7 +3972,7 @@ class Framework():
         if self.verbosity is True:
             print('Unitary cell built:', lattice)
 
-        bb1_v1, bb1_v2, bb1_v3, bb1_v4 = bb_1.get_X_points()[1]
+        bb1_v1, bb1_v2, bb1_v3, bb1_v4 = bb_1._get_X_points()[1]
         bb1_lado1, _, _ = (
             bb1_v1 + bb1_v2) / 2, (bb1_v1 + bb1_v3) / 2, (bb1_v1 + bb1_v4) / 2
 
@@ -4403,11 +4403,11 @@ class Framework():
         print_command(f'Bond atom detected: {bond_atom}', self.verbosity, ['debug', 'high'])
 
         # Align and rotate the building block 1 to their respective positions
-        BB_D41.align_to(topology_info['vertices'][0]['align_v'])
+        BB_D41._align_to(topology_info['vertices'][0]['align_v'])
 
         # Determine the angle that alings the X[1] to one of the vertices of the tetrahedron
         vertice_pos = unit_vector(np.array([1, 0, 1]))
-        Q_vertice_pos = BB_D41.get_X_points()[1][1]
+        Q_vertice_pos = BB_D41._get_X_points()[1][1]
 
         rotated_list = [
              R.from_rotvec(
@@ -4421,9 +4421,9 @@ class Framework():
 
         rot_angle = np.linspace(0, 360, 360)[np.argmax(angle_list)]
 
-        BB_D41.rotate_around(rotation_axis=np.array(topology_info['vertices'][0]['align_v']),
-                             angle=rot_angle,
-                             degree=True)
+        BB_D41._rotate_around(rotation_axis=np.array(topology_info['vertices'][0]['align_v']),
+                              angle=rot_angle,
+                              degree=True)
 
         BB_D41.shift(np.array(topology_info['vertices'][0]['position'])*a_conv)
         BB_D41.remove_X()
@@ -4434,11 +4434,11 @@ class Framework():
         self.atom_labels += ['C1' if i == 'C' else i for i in BB_D41.atom_labels]
 
         # Align and rotate the building block 1 to their respective positions
-        BB_D42.align_to(topology_info['vertices'][0]['align_v'])
+        BB_D42._align_to(topology_info['vertices'][0]['align_v'])
 
         # Determine the angle that alings the X[1] to one of the vertices of the tetrahedron
         vertice_pos = unit_vector(np.array([1, 0, 1]))
-        Q_vertice_pos = BB_D42.get_X_points()[1][1]
+        Q_vertice_pos = BB_D42._get_X_points()[1][1]
 
         rotated_list = [
              R.from_rotvec(
@@ -4452,9 +4452,9 @@ class Framework():
 
         rot_angle = np.linspace(0, 360, 360)[np.argmax(angle_list)]
 
-        BB_D42.rotate_around(rotation_axis=np.array(topology_info['vertices'][0]['align_v']),
-                             angle=rot_angle,
-                             degree=True)
+        BB_D42._rotate_around(rotation_axis=np.array(topology_info['vertices'][0]['align_v']),
+                              angle=rot_angle,
+                              degree=True)
 
         BB_D42.atom_pos = -BB_D42.atom_pos
 
@@ -4624,11 +4624,11 @@ class Framework():
         self.atom_pos = []
 
         # Align and rotate the building block 1 to their respective positions
-        BB_D4.align_to(topology_info['vertices'][0]['align_v'])
+        BB_D4._align_to(topology_info['vertices'][0]['align_v'])
 
         # Determine the angle that alings the X[1] to one of the vertices of the tetrahedron
         vertice_pos = unit_vector(np.array([1, 0, 1]))
-        Q_vertice_pos = BB_D4.get_X_points()[1][1]
+        Q_vertice_pos = BB_D4._get_X_points()[1][1]
 
         rotated_list = [
              R.from_rotvec(
@@ -4642,9 +4642,9 @@ class Framework():
 
         rot_angle = np.linspace(0, 360, 360)[np.argmax(angle_list)]
 
-        BB_D4.rotate_around(rotation_axis=np.array(topology_info['vertices'][0]['align_v']),
-                            angle=rot_angle,
-                            degree=True)
+        BB_D4._rotate_around(rotation_axis=np.array(topology_info['vertices'][0]['align_v']),
+                             angle=rot_angle,
+                             degree=True)
 
         BB_D4.shift(np.array(topology_info['vertices'][0]['position'])*a_conv)
         BB_D4.remove_X()
@@ -4665,8 +4665,9 @@ class Framework():
             BB = copy.deepcopy(BB_L2)
 
             # Align, rotate and shift the building block 2 to their respective positions
-            BB.align_to(edge_data['align_v'])
-            BB.rotate_around(rotation_axis=edge_data['align_v'], angle=edge_data['angle'])
+            BB._align_to(edge_data['align_v'])
+            BB._rotate_around(rotation_axis=edge_data['align_v'],
+                              angle=edge_data['angle'])
             BB.shift(np.array(edge_data['position']) * a_conv)
 
             # Replace "X" the building block with the correct atom dicated by the connection group
@@ -4718,204 +4719,6 @@ class Framework():
         self.composition = StartingFramework.formula
 
         StartingFramework.to('TESTE_DIA-A.cif', fmt='cif')
-
-        # Get the simmetry information of the generated structure
-        symm = SpacegroupAnalyzer(StartingFramework, symprec=1, angle_tolerance=5)
-        try:
-            self.prim_structure = symm.get_primitive_standard_structure(keep_site_properties=True)
-
-            dict_structure = symm.get_refined_structure(keep_site_properties=True).as_dict()
-
-            self.lattice = np.array(dict_structure['lattice']['matrix']).astype(float)
-
-            self.atom_types = [i['label'] for i in dict_structure['sites']]
-            self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-            self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
-            self.n_atoms = len(dict_structure['sites'])
-            self.composition = self.prim_structure.formula
-
-            print_command(self.prim_structure, self.verbosity, ['debug'])
-
-            self.lattice_type = symm.get_lattice_type()
-            self.space_group = symm.get_space_group_symbol()
-            self.space_group_n = symm.get_space_group_number()
-
-            symm_op = symm.get_point_group_operations()
-            self.hall = symm.get_hall()
-
-        except Exception as e:
-            print_command(e, self.verbosity, ['debug'])
-
-            self.lattice_type = 'Triclinic'
-            self.space_group = 'P1'
-            self.space_group_n = '1'
-
-            symm_op = [1]
-            self.hall = 'P 1'
-
-        if print_result is True:
-            print_framework_name(self.name,
-                                 str(self.lattice_type),
-                                 str(self.hall[0:2]),
-                                 str(self.space_group),
-                                 str(self.space_group_n),
-                                 len(symm_op))
-
-        return [self.name,
-                str(self.lattice_type),
-                str(self.hall[0:2]),
-                str(self.space_group),
-                str(self.space_group_n),
-                len(symm_op)]
-
-    def _create_bor_structure(self,
-                              BB_D4: str,
-                              BB_T3: str,
-                              interp_dg: str = '1',
-                              print_result: bool = True,
-                              **kwargs):
-        """Creates a COF with BOR network.
-
-        The BOR net is composed of one tetrapodal tetrahedical building block and
-        one tripotal triangular building block.
-
-        Parameters
-        ----------
-        BB_D4 : BuildingBlock, required
-            The BuildingBlock object of the tetrapodal tetrahedical Buiding Block
-        BB_T3 : BuildingBlock, required
-            The BuildingBlock object of the tripodal triangular Buiding Block
-        interp_dg : str, optional
-            The degree of interpenetration of the framework (default is '1')
-        print_result : bool, optional
-            Parameter for the control for printing the result (default is True)
-
-        Returns
-        -------
-        list
-            A list of strings containing:
-                1. the structure name,
-                2. lattice type,
-                3. hall symbol of the cristaline structure,
-                4. space group,
-                5. number of the space group,
-                6. number of operation symmetry
-        """
-        # Get the topology information
-        topology_info = TOPOLOGY_DICT[self.topology]
-
-        connectivity_error = 'Building block {} must present connectivity {}'
-        assert BB_D4.connectivity == topology_info['vertice_connectivity'], connectivity_error.format('A', 4)
-        assert BB_T3.connectivity == topology_info['edge_connectivity'], connectivity_error.format('B', 2)
-
-        self.name = f'{BB_D4.name}-{BB_T3.name}-BOR-{interp_dg}'
-        self.topology = 'BOR'
-        self.staking = interp_dg
-        self.dimension = 3
-
-        self.charge = BB_D4.charge + BB_T3.charge
-        self.chirality = BB_D4.chirality or BB_T3.chirality
-
-        print_command(f'Starting the creation of {self.name}', self.verbosity, ['debug', 'high'])
-
-        # Detect the bond atom from the connection groups type
-        bond_atom = get_bond_atom(BB_D4.conector, BB_T3.conector)
-
-        # Replace "X" the building block
-        print_command(f'Bond atom detected: {bond_atom}', self.verbosity, ['debug', 'high'])
-
-        # Measure the base size of the building blocks
-        d_size = (np.array(BB_D4.size).mean() + np.array(BB_T3.size).mean())
-
-        print_command(f'Starting the creation of {self.name}', self.verbosity, ['debug', 'high'])
-
-        # Calculate the primitive cell vector assuming tetrahedical building blocks
-        a_conv = np.sqrt(6) * d_size
-
-        # Create the primitive lattice
-        self.lattice = Lattice(a_conv * np.array(topology_info['lattice']))
-
-        # Create the structure
-        self.atom_types = []
-        self.atom_labels = []
-        self.atom_pos = []
-
-        for D_site in topology_info['vertices']:
-            D4 = copy.deepcopy(BB_D4)
-            D4.align_to(
-                np.array(D_site['align_v'])
-                )
-
-            D4.rotate_around(
-                rotation_axis=D_site['align_v'],
-                angle=D_site['angle'])
-
-            D4.shift(np.array(D_site['position'])*a_conv)
-
-            self.atom_types += D4.atom_types
-            self.atom_pos += D4.atom_pos.tolist()
-            self.atom_labels += D4.atom_labels.tolist()
-
-        for T_site in topology_info['edges']:
-
-            T3 = copy.deepcopy(BB_T3)
-
-            _, X = T3.get_X_points()
-            T3.rotate_around([0, 0, 1], T_site['angle'], True)
-
-            R_matrix = rotation_matrix_from_vectors([0, 0, 1],
-                                                    T_site['align_v'])
-
-            T3.atom_pos = T3.atom_pos * np.array([-1, -1, 1])
-
-            T3.atom_pos = np.dot(T3.atom_pos, R_matrix.T)
-
-            T3.shift(np.array(T_site['position'])*a_conv)
-
-            self.atom_types += T3.atom_types
-            self.atom_pos += T3.atom_pos.tolist()
-            self.atom_labels += T3.atom_labels.tolist()
-
-        atom_types, atom_labels, atom_pos = [], [], []
-        for n_int in range(int(self.stacking)):
-            int_direction = np.array([0, 1, 0]) * 7.2 * n_int
-
-            atom_types += self.atom_types
-            atom_pos += (np.array(self.atom_pos) + int_direction).tolist()
-            atom_labels += self.atom_labels
-
-            n_int += 1
-
-        self.atom_types = atom_types
-        self.atom_pos = atom_pos
-        self.atom_labels = atom_labels
-
-        StartingFramework = Structure(
-            self.lattice,
-            self.atom_types,
-            self.atom_pos,
-            coords_are_cartesian=True,
-            site_properties={'source': self.atom_labels}
-        ).get_sorted_structure()
-
-        StartingFramework.translate_sites(
-            np.ones(len(self.atom_types)).astype(int).tolist(),
-            [0, 0, 0],
-            frac_coords=True,
-            to_unit_cell=True
-            )
-
-        dict_structure = StartingFramework.as_dict()
-
-        self.lattice = np.array(dict_structure['lattice']['matrix']).astype(float)
-
-        self.atom_types = [i['label'] for i in dict_structure['sites']]
-        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
-        self.n_atoms = len(dict_structure['sites'])
-        self.composition = StartingFramework.formula
-
-        StartingFramework.to('TESTE_BOR.cif', fmt='cif')
 
         # Get the simmetry information of the generated structure
         symm = SpacegroupAnalyzer(StartingFramework, symprec=1, angle_tolerance=5)
