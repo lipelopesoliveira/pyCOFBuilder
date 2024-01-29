@@ -106,11 +106,7 @@ class Framework():
 
     def __init__(self, name=None, out_dir=None, verbosity='normal', save_bb=True):
 
-        if name is None:
-            self.name = ""
-        else:
-            self.name = name
-            self.from_name(self.name)
+        self.name = name
 
         self.out_path: str = os.path.join(os.getcwd(), 'out') if out_dir is None else out_dir
         self.save_bb: bool = save_bb
@@ -170,6 +166,8 @@ class Framework():
         v_error = 'Verbosity must be one of the following: None, Low, Normal, High, Debug'
         assert verbosity.lower() in ['none', 'normal', 'debug'], v_error
         self.verbosity = verbosity.lower()
+
+        self.from_name(self.name)
 
     def __str__(self) -> str:
         return self.name
@@ -4821,6 +4819,8 @@ class Framework():
         self.n_atoms = len(dict_structure['sites'])
         self.composition = StartingFramework.formula
 
+        StartingFramework.to('TESTE_DIA-A.cif', fmt='cif')
+
         dist_matrix = StartingFramework.distance_matrix
 
         # Check if there are any atoms closer than 0.8 A
@@ -4828,8 +4828,6 @@ class Framework():
             for j in range(i+1, len(dist_matrix)):
                 if dist_matrix[i][j] < self.dist_threshold:
                     raise BondLenghError(i, j, dist_matrix[i][j])
-
-        StartingFramework.to('TESTE_DIA-A.cif', fmt='cif')
 
         # Get the simmetry information of the generated structure
         symm = SpacegroupAnalyzer(StartingFramework, symprec=1, angle_tolerance=5)
@@ -5076,6 +5074,8 @@ class Framework():
         self.n_atoms = len(dict_structure['sites'])
         self.composition = StartingFramework.formula
 
+        StartingFramework.to('TESTE_BOR.cif', fmt='cif')
+
         dist_matrix = StartingFramework.distance_matrix
 
         # Check if there are any atoms closer than 0.8 A
@@ -5083,8 +5083,6 @@ class Framework():
             for j in range(i+1, len(dist_matrix)):
                 if dist_matrix[i][j] < self.dist_threshold:
                     raise BondLenghError(i, j, dist_matrix[i][j])
-
-        StartingFramework.to('TESTE_BOR-A.cif', fmt='cif')
 
         # Get the simmetry information of the generated structure
         symm = SpacegroupAnalyzer(StartingFramework, symprec=1, angle_tolerance=5)
