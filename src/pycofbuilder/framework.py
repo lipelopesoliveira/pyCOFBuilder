@@ -65,8 +65,8 @@ class Framework():
         Path to save the results.
         If not defined, a `out` folder will be created in the current directory.
     verbosity : str
-        Control the printing options. Can be 'None', 'Normal', 'High', or 'Debug'.
-        Default: 'Normal'
+        Control the printing options. Can be 'none', 'normal', or 'debug'.
+        Default: 'normal'
     save_bb : bool
         Control the saving of the building blocks.
         Default: True
@@ -90,6 +90,7 @@ class Framework():
     lattice : list = [[], [], []]
     symm_tol : float = 0.2
     angle_tol : float = 0.2
+    dist_threshold : float = 0.8
     available_2D_topologies : list
         List of available 2D topologies
     available_3D_topologies : list
@@ -103,9 +104,14 @@ class Framework():
         Default: bb_lib
     """
 
-    def __init__(self, name=None, out_dir=None, verbosity='low', save_bb=True):
+    def __init__(self, name=None, out_dir=None, verbosity='normal', save_bb=True):
 
-        self.verbosity: str = verbosity.lower()
+        if name is None:
+            self.name = ""
+        else:
+            self.name = name
+            self.from_name(self.name)
+
         self.out_path: str = os.path.join(os.getcwd(), 'out') if out_dir is None else out_dir
         self.save_bb: bool = save_bb
         self.lib_path: str = os.path.join(self.out_path, 'building_blocks')
@@ -161,11 +167,9 @@ class Framework():
             'BOR': [str(i + 1) for i in range(15)]
         }
 
-        if name is None:
-            self.name = ""
-        else:
-            self.name = name
-            self.from_name(self.name)
+        v_error = 'Verbosity must be one of the following: None, Low, Normal, High, Debug'
+        assert verbosity.lower() in ['none', 'normal', 'debug'], v_error
+        self.verbosity = verbosity.lower()
 
     def __str__(self) -> str:
         return self.name
