@@ -1131,12 +1131,12 @@ class Framework():
         self.n_atoms = len(dict_structure['sites'])
         self.composition = stacked_structure.formula
 
-        dist_matrix = StartingFramework.distance_matrix
+        dist_matrix = stacked_structure.distance_matrix
 
         # Check if there are any atoms closer than 0.8 A
         for i in range(len(dist_matrix)):
             for j in range(i+1, len(dist_matrix)):
-                if dist_matrix[i][j] < self.dist_threshold
+                if dist_matrix[i][j] < self.dist_threshold:
                     raise BondLenghError(i, j, dist_matrix[i][j])
 
         # Get the simmetry information of the generated structure
@@ -1526,12 +1526,12 @@ class Framework():
         self.n_atoms = len(dict_structure['sites'])
         self.composition = stacked_structure.formula
 
-        dist_matrix = StartingFramework.distance_matrix
+        dist_matrix = stacked_structure.distance_matrix
 
         # Check if there are any atoms closer than 0.8 A
         for i in range(len(dist_matrix)):
             for j in range(i+1, len(dist_matrix)):
-                if dist_matrix[i][j] < self.dist_threshold
+                if dist_matrix[i][j] < self.dist_threshold:
                     raise BondLenghError(i, j, dist_matrix[i][j])
 
         # Get the simmetry information of the generated structure
@@ -1922,12 +1922,12 @@ class Framework():
         self.n_atoms = len(dict_structure['sites'])
         self.composition = stacked_structure.formula
 
-        dist_matrix = StartingFramework.distance_matrix
+        dist_matrix = stacked_structure.distance_matrix
 
         # Check if there are any atoms closer than 0.8 A
         for i in range(len(dist_matrix)):
             for j in range(i+1, len(dist_matrix)):
-                if dist_matrix[i][j] < self.dist_threshold
+                if dist_matrix[i][j] < self.dist_threshold:
                     raise BondLenghError(i, j, dist_matrix[i][j])
 
         # Get the simmetry information of the generated structure
@@ -2317,12 +2317,12 @@ class Framework():
         self.n_atoms = len(dict_structure['sites'])
         self.composition = stacked_structure.formula
 
-        dist_matrix = StartingFramework.distance_matrix
+        dist_matrix = stacked_structure.distance_matrix
 
         # Check if there are any atoms closer than 0.8 A
         for i in range(len(dist_matrix)):
             for j in range(i+1, len(dist_matrix)):
-                if dist_matrix[i][j] < self.dist_threshold
+                if dist_matrix[i][j] < self.dist_threshold:
                     raise BondLenghError(i, j, dist_matrix[i][j])
 
         # Get the simmetry information of the generated structure
@@ -2711,12 +2711,12 @@ class Framework():
         self.n_atoms = len(dict_structure['sites'])
         self.composition = stacked_structure.formula
 
-        dist_matrix = StartingFramework.distance_matrix
+        dist_matrix = stacked_structure.distance_matrix
 
         # Check if there are any atoms closer than 0.8 A
         for i in range(len(dist_matrix)):
             for j in range(i+1, len(dist_matrix)):
-                if dist_matrix[i][j] < self.dist_threshold
+                if dist_matrix[i][j] < self.dist_threshold:
                     raise BondLenghError(i, j, dist_matrix[i][j])
 
         # Get the simmetry information of the generated structure
@@ -3107,12 +3107,12 @@ class Framework():
         self.n_atoms = len(dict_structure['sites'])
         self.composition = stacked_structure.formula
 
-        dist_matrix = StartingFramework.distance_matrix
+        dist_matrix = stacked_structure.distance_matrix
 
         # Check if there are any atoms closer than 0.8 A
         for i in range(len(dist_matrix)):
             for j in range(i+1, len(dist_matrix)):
-                if dist_matrix[i][j] < self.dist_threshold
+                if dist_matrix[i][j] < self.dist_threshold:
                     raise BondLenghError(i, j, dist_matrix[i][j])
 
         # Get the simmetry information of the generated structure
@@ -3498,12 +3498,12 @@ class Framework():
         self.n_atoms = len(dict_structure['sites'])
         self.composition = stacked_structure.formula
 
-        dist_matrix = StartingFramework.distance_matrix
+        dist_matrix = stacked_structure.distance_matrix
 
         # Check if there are any atoms closer than 0.8 A
         for i in range(len(dist_matrix)):
             for j in range(i+1, len(dist_matrix)):
-                if dist_matrix[i][j] < self.dist_threshold
+                if dist_matrix[i][j] < self.dist_threshold:
                     raise BondLenghError(i, j, dist_matrix[i][j])
 
         # Get the simmetry information of the generated structure
@@ -3908,7 +3908,7 @@ class Framework():
         # Check if there are any atoms closer than 0.8 A
         for i in range(len(dist_matrix)):
             for j in range(i+1, len(dist_matrix)):
-                if dist_matrix[i][j] < self.dist_threshold
+                if dist_matrix[i][j] < self.dist_threshold:
                     raise BondLenghError(i, j, dist_matrix[i][j])
 
         if self.verbosity is True:
@@ -4387,7 +4387,7 @@ class Framework():
         # Check if there are any atoms closer than 0.8 A
         for i in range(len(dist_matrix)):
             for j in range(i+1, len(dist_matrix)):
-                if dist_matrix[i][j] < self.dist_threshold
+                if dist_matrix[i][j] < self.dist_threshold:
                     raise BondLenghError(i, j, dist_matrix[i][j])
 
         if self.verbosity is True:
@@ -4592,7 +4592,7 @@ class Framework():
         # Check if there are any atoms closer than 0.8 A
         for i in range(len(dist_matrix)):
             for j in range(i+1, len(dist_matrix)):
-                if dist_matrix[i][j] < self.dist_threshold
+                if dist_matrix[i][j] < self.dist_threshold:
                     raise BondLenghError(i, j, dist_matrix[i][j])
 
         # Get the simmetry information of the generated structure
@@ -4817,7 +4817,7 @@ class Framework():
         # Check if there are any atoms closer than 0.8 A
         for i in range(len(dist_matrix)):
             for j in range(i+1, len(dist_matrix)):
-                if dist_matrix[i][j] < self.dist_threshold
+                if dist_matrix[i][j] < self.dist_threshold:
                     raise BondLenghError(i, j, dist_matrix[i][j])
 
         StartingFramework.to('TESTE_DIA-A.cif', fmt='cif')
@@ -5072,7 +5072,7 @@ class Framework():
         # Check if there are any atoms closer than 0.8 A
         for i in range(len(dist_matrix)):
             for j in range(i+1, len(dist_matrix)):
-                if dist_matrix[i][j] < self.dist_threshold
+                if dist_matrix[i][j] < self.dist_threshold:
                     raise BondLenghError(i, j, dist_matrix[i][j])
 
         StartingFramework.to('TESTE_BOR-A.cif', fmt='cif')
