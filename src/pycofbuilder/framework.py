@@ -4337,6 +4337,7 @@ class Framework():
                              BB_D41: str,
                              BB_D42: str,
                              interp_dg: str = '1',
+                             d_param_base: float = 7.2,
                              print_result: bool = True,
                              **kwargs):
         """Creates a COF with DIA network.
@@ -4351,6 +4352,8 @@ class Framework():
             The BuildingBlock object of the tetrapodal tetrahedical Buiding Block
         interp_dg : str, optional
             The degree of interpenetration of the framework (default is '1')
+        d_param_base : float, optional
+            The base value for interlayer distance in angstroms (default is 7.2)
         print_result : bool, optional
             Parameter for the control for printing the result (default is True)
 
@@ -4471,13 +4474,11 @@ class Framework():
 
         atom_types, atom_labels, atom_pos = [], [], []
         for n_int in range(int(self.stacking)):
-            int_direction = np.array([0, 1, 0]) * 7.2 * n_int
+            int_direction = np.array([0, 1, 0]) * d_param_base * n_int
 
             atom_types += self.atom_types
             atom_pos += (np.array(self.atom_pos) + int_direction).tolist()
             atom_labels += self.atom_labels
-
-            n_int += 1
 
         self.atom_types = atom_types
         self.atom_pos = atom_pos
@@ -4556,6 +4557,7 @@ class Framework():
                                BB_D4: str,
                                BB_L2: str,
                                interp_dg: str = '1',
+                               d_param_base: float = 7.2,
                                print_result: bool = True,
                                **kwargs):
         """Creates a COF with DIA-A network.
@@ -4570,6 +4572,8 @@ class Framework():
             The BuildingBlock object of the dipodal linear Buiding Block
         interp_dg : str, optional
             The degree of interpenetration of the framework (default is '1')
+        d_param_base : float, optional
+            The base value for interlayer distance in angstroms (default is 7.2)
         print_result : bool, optional
             Parameter for the control for printing the result (default is True)
 
@@ -4682,13 +4686,11 @@ class Framework():
 
         atom_types, atom_labels, atom_pos = [], [], []
         for n_int in range(int(self.stacking)):
-            int_direction = np.array([0, 1, 0]) * 7.2 * n_int
+            int_direction = np.array([0, 1, 0]) * d_param_base * n_int
 
             atom_types += self.atom_types
             atom_pos += (np.array(self.atom_pos) + int_direction).tolist()
             atom_labels += self.atom_labels
-
-            n_int += 1
 
         self.atom_types = atom_types
         self.atom_pos = atom_pos
@@ -4774,6 +4776,7 @@ class Framework():
                              BB_D4: str,
                              BB_T3: str,
                              interp_dg: str = '1',
+                             d_param_base: float = 7.2,
                              print_result: bool = True,
                              **kwargs):
         """Creates a COF with BOR network.
@@ -4789,6 +4792,8 @@ class Framework():
             The BuildingBlock object of the tripodal triangular Buiding Block
         interp_dg : str, optional
             The degree of interpenetration of the framework (default is '1')
+        d_param_base : float, optional
+            The base value for interlayer distance in angstroms (default is 7.2)
         print_result : bool, optional
             Parameter for the control for printing the result (default is True)
 
@@ -4928,13 +4933,11 @@ class Framework():
 
         atom_types, atom_labels, atom_pos = [], [], []
         for n_int in range(int(self.stacking)):
-            int_direction = np.array([0, 1, 0]) * 7.2 * n_int
+            int_direction = np.array([0, 1, 0]) * d_param_base * n_int
 
             atom_types += self.atom_types
             atom_pos += (np.array(self.atom_pos) + int_direction).tolist()
             atom_labels += self.atom_labels
-
-            n_int += 1
 
         self.atom_types = atom_types
         self.atom_pos = atom_pos
