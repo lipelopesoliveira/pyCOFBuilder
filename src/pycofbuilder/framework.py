@@ -275,7 +275,7 @@ class Framework():
 
         self.from_building_blocks(bb1, bb2, Net, Stacking, **kwargs)
 
-    def from_building_blocks(self, bb1, bb2, Net, Stacking, **kwargs):
+    def from_building_blocks(self, bb1: BuildingBlock, bb2: BuildingBlock, net: str, stacking: str, **kwargs):
         """Creates a COF from the building blocks.
 
         Parameters
@@ -294,11 +294,11 @@ class Framework():
         COF : Framework
             The COF object
         """
-        self.name = f'{bb1.name}-{bb2.name}-{Net}-{Stacking}'
+        self.name = f'{bb1.name}-{bb2.name}-{net}-{stacking}'
         self.bb1_name = bb1.name
         self.bb2_name = bb2.name
-        self.topology = Net
-        self.stacking = Stacking
+        self.topology = net
+        self.stacking = stacking
 
         # Check if the BB1 has the smiles attribute
         if hasattr(bb1, 'smiles') and hasattr(bb2, 'smiles'):
@@ -321,7 +321,7 @@ class Framework():
             'BOR': self.create_bor_structure
             }
 
-        result = net_build_dict[Net](bb1, bb2, Stacking, **kwargs)
+        result = net_build_dict[net](bb1, bb2, stacking, **kwargs)
 
         return result
 

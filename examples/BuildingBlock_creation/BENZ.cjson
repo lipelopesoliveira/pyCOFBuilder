@@ -1,7 +1,7 @@
 {
     "chemical json": 1,
     "name": "benzene",
-    "formula": "Q2 C6 R22 R12",
+    "formula": "R22R12C6Q2",
     "atoms": {
         "elements": {
             "type": [
@@ -75,9 +75,9 @@
         }
     },
     "properties": {
-        "smiles": "[Q]C1=C([R2])C([R1])=C([Q])C([R2])=C1[R1]",
+        "smiles": "[Q]C1=C([Q])C([R1])=C([Q])C([Q])=C1[R1]",
         "code": "BENZ",
         "xsmiles": "[*]C1=C([*])C([*])=C([*])C([*])=C1[*]",
-        "xsmiles_label": "|$Q;;;R2;;R1;;Q;;R2;;R1$|"
+        "xsmiles_label": "|$Q;;;Q;;R1;;Q;;Q;;R1$|"
     }
 }
