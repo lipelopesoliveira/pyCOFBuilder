@@ -1,6 +1,6 @@
 {
     "chemical json": 1,
-    "name": "tetrakis-(4-methylphenyl)-methane",
+    "name": "Tetraphenylmethane",
     "formula": "R34R14Q4R24C25R44",
     "atoms": {
         "elements": {
@@ -241,7 +241,7 @@
     },
     "properties": {
         "smiles": "[Q]C(C=C1)=CC=C1C(C2=CC=C([Q])C=C2)(C3=CC=C([Q])C=C3)C4=CC=C([Q])C=C4",
-        "code": "TKPM",
+        "code": "TTPM",
         "xsmiles": "[*]C(C=C1)=CC=C1C(C2=CC=C([*])C=C2)(C3=CC=C([*])C=C3)C4=CC=C([*])C=C4",
         "xsmiles_label": "|$Q;;;;;;;;;;;;Q;;;;;;;Q;;;;;;;Q;;$|"
     },
