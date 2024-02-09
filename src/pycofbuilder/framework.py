@@ -167,7 +167,8 @@ class Framework():
         assert verbosity.lower() in ['none', 'normal', 'debug'], v_error
         self.verbosity = verbosity.lower()
 
-        self.from_name(self.name)
+        if self.name is not None:
+            self.from_name(self.name)
 
     def __str__(self) -> str:
         return self.name
@@ -223,7 +224,7 @@ class Framework():
 
     def check_name_concistency(self, FrameworkName) -> tuple[str, str, str, str]:
         """
-        Checks if the name is in the correct format and returns a 
+        Checks if the name is in the correct format and returns a
         tuple with the building blocks names, the net and the stacking.
 
         In case the name is not in the correct format, an error is raised.
@@ -273,7 +274,9 @@ class Framework():
         bb1 = BuildingBlock(name=bb1_name, save_dir=self.out_path, save_bb=self.save_bb)
         bb2 = BuildingBlock(name=bb2_name, save_dir=self.out_path, save_bb=self.save_bb)
 
-        self.from_building_blocks(bb1, bb2, Net, Stacking, **kwargs)
+        print_result = False if self.verbosity == 'none' else True
+
+        self.from_building_blocks(bb1, bb2, Net, Stacking, print_result=print_result, **kwargs)
 
     def from_building_blocks(self, bb1: BuildingBlock, bb2: BuildingBlock, net: str, stacking: str, **kwargs):
         """Creates a COF from the building blocks.
