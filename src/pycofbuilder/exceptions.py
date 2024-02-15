@@ -27,3 +27,13 @@ class BBConnectivityError(Exception):
 
     def __str__(self):
         return str(self.message)
+
+
+class ConnectionGroupError(Exception):
+    """Exception raised when the connection group is not valid."""
+    def __init__(self, conn_1=None, conn_2=None):
+        self.message = 'ERROR: The connection group {} not compatible with {}'.format(conn_1,
+                                                                                      conn_2)
+
+    def __str__(self):
+        return str(self.message)
