@@ -692,6 +692,17 @@ def get_bond_atom(connector_1: str, connector_2: str) -> str:
     return bond_atom
 
 
+def get_framework_symm_text(name, lattice, hall, space_group, space_number, symm_op):
+    '''Get the text for the framework symmop'''
+    text = '{:<60s} {:^12s} {:<4s} {:^4s} #{:^5s}   {:^2} sym. op.'.format(name,
+                                                                           lattice,
+                                                                           hall.lstrip('-'),
+                                                                           space_group,
+                                                                           space_number,
+                                                                           symm_op)
+    return text
+
+
 def print_framework_name(name, lattice, hall, space_group, space_number, symm_op):
     '''Print the results of the created structure'''
     print('{:<60s} {:^12s} {:<4s} {:^4s} #{:^5s}   {:^2} sym. op.'.format(name,

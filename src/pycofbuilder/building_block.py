@@ -22,7 +22,7 @@ from pycofbuilder.cjson import ChemJSON
 
 class BuildingBlock():
 
-    def __init__(self, name=None, verbosity=False, save_dir=False, save_bb=True):
+    def __init__(self, name=None, verbosity=False, save_dir: str = '.', save_bb=True):
 
         _ROOTDIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -59,7 +59,7 @@ class BuildingBlock():
                                    ]
 
         # Check if save_dir exists and try to create it if not
-        if self.save_dir is not False:
+        if self.save_dir != '':
             os.makedirs(self.save_dir, exist_ok=True)
 
         # If a name is provided create building block from this name
@@ -522,7 +522,8 @@ class BuildingBlock():
         self.composition = core.formula
         self.atom_labels = ['C']*len(self.atom_types)
 
-        # pref_orientation = unit_vector(selfget_Q_points(core.atomic_types, core.cartesian_positions)[1][0])
+        pref_orientation = unit_vector(
+            self.get_Q_points(core.atomic_types, core.cartesian_positions)[1][0])
 
         if symmetry == 'D4':
             self.add_connection_group_symm(conector)
@@ -542,8 +543,8 @@ class BuildingBlock():
         self.funcGroups = funcGroup_string
 
         self.connectivity = len([i for i in self.atom_types if 'X' in i])
-        # self.centralize()
-        # self.align_to(pref_orientation)
+        self.centralize()
+        self.align_to(pref_orientation)
         self.calculate_size()
 
     def replace_X(self, target_type):

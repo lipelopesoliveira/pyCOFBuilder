@@ -53,8 +53,8 @@ TOPOLOGY_DICT = {
         'vertice_connectivity': 4,
         'edge_connectivity': 0,
         'vertices': [
-            {'position': [0, 0, 0], 'angle': 45},
-            {'position': [1/2, 1/2, 0], 'angle': -45}
+            {'position': [0, 0, 0], 'angle': 0},
+            {'position': [1/2, 1/2, 0], 'angle': 0}
             ],
         'edges': []
         },
@@ -68,8 +68,8 @@ TOPOLOGY_DICT = {
         'vertice_connectivity': 4,
         'edge_connectivity': 2,
         'vertices': [
-            {'position': [0, 0, 0], 'angle': 45},
-            {'position': [1/2, 1/2, 0], 'angle': 45}
+            {'position': [0, 0, 0], 'angle': 0},
+            {'position': [1/2, 1/2, 0], 'angle': 0}
             ],
         'edges': [
             {'position': [1/4, 1/4, 0], 'angle': 45},
@@ -162,8 +162,8 @@ TOPOLOGY_DICT = {
         'vertice_connectivity': 4,
         'edge_connectivity': 2,
         'vertices': [
-            {'position': [0.5, 0, 0], 'angle': 45},
             {'position': [1/4, 3*np.sqrt(3)/12, 0], 'angle': -15},
+            {'position': [0.5, 0, 0], 'angle': 45},
             {'position': [-1/4, 3*np.sqrt(3)/12, 0], 'angle': 15}
             ],
         'edges': []
@@ -178,8 +178,8 @@ TOPOLOGY_DICT = {
         'vertice_connectivity': 4,
         'edge_connectivity': 2,
         'vertices': [
-            {'position': [0.5, 0, 0], 'angle': 45},
             {'position': [1/4, 3*np.sqrt(3)/12, 0], 'angle': -15},
+            {'position': [0.5, 0, 0], 'angle': 45},
             {'position': [-1/4, 3*np.sqrt(3)/12, 0], 'angle': 15}
             ],
         'edges': [
