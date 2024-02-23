@@ -27,14 +27,10 @@ from pycofbuilder.building_block import BuildingBlock
 from pycofbuilder.data.topology import TOPOLOGY_DICT
 
 # Import pycofbuilder tools
-from pycofbuilder.tools import (print_command,
-                                get_bond_atom,
-                                get_cartesian_to_fractional_matrix,
+from pycofbuilder.tools import (get_bond_atom,
                                 cell_to_cellpar,
                                 cellpar_to_cell,
                                 rotation_matrix_from_vectors,
-                                change_X_atoms,
-                                print_framework_name,
                                 unit_vector,
                                 angle,
                                 get_framework_symm_text)
@@ -204,10 +200,10 @@ class Framework():
         fram_str += 'A: {:11.6f}  {:11.6f}   {:11.6f}\n'.format(*self.cellMatrix[0])
         fram_str += 'B: {:11.6f}  {:11.6f}   {:11.6f}\n'.format(*self.cellMatrix[1])
         fram_str += 'C: {:11.6f}  {:11.6f}   {:11.6f}\n'.format(*self.cellMatrix[2])
-        
+
         fram_str += f'Cartesian Sites ({self.n_atoms})\n'
-        fram_str += f'  #  Type         a         b         c    label\n'
-        fram_str += f'---  ----  --------  --------  --------  -------\n'
+        fram_str += '  #  Type         a         b         c    label\n'
+        fram_str += '---  ----  --------  --------  --------  -------\n'
 
         for i in range(len(self.atom_types)):
             fram_str += '{:3d}  {:4s}  {:8.5f}  {:8.5f}  {:8.5f}  {:>7}\n'.format(i,
@@ -848,7 +844,7 @@ class Framework():
                                             str(self.space_group),
                                             str(self.space_group_n),
                                             len(symm_op))
-        
+
         self.logger.info(symm_text)
 
         return [self.name,
@@ -1256,7 +1252,7 @@ class Framework():
                                             str(self.space_group),
                                             str(self.space_group_n),
                                             len(symm_op))
-        
+
         self.logger.info(symm_text)
 
         return [self.name,
@@ -1667,7 +1663,7 @@ class Framework():
                                             str(self.space_group),
                                             str(self.space_group_n),
                                             len(symm_op))
-        
+
         self.logger.info(symm_text)
 
         return [self.name,
@@ -2077,7 +2073,7 @@ class Framework():
                                             str(self.space_group),
                                             str(self.space_group_n),
                                             len(symm_op))
-        
+
         self.logger.info(symm_text)
 
         return [self.name,
@@ -2488,7 +2484,7 @@ class Framework():
                                             str(self.space_group),
                                             str(self.space_group_n),
                                             len(symm_op))
-        
+
         self.logger.info(symm_text)
 
         return [self.name,
@@ -2898,7 +2894,7 @@ class Framework():
                                             str(self.space_group),
                                             str(self.space_group_n),
                                             len(symm_op))
-        
+
         self.logger.info(symm_text)
 
         return [self.name,
@@ -3370,7 +3366,6 @@ class Framework():
             self.logger.error(connectivity_error.format('B', 3, BB_L2.connectivity))
             raise BBConnectivityError(2, BB_L2.connectivity)
 
-
         self.name = f'{BB_S4.name}-{BB_L2.name}-FXT_A-{stacking}'
         self.topology = 'FXT_A'
         self.staking = stacking
@@ -3788,11 +3783,11 @@ class Framework():
         self.logger.debug('{} detected as bond atom for groups {} and {}'.format(bond_atom,
                                                                                  BB_D41.conector,
                                                                                  BB_D42.conector))
-        
+
         # Get the topology information
         topology_info = TOPOLOGY_DICT[self.topology]
 
-         # Measure the base size of the building blocks
+        # Measure the base size of the building blocks
         size = np.average(BB_D41.size) + np.average(BB_D42.size)
 
         # Calculate the primitive cell vector assuming tetrahedical building blocks
@@ -4210,7 +4205,7 @@ class Framework():
                                             str(self.space_group),
                                             str(self.space_group_n),
                                             len(symm_op))
-        
+
         self.logger.info(symm_text)
 
         return [self.name,
@@ -4256,6 +4251,7 @@ class Framework():
                 5. number of the space group,
                 6. number of operation symmetry
         """
+        connectivity_error = 'Building block {} must present connectivity {} not {}'
         if BB_D4.connectivity != 4:
             self.logger.error(connectivity_error.format('A', 4, BB_D4.connectivity))
             raise BBConnectivityError(4, BB_D4.connectivity)
@@ -4487,7 +4483,7 @@ class Framework():
                                             str(self.space_group),
                                             str(self.space_group_n),
                                             len(symm_op))
-        
+
         self.logger.info(symm_text)
 
         return [self.name,
