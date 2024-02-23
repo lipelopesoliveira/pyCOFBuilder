@@ -99,128 +99,193 @@
 <h1>Generating COF structures from custom Building Blocks<a class="headerlink" href="#generating-cof-structures-from-custom-building-blocks" title="Link to this heading"></a></h1>
 <p>To create a COF structure from custom Building Blocks, you need the desired Building Block in the <code class="docutils literal notranslate"><span class="pre">.xyz</span></code>, <code class="docutils literal notranslate"><span class="pre">.gjf</span></code>, or <code class="docutils literal notranslate"><span class="pre">.cjson</span></code> format, as in the example below:</p>
 <div class="sphinx-tabs docutils container">
-<div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-0-Q2hlbWljYWxKU09OICguY2pzb24p" aria-selected="true" class="sphinx-tabs-tab group-tab" id="tab-0-Q2hlbWljYWxKU09OICguY2pzb24p" name="Q2hlbWljYWxKU09OICguY2pzb24p" role="tab" tabindex="0">ChemicalJSON (.cjson)</button><button aria-controls="panel-0-WFlaICgueHl6KQ==" aria-selected="false" class="sphinx-tabs-tab group-tab" id="tab-0-WFlaICgueHl6KQ==" name="WFlaICgueHl6KQ==" role="tab" tabindex="-1">XYZ (.xyz)</button><button aria-controls="panel-0-R2F1c3NWaWV3ICguZ2pmKQ==" aria-selected="false" class="sphinx-tabs-tab group-tab" id="tab-0-R2F1c3NWaWV3ICguZ2pmKQ==" name="R2F1c3NWaWV3ICguZ2pmKQ==" role="tab" tabindex="-1">GaussView (.gjf)</button></div><div aria-labelledby="tab-0-Q2hlbWljYWxKU09OICguY2pzb24p" class="sphinx-tabs-panel group-tab" id="panel-0-Q2hlbWljYWxKU09OICguY2pzb24p" name="Q2hlbWljYWxKU09OICguY2pzb24p" role="tabpanel" tabindex="0"><div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="nt">&quot;chemical json&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
-<span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;benzene&quot;</span><span class="p">,</span>
-<span class="nt">&quot;formula&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Q2 C6 R22 R12&quot;</span><span class="p">,</span>
-<span class="nt">&quot;atoms&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="nt">&quot;elements&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">         </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">            </span><span class="s2">&quot;C&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="s2">&quot;C&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="s2">&quot;C&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="s2">&quot;C&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="s2">&quot;C&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="s2">&quot;C&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="s2">&quot;R1&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="s2">&quot;R1&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="s2">&quot;R2&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="s2">&quot;R2&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="s2">&quot;Q&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="s2">&quot;Q&quot;</span>
-<span class="w">         </span><span class="p">],</span>
-<span class="w">         </span><span class="nt">&quot;number&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">            </span><span class="mi">6</span><span class="p">,</span>
-<span class="w">            </span><span class="mi">6</span><span class="p">,</span>
-<span class="w">            </span><span class="mi">6</span><span class="p">,</span>
-<span class="w">            </span><span class="mi">6</span><span class="p">,</span>
-<span class="w">            </span><span class="mi">6</span><span class="p">,</span>
-<span class="w">            </span><span class="mi">6</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">0.0</span>
-<span class="w">         </span><span class="p">]</span>
-<span class="w">   </span><span class="p">},</span>
-<span class="w">   </span><span class="nt">&quot;coords&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">         </span><span class="nt">&quot;3d&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">            </span><span class="mf">1.21383527</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">0.70080812</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">1.40161624</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">-1.21383527</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">0.70080812</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">-1.21383527</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">-0.70080812</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">-1.40161624</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">1.21383527</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">-0.70080812</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">2.07986067</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">1.20080812</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">-2.07986067</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">-1.20080812</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">2.07986067</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">-1.20080812</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">-2.07986067</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">1.20080812</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">2.40161624</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">-2.40161624</span><span class="p">,</span>
-<span class="w">            </span><span class="mf">0.0</span>
-<span class="w">         </span><span class="p">]</span>
-<span class="w">   </span><span class="p">}</span>
-<span class="p">},</span>
-<span class="nt">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">   </span><span class="nt">&quot;smiles&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;[Q]C1=C([R2])C([R1])=C([Q])C([R2])=C1[R1]&quot;</span><span class="p">,</span>
-<span class="w">   </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;BENZ&quot;</span><span class="p">,</span>
-<span class="w">   </span><span class="nt">&quot;xsmiles&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;[*]C1=C([*])C([*])=C([*])C([*])=C1[*]&quot;</span><span class="p">,</span>
-<span class="w">   </span><span class="nt">&quot;xsmiles_label&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;|$Q;;;R2;;R1;;Q;;R2;;R1$|&quot;</span>
-<span class="p">}</span>
-<span class="p">}</span>
+<div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-0-WFlaICgueHl6KQ==" aria-selected="true" class="sphinx-tabs-tab group-tab" id="tab-0-WFlaICgueHl6KQ==" name="WFlaICgueHl6KQ==" role="tab" tabindex="0">XYZ (.xyz)</button><button aria-controls="panel-0-R2F1c3NWaWV3ICguZ2pmKQ==" aria-selected="false" class="sphinx-tabs-tab group-tab" id="tab-0-R2F1c3NWaWV3ICguZ2pmKQ==" name="R2F1c3NWaWV3ICguZ2pmKQ==" role="tab" tabindex="-1">GaussView (.gjf)</button><button aria-controls="panel-0-Q2hlbWljYWxKU09OICguY2pzb24p" aria-selected="false" class="sphinx-tabs-tab group-tab" id="tab-0-Q2hlbWljYWxKU09OICguY2pzb24p" name="Q2hlbWljYWxKU09OICguY2pzb24p" role="tab" tabindex="-1">ChemicalJSON (.cjson)</button></div><div aria-labelledby="tab-0-WFlaICgueHl6KQ==" class="sphinx-tabs-panel group-tab" id="panel-0-WFlaICgueHl6KQ==" name="WFlaICgueHl6KQ==" role="tabpanel" tabindex="0"><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="m">9</span>
+T3<span class="w"> </span>building<span class="w"> </span>block
+C<span class="w">          </span><span class="m">0</span>.9828406<span class="w">      </span><span class="m">0</span>.9992759<span class="w">      </span><span class="m">0</span>.0000000
+C<span class="w">         </span>-0.3739780<span class="w">      </span><span class="m">1</span>.3508029<span class="w">      </span><span class="m">0</span>.0000000
+C<span class="w">         </span>-1.3568187<span class="w">      </span><span class="m">0</span>.3515270<span class="w">      </span><span class="m">0</span>.0000000
+C<span class="w">         </span>-0.9828406<span class="w">     </span>-0.9992759<span class="w">      </span><span class="m">0</span>.0000000
+C<span class="w">          </span><span class="m">0</span>.3739780<span class="w">     </span>-1.3508029<span class="w">      </span><span class="m">0</span>.0000000
+C<span class="w">          </span><span class="m">1</span>.3568187<span class="w">     </span>-0.3515270<span class="w">      </span><span class="m">0</span>.0000000
+C<span class="w">         </span>-1.9996089<span class="w">     </span>-2.0330469<span class="w">      </span><span class="m">0</span>.0000000
+H<span class="w">         </span>-1.8107021<span class="w">     </span>-3.1273182<span class="w">      </span><span class="m">0</span>.0000000
+C<span class="w">          </span><span class="m">2</span>.7604747<span class="w">     </span>-0.7151886<span class="w">      </span><span class="m">0</span>.0000000
+H<span class="w">          </span><span class="m">3</span>.6136881<span class="w">     </span>-0.0044549<span class="w">      </span><span class="m">0</span>.0000000
+C<span class="w">         </span>-0.7608658<span class="w">      </span><span class="m">2</span>.7482355<span class="w">      </span><span class="m">0</span>.0000000
+H<span class="w">         </span>-1.8029860<span class="w">      </span><span class="m">3</span>.1317731<span class="w">      </span><span class="m">0</span>.0000000
+O<span class="w">          </span><span class="m">1</span>.9855845<span class="w">      </span><span class="m">2</span>.0187880<span class="w">      </span><span class="m">0</span>.0000000
+H<span class="w">          </span><span class="m">1</span>.7077038<span class="w">      </span><span class="m">3</span>.0013254<span class="w">      </span><span class="m">0</span>.0000000
+O<span class="w">         </span>-2.7411139<span class="w">      </span><span class="m">0</span>.7101726<span class="w">      </span><span class="m">0</span>.0000000
+H<span class="w">         </span>-3.4530759<span class="w">     </span>-0.0217478<span class="w">      </span><span class="m">0</span>.0000000
+O<span class="w">          </span><span class="m">0</span>.7555294<span class="w">     </span>-2.7289606<span class="w">      </span><span class="m">0</span>.0000000
+H<span class="w">          </span><span class="m">1</span>.7453721<span class="w">     </span>-2.9795776<span class="w">      </span><span class="m">0</span>.0000000
+X<span class="w">          </span><span class="m">0</span>.0000000<span class="w">      </span><span class="m">3</span>.7112465<span class="w">      </span><span class="m">0</span>.0000000
+X<span class="w">         </span>-3.2140338<span class="w">     </span>-1.8556233<span class="w">      </span><span class="m">0</span>.0000000
+X<span class="w">          </span><span class="m">3</span>.2140338<span class="w">     </span>-1.8556233<span class="w">      </span><span class="m">0</span>.0000000
 </pre></div>
 </div>
-</div><div aria-labelledby="tab-0-WFlaICgueHl6KQ==" class="sphinx-tabs-panel group-tab" hidden="true" id="panel-0-WFlaICgueHl6KQ==" name="WFlaICgueHl6KQ==" role="tabpanel" tabindex="0"><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="m">12</span>
-L2_BENZ<span class="w"> </span>building<span class="w"> </span>block
-C<span class="w">                  </span><span class="m">1</span>.21383527<span class="w">    </span><span class="m">0</span>.70080812<span class="w">    </span><span class="m">0</span>.00000000
-C<span class="w">                  </span><span class="m">0</span>.00000000<span class="w">    </span><span class="m">1</span>.40161624<span class="w">    </span><span class="m">0</span>.00000000
-C<span class="w">                 </span>-1.21383527<span class="w">    </span><span class="m">0</span>.70080812<span class="w">    </span><span class="m">0</span>.00000000
-C<span class="w">                 </span>-1.21383527<span class="w">   </span>-0.70080812<span class="w">    </span><span class="m">0</span>.00000000
-C<span class="w">                  </span><span class="m">0</span>.00000000<span class="w">   </span>-1.40161624<span class="w">    </span><span class="m">0</span>.00000000
-C<span class="w">                  </span><span class="m">1</span>.21383527<span class="w">   </span>-0.70080812<span class="w">    </span><span class="m">0</span>.00000000
-R1<span class="w">                 </span><span class="m">2</span>.07986067<span class="w">    </span><span class="m">1</span>.20080812<span class="w">    </span><span class="m">0</span>.00000000
-R1<span class="w">                </span>-2.07986067<span class="w">   </span>-1.20080812<span class="w">    </span><span class="m">0</span>.00000000
-R2<span class="w">                 </span><span class="m">2</span>.07986067<span class="w">   </span>-1.20080812<span class="w">    </span><span class="m">0</span>.00000000
-R2<span class="w">                </span>-2.07986067<span class="w">    </span><span class="m">1</span>.20080812<span class="w">    </span><span class="m">0</span>.00000000
-Q<span class="w">                  </span><span class="m">0</span>.00000000<span class="w">    </span><span class="m">2</span>.40161624<span class="w">    </span><span class="m">0</span>.00000000
-Q<span class="w">                  </span><span class="m">0</span>.00000000<span class="w">   </span>-2.40161624<span class="w">    </span><span class="m">0</span>.00000000
-</pre></div>
-</div>
-</div><div aria-labelledby="tab-0-R2F1c3NWaWV3ICguZ2pmKQ==" class="sphinx-tabs-panel group-tab" hidden="true" id="panel-0-R2F1c3NWaWV3ICguZ2pmKQ==" name="R2F1c3NWaWV3ICguZ2pmKQ==" role="tabpanel" tabindex="0"><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># hf/3-21g</span>
+</div><div aria-labelledby="tab-0-R2F1c3NWaWV3ICguZ2pmKQ==" class="sphinx-tabs-panel group-tab" hidden="true" id="panel-0-R2F1c3NWaWV3ICguZ2pmKQ==" name="R2F1c3NWaWV3ICguZ2pmKQ==" role="tabpanel" tabindex="0"><blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># hf/3-21g</span>
 
-L2_BENZ<span class="w"> </span>building<span class="w"> </span>block
+T3<span class="w"> </span>building<span class="w"> </span>block
 
 <span class="m">0</span><span class="w"> </span><span class="m">1</span>
-C<span class="w">                  </span><span class="m">1</span>.21383527<span class="w">    </span><span class="m">0</span>.70080812<span class="w">    </span><span class="m">0</span>.00000000
-C<span class="w">                  </span><span class="m">0</span>.00000000<span class="w">    </span><span class="m">1</span>.40161624<span class="w">    </span><span class="m">0</span>.00000000
-C<span class="w">                 </span>-1.21383527<span class="w">    </span><span class="m">0</span>.70080812<span class="w">    </span><span class="m">0</span>.00000000
-C<span class="w">                 </span>-1.21383527<span class="w">   </span>-0.70080812<span class="w">    </span><span class="m">0</span>.00000000
-C<span class="w">                  </span><span class="m">0</span>.00000000<span class="w">   </span>-1.40161624<span class="w">    </span><span class="m">0</span>.00000000
-C<span class="w">                  </span><span class="m">1</span>.21383527<span class="w">   </span>-0.70080812<span class="w">    </span><span class="m">0</span>.00000000
-R1<span class="w">                 </span><span class="m">2</span>.07986067<span class="w">    </span><span class="m">1</span>.20080812<span class="w">    </span><span class="m">0</span>.00000000
-R1<span class="w">                </span>-2.07986067<span class="w">   </span>-1.20080812<span class="w">    </span><span class="m">0</span>.00000000
-R2<span class="w">                 </span><span class="m">2</span>.07986067<span class="w">   </span>-1.20080812<span class="w">    </span><span class="m">0</span>.00000000
-R2<span class="w">                </span>-2.07986067<span class="w">    </span><span class="m">1</span>.20080812<span class="w">    </span><span class="m">0</span>.00000000
-Q<span class="w">                  </span><span class="m">0</span>.00000000<span class="w">    </span><span class="m">2</span>.40161624<span class="w">    </span><span class="m">0</span>.00000000
-Q<span class="w">                  </span><span class="m">0</span>.00000000<span class="w">   </span>-2.40161624<span class="w">    </span><span class="m">0</span>.00000000
+C<span class="w">          </span><span class="m">0</span>.9828406<span class="w">      </span><span class="m">0</span>.9992759<span class="w">      </span><span class="m">0</span>.0000000
+C<span class="w">         </span>-0.3739780<span class="w">      </span><span class="m">1</span>.3508029<span class="w">      </span><span class="m">0</span>.0000000
+C<span class="w">         </span>-1.3568187<span class="w">      </span><span class="m">0</span>.3515270<span class="w">      </span><span class="m">0</span>.0000000
+C<span class="w">         </span>-0.9828406<span class="w">     </span>-0.9992759<span class="w">      </span><span class="m">0</span>.0000000
+C<span class="w">          </span><span class="m">0</span>.3739780<span class="w">     </span>-1.3508029<span class="w">      </span><span class="m">0</span>.0000000
+C<span class="w">          </span><span class="m">1</span>.3568187<span class="w">     </span>-0.3515270<span class="w">      </span><span class="m">0</span>.0000000
+C<span class="w">         </span>-1.9996089<span class="w">     </span>-2.0330469<span class="w">      </span><span class="m">0</span>.0000000
+H<span class="w">         </span>-1.8107021<span class="w">     </span>-3.1273182<span class="w">      </span><span class="m">0</span>.0000000
+C<span class="w">          </span><span class="m">2</span>.7604747<span class="w">     </span>-0.7151886<span class="w">      </span><span class="m">0</span>.0000000
+H<span class="w">          </span><span class="m">3</span>.6136881<span class="w">     </span>-0.0044549<span class="w">      </span><span class="m">0</span>.0000000
+C<span class="w">         </span>-0.7608658<span class="w">      </span><span class="m">2</span>.7482355<span class="w">      </span><span class="m">0</span>.0000000
+H<span class="w">         </span>-1.8029860<span class="w">      </span><span class="m">3</span>.1317731<span class="w">      </span><span class="m">0</span>.0000000
+O<span class="w">          </span><span class="m">1</span>.9855845<span class="w">      </span><span class="m">2</span>.0187880<span class="w">      </span><span class="m">0</span>.0000000
+H<span class="w">          </span><span class="m">1</span>.7077038<span class="w">      </span><span class="m">3</span>.0013254<span class="w">      </span><span class="m">0</span>.0000000
+O<span class="w">         </span>-2.7411139<span class="w">      </span><span class="m">0</span>.7101726<span class="w">      </span><span class="m">0</span>.0000000
+H<span class="w">         </span>-3.4530759<span class="w">     </span>-0.0217478<span class="w">      </span><span class="m">0</span>.0000000
+O<span class="w">          </span><span class="m">0</span>.7555294<span class="w">     </span>-2.7289606<span class="w">      </span><span class="m">0</span>.0000000
+H<span class="w">          </span><span class="m">1</span>.7453721<span class="w">     </span>-2.9795776<span class="w">      </span><span class="m">0</span>.0000000
+X<span class="w">          </span><span class="m">0</span>.0000000<span class="w">      </span><span class="m">3</span>.7112465<span class="w">      </span><span class="m">0</span>.0000000
+X<span class="w">         </span>-3.2140338<span class="w">     </span>-1.8556233<span class="w">      </span><span class="m">0</span>.0000000
+X<span class="w">          </span><span class="m">3</span>.2140338<span class="w">     </span>-1.8556233<span class="w">      </span><span class="m">0</span>.0000000
 </pre></div>
 </div>
-</div></div>
-<p>Then, you will need to create a <code class="docutils literal notranslate"><span class="pre">BuildingBlock</span></code> object from the desired Building Block. The <code class="docutils literal notranslate"><span class="pre">BuildingBlock</span></code> class is used to create the COF structure.
+</div></blockquote>
+<div aria-labelledby="tab-0-Q2hlbWljYWxKU09OICguY2pzb24p" class="sphinx-tabs-panel group-tab" hidden="true" id="panel-0-Q2hlbWljYWxKU09OICguY2pzb24p" name="Q2hlbWljYWxKU09OICguY2pzb24p" role="tabpanel" tabindex="0"><div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="nt">&quot;chemical json&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;T3_BENZ_CHO_OH&quot;</span><span class="p">,</span>
+<span class="nt">&quot;formula&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;C9O3H6X3&quot;</span><span class="p">,</span>
+<span class="nt">&quot;atoms&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;elements&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="s2">&quot;C&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;C&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;C&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;C&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;C&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;C&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;C&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;X&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;H&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;C&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;X&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;H&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;C&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;X&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;H&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;O&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;H&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;O&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;H&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;O&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;H&quot;</span>
+<span class="w">        </span><span class="p">],</span>
+<span class="w">        </span><span class="nt">&quot;number&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="mi">6</span><span class="p">,</span>
+<span class="w">            </span><span class="mi">6</span><span class="p">,</span>
+<span class="w">            </span><span class="mi">6</span><span class="p">,</span>
+<span class="w">            </span><span class="mi">6</span><span class="p">,</span>
+<span class="w">            </span><span class="mi">6</span><span class="p">,</span>
+<span class="w">            </span><span class="mi">6</span><span class="p">,</span>
+<span class="w">            </span><span class="mi">6</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">            </span><span class="mi">6</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">            </span><span class="mi">6</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">            </span><span class="mi">8</span><span class="p">,</span>
+<span class="w">            </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">            </span><span class="mi">8</span><span class="p">,</span>
+<span class="w">            </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">            </span><span class="mi">8</span><span class="p">,</span>
+<span class="w">            </span><span class="mi">1</span>
+<span class="w">        </span><span class="p">]</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;coords&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;3d&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="mf">0.9828406</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.9992759</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">-0.373978</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">1.3508029</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">-1.3568187</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.351527</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">-0.9828406</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">-0.9992759</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.373978</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">-1.3508029</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">1.3568187</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">-0.351527</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">-1.9996089</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">-2.0330469</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">-3.2140338</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">-1.8556233</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">-1.8107021</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">-3.1273182</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">2.7604747</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">-0.7151886</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">3.2140338</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">-1.8556233</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">3.6136881</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">-0.0044549</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">-0.7608658</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">2.7482355</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">3.7112465</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">-1.802986</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">3.1317731</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">1.9855845</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">2.018788</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">1.7077038</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">3.0013254</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">-2.7411139</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.7101726</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">-3.4530759</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">-0.0217478</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.7555294</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">-2.7289606</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">1.7453721</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">-2.9795776</span><span class="p">,</span>
+<span class="w">            </span><span class="mf">0.0</span>
+<span class="w">        </span><span class="p">]</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">},</span>
+<span class="nt">&quot;partialCharges&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<span class="nt">&quot;results&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="nt">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;totalCharge&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;spinMultiplicity&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div></div></div>
+<p>Then, you will need to create a <code class="docutils literal notranslate"><span class="pre">BuildingBlock</span></code> object from the desired Building Block. Don’t forget to add the <code class="docutils literal notranslate"><span class="pre">X</span></code> atoms on the structure where the building blocks will be connected to each other.
 This method requires the path to the Building Block file and the name of the Building Block file and the type of connector.
 The connector atom is the atom that will be used to determine the correct atom to connect the Building Blocks.
 The method to create the <code class="docutils literal notranslate"><span class="pre">BuildingBlock</span></code> object is shown below:</p>

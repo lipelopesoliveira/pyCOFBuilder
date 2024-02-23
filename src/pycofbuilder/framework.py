@@ -310,8 +310,8 @@ class Framework():
         """
         bb1_name, bb2_name, Net, Stacking = self.check_name_concistency(FrameworkName)
 
-        bb1 = BuildingBlock(name=bb1_name, save_dir=self.bb_out_path, save_bb=self.save_bb)
-        bb2 = BuildingBlock(name=bb2_name, save_dir=self.bb_out_path, save_bb=self.save_bb)
+        bb1 = BuildingBlock(name=bb1_name, bb_out_path=self.bb_out_path, save_bb=self.save_bb)
+        bb2 = BuildingBlock(name=bb2_name, bb_out_path=self.bb_out_path, save_bb=self.save_bb)
 
         self.from_building_blocks(bb1, bb2, Net, Stacking, **kwargs)
 

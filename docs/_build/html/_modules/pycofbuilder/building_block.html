@@ -771,7 +771,7 @@
     <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="s1">&#39;xyz&#39;</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="n">extension</span> <span class="o">==</span> <span class="s1">&#39;xyz&#39;</span><span class="p">:</span>
-            <span class="n">save_xyz</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">,</span>
+            <span class="n">save_xyz</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bb_out_path</span><span class="p">,</span>
                      <span class="n">file_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.xyz&#39;</span><span class="p">,</span>
                      <span class="n">atom_types</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">,</span>
                      <span class="n">atom_pos</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_pos</span><span class="p">)</span></div>
@@ -860,7 +860,7 @@
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.building_block.BuildingBlock.get_buildingblock_list">[docs]</a>
     <span class="k">def</span> <span class="nf">get_buildingblock_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">connector_group</span><span class="p">):</span>
 
-        <span class="n">files_list</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">)</span>
+        <span class="n">files_list</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bb_out_path</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;.xyz&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">files_list</span> <span class="k">if</span> <span class="n">shape</span> <span class="o">==</span> <span class="n">i</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">connector_group</span> <span class="ow">in</span> <span class="n">i</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">2</span><span class="p">]]</span></div>
 </div>

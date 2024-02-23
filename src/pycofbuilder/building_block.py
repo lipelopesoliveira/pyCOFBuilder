@@ -607,7 +607,7 @@ class BuildingBlock():
     def save(self, extension='xyz'):
 
         if extension == 'xyz':
-            save_xyz(path=self.save_dir,
+            save_xyz(path=self.bb_out_path,
                      file_name=self.name + '.xyz',
                      atom_types=self.atom_types,
                      atom_pos=self.atom_pos)
@@ -681,6 +681,6 @@ class BuildingBlock():
 
     def get_buildingblock_list(self, shape, connector_group):
 
-        files_list = os.listdir(self.save_dir)
+        files_list = os.listdir(self.bb_out_path)
 
         return [i.rstrip('.xyz') for i in files_list if shape == i.split('_')[0] and connector_group in i.split('_')[2]]
