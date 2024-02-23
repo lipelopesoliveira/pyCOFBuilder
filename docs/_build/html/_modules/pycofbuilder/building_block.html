@@ -32,8 +32,8 @@
 
           
           
-          <a href="../../index.html">
-            
+          <a href="../../index.html" class="icon icon-home">
+            pyCOFBuilder
               <img src="../../_static/header-logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
@@ -104,6 +104,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">scipy.spatial.transform</span> <span class="kn">import</span> <span class="n">Rotation</span> <span class="k">as</span> <span class="n">R</span>
 
@@ -112,41 +113,52 @@
                                 <span class="n">closest_atom_struc</span><span class="p">,</span>
                                 <span class="n">find_index</span><span class="p">,</span>
                                 <span class="n">unit_vector</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">pycofbuilder.io_tools</span> <span class="kn">import</span> <span class="n">save_xyz</span>
+<span class="kn">from</span> <span class="nn">pycofbuilder.io_tools</span> <span class="kn">import</span> <span class="p">(</span><span class="n">read_xyz</span><span class="p">,</span> <span class="n">save_xyz</span><span class="p">,</span> <span class="n">read_gjf</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pycofbuilder.cjson</span> <span class="kn">import</span> <span class="n">ChemJSON</span>
+
+<span class="kn">from</span> <span class="nn">pycofbuilder.logger</span> <span class="kn">import</span> <span class="n">create_logger</span>
+
+<span class="kn">from</span> <span class="nn">pycofbuilder.exceptions</span> <span class="kn">import</span> <span class="n">MissingXError</span>
 
 
 <div class="viewcode-block" id="BuildingBlock">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.building_block.BuildingBlock">[docs]</a>
 <span class="k">class</span> <span class="nc">BuildingBlock</span><span class="p">():</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">save_dir</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">save_bb</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">name</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;out_dir&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="s1">&#39;out&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_bb</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;save_bb&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bb_out_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;bb_out_path&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_path</span><span class="p">,</span> <span class="s1">&#39;building_blocks&#39;</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">create_logger</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;log_level&#39;</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">),</span>
+                                    <span class="nb">format</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;log_format&#39;</span><span class="p">,</span> <span class="s1">&#39;simple&#39;</span><span class="p">),</span>
+                                    <span class="n">save_to_file</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;save_to_file&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                                    <span class="n">log_filename</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;log_filename&#39;</span><span class="p">,</span> <span class="s1">&#39;pycofbuilder.log&#39;</span><span class="p">))</span>
 
         <span class="n">_ROOTDIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">=</span> <span class="n">verbosity</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">main_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_ROOTDIR</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span> <span class="o">=</span> <span class="n">save_dir</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">save_bb</span> <span class="o">=</span> <span class="n">save_bb</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">connectivity</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mass</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">composition</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">atom_pos</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">atom_labels</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connectivity</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;connectivity&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;size&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mass</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;mass&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">composition</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;composition&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">smiles</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">charge</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">multiplicity</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">chirality</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">symmetry</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;atom_types&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom_pos</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;atom_pos&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom_labels</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;atom_labels&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">core</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">conector</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">funcGroups</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">smiles</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;smiles&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">charge</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;charge&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">multiplicity</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;multiplicity&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chirality</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;chirality&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">symmetry</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;symmetry&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">core</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;core&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conector</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;conector&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">funcGroups</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;funcGroups&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">available_symmetry</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;L2&#39;</span><span class="p">,</span>
                                    <span class="s1">&#39;T3&#39;</span><span class="p">,</span>
@@ -156,13 +168,18 @@
                                    <span class="c1"># &#39;B12&#39;, &#39;I12&#39;, &#39;U12&#39;, &#39;X12&#39;</span>
                                    <span class="p">]</span>
 
-        <span class="c1"># Check if save_dir exists and try to create it if not</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span><span class="p">:</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># Check if bb_out_path exists and try to create it if not</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_bb</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bb_out_path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="c1"># If a name is provided create building block from this name</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">from_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">from_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+            <span class="c1"># If a name is provided and it is a file, create building block from this file</span>
+            <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">structure_as_string</span><span class="p">()</span>
@@ -173,18 +190,43 @@
                                                       <span class="bp">self</span><span class="o">.</span><span class="n">conector</span><span class="p">,</span>
                                                       <span class="bp">self</span><span class="o">.</span><span class="n">funcGroups</span><span class="p">)</span>
 
+<div class="viewcode-block" id="BuildingBlock.copy">
+<a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.building_block.BuildingBlock.copy">[docs]</a>
+    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Return a deep copy of the BuildingBlock object&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BuildingBlock.from_file">
+<a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.building_block.BuildingBlock.from_file">[docs]</a>
+    <span class="k">def</span> <span class="nf">from_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Read a building block from a file&#39;&#39;&#39;</span>
+        <span class="n">extension</span> <span class="o">=</span> <span class="n">file_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">read_func_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;xyz&#39;</span><span class="p">:</span> <span class="n">read_xyz</span><span class="p">,</span>
+                          <span class="s1">&#39;gjf&#39;</span><span class="p">:</span> <span class="n">read_gjf</span><span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">file_name</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;.</span><span class="si">{</span><span class="n">extension</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_pos</span> <span class="o">=</span> <span class="n">read_func_dict</span><span class="p">[</span><span class="n">extension</span><span class="p">](</span><span class="n">path</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="n">i</span> <span class="o">==</span> <span class="s1">&#39;X&#39;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">]):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connectivity</span> <span class="o">=</span> <span class="nb">len</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span> <span class="k">if</span> <span class="s1">&#39;X&#39;</span> <span class="ow">in</span> <span class="n">i</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MissingXError</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">centralize</span><span class="p">(</span><span class="n">by_X</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calculate_size</span><span class="p">()</span>
+        <span class="n">pref_orientation</span> <span class="o">=</span> <span class="n">unit_vector</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_X_points</span><span class="p">()[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">pref_orientation</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="BuildingBlock.from_name">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.building_block.BuildingBlock.from_name">[docs]</a>
-    <span class="k">def</span> <span class="nf">from_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Automatically create a buiding block based on its name.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        name : str</span>
-<span class="sd">            Name of the building block. The name must follow the pattern:</span>
-<span class="sd">            `symmetry_core_conector_functional_group_1_functional_group_2_..._functional_group_n`</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">from_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Automatically read or create a buiding block based on its name&#39;&#39;&#39;</span>
 
         <span class="c1"># Check the existence of the building block files</span>
         <span class="n">symm_check</span><span class="p">,</span> <span class="n">core_check</span><span class="p">,</span> <span class="n">conector_check</span><span class="p">,</span> <span class="n">funcGroup_check</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_existence</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
@@ -202,8 +244,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">symmetry</span> <span class="o">=</span> <span class="n">BB_name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">core</span> <span class="o">=</span> <span class="n">BB_name</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">conector</span> <span class="o">=</span> <span class="n">BB_name</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-
-        <span class="c1"># Fill the vacant functional group possition with H</span>
         <span class="n">possible_funcGroups</span> <span class="o">=</span> <span class="n">BB_name</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;H&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">9</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">BB_name</span><span class="p">[</span><span class="mi">3</span><span class="p">:]))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">create_BB_structure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">symmetry</span><span class="p">,</span>
@@ -662,22 +702,7 @@
                             <span class="n">R7</span><span class="o">=</span><span class="s1">&#39;H&#39;</span><span class="p">,</span>
                             <span class="n">R8</span><span class="o">=</span><span class="s1">&#39;H&#39;</span><span class="p">,</span>
                             <span class="n">R9</span><span class="o">=</span><span class="s1">&#39;H&#39;</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Create a building block structure based on its symmetry, core, conector</span>
-<span class="sd">        and functional groups.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        symmetry : str</span>
-<span class="sd">            Symmetry of the building block. Available symmetries are:</span>
-<span class="sd">            L2, T3, S4, D4, H6, O6, P6, C8, A8, E8, B12, I12, U12, X12</span>
-<span class="sd">        core_name : str</span>
-<span class="sd">            Name of the core of the building block</span>
-<span class="sd">        conector : str</span>
-<span class="sd">            Name of the conector of the building block</span>
-<span class="sd">        RX : str</span>
-<span class="sd">            Name of the X-th functional group</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Create a building block&#39;&#39;&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">symmetry</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">core_name</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">conector</span><span class="si">}</span><span class="s1">&#39;</span>
 
@@ -691,7 +716,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">composition</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">formula</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atom_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">)</span>
 
-        <span class="c1"># pref_orientation = unit_vector(self._get_Q_points(core.atomic_types, core.cartesian_positions)[1][0])</span>
+        <span class="n">pref_orientation</span> <span class="o">=</span> <span class="n">unit_vector</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_Q_points</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">atomic_types</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">cartesian_positions</span><span class="p">)[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
 
         <span class="k">if</span> <span class="n">symmetry</span> <span class="o">==</span> <span class="s1">&#39;D4&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_connection_group_symm</span><span class="p">(</span><span class="n">conector</span><span class="p">)</span>
@@ -711,8 +737,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">funcGroups</span> <span class="o">=</span> <span class="n">funcGroup_string</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">connectivity</span> <span class="o">=</span> <span class="nb">len</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span> <span class="k">if</span> <span class="s1">&#39;X&#39;</span> <span class="ow">in</span> <span class="n">i</span><span class="p">])</span>
-        <span class="c1"># self._centralize()</span>
-        <span class="c1"># self._align_to(pref_orientation)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">centralize</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">align_to</span><span class="p">(</span><span class="n">pref_orientation</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">calculate_size</span><span class="p">()</span></div>
 
 
@@ -742,15 +768,7 @@
 
 <div class="viewcode-block" id="BuildingBlock.save">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.building_block.BuildingBlock.save">[docs]</a>
-    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">extension</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;xyz&#39;</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Save the building block molecule in a file.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        extension : str</span>
-<span class="sd">            File extension. Available extensions are: xyz</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="s1">&#39;xyz&#39;</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="n">extension</span> <span class="o">==</span> <span class="s1">&#39;xyz&#39;</span><span class="p">:</span>
             <span class="n">save_xyz</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">,</span>
@@ -777,8 +795,8 @@
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.building_block.BuildingBlock.get_available_R">[docs]</a>
     <span class="k">def</span> <span class="nf">get_available_R</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Get the list of available functional groups&#39;&#39;&#39;</span>
-        <span class="n">R_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">main_path</span><span class="p">,</span> <span class="s1">&#39;func_groups&#39;</span><span class="p">)</span>
-        <span class="n">R_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;.cjson&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">R_path</span><span class="p">)</span> <span class="k">if</span> <span class="s1">&#39;.cjson&#39;</span> <span class="ow">in</span> <span class="n">i</span><span class="p">]</span>
+        <span class="n">R_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">main_path</span><span class="p">,</span> <span class="s1">&#39;func_groups&#39;</span><span class="p">)</span>
+        <span class="n">R_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;.cjson&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">R_PATH</span><span class="p">)</span> <span class="k">if</span> <span class="s1">&#39;.cjson&#39;</span> <span class="ow">in</span> <span class="n">i</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">R_list</span></div>
 
@@ -787,8 +805,8 @@
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.building_block.BuildingBlock.get_available_conector">[docs]</a>
     <span class="k">def</span> <span class="nf">get_available_conector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;Get the list of available conectores&#39;&#39;&#39;</span>
-        <span class="n">C_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">main_path</span><span class="p">,</span> <span class="s1">&#39;conector&#39;</span><span class="p">)</span>
-        <span class="n">C_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;.cjson&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">C_path</span><span class="p">)</span> <span class="k">if</span> <span class="s1">&#39;.cjson&#39;</span> <span class="ow">in</span> <span class="n">i</span><span class="p">]</span>
+        <span class="n">C_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">main_path</span><span class="p">,</span> <span class="s1">&#39;conector&#39;</span><span class="p">)</span>
+        <span class="n">C_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;.cjson&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">C_PATH</span><span class="p">)</span> <span class="k">if</span> <span class="s1">&#39;.cjson&#39;</span> <span class="ow">in</span> <span class="n">i</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">C_list</span></div>
 
@@ -813,7 +831,7 @@
         <span class="k">if</span> <span class="n">symm</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_symmetry</span><span class="p">:</span>
             <span class="n">symm_check</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ERROR!: Building Block symmetry must be:&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">available_symmetry</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ERROR!: Building Block symmetry must be L2, T3, S4, or H6.&#39;</span><span class="p">)</span>
             <span class="n">symm_check</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="k">if</span> <span class="n">core</span> <span class="ow">in</span> <span class="n">BB_dict</span><span class="p">[</span><span class="n">symm</span><span class="p">]:</span>

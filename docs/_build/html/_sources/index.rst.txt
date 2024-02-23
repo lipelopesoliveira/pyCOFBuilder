@@ -35,6 +35,8 @@ maybe it is best to start here, otherwise you can just skip and go to the next s
 
 * :doc:`first_steps/file_formats`
 
+* :doc:`first_steps/custom_building_blocks`
+
 Available building blocks
 -------------------------
 

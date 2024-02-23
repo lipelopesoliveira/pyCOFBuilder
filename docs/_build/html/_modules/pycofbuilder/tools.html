@@ -32,8 +32,8 @@
 
           
           
-          <a href="../../index.html">
-            
+          <a href="../../index.html" class="icon icon-home">
+            pyCOFBuilder
               <img src="../../_static/header-logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
@@ -843,6 +843,20 @@
             <span class="n">bond_atom</span> <span class="o">=</span> <span class="n">bond_dict</span><span class="p">[</span><span class="n">group</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="n">bond_atom</span></div>
+
+
+
+<div class="viewcode-block" id="get_framework_symm_text">
+<a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.tools.get_framework_symm_text">[docs]</a>
+<span class="k">def</span> <span class="nf">get_framework_symm_text</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">lattice</span><span class="p">,</span> <span class="n">hall</span><span class="p">,</span> <span class="n">space_group</span><span class="p">,</span> <span class="n">space_number</span><span class="p">,</span> <span class="n">symm_op</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Get the text for the framework symmop&#39;&#39;&#39;</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{:&lt;60s}</span><span class="s1"> </span><span class="si">{:^12s}</span><span class="s1"> </span><span class="si">{:&lt;4s}</span><span class="s1"> </span><span class="si">{:^4s}</span><span class="s1"> #</span><span class="si">{:^5s}</span><span class="s1">   </span><span class="si">{:^2}</span><span class="s1"> sym. op.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span>
+                                                                           <span class="n">lattice</span><span class="p">,</span>
+                                                                           <span class="n">hall</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">),</span>
+                                                                           <span class="n">space_group</span><span class="p">,</span>
+                                                                           <span class="n">space_number</span><span class="p">,</span>
+                                                                           <span class="n">symm_op</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">text</span></div>
 
 
 

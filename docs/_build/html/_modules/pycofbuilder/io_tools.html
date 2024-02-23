@@ -32,8 +32,8 @@
 
           
           
-          <a href="../../index.html">
-            
+          <a href="../../index.html" class="icon icon-home">
+            pyCOFBuilder
               <img src="../../_static/header-logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
@@ -156,9 +156,9 @@
 
 
 
-<div class="viewcode-block" id="read_xyz_file">
-<a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.io_tools.read_xyz_file">[docs]</a>
-<span class="k">def</span> <span class="nf">read_xyz_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
+<div class="viewcode-block" id="read_xyz">
+<a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.io_tools.read_xyz">[docs]</a>
+<span class="k">def</span> <span class="nf">read_xyz</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Reads a file in format `.xyz` from the `path` given and returns</span>
 <span class="sd">    a list containg the N atom labels and a Nx3 array contaning</span>
@@ -197,9 +197,9 @@
 
 
 
-<div class="viewcode-block" id="read_gjf_file">
-<a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.io_tools.read_gjf_file">[docs]</a>
-<span class="k">def</span> <span class="nf">read_gjf_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
+<div class="viewcode-block" id="read_gjf">
+<a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.io_tools.read_gjf">[docs]</a>
+<span class="k">def</span> <span class="nf">read_gjf</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Reads a file in format `.gjf` from the `path` given and returns</span>
 <span class="sd">    a list containg the N atom labels and a Nx3 array contaning</span>
@@ -1139,7 +1139,7 @@
 
     <span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
-    <span class="n">atom_labels</span><span class="p">,</span> <span class="n">atom_pos</span> <span class="o">=</span> <span class="n">read_gjf_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">file_name</span> <span class="o">+</span> <span class="s1">&#39;.gjf&#39;</span><span class="p">)</span>
+    <span class="n">atom_labels</span><span class="p">,</span> <span class="n">atom_pos</span> <span class="o">=</span> <span class="n">read_gjf</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">file_name</span> <span class="o">+</span> <span class="s1">&#39;.gjf&#39;</span><span class="p">)</span>
 
     <span class="n">save_xyz</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">file_name</span> <span class="o">+</span> <span class="s1">&#39;.xyz&#39;</span><span class="p">,</span> <span class="n">atom_labels</span><span class="p">,</span> <span class="n">atom_pos</span><span class="p">)</span></div>
 
@@ -1151,7 +1151,7 @@
 
     <span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
-    <span class="n">atom_labels</span><span class="p">,</span> <span class="n">atom_pos</span> <span class="o">=</span> <span class="n">read_xyz_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">file_name</span> <span class="o">+</span> <span class="s1">&#39;.xyz&#39;</span><span class="p">)</span>
+    <span class="n">atom_labels</span><span class="p">,</span> <span class="n">atom_pos</span> <span class="o">=</span> <span class="n">read_xyz</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">file_name</span> <span class="o">+</span> <span class="s1">&#39;.xyz&#39;</span><span class="p">)</span>
 
     <span class="n">save_xyz</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">file_name</span> <span class="o">+</span> <span class="s1">&#39;.gjf&#39;</span><span class="p">,</span> <span class="n">atom_labels</span><span class="p">,</span> <span class="n">atom_pos</span><span class="p">)</span></div>
 
@@ -1402,9 +1402,9 @@
     <span class="n">xsmiles</span><span class="p">,</span> <span class="n">xsmiles_label</span><span class="p">,</span> <span class="n">composition</span> <span class="o">=</span> <span class="n">smiles_to_xsmiles</span><span class="p">(</span><span class="n">smiles</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">file_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;gjf&#39;</span><span class="p">):</span>
-        <span class="n">atom_types</span><span class="p">,</span> <span class="n">atom_pos</span> <span class="o">=</span> <span class="n">read_gjf_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+        <span class="n">atom_types</span><span class="p">,</span> <span class="n">atom_pos</span> <span class="o">=</span> <span class="n">read_gjf</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">file_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;xyz&#39;</span><span class="p">):</span>
-        <span class="n">atom_types</span><span class="p">,</span> <span class="n">atom_pos</span> <span class="o">=</span> <span class="n">read_xyz_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+        <span class="n">atom_types</span><span class="p">,</span> <span class="n">atom_pos</span> <span class="o">=</span> <span class="n">read_xyz</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
 
     <span class="n">mol_dict</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>

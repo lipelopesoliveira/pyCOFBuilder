@@ -79,7 +79,9 @@
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock.calculate_size"><code class="docutils literal notranslate"><span class="pre">BuildingBlock.calculate_size()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock.centralize"><code class="docutils literal notranslate"><span class="pre">BuildingBlock.centralize()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock.check_existence"><code class="docutils literal notranslate"><span class="pre">BuildingBlock.check_existence()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock.copy"><code class="docutils literal notranslate"><span class="pre">BuildingBlock.copy()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock.create_BB_structure"><code class="docutils literal notranslate"><span class="pre">BuildingBlock.create_BB_structure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock.from_file"><code class="docutils literal notranslate"><span class="pre">BuildingBlock.from_file()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock.from_name"><code class="docutils literal notranslate"><span class="pre">BuildingBlock.from_name()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock.get_Q_points"><code class="docutils literal notranslate"><span class="pre">BuildingBlock.get_Q_points()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock.get_R_points"><code class="docutils literal notranslate"><span class="pre">BuildingBlock.get_R_points()</span></code></a></li>
@@ -127,6 +129,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.cjson.ChemJSON.set_cell_parameters"><code class="docutils literal notranslate"><span class="pre">ChemJSON.set_cell_parameters()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.cjson.ChemJSON.set_fractional_positions"><code class="docutils literal notranslate"><span class="pre">ChemJSON.set_fractional_positions()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.cjson.ChemJSON.set_properties"><code class="docutils literal notranslate"><span class="pre">ChemJSON.set_properties()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.cjson.ChemJSON.set_results"><code class="docutils literal notranslate"><span class="pre">ChemJSON.set_results()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.cjson.ChemJSON.write_cjson"><code class="docutils literal notranslate"><span class="pre">ChemJSON.write_cjson()</span></code></a></li>
 </ul>
 </li>
@@ -156,12 +159,25 @@
 <li class="toctree-l4"><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">Framework.lattice</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.symm_tol"><code class="docutils literal notranslate"><span class="pre">Framework.symm_tol</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.angle_tol"><code class="docutils literal notranslate"><span class="pre">Framework.angle_tol</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.dist_threshold"><code class="docutils literal notranslate"><span class="pre">Framework.dist_threshold</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.available_2D_topologies"><code class="docutils literal notranslate"><span class="pre">Framework.available_2D_topologies</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.available_3D_topologies"><code class="docutils literal notranslate"><span class="pre">Framework.available_3D_topologies</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.available_topologies"><code class="docutils literal notranslate"><span class="pre">Framework.available_topologies</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.available_stacking"><code class="docutils literal notranslate"><span class="pre">Framework.available_stacking</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.lib_bb"><code class="docutils literal notranslate"><span class="pre">Framework.lib_bb</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.as_string"><code class="docutils literal notranslate"><span class="pre">Framework.as_string()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.check_name_concistency"><code class="docutils literal notranslate"><span class="pre">Framework.check_name_concistency()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.create_bor_structure"><code class="docutils literal notranslate"><span class="pre">Framework.create_bor_structure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.create_dia_a_structure"><code class="docutils literal notranslate"><span class="pre">Framework.create_dia_a_structure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.create_dia_structure"><code class="docutils literal notranslate"><span class="pre">Framework.create_dia_structure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.create_fxt_a_structure"><code class="docutils literal notranslate"><span class="pre">Framework.create_fxt_a_structure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.create_fxt_structure"><code class="docutils literal notranslate"><span class="pre">Framework.create_fxt_structure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.create_hcb_a_structure"><code class="docutils literal notranslate"><span class="pre">Framework.create_hcb_a_structure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.create_hcb_structure"><code class="docutils literal notranslate"><span class="pre">Framework.create_hcb_structure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.create_hxl_a_structure"><code class="docutils literal notranslate"><span class="pre">Framework.create_hxl_a_structure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.create_kgd_structure"><code class="docutils literal notranslate"><span class="pre">Framework.create_kgd_structure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.create_sql_a_structure"><code class="docutils literal notranslate"><span class="pre">Framework.create_sql_a_structure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.create_sql_structure"><code class="docutils literal notranslate"><span class="pre">Framework.create_sql_structure()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.from_building_blocks"><code class="docutils literal notranslate"><span class="pre">Framework.from_building_blocks()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.from_name"><code class="docutils literal notranslate"><span class="pre">Framework.from_name()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.framework.Framework.get_available_topologies"><code class="docutils literal notranslate"><span class="pre">Framework.get_available_topologies()</span></code></a></li>
@@ -182,9 +198,9 @@
 <li class="toctree-l3"><a class="reference internal" href="#pycofbuilder.io_tools.create_structure_CJSON"><code class="docutils literal notranslate"><span class="pre">create_structure_CJSON()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pycofbuilder.io_tools.generate_mol_dict"><code class="docutils literal notranslate"><span class="pre">generate_mol_dict()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pycofbuilder.io_tools.read_cif"><code class="docutils literal notranslate"><span class="pre">read_cif()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#pycofbuilder.io_tools.read_gjf_file"><code class="docutils literal notranslate"><span class="pre">read_gjf_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pycofbuilder.io_tools.read_gjf"><code class="docutils literal notranslate"><span class="pre">read_gjf()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pycofbuilder.io_tools.read_json"><code class="docutils literal notranslate"><span class="pre">read_json()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#pycofbuilder.io_tools.read_xyz_file"><code class="docutils literal notranslate"><span class="pre">read_xyz_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pycofbuilder.io_tools.read_xyz"><code class="docutils literal notranslate"><span class="pre">read_xyz()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pycofbuilder.io_tools.save_chemjson"><code class="docutils literal notranslate"><span class="pre">save_chemjson()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pycofbuilder.io_tools.save_cif"><code class="docutils literal notranslate"><span class="pre">save_cif()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pycofbuilder.io_tools.save_csv"><code class="docutils literal notranslate"><span class="pre">save_csv()</span></code></a></li>
@@ -219,6 +235,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#pycofbuilder.tools.get_bond_atom"><code class="docutils literal notranslate"><span class="pre">get_bond_atom()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pycofbuilder.tools.get_cartesian_to_fractional_matrix"><code class="docutils literal notranslate"><span class="pre">get_cartesian_to_fractional_matrix()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pycofbuilder.tools.get_fractional_to_cartesian_matrix"><code class="docutils literal notranslate"><span class="pre">get_fractional_to_cartesian_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pycofbuilder.tools.get_framework_symm_text"><code class="docutils literal notranslate"><span class="pre">get_framework_symm_text()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pycofbuilder.tools.get_kgrid"><code class="docutils literal notranslate"><span class="pre">get_kgrid()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pycofbuilder.tools.get_reciprocal_vectors"><code class="docutils literal notranslate"><span class="pre">get_reciprocal_vectors()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pycofbuilder.tools.ibrav_to_cell"><code class="docutils literal notranslate"><span class="pre">ibrav_to_cell()</span></code></a></li>
@@ -239,7 +256,9 @@
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.BuildingBlock.calculate_size"><code class="docutils literal notranslate"><span class="pre">BuildingBlock.calculate_size()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.BuildingBlock.centralize"><code class="docutils literal notranslate"><span class="pre">BuildingBlock.centralize()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.BuildingBlock.check_existence"><code class="docutils literal notranslate"><span class="pre">BuildingBlock.check_existence()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.BuildingBlock.copy"><code class="docutils literal notranslate"><span class="pre">BuildingBlock.copy()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.BuildingBlock.create_BB_structure"><code class="docutils literal notranslate"><span class="pre">BuildingBlock.create_BB_structure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.BuildingBlock.from_file"><code class="docutils literal notranslate"><span class="pre">BuildingBlock.from_file()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.BuildingBlock.from_name"><code class="docutils literal notranslate"><span class="pre">BuildingBlock.from_name()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.BuildingBlock.get_Q_points"><code class="docutils literal notranslate"><span class="pre">BuildingBlock.get_Q_points()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.BuildingBlock.get_R_points"><code class="docutils literal notranslate"><span class="pre">BuildingBlock.get_R_points()</span></code></a></li>
@@ -282,12 +301,25 @@
 <li class="toctree-l4"><a class="reference internal" href="#id1"><code class="docutils literal notranslate"><span class="pre">Framework.lattice</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.symm_tol"><code class="docutils literal notranslate"><span class="pre">Framework.symm_tol</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.angle_tol"><code class="docutils literal notranslate"><span class="pre">Framework.angle_tol</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.dist_threshold"><code class="docutils literal notranslate"><span class="pre">Framework.dist_threshold</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.available_2D_topologies"><code class="docutils literal notranslate"><span class="pre">Framework.available_2D_topologies</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.available_3D_topologies"><code class="docutils literal notranslate"><span class="pre">Framework.available_3D_topologies</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.available_topologies"><code class="docutils literal notranslate"><span class="pre">Framework.available_topologies</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.available_stacking"><code class="docutils literal notranslate"><span class="pre">Framework.available_stacking</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.lib_bb"><code class="docutils literal notranslate"><span class="pre">Framework.lib_bb</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.as_string"><code class="docutils literal notranslate"><span class="pre">Framework.as_string()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.check_name_concistency"><code class="docutils literal notranslate"><span class="pre">Framework.check_name_concistency()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.create_bor_structure"><code class="docutils literal notranslate"><span class="pre">Framework.create_bor_structure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.create_dia_a_structure"><code class="docutils literal notranslate"><span class="pre">Framework.create_dia_a_structure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.create_dia_structure"><code class="docutils literal notranslate"><span class="pre">Framework.create_dia_structure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.create_fxt_a_structure"><code class="docutils literal notranslate"><span class="pre">Framework.create_fxt_a_structure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.create_fxt_structure"><code class="docutils literal notranslate"><span class="pre">Framework.create_fxt_structure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.create_hcb_a_structure"><code class="docutils literal notranslate"><span class="pre">Framework.create_hcb_a_structure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.create_hcb_structure"><code class="docutils literal notranslate"><span class="pre">Framework.create_hcb_structure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.create_hxl_a_structure"><code class="docutils literal notranslate"><span class="pre">Framework.create_hxl_a_structure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.create_kgd_structure"><code class="docutils literal notranslate"><span class="pre">Framework.create_kgd_structure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.create_sql_a_structure"><code class="docutils literal notranslate"><span class="pre">Framework.create_sql_a_structure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.create_sql_structure"><code class="docutils literal notranslate"><span class="pre">Framework.create_sql_structure()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.from_building_blocks"><code class="docutils literal notranslate"><span class="pre">Framework.from_building_blocks()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.from_name"><code class="docutils literal notranslate"><span class="pre">Framework.from_name()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pycofbuilder.Framework.get_available_topologies"><code class="docutils literal notranslate"><span class="pre">Framework.get_available_topologies()</span></code></a></li>
@@ -336,7 +368,7 @@
 <p>The BuildingBlock class is used to create the building blocks for the Framework class.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pycofbuilder.building_block.BuildingBlock">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pycofbuilder.building_block.</span></span><span class="sig-name descname"><span class="pre">BuildingBlock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_bb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/building_block.html#BuildingBlock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.building_block.BuildingBlock" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pycofbuilder.building_block.</span></span><span class="sig-name descname"><span class="pre">BuildingBlock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/building_block.html#BuildingBlock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.building_block.BuildingBlock" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pycofbuilder.building_block.BuildingBlock.add_R_group">
@@ -389,33 +421,27 @@
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pycofbuilder.building_block.BuildingBlock.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/building_block.html#BuildingBlock.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.building_block.BuildingBlock.copy" title="Link to this definition"></a></dt>
+<dd><p>Return a deep copy of the BuildingBlock object</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pycofbuilder.building_block.BuildingBlock.create_BB_structure">
 <span class="sig-name descname"><span class="pre">create_BB_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symmetry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'L2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">core_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'BENZ'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'CHO'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'H'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'H'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R3</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'H'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R4</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'H'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R5</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'H'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R6</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'H'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R7</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'H'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R8</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'H'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R9</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'H'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/building_block.html#BuildingBlock.create_BB_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.building_block.BuildingBlock.create_BB_structure" title="Link to this definition"></a></dt>
-<dd><p>Create a building block structure based on its symmetry, core, conector
-and functional groups.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>symmetry</strong> (<em>str</em>) – Symmetry of the building block. Available symmetries are:
-L2, T3, S4, D4, H6, O6, P6, C8, A8, E8, B12, I12, U12, X12</p></li>
-<li><p><strong>core_name</strong> (<em>str</em>) – Name of the core of the building block</p></li>
-<li><p><strong>conector</strong> (<em>str</em>) – Name of the conector of the building block</p></li>
-<li><p><strong>RX</strong> (<em>str</em>) – Name of the X-th functional group</p></li>
-</ul>
-</dd>
-</dl>
+<dd><p>Create a building block</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycofbuilder.building_block.BuildingBlock.from_file">
+<span class="sig-name descname"><span class="pre">from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/building_block.html#BuildingBlock.from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.building_block.BuildingBlock.from_file" title="Link to this definition"></a></dt>
+<dd><p>Read a building block from a file</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pycofbuilder.building_block.BuildingBlock.from_name">
-<span class="sig-name descname"><span class="pre">from_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/building_block.html#BuildingBlock.from_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.building_block.BuildingBlock.from_name" title="Link to this definition"></a></dt>
-<dd><p>Automatically create a buiding block based on its name.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – Name of the building block. The name must follow the pattern:
-<cite>symmetry_core_conector_functional_group_1_functional_group_2_…_functional_group_n</cite></p>
-</dd>
-</dl>
+<span class="sig-name descname"><span class="pre">from_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/building_block.html#BuildingBlock.from_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.building_block.BuildingBlock.from_name" title="Link to this definition"></a></dt>
+<dd><p>Automatically read or create a buiding block based on its name</p>
 </dd></dl>
 
 <dl class="py method">
@@ -506,14 +532,8 @@ Default is True.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pycofbuilder.building_block.BuildingBlock.save">
-<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extension</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'xyz'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/building_block.html#BuildingBlock.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.building_block.BuildingBlock.save" title="Link to this definition"></a></dt>
-<dd><p>Save the building block molecule in a file.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>extension</strong> (<em>str</em>) – File extension. Available extensions are: xyz</p>
-</dd>
-</dl>
-</dd></dl>
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extension</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'xyz'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/building_block.html#BuildingBlock.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.building_block.BuildingBlock.save" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pycofbuilder.building_block.BuildingBlock.shift">
@@ -752,6 +772,12 @@ positions will be calculated and also updated.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pycofbuilder.cjson.ChemJSON.set_results">
+<span class="sig-name descname"><span class="pre">set_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/cjson.html#ChemJSON.set_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.cjson.ChemJSON.set_results" title="Link to this definition"></a></dt>
+<dd><p>Sets the results of the structure.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pycofbuilder.cjson.ChemJSON.write_cjson">
 <span class="sig-name descname"><span class="pre">write_cjson</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/cjson.html#ChemJSON.write_cjson"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.cjson.ChemJSON.write_cjson" title="Link to this definition"></a></dt>
 <dd><p>Writes a ChemJSON file to a given path and file_name.</p>
@@ -765,7 +791,7 @@ positions will be calculated and also updated.</p>
 <p>The Framework class implements definitions and methods for a Framework buiding</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pycofbuilder.framework.Framework">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pycofbuilder.framework.</span></span><span class="sig-name descname"><span class="pre">Framework</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'low'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_bb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.framework.Framework" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pycofbuilder.framework.</span></span><span class="sig-name descname"><span class="pre">Framework</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.framework.Framework" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class used to represent a Covalent Organic Framework as a reticular entity.</p>
 <p>…</p>
@@ -795,8 +821,8 @@ If not defined, a <cite>out</cite> folder will be created in the current directo
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pycofbuilder.framework.Framework.verbosity">
 <span class="sig-name descname"><span class="pre">verbosity</span></span><a class="headerlink" href="#pycofbuilder.framework.Framework.verbosity" title="Link to this definition"></a></dt>
-<dd><p>Control the printing options. Can be ‘None’, ‘Normal’, ‘High’, or ‘Debug’.
-Default: ‘Normal’</p>
+<dd><p>Control the printing options. Can be ‘none’, ‘normal’, or ‘debug’.
+Default: ‘normal’</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>str</p>
@@ -999,6 +1025,16 @@ If not defined, a <cite>building_blocks</cite> folder will be created in the cur
 </dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="pycofbuilder.framework.Framework.dist_threshold">
+<span class="sig-name descname"><span class="pre">dist_threshold</span></span><a class="headerlink" href="#pycofbuilder.framework.Framework.dist_threshold" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float = 0.8</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="pycofbuilder.framework.Framework.available_2D_topologies">
 <span class="sig-name descname"><span class="pre">available_2D_topologies</span></span><a class="headerlink" href="#pycofbuilder.framework.Framework.available_2D_topologies" title="Link to this definition"></a></dt>
 <dd><p>List of available 2D topologies</p>
@@ -1055,8 +1091,14 @@ Default: bb_lib</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pycofbuilder.framework.Framework.as_string">
+<span class="sig-name descname"><span class="pre">as_string</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.as_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.framework.Framework.as_string" title="Link to this definition"></a></dt>
+<dd><p>Returns a string with the Framework information.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pycofbuilder.framework.Framework.check_name_concistency">
-<span class="sig-name descname"><span class="pre">check_name_concistency</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">FrameworkName</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.check_name_concistency"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.framework.Framework.check_name_concistency" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">check_name_concistency</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">FrameworkName</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.check_name_concistency"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.framework.Framework.check_name_concistency" title="Link to this definition"></a></dt>
 <dd><p>Checks if the name is in the correct format and returns a
 tuple with the building blocks names, the net and the stacking.</p>
 <p>In case the name is not in the correct format, an error is raised.</p>
@@ -1074,8 +1116,410 @@ tuple with the building blocks names, the net and the stacking.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pycofbuilder.framework.Framework.create_bor_structure">
+<span class="sig-name descname"><span class="pre">create_bor_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BB_D4</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BB_T3</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interp_dg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_param_base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">7.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.create_bor_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.framework.Framework.create_bor_structure" title="Link to this definition"></a></dt>
+<dd><p>Creates a COF with BOR network.</p>
+<p>The DIA net is composed of one tetrapodal tetrahedical building block and
+one tripodal triangular building block.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>BB_D4</strong> (<a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock" title="pycofbuilder.building_block.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tetrapodal tetrahedical Buiding Block</p></li>
+<li><p><strong>BB_T3</strong> (<a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock" title="pycofbuilder.building_block.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tripodal triangular Buiding Block</p></li>
+<li><p><strong>interp_dg</strong> (<em>str</em><em>, </em><em>optional</em>) – The degree of interpenetration of the framework (default is ‘1’)</p></li>
+<li><p><strong>d_param_base</strong> (<em>float</em><em>, </em><em>optional</em>) – The base value for interlayer distance in angstroms (default is 7.2)</p></li>
+<li><p><strong>print_result</strong> (<em>bool</em><em>, </em><em>optional</em>) – Parameter for the control for printing the result (default is True)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A list of strings containing:</dt><dd><ol class="arabic simple">
+<li><p>the structure name,</p></li>
+<li><p>lattice type,</p></li>
+<li><p>hall symbol of the cristaline structure,</p></li>
+<li><p>space group,</p></li>
+<li><p>number of the space group,</p></li>
+<li><p>number of operation symmetry</p></li>
+</ol>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycofbuilder.framework.Framework.create_dia_a_structure">
+<span class="sig-name descname"><span class="pre">create_dia_a_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BB_D4</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BB_L2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interp_dg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_param_base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">7.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.create_dia_a_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.framework.Framework.create_dia_a_structure" title="Link to this definition"></a></dt>
+<dd><p>Creates a COF with DIA-A network.</p>
+<p>The DIA net is composed of two tetrapodal tetrahedical building blocks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>BB_D4</strong> (<a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock" title="pycofbuilder.building_block.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tetrapodal tetrahedical Buiding Block</p></li>
+<li><p><strong>BB_L2</strong> (<a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock" title="pycofbuilder.building_block.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the dipodal linear Buiding Block</p></li>
+<li><p><strong>interp_dg</strong> (<em>str</em><em>, </em><em>optional</em>) – The degree of interpenetration of the framework (default is ‘1’)</p></li>
+<li><p><strong>d_param_base</strong> (<em>float</em><em>, </em><em>optional</em>) – The base value for interlayer distance in angstroms (default is 7.2)</p></li>
+<li><p><strong>print_result</strong> (<em>bool</em><em>, </em><em>optional</em>) – Parameter for the control for printing the result (default is True)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A list of strings containing:</dt><dd><ol class="arabic simple">
+<li><p>the structure name,</p></li>
+<li><p>lattice type,</p></li>
+<li><p>hall symbol of the cristaline structure,</p></li>
+<li><p>space group,</p></li>
+<li><p>number of the space group,</p></li>
+<li><p>number of operation symmetry</p></li>
+</ol>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycofbuilder.framework.Framework.create_dia_structure">
+<span class="sig-name descname"><span class="pre">create_dia_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BB_D41</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BB_D42</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interp_dg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_param_base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">7.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.create_dia_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.framework.Framework.create_dia_structure" title="Link to this definition"></a></dt>
+<dd><p>Creates a COF with DIA network.</p>
+<p>The DIA net is composed of two tetrapodal tetrahedical building blocks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>BB_D41</strong> (<a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock" title="pycofbuilder.building_block.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tetrapodal tetrahedical Buiding Block</p></li>
+<li><p><strong>BB_D42</strong> (<a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock" title="pycofbuilder.building_block.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tetrapodal tetrahedical Buiding Block</p></li>
+<li><p><strong>interp_dg</strong> (<em>str</em><em>, </em><em>optional</em>) – The degree of interpenetration of the framework (default is ‘1’)</p></li>
+<li><p><strong>d_param_base</strong> (<em>float</em><em>, </em><em>optional</em>) – The base value for interlayer distance in angstroms (default is 7.2)</p></li>
+<li><p><strong>print_result</strong> (<em>bool</em><em>, </em><em>optional</em>) – Parameter for the control for printing the result (default is True)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A list of strings containing:</dt><dd><ol class="arabic simple">
+<li><p>the structure name,</p></li>
+<li><p>lattice type,</p></li>
+<li><p>hall symbol of the cristaline structure,</p></li>
+<li><p>space group,</p></li>
+<li><p>number of the space group,</p></li>
+<li><p>number of operation symmetry</p></li>
+</ol>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycofbuilder.framework.Framework.create_fxt_a_structure">
+<span class="sig-name descname"><span class="pre">create_fxt_a_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BB_S4</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BB_L2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stacking</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'AA'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_parameter_base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slab</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[1.0,</span> <span class="pre">1.0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tilt_angle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.create_fxt_a_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.framework.Framework.create_fxt_a_structure" title="Link to this definition"></a></dt>
+<dd><p>Creates a COF with FXT-A network.</p>
+<p>The FXT-A net is composed of one tetrapodal and one linear building blocks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>BB_S4</strong> (<a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock" title="pycofbuilder.building_block.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tetrapodal Buiding Block</p></li>
+<li><p><strong>BB_L2</strong> (<a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock" title="pycofbuilder.building_block.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the bipodal Buiding Block</p></li>
+<li><p><strong>stacking</strong> (<em>str</em><em>, </em><em>optional</em>) – The stacking pattern of the COF layers (default is ‘AA’)</p></li>
+<li><p><strong>print_result</strong> (<em>bool</em><em>, </em><em>optional</em>) – Parameter for the control for printing the result (default is True)</p></li>
+<li><p><strong>slab</strong> (<em>float</em><em>, </em><em>optional</em>) – Default parameter for the interlayer slab (default is 10.0)</p></li>
+<li><p><strong>shift_vector</strong> (<em>list</em><em>, </em><em>optional</em>) – Shift vector for the AAl and AAt stakings (defatult is [1.0,1.0,0])</p></li>
+<li><p><strong>tilt_angle</strong> (<em>float</em><em>, </em><em>optional</em>) – Tilt angle for the AAt staking in degrees (default is 5.0)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A list of strings containing:</dt><dd><ol class="arabic simple">
+<li><p>the structure name,</p></li>
+<li><p>lattice type,</p></li>
+<li><p>hall symbol of the cristaline structure,</p></li>
+<li><p>space group,</p></li>
+<li><p>number of the space group,</p></li>
+<li><p>number of operation symmetry</p></li>
+</ol>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycofbuilder.framework.Framework.create_fxt_structure">
+<span class="sig-name descname"><span class="pre">create_fxt_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BB_S4_A</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BB_S4_B</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stacking</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'AA'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slab</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[1.0,</span> <span class="pre">1.0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tilt_angle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.create_fxt_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.framework.Framework.create_fxt_structure" title="Link to this definition"></a></dt>
+<dd><p>Creates a COF with FXT network.</p>
+<p>The FXT net is composed of two tetrapodal building blocks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>BB_S4_A</strong> (<a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock" title="pycofbuilder.building_block.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tetrapodal Buiding Block A</p></li>
+<li><p><strong>BB_S4_B</strong> (<a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock" title="pycofbuilder.building_block.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tetrapodal Buiding Block B</p></li>
+<li><p><strong>stacking</strong> (<em>str</em><em>, </em><em>optional</em>) – The stacking pattern of the COF layers (default is ‘AA’)</p></li>
+<li><p><strong>print_result</strong> (<em>bool</em><em>, </em><em>optional</em>) – Parameter for the control for printing the result (default is True)</p></li>
+<li><p><strong>slab</strong> (<em>float</em><em>, </em><em>optional</em>) – Default parameter for the interlayer slab (default is 10.0)</p></li>
+<li><p><strong>shift_vector</strong> (<em>list</em><em>, </em><em>optional</em>) – Shift vector for the AAl and AAt stakings (defatult is [1.0,1.0,0])</p></li>
+<li><p><strong>tilt_angle</strong> (<em>float</em><em>, </em><em>optional</em>) – Tilt angle for the AAt staking in degrees (default is 5.0)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A list of strings containing:</dt><dd><ol class="arabic simple">
+<li><p>the structure name,</p></li>
+<li><p>lattice type,</p></li>
+<li><p>hall symbol of the cristaline structure,</p></li>
+<li><p>space group,</p></li>
+<li><p>number of the space group,</p></li>
+<li><p>number of operation symmetry</p></li>
+</ol>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycofbuilder.framework.Framework.create_hcb_a_structure">
+<span class="sig-name descname"><span class="pre">create_hcb_a_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BB_T3</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BB_L2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stacking</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'AA'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slab</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[1.0,</span> <span class="pre">1.0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tilt_angle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.create_hcb_a_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.framework.Framework.create_hcb_a_structure" title="Link to this definition"></a></dt>
+<dd><p>Creates a COF with HCB-A network.</p>
+<p>The HCB-A net is composed of one tripodal and one linear building blocks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>BB_T3</strong> (<a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock" title="pycofbuilder.building_block.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tripodal Buiding Block</p></li>
+<li><p><strong>BB_L2</strong> (<a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock" title="pycofbuilder.building_block.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the linear Buiding Block</p></li>
+<li><p><strong>stacking</strong> (<em>str</em><em>, </em><em>optional</em>) – The stacking pattern of the COF layers (default is ‘AA’)</p></li>
+<li><p><strong>c_parameter_base</strong> (<em>float</em><em>, </em><em>optional</em>) – The base value for interlayer distance in angstroms (default is 3.6)</p></li>
+<li><p><strong>print_result</strong> (<em>bool</em><em>, </em><em>optional</em>) – Parameter for the control for printing the result (default is True)</p></li>
+<li><p><strong>slab</strong> (<em>float</em><em>, </em><em>optional</em>) – Default parameter for the interlayer slab (default is 10.0)</p></li>
+<li><p><strong>shift_vector</strong> (<em>list</em><em>, </em><em>optional</em>) – Shift vector for the AAl and AAt stakings (defatult is [1.0,1.0,0])</p></li>
+<li><p><strong>tilt_angle</strong> (<em>float</em><em>, </em><em>optional</em>) – Tilt angle for the AAt staking in degrees (default is 5.0)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A list of strings containing:</dt><dd><ol class="arabic simple">
+<li><p>the structure name</p></li>
+<li><p>lattice type</p></li>
+<li><p>hall symbol of the cristaline structure</p></li>
+<li><p>space group</p></li>
+<li><p>number of the space group,</p></li>
+<li><p>number of operation symmetry</p></li>
+</ol>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycofbuilder.framework.Framework.create_hcb_structure">
+<span class="sig-name descname"><span class="pre">create_hcb_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BB_T3_A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BB_T3_B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stacking</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'AA'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slab</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[1.0,</span> <span class="pre">1.0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tilt_angle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.create_hcb_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.framework.Framework.create_hcb_structure" title="Link to this definition"></a></dt>
+<dd><p>Creates a COF with HCB network.</p>
+<p>The HCB net is composed of two tripodal building blocks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>BB_T3_1</strong> (<a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock" title="pycofbuilder.building_block.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tripodal Buiding Block A</p></li>
+<li><p><strong>BB_T3_2</strong> (<a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock" title="pycofbuilder.building_block.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tripodal Buiding Block B</p></li>
+<li><p><strong>stacking</strong> (<em>str</em><em>, </em><em>optional</em>) – The stacking pattern of the COF layers (default is ‘AA’)</p></li>
+<li><p><strong>slab</strong> (<em>float</em><em>, </em><em>optional</em>) – Default parameter for the interlayer slab (default is 10.0)</p></li>
+<li><p><strong>shift_vector</strong> (<em>list</em><em>, </em><em>optional</em>) – Shift vector for the AAl and AAt stakings (defatult is [1.0,1.0,0])</p></li>
+<li><p><strong>tilt_angle</strong> (<em>float</em><em>, </em><em>optional</em>) – Tilt angle for the AAt staking in degrees (default is 5.0)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A list of strings containing:</dt><dd><ol class="arabic simple">
+<li><p>the structure name,</p></li>
+<li><p>lattice type,</p></li>
+<li><p>hall symbol of the cristaline structure,</p></li>
+<li><p>space group,</p></li>
+<li><p>number of the space group,</p></li>
+<li><p>number of operation symmetry</p></li>
+</ol>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycofbuilder.framework.Framework.create_hxl_a_structure">
+<span class="sig-name descname"><span class="pre">create_hxl_a_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BB_H6</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BB_L2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stacking</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'AA'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slab</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[1.0,</span> <span class="pre">1.0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tilt_angle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.create_hxl_a_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.framework.Framework.create_hxl_a_structure" title="Link to this definition"></a></dt>
+<dd><p>Creates a COF with HXL-A network.</p>
+<p>The HXL-A net is composed of one hexapodal and one linear building blocks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>BB_H6</strong> (<a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock" title="pycofbuilder.building_block.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tetrapodal Buiding Block A</p></li>
+<li><p><strong>BB_L2</strong> (<a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock" title="pycofbuilder.building_block.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tetrapodal Buiding Block B</p></li>
+<li><p><strong>stacking</strong> (<em>str</em><em>, </em><em>optional</em>) – The stacking pattern of the COF layers (default is ‘AA’)</p></li>
+<li><p><strong>print_result</strong> (<em>bool</em><em>, </em><em>optional</em>) – Parameter for the control for printing the result (default is True)</p></li>
+<li><p><strong>slab</strong> (<em>float</em><em>, </em><em>optional</em>) – Default parameter for the interlayer slab (default is 10.0)</p></li>
+<li><p><strong>shift_vector</strong> (<em>list</em><em>, </em><em>optional</em>) – Shift vector for the AAl and AAt stakings (defatult is [1.0,1.0,0])</p></li>
+<li><p><strong>tilt_angle</strong> (<em>float</em><em>, </em><em>optional</em>) – Tilt angle for the AAt staking in degrees (default is 5.0)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A list of strings containing:</dt><dd><ol class="arabic simple">
+<li><p>the structure name,</p></li>
+<li><p>lattice type,</p></li>
+<li><p>hall symbol of the cristaline structure,</p></li>
+<li><p>space group,</p></li>
+<li><p>number of the space group,</p></li>
+<li><p>number of operation symmetry</p></li>
+</ol>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycofbuilder.framework.Framework.create_kgd_structure">
+<span class="sig-name descname"><span class="pre">create_kgd_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BB_H6</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BB_T3</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stacking</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'AA'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slab</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[1.0,</span> <span class="pre">1.0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tilt_angle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.create_kgd_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.framework.Framework.create_kgd_structure" title="Link to this definition"></a></dt>
+<dd><p>Creates a COF with KGD network.</p>
+<p>The KGD net is composed of one hexapodal and one tripodal building blocks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>BB_H6</strong> (<a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock" title="pycofbuilder.building_block.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the hexapodal Buiding Block</p></li>
+<li><p><strong>BB_T3</strong> (<a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock" title="pycofbuilder.building_block.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tripodal Buiding Block</p></li>
+<li><p><strong>stacking</strong> (<em>str</em><em>, </em><em>optional</em>) – The stacking pattern of the COF layers (default is ‘AA’)</p></li>
+<li><p><strong>c_parameter_base</strong> (<em>float</em><em>, </em><em>optional</em>) – The base value for interlayer distance in angstroms (default is 3.6)</p></li>
+<li><p><strong>print_result</strong> (<em>bool</em><em>, </em><em>optional</em>) – Parameter for the control for printing the result (default is True)</p></li>
+<li><p><strong>slab</strong> (<em>float</em><em>, </em><em>optional</em>) – Default parameter for the interlayer slab (default is 10.0)</p></li>
+<li><p><strong>shift_vector</strong> (<em>list</em><em>, </em><em>optional</em>) – Shift vector for the AAl and AAt stakings (defatult is [1.0,1.0,0])</p></li>
+<li><p><strong>tilt_angle</strong> (<em>float</em><em>, </em><em>optional</em>) – Tilt angle for the AAt staking in degrees (default is 5.0)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A list of strings containing:</dt><dd><ol class="arabic simple">
+<li><p>the structure name,</p></li>
+<li><p>lattice type,</p></li>
+<li><p>hall symbol of the cristaline structure,</p></li>
+<li><p>space group,</p></li>
+<li><p>number of the space group,</p></li>
+<li><p>number of operation symmetry</p></li>
+</ol>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycofbuilder.framework.Framework.create_sql_a_structure">
+<span class="sig-name descname"><span class="pre">create_sql_a_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BB_S4</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BB_L2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stacking</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'AA'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_parameter_base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slab</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[1.0,</span> <span class="pre">1.0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tilt_angle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.create_sql_a_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.framework.Framework.create_sql_a_structure" title="Link to this definition"></a></dt>
+<dd><p>Creates a COF with SQL-A network.</p>
+<p>The SQL-A net is composed of one tetrapodal and one linear building blocks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>BB_S4</strong> (<a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock" title="pycofbuilder.building_block.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tetrapodal Buiding Block</p></li>
+<li><p><strong>BB_L2</strong> (<a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock" title="pycofbuilder.building_block.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the bipodal Buiding Block</p></li>
+<li><p><strong>stacking</strong> (<em>str</em><em>, </em><em>optional</em>) – The stacking pattern of the COF layers (default is ‘AA’)</p></li>
+<li><p><strong>slab</strong> (<em>float</em><em>, </em><em>optional</em>) – Default parameter for the interlayer slab (default is 10.0)</p></li>
+<li><p><strong>shift_vector</strong> (<em>list</em><em>, </em><em>optional</em>) – Shift vector for the AAl and AAt stakings (defatult is [1.0,1.0,0])</p></li>
+<li><p><strong>tilt_angle</strong> (<em>float</em><em>, </em><em>optional</em>) – Tilt angle for the AAt staking in degrees (default is 5.0)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A list of strings containing:</dt><dd><ol class="arabic simple">
+<li><p>the structure name,</p></li>
+<li><p>lattice type,</p></li>
+<li><p>hall symbol of the cristaline structure,</p></li>
+<li><p>space group,</p></li>
+<li><p>number of the space group,</p></li>
+<li><p>number of operation symmetry</p></li>
+</ol>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycofbuilder.framework.Framework.create_sql_structure">
+<span class="sig-name descname"><span class="pre">create_sql_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BB_S4_A</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BB_S4_B</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stacking</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'AA'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slab</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[1.0,</span> <span class="pre">1.0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tilt_angle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.create_sql_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.framework.Framework.create_sql_structure" title="Link to this definition"></a></dt>
+<dd><p>Creates a COF with SQL network.</p>
+<p>The SQL net is composed of two tetrapodal building blocks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>BB_S4_A</strong> (<a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock" title="pycofbuilder.building_block.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tetrapodal Buiding Block A</p></li>
+<li><p><strong>BB_S4_B</strong> (<a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock" title="pycofbuilder.building_block.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tetrapodal Buiding Block B</p></li>
+<li><p><strong>stacking</strong> (<em>str</em><em>, </em><em>optional</em>) – The stacking pattern of the COF layers (default is ‘AA’)</p></li>
+<li><p><strong>print_result</strong> (<em>bool</em><em>, </em><em>optional</em>) – Parameter for the control for printing the result (default is True)</p></li>
+<li><p><strong>slab</strong> (<em>float</em><em>, </em><em>optional</em>) – Default parameter for the interlayer slab (default is 10.0)</p></li>
+<li><p><strong>shift_vector</strong> (<em>list</em><em>, </em><em>optional</em>) – Shift vector for the AAl and AAt stakings (defatult is [1.0,1.0,0])</p></li>
+<li><p><strong>tilt_angle</strong> (<em>float</em><em>, </em><em>optional</em>) – Tilt angle for the AAt staking in degrees (default is 5.0)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A list of strings containing:</dt><dd><ol class="arabic simple">
+<li><p>the structure name,</p></li>
+<li><p>lattice type,</p></li>
+<li><p>hall symbol of the cristaline structure,</p></li>
+<li><p>space group,</p></li>
+<li><p>number of the space group,</p></li>
+<li><p>number of operation symmetry</p></li>
+</ol>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pycofbuilder.framework.Framework.from_building_blocks">
-<span class="sig-name descname"><span class="pre">from_building_blocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bb1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bb2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Stacking</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.from_building_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.framework.Framework.from_building_blocks" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">from_building_blocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bb1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock" title="pycofbuilder.building_block.BuildingBlock"><span class="pre">BuildingBlock</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">bb2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock" title="pycofbuilder.building_block.BuildingBlock"><span class="pre">BuildingBlock</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">net</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stacking</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.from_building_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.framework.Framework.from_building_blocks" title="Link to this definition"></a></dt>
 <dd><p>Creates a COF from the building blocks.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1272,8 +1716,8 @@ the atoms coordinates.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="pycofbuilder.io_tools.read_gjf_file">
-<span class="sig-prename descclassname"><span class="pre">pycofbuilder.io_tools.</span></span><span class="sig-name descname"><span class="pre">read_gjf_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/io_tools.html#read_gjf_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.io_tools.read_gjf_file" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="pycofbuilder.io_tools.read_gjf">
+<span class="sig-prename descclassname"><span class="pre">pycofbuilder.io_tools.</span></span><span class="sig-name descname"><span class="pre">read_gjf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/io_tools.html#read_gjf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.io_tools.read_gjf" title="Link to this definition"></a></dt>
 <dd><p>Reads a file in format <cite>.gjf</cite> from the <cite>path</cite> given and returns
 a list containg the N atom labels and a Nx3 array contaning
 the atoms coordinates.</p>
@@ -1300,8 +1744,8 @@ the atoms coordinates.</p>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="pycofbuilder.io_tools.read_xyz_file">
-<span class="sig-prename descclassname"><span class="pre">pycofbuilder.io_tools.</span></span><span class="sig-name descname"><span class="pre">read_xyz_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/io_tools.html#read_xyz_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.io_tools.read_xyz_file" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="pycofbuilder.io_tools.read_xyz">
+<span class="sig-prename descclassname"><span class="pre">pycofbuilder.io_tools.</span></span><span class="sig-name descname"><span class="pre">read_xyz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/io_tools.html#read_xyz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.io_tools.read_xyz" title="Link to this definition"></a></dt>
 <dd><p>Reads a file in format <cite>.xyz</cite> from the <cite>path</cite> given and returns
 a list containg the N atom labels and a Nx3 array contaning
 the atoms coordinates.</p>
@@ -1896,6 +2340,12 @@ cartesian coordinates.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="pycofbuilder.tools.get_framework_symm_text">
+<span class="sig-prename descclassname"><span class="pre">pycofbuilder.tools.</span></span><span class="sig-name descname"><span class="pre">get_framework_symm_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hall</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_group</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symm_op</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/tools.html#get_framework_symm_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.tools.get_framework_symm_text" title="Link to this definition"></a></dt>
+<dd><p>Get the text for the framework symmop</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="pycofbuilder.tools.get_kgrid">
 <span class="sig-prename descclassname"><span class="pre">pycofbuilder.tools.</span></span><span class="sig-name descname"><span class="pre">get_kgrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span></span></span><a class="reference internal" href="_modules/pycofbuilder/tools.html#get_kgrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.tools.get_kgrid" title="Link to this definition"></a></dt>
 <dd><p>Get the k-points grid in the reciprocal space with a given distance for a
@@ -2036,7 +2486,7 @@ cell given in cell parameters of cell vectors.</p>
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pycofbuilder" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pycofbuilder.BuildingBlock">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pycofbuilder.</span></span><span class="sig-name descname"><span class="pre">BuildingBlock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_bb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/building_block.html#BuildingBlock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.BuildingBlock" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pycofbuilder.</span></span><span class="sig-name descname"><span class="pre">BuildingBlock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/building_block.html#BuildingBlock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.BuildingBlock" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pycofbuilder.BuildingBlock.add_R_group">
@@ -2089,33 +2539,27 @@ cell given in cell parameters of cell vectors.</p>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pycofbuilder.BuildingBlock.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/building_block.html#BuildingBlock.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.BuildingBlock.copy" title="Link to this definition"></a></dt>
+<dd><p>Return a deep copy of the BuildingBlock object</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pycofbuilder.BuildingBlock.create_BB_structure">
 <span class="sig-name descname"><span class="pre">create_BB_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symmetry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'L2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">core_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'BENZ'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'CHO'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'H'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'H'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R3</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'H'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R4</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'H'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R5</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'H'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R6</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'H'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R7</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'H'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R8</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'H'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R9</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'H'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/building_block.html#BuildingBlock.create_BB_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.BuildingBlock.create_BB_structure" title="Link to this definition"></a></dt>
-<dd><p>Create a building block structure based on its symmetry, core, conector
-and functional groups.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>symmetry</strong> (<em>str</em>) – Symmetry of the building block. Available symmetries are:
-L2, T3, S4, D4, H6, O6, P6, C8, A8, E8, B12, I12, U12, X12</p></li>
-<li><p><strong>core_name</strong> (<em>str</em>) – Name of the core of the building block</p></li>
-<li><p><strong>conector</strong> (<em>str</em>) – Name of the conector of the building block</p></li>
-<li><p><strong>RX</strong> (<em>str</em>) – Name of the X-th functional group</p></li>
-</ul>
-</dd>
-</dl>
+<dd><p>Create a building block</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycofbuilder.BuildingBlock.from_file">
+<span class="sig-name descname"><span class="pre">from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/building_block.html#BuildingBlock.from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.BuildingBlock.from_file" title="Link to this definition"></a></dt>
+<dd><p>Read a building block from a file</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pycofbuilder.BuildingBlock.from_name">
-<span class="sig-name descname"><span class="pre">from_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/building_block.html#BuildingBlock.from_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.BuildingBlock.from_name" title="Link to this definition"></a></dt>
-<dd><p>Automatically create a buiding block based on its name.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – Name of the building block. The name must follow the pattern:
-<cite>symmetry_core_conector_functional_group_1_functional_group_2_…_functional_group_n</cite></p>
-</dd>
-</dl>
+<span class="sig-name descname"><span class="pre">from_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/building_block.html#BuildingBlock.from_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.BuildingBlock.from_name" title="Link to this definition"></a></dt>
+<dd><p>Automatically read or create a buiding block based on its name</p>
 </dd></dl>
 
 <dl class="py method">
@@ -2206,14 +2650,8 @@ Default is True.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pycofbuilder.BuildingBlock.save">
-<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extension</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'xyz'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/building_block.html#BuildingBlock.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.BuildingBlock.save" title="Link to this definition"></a></dt>
-<dd><p>Save the building block molecule in a file.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>extension</strong> (<em>str</em>) – File extension. Available extensions are: xyz</p>
-</dd>
-</dl>
-</dd></dl>
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extension</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'xyz'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/building_block.html#BuildingBlock.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.BuildingBlock.save" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pycofbuilder.BuildingBlock.shift">
@@ -2235,7 +2673,7 @@ Default is True.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pycofbuilder.Framework">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pycofbuilder.</span></span><span class="sig-name descname"><span class="pre">Framework</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'low'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_bb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.Framework" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pycofbuilder.</span></span><span class="sig-name descname"><span class="pre">Framework</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.Framework" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class used to represent a Covalent Organic Framework as a reticular entity.</p>
 <p>…</p>
@@ -2265,8 +2703,8 @@ If not defined, a <cite>out</cite> folder will be created in the current directo
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pycofbuilder.Framework.verbosity">
 <span class="sig-name descname"><span class="pre">verbosity</span></span><a class="headerlink" href="#pycofbuilder.Framework.verbosity" title="Link to this definition"></a></dt>
-<dd><p>Control the printing options. Can be ‘None’, ‘Normal’, ‘High’, or ‘Debug’.
-Default: ‘Normal’</p>
+<dd><p>Control the printing options. Can be ‘none’, ‘normal’, or ‘debug’.
+Default: ‘normal’</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>str</p>
@@ -2469,6 +2907,16 @@ If not defined, a <cite>building_blocks</cite> folder will be created in the cur
 </dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="pycofbuilder.Framework.dist_threshold">
+<span class="sig-name descname"><span class="pre">dist_threshold</span></span><a class="headerlink" href="#pycofbuilder.Framework.dist_threshold" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float = 0.8</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="pycofbuilder.Framework.available_2D_topologies">
 <span class="sig-name descname"><span class="pre">available_2D_topologies</span></span><a class="headerlink" href="#pycofbuilder.Framework.available_2D_topologies" title="Link to this definition"></a></dt>
 <dd><p>List of available 2D topologies</p>
@@ -2525,8 +2973,14 @@ Default: bb_lib</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pycofbuilder.Framework.as_string">
+<span class="sig-name descname"><span class="pre">as_string</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.as_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.Framework.as_string" title="Link to this definition"></a></dt>
+<dd><p>Returns a string with the Framework information.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pycofbuilder.Framework.check_name_concistency">
-<span class="sig-name descname"><span class="pre">check_name_concistency</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">FrameworkName</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.check_name_concistency"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.Framework.check_name_concistency" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">check_name_concistency</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">FrameworkName</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.check_name_concistency"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.Framework.check_name_concistency" title="Link to this definition"></a></dt>
 <dd><p>Checks if the name is in the correct format and returns a
 tuple with the building blocks names, the net and the stacking.</p>
 <p>In case the name is not in the correct format, an error is raised.</p>
@@ -2544,8 +2998,410 @@ tuple with the building blocks names, the net and the stacking.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pycofbuilder.Framework.create_bor_structure">
+<span class="sig-name descname"><span class="pre">create_bor_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BB_D4</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BB_T3</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interp_dg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_param_base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">7.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.create_bor_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.Framework.create_bor_structure" title="Link to this definition"></a></dt>
+<dd><p>Creates a COF with BOR network.</p>
+<p>The DIA net is composed of one tetrapodal tetrahedical building block and
+one tripodal triangular building block.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>BB_D4</strong> (<a class="reference internal" href="#pycofbuilder.BuildingBlock" title="pycofbuilder.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tetrapodal tetrahedical Buiding Block</p></li>
+<li><p><strong>BB_T3</strong> (<a class="reference internal" href="#pycofbuilder.BuildingBlock" title="pycofbuilder.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tripodal triangular Buiding Block</p></li>
+<li><p><strong>interp_dg</strong> (<em>str</em><em>, </em><em>optional</em>) – The degree of interpenetration of the framework (default is ‘1’)</p></li>
+<li><p><strong>d_param_base</strong> (<em>float</em><em>, </em><em>optional</em>) – The base value for interlayer distance in angstroms (default is 7.2)</p></li>
+<li><p><strong>print_result</strong> (<em>bool</em><em>, </em><em>optional</em>) – Parameter for the control for printing the result (default is True)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A list of strings containing:</dt><dd><ol class="arabic simple">
+<li><p>the structure name,</p></li>
+<li><p>lattice type,</p></li>
+<li><p>hall symbol of the cristaline structure,</p></li>
+<li><p>space group,</p></li>
+<li><p>number of the space group,</p></li>
+<li><p>number of operation symmetry</p></li>
+</ol>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycofbuilder.Framework.create_dia_a_structure">
+<span class="sig-name descname"><span class="pre">create_dia_a_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BB_D4</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BB_L2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interp_dg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_param_base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">7.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.create_dia_a_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.Framework.create_dia_a_structure" title="Link to this definition"></a></dt>
+<dd><p>Creates a COF with DIA-A network.</p>
+<p>The DIA net is composed of two tetrapodal tetrahedical building blocks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>BB_D4</strong> (<a class="reference internal" href="#pycofbuilder.BuildingBlock" title="pycofbuilder.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tetrapodal tetrahedical Buiding Block</p></li>
+<li><p><strong>BB_L2</strong> (<a class="reference internal" href="#pycofbuilder.BuildingBlock" title="pycofbuilder.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the dipodal linear Buiding Block</p></li>
+<li><p><strong>interp_dg</strong> (<em>str</em><em>, </em><em>optional</em>) – The degree of interpenetration of the framework (default is ‘1’)</p></li>
+<li><p><strong>d_param_base</strong> (<em>float</em><em>, </em><em>optional</em>) – The base value for interlayer distance in angstroms (default is 7.2)</p></li>
+<li><p><strong>print_result</strong> (<em>bool</em><em>, </em><em>optional</em>) – Parameter for the control for printing the result (default is True)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A list of strings containing:</dt><dd><ol class="arabic simple">
+<li><p>the structure name,</p></li>
+<li><p>lattice type,</p></li>
+<li><p>hall symbol of the cristaline structure,</p></li>
+<li><p>space group,</p></li>
+<li><p>number of the space group,</p></li>
+<li><p>number of operation symmetry</p></li>
+</ol>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycofbuilder.Framework.create_dia_structure">
+<span class="sig-name descname"><span class="pre">create_dia_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BB_D41</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BB_D42</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interp_dg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_param_base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">7.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.create_dia_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.Framework.create_dia_structure" title="Link to this definition"></a></dt>
+<dd><p>Creates a COF with DIA network.</p>
+<p>The DIA net is composed of two tetrapodal tetrahedical building blocks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>BB_D41</strong> (<a class="reference internal" href="#pycofbuilder.BuildingBlock" title="pycofbuilder.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tetrapodal tetrahedical Buiding Block</p></li>
+<li><p><strong>BB_D42</strong> (<a class="reference internal" href="#pycofbuilder.BuildingBlock" title="pycofbuilder.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tetrapodal tetrahedical Buiding Block</p></li>
+<li><p><strong>interp_dg</strong> (<em>str</em><em>, </em><em>optional</em>) – The degree of interpenetration of the framework (default is ‘1’)</p></li>
+<li><p><strong>d_param_base</strong> (<em>float</em><em>, </em><em>optional</em>) – The base value for interlayer distance in angstroms (default is 7.2)</p></li>
+<li><p><strong>print_result</strong> (<em>bool</em><em>, </em><em>optional</em>) – Parameter for the control for printing the result (default is True)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A list of strings containing:</dt><dd><ol class="arabic simple">
+<li><p>the structure name,</p></li>
+<li><p>lattice type,</p></li>
+<li><p>hall symbol of the cristaline structure,</p></li>
+<li><p>space group,</p></li>
+<li><p>number of the space group,</p></li>
+<li><p>number of operation symmetry</p></li>
+</ol>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycofbuilder.Framework.create_fxt_a_structure">
+<span class="sig-name descname"><span class="pre">create_fxt_a_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BB_S4</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BB_L2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stacking</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'AA'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_parameter_base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slab</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[1.0,</span> <span class="pre">1.0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tilt_angle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.create_fxt_a_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.Framework.create_fxt_a_structure" title="Link to this definition"></a></dt>
+<dd><p>Creates a COF with FXT-A network.</p>
+<p>The FXT-A net is composed of one tetrapodal and one linear building blocks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>BB_S4</strong> (<a class="reference internal" href="#pycofbuilder.BuildingBlock" title="pycofbuilder.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tetrapodal Buiding Block</p></li>
+<li><p><strong>BB_L2</strong> (<a class="reference internal" href="#pycofbuilder.BuildingBlock" title="pycofbuilder.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the bipodal Buiding Block</p></li>
+<li><p><strong>stacking</strong> (<em>str</em><em>, </em><em>optional</em>) – The stacking pattern of the COF layers (default is ‘AA’)</p></li>
+<li><p><strong>print_result</strong> (<em>bool</em><em>, </em><em>optional</em>) – Parameter for the control for printing the result (default is True)</p></li>
+<li><p><strong>slab</strong> (<em>float</em><em>, </em><em>optional</em>) – Default parameter for the interlayer slab (default is 10.0)</p></li>
+<li><p><strong>shift_vector</strong> (<em>list</em><em>, </em><em>optional</em>) – Shift vector for the AAl and AAt stakings (defatult is [1.0,1.0,0])</p></li>
+<li><p><strong>tilt_angle</strong> (<em>float</em><em>, </em><em>optional</em>) – Tilt angle for the AAt staking in degrees (default is 5.0)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A list of strings containing:</dt><dd><ol class="arabic simple">
+<li><p>the structure name,</p></li>
+<li><p>lattice type,</p></li>
+<li><p>hall symbol of the cristaline structure,</p></li>
+<li><p>space group,</p></li>
+<li><p>number of the space group,</p></li>
+<li><p>number of operation symmetry</p></li>
+</ol>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycofbuilder.Framework.create_fxt_structure">
+<span class="sig-name descname"><span class="pre">create_fxt_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BB_S4_A</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BB_S4_B</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stacking</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'AA'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slab</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[1.0,</span> <span class="pre">1.0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tilt_angle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.create_fxt_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.Framework.create_fxt_structure" title="Link to this definition"></a></dt>
+<dd><p>Creates a COF with FXT network.</p>
+<p>The FXT net is composed of two tetrapodal building blocks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>BB_S4_A</strong> (<a class="reference internal" href="#pycofbuilder.BuildingBlock" title="pycofbuilder.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tetrapodal Buiding Block A</p></li>
+<li><p><strong>BB_S4_B</strong> (<a class="reference internal" href="#pycofbuilder.BuildingBlock" title="pycofbuilder.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tetrapodal Buiding Block B</p></li>
+<li><p><strong>stacking</strong> (<em>str</em><em>, </em><em>optional</em>) – The stacking pattern of the COF layers (default is ‘AA’)</p></li>
+<li><p><strong>print_result</strong> (<em>bool</em><em>, </em><em>optional</em>) – Parameter for the control for printing the result (default is True)</p></li>
+<li><p><strong>slab</strong> (<em>float</em><em>, </em><em>optional</em>) – Default parameter for the interlayer slab (default is 10.0)</p></li>
+<li><p><strong>shift_vector</strong> (<em>list</em><em>, </em><em>optional</em>) – Shift vector for the AAl and AAt stakings (defatult is [1.0,1.0,0])</p></li>
+<li><p><strong>tilt_angle</strong> (<em>float</em><em>, </em><em>optional</em>) – Tilt angle for the AAt staking in degrees (default is 5.0)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A list of strings containing:</dt><dd><ol class="arabic simple">
+<li><p>the structure name,</p></li>
+<li><p>lattice type,</p></li>
+<li><p>hall symbol of the cristaline structure,</p></li>
+<li><p>space group,</p></li>
+<li><p>number of the space group,</p></li>
+<li><p>number of operation symmetry</p></li>
+</ol>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycofbuilder.Framework.create_hcb_a_structure">
+<span class="sig-name descname"><span class="pre">create_hcb_a_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BB_T3</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BB_L2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stacking</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'AA'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slab</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[1.0,</span> <span class="pre">1.0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tilt_angle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.create_hcb_a_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.Framework.create_hcb_a_structure" title="Link to this definition"></a></dt>
+<dd><p>Creates a COF with HCB-A network.</p>
+<p>The HCB-A net is composed of one tripodal and one linear building blocks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>BB_T3</strong> (<a class="reference internal" href="#pycofbuilder.BuildingBlock" title="pycofbuilder.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tripodal Buiding Block</p></li>
+<li><p><strong>BB_L2</strong> (<a class="reference internal" href="#pycofbuilder.BuildingBlock" title="pycofbuilder.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the linear Buiding Block</p></li>
+<li><p><strong>stacking</strong> (<em>str</em><em>, </em><em>optional</em>) – The stacking pattern of the COF layers (default is ‘AA’)</p></li>
+<li><p><strong>c_parameter_base</strong> (<em>float</em><em>, </em><em>optional</em>) – The base value for interlayer distance in angstroms (default is 3.6)</p></li>
+<li><p><strong>print_result</strong> (<em>bool</em><em>, </em><em>optional</em>) – Parameter for the control for printing the result (default is True)</p></li>
+<li><p><strong>slab</strong> (<em>float</em><em>, </em><em>optional</em>) – Default parameter for the interlayer slab (default is 10.0)</p></li>
+<li><p><strong>shift_vector</strong> (<em>list</em><em>, </em><em>optional</em>) – Shift vector for the AAl and AAt stakings (defatult is [1.0,1.0,0])</p></li>
+<li><p><strong>tilt_angle</strong> (<em>float</em><em>, </em><em>optional</em>) – Tilt angle for the AAt staking in degrees (default is 5.0)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A list of strings containing:</dt><dd><ol class="arabic simple">
+<li><p>the structure name</p></li>
+<li><p>lattice type</p></li>
+<li><p>hall symbol of the cristaline structure</p></li>
+<li><p>space group</p></li>
+<li><p>number of the space group,</p></li>
+<li><p>number of operation symmetry</p></li>
+</ol>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycofbuilder.Framework.create_hcb_structure">
+<span class="sig-name descname"><span class="pre">create_hcb_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BB_T3_A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BB_T3_B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stacking</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'AA'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slab</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[1.0,</span> <span class="pre">1.0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tilt_angle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.create_hcb_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.Framework.create_hcb_structure" title="Link to this definition"></a></dt>
+<dd><p>Creates a COF with HCB network.</p>
+<p>The HCB net is composed of two tripodal building blocks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>BB_T3_1</strong> (<a class="reference internal" href="#pycofbuilder.BuildingBlock" title="pycofbuilder.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tripodal Buiding Block A</p></li>
+<li><p><strong>BB_T3_2</strong> (<a class="reference internal" href="#pycofbuilder.BuildingBlock" title="pycofbuilder.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tripodal Buiding Block B</p></li>
+<li><p><strong>stacking</strong> (<em>str</em><em>, </em><em>optional</em>) – The stacking pattern of the COF layers (default is ‘AA’)</p></li>
+<li><p><strong>slab</strong> (<em>float</em><em>, </em><em>optional</em>) – Default parameter for the interlayer slab (default is 10.0)</p></li>
+<li><p><strong>shift_vector</strong> (<em>list</em><em>, </em><em>optional</em>) – Shift vector for the AAl and AAt stakings (defatult is [1.0,1.0,0])</p></li>
+<li><p><strong>tilt_angle</strong> (<em>float</em><em>, </em><em>optional</em>) – Tilt angle for the AAt staking in degrees (default is 5.0)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A list of strings containing:</dt><dd><ol class="arabic simple">
+<li><p>the structure name,</p></li>
+<li><p>lattice type,</p></li>
+<li><p>hall symbol of the cristaline structure,</p></li>
+<li><p>space group,</p></li>
+<li><p>number of the space group,</p></li>
+<li><p>number of operation symmetry</p></li>
+</ol>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycofbuilder.Framework.create_hxl_a_structure">
+<span class="sig-name descname"><span class="pre">create_hxl_a_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BB_H6</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BB_L2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stacking</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'AA'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slab</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[1.0,</span> <span class="pre">1.0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tilt_angle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.create_hxl_a_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.Framework.create_hxl_a_structure" title="Link to this definition"></a></dt>
+<dd><p>Creates a COF with HXL-A network.</p>
+<p>The HXL-A net is composed of one hexapodal and one linear building blocks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>BB_H6</strong> (<a class="reference internal" href="#pycofbuilder.BuildingBlock" title="pycofbuilder.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tetrapodal Buiding Block A</p></li>
+<li><p><strong>BB_L2</strong> (<a class="reference internal" href="#pycofbuilder.BuildingBlock" title="pycofbuilder.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tetrapodal Buiding Block B</p></li>
+<li><p><strong>stacking</strong> (<em>str</em><em>, </em><em>optional</em>) – The stacking pattern of the COF layers (default is ‘AA’)</p></li>
+<li><p><strong>print_result</strong> (<em>bool</em><em>, </em><em>optional</em>) – Parameter for the control for printing the result (default is True)</p></li>
+<li><p><strong>slab</strong> (<em>float</em><em>, </em><em>optional</em>) – Default parameter for the interlayer slab (default is 10.0)</p></li>
+<li><p><strong>shift_vector</strong> (<em>list</em><em>, </em><em>optional</em>) – Shift vector for the AAl and AAt stakings (defatult is [1.0,1.0,0])</p></li>
+<li><p><strong>tilt_angle</strong> (<em>float</em><em>, </em><em>optional</em>) – Tilt angle for the AAt staking in degrees (default is 5.0)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A list of strings containing:</dt><dd><ol class="arabic simple">
+<li><p>the structure name,</p></li>
+<li><p>lattice type,</p></li>
+<li><p>hall symbol of the cristaline structure,</p></li>
+<li><p>space group,</p></li>
+<li><p>number of the space group,</p></li>
+<li><p>number of operation symmetry</p></li>
+</ol>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycofbuilder.Framework.create_kgd_structure">
+<span class="sig-name descname"><span class="pre">create_kgd_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BB_H6</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BB_T3</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stacking</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'AA'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slab</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[1.0,</span> <span class="pre">1.0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tilt_angle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.create_kgd_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.Framework.create_kgd_structure" title="Link to this definition"></a></dt>
+<dd><p>Creates a COF with KGD network.</p>
+<p>The KGD net is composed of one hexapodal and one tripodal building blocks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>BB_H6</strong> (<a class="reference internal" href="#pycofbuilder.BuildingBlock" title="pycofbuilder.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the hexapodal Buiding Block</p></li>
+<li><p><strong>BB_T3</strong> (<a class="reference internal" href="#pycofbuilder.BuildingBlock" title="pycofbuilder.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tripodal Buiding Block</p></li>
+<li><p><strong>stacking</strong> (<em>str</em><em>, </em><em>optional</em>) – The stacking pattern of the COF layers (default is ‘AA’)</p></li>
+<li><p><strong>c_parameter_base</strong> (<em>float</em><em>, </em><em>optional</em>) – The base value for interlayer distance in angstroms (default is 3.6)</p></li>
+<li><p><strong>print_result</strong> (<em>bool</em><em>, </em><em>optional</em>) – Parameter for the control for printing the result (default is True)</p></li>
+<li><p><strong>slab</strong> (<em>float</em><em>, </em><em>optional</em>) – Default parameter for the interlayer slab (default is 10.0)</p></li>
+<li><p><strong>shift_vector</strong> (<em>list</em><em>, </em><em>optional</em>) – Shift vector for the AAl and AAt stakings (defatult is [1.0,1.0,0])</p></li>
+<li><p><strong>tilt_angle</strong> (<em>float</em><em>, </em><em>optional</em>) – Tilt angle for the AAt staking in degrees (default is 5.0)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A list of strings containing:</dt><dd><ol class="arabic simple">
+<li><p>the structure name,</p></li>
+<li><p>lattice type,</p></li>
+<li><p>hall symbol of the cristaline structure,</p></li>
+<li><p>space group,</p></li>
+<li><p>number of the space group,</p></li>
+<li><p>number of operation symmetry</p></li>
+</ol>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycofbuilder.Framework.create_sql_a_structure">
+<span class="sig-name descname"><span class="pre">create_sql_a_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BB_S4</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BB_L2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stacking</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'AA'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_parameter_base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slab</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[1.0,</span> <span class="pre">1.0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tilt_angle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.create_sql_a_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.Framework.create_sql_a_structure" title="Link to this definition"></a></dt>
+<dd><p>Creates a COF with SQL-A network.</p>
+<p>The SQL-A net is composed of one tetrapodal and one linear building blocks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>BB_S4</strong> (<a class="reference internal" href="#pycofbuilder.BuildingBlock" title="pycofbuilder.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tetrapodal Buiding Block</p></li>
+<li><p><strong>BB_L2</strong> (<a class="reference internal" href="#pycofbuilder.BuildingBlock" title="pycofbuilder.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the bipodal Buiding Block</p></li>
+<li><p><strong>stacking</strong> (<em>str</em><em>, </em><em>optional</em>) – The stacking pattern of the COF layers (default is ‘AA’)</p></li>
+<li><p><strong>slab</strong> (<em>float</em><em>, </em><em>optional</em>) – Default parameter for the interlayer slab (default is 10.0)</p></li>
+<li><p><strong>shift_vector</strong> (<em>list</em><em>, </em><em>optional</em>) – Shift vector for the AAl and AAt stakings (defatult is [1.0,1.0,0])</p></li>
+<li><p><strong>tilt_angle</strong> (<em>float</em><em>, </em><em>optional</em>) – Tilt angle for the AAt staking in degrees (default is 5.0)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A list of strings containing:</dt><dd><ol class="arabic simple">
+<li><p>the structure name,</p></li>
+<li><p>lattice type,</p></li>
+<li><p>hall symbol of the cristaline structure,</p></li>
+<li><p>space group,</p></li>
+<li><p>number of the space group,</p></li>
+<li><p>number of operation symmetry</p></li>
+</ol>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycofbuilder.Framework.create_sql_structure">
+<span class="sig-name descname"><span class="pre">create_sql_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">BB_S4_A</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BB_S4_B</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stacking</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'AA'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slab</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[1.0,</span> <span class="pre">1.0,</span> <span class="pre">0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tilt_angle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.create_sql_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.Framework.create_sql_structure" title="Link to this definition"></a></dt>
+<dd><p>Creates a COF with SQL network.</p>
+<p>The SQL net is composed of two tetrapodal building blocks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>BB_S4_A</strong> (<a class="reference internal" href="#pycofbuilder.BuildingBlock" title="pycofbuilder.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tetrapodal Buiding Block A</p></li>
+<li><p><strong>BB_S4_B</strong> (<a class="reference internal" href="#pycofbuilder.BuildingBlock" title="pycofbuilder.BuildingBlock"><em>BuildingBlock</em></a><em>, </em><em>required</em>) – The BuildingBlock object of the tetrapodal Buiding Block B</p></li>
+<li><p><strong>stacking</strong> (<em>str</em><em>, </em><em>optional</em>) – The stacking pattern of the COF layers (default is ‘AA’)</p></li>
+<li><p><strong>print_result</strong> (<em>bool</em><em>, </em><em>optional</em>) – Parameter for the control for printing the result (default is True)</p></li>
+<li><p><strong>slab</strong> (<em>float</em><em>, </em><em>optional</em>) – Default parameter for the interlayer slab (default is 10.0)</p></li>
+<li><p><strong>shift_vector</strong> (<em>list</em><em>, </em><em>optional</em>) – Shift vector for the AAl and AAt stakings (defatult is [1.0,1.0,0])</p></li>
+<li><p><strong>tilt_angle</strong> (<em>float</em><em>, </em><em>optional</em>) – Tilt angle for the AAt staking in degrees (default is 5.0)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A list of strings containing:</dt><dd><ol class="arabic simple">
+<li><p>the structure name,</p></li>
+<li><p>lattice type,</p></li>
+<li><p>hall symbol of the cristaline structure,</p></li>
+<li><p>space group,</p></li>
+<li><p>number of the space group,</p></li>
+<li><p>number of operation symmetry</p></li>
+</ol>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pycofbuilder.Framework.from_building_blocks">
-<span class="sig-name descname"><span class="pre">from_building_blocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bb1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bb2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Stacking</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.from_building_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.Framework.from_building_blocks" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">from_building_blocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bb1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock" title="pycofbuilder.building_block.BuildingBlock"><span class="pre">BuildingBlock</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">bb2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pycofbuilder.building_block.BuildingBlock" title="pycofbuilder.building_block.BuildingBlock"><span class="pre">BuildingBlock</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">net</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stacking</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/framework.html#Framework.from_building_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.Framework.from_building_blocks" title="Link to this definition"></a></dt>
 <dd><p>Creates a COF from the building blocks.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
