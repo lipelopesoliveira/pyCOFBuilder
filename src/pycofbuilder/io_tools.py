@@ -56,7 +56,7 @@ def save_csv(path, file_name, data, delimiter=',', head=False):
     file_temp.close()
 
 
-def read_xyz_file(path, file_name):
+def read_xyz(path, file_name):
     """
     Reads a file in format `.xyz` from the `path` given and returns
     a list containg the N atom labels and a Nx3 array contaning
@@ -94,7 +94,7 @@ def read_xyz_file(path, file_name):
         return None
 
 
-def read_gjf_file(path, file_name):
+def read_gjf(path, file_name):
     """
     Reads a file in format `.gjf` from the `path` given and returns
     a list containg the N atom labels and a Nx3 array contaning
@@ -989,7 +989,7 @@ def convert_gjf_2_xyz(path, file_name):
 
     file_name = file_name.split('.')[0]
 
-    atom_labels, atom_pos = read_gjf_file(path, file_name + '.gjf')
+    atom_labels, atom_pos = read_gjf(path, file_name + '.gjf')
 
     save_xyz(path, file_name + '.xyz', atom_labels, atom_pos)
 
@@ -998,7 +998,7 @@ def convert_xyz_2_gjf(path, file_name):
 
     file_name = file_name.split('.')[0]
 
-    atom_labels, atom_pos = read_xyz_file(path, file_name + '.xyz')
+    atom_labels, atom_pos = read_xyz(path, file_name + '.xyz')
 
     save_xyz(path, file_name + '.gjf', atom_labels, atom_pos)
 
@@ -1228,9 +1228,9 @@ def generate_mol_dict(path, file_name, name, code, smiles):
     xsmiles, xsmiles_label, composition = smiles_to_xsmiles(smiles)
 
     if file_name.endswith('gjf'):
-        atom_types, atom_pos = read_gjf_file(path, file_name)
+        atom_types, atom_pos = read_gjf(path, file_name)
     elif file_name.endswith('xyz'):
-        atom_types, atom_pos = read_xyz_file(path, file_name)
+        atom_types, atom_pos = read_xyz(path, file_name)
 
     mol_dict = {
         "name": name,

@@ -37,3 +37,12 @@ class ConnectionGroupError(Exception):
 
     def __str__(self):
         return str(self.message)
+
+
+class MissingXError(Exception):
+    """Exception raised when the building block has missing X atoms."""
+    def __init__(self):
+        self.message = 'No X points found in the structure!'
+
+    def __str__(self):
+        return str(self.message)

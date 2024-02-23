@@ -104,7 +104,7 @@ class Framework():
         Default: bb_lib
     """
 
-    def __init__(self, name=None, **kwargs):
+    def __init__(self, name: str = None, **kwargs):
 
         self.name: str = name
 

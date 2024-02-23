@@ -16,39 +16,50 @@ from pycofbuilder.tools import (rotation_matrix_from_vectors,
                                 closest_atom_struc,
                                 find_index,
                                 unit_vector)
-from pycofbuilder.io_tools import save_xyz
+from pycofbuilder.io_tools import (read_xyz, save_xyz, read_gjf)
 from pycofbuilder.cjson import ChemJSON
+
+from pycofbuilder.logger import create_logger
+
+from pycofbuilder.exceptions import MissingXError
 
 
 class BuildingBlock():
 
-    def __init__(self, name=None, verbosity=False, save_dir: str = '.', save_bb=True):
+    def __init__(self, name: str = '', **kwargs):
+
+        self.name: str = name
+
+        self.out_path: str = kwargs.get('out_dir', os.path.join(os.getcwd(), 'out'))
+        self.save_bb: bool = kwargs.get('save_bb', True)
+        self.bb_out_path: str = kwargs.get('bb_out_path', os.path.join(self.out_path, 'building_blocks'))
+
+        self.logger = create_logger(level=kwargs.get('log_level', 'info'),
+                                    format=kwargs.get('log_format', 'simple'),
+                                    save_to_file=kwargs.get('save_to_file', False),
+                                    log_filename=kwargs.get('log_filename', 'pycofbuilder.log'))
 
         _ROOTDIR = os.path.abspath(os.path.dirname(__file__))
-
-        self.name = name
-        self.verbosity = verbosity
         self.main_path = os.path.join(_ROOTDIR, 'data')
-        self.save_dir = save_dir
-        self.save_bb = save_bb
-        self.connectivity = None
-        self.size = 0
-        self.mass = None
-        self.composition = None
 
-        self.atom_types = None
-        self.atom_pos = None
-        self.atom_labels = None
+        self.connectivity = kwargs.get('connectivity', None)
+        self.size = kwargs.get('size', None)
+        self.mass = kwargs.get('mass', None)
+        self.composition = kwargs.get('composition', None)
 
-        self.smiles = None
-        self.charge = 0
-        self.multiplicity = 1
-        self.chirality = None
-        self.symmetry = None
+        self.atom_types = kwargs.get('atom_types', None)
+        self.atom_pos = kwargs.get('atom_pos', None)
+        self.atom_labels = kwargs.get('atom_labels', None)
 
-        self.core = None
-        self.conector = None
-        self.funcGroups = None
+        self.smiles = kwargs.get('smiles', None)
+        self.charge = kwargs.get('charge', 0)
+        self.multiplicity = kwargs.get('multiplicity', 1)
+        self.chirality = kwargs.get('chirality', 0)
+        self.symmetry = kwargs.get('symmetry', None)
+
+        self.core = kwargs.get('core', None)
+        self.conector = kwargs.get('conector', None)
+        self.funcGroups = kwargs.get('funcGroups', None)
 
         self.available_symmetry = ['L2',
                                    'T3',
@@ -58,13 +69,18 @@ class BuildingBlock():
                                    # 'B12', 'I12', 'U12', 'X12'
                                    ]
 
-        # Check if save_dir exists and try to create it if not
-        if self.save_dir != '':
-            os.makedirs(self.save_dir, exist_ok=True)
+        # Check if bb_out_path exists and try to create it if not
+        if self.save_bb != '':
+            os.makedirs(self.bb_out_path, exist_ok=True)
 
         # If a name is provided create building block from this name
-        if self.name is not None:
-            self.from_name(self.name)
+        if self.name != '':
+            if '.' not in self.name:
+                self.from_name(self.name)
+
+            # If a name is provided and it is a file, create building block from this file
+            if '.' in self.name:
+                self.from_file(self.out_path, self.name)
 
     def __str__(self):
         return self.structure_as_string()
@@ -78,6 +94,29 @@ class BuildingBlock():
     def copy(self):
         '''Return a deep copy of the BuildingBlock object'''
         return copy.deepcopy(self)
+
+    def from_file(self, path, file_name):
+        '''Read a building block from a file'''
+        extension = file_name.split('.')[-1]
+
+        read_func_dict = {'xyz': read_xyz,
+                          'gjf': read_gjf}
+
+        self.name = file_name.rstrip(f'.{extension}')
+        self.atom_types, self.atom_pos = read_func_dict[extension](path, file_name)
+        self.atom_labels = ['C']*len(self.atom_types)
+
+        if any([i == 'X' for i in self.atom_types]):
+            self.connectivity = len([i for i in self.atom_types if 'X' in i])
+        else:
+            raise MissingXError()
+
+        self.centralize(by_X=True)
+        self.calculate_size()
+        pref_orientation = unit_vector(
+            self.get_X_points()[1][0])
+
+        self.align_to(pref_orientation)
 
     def from_name(self, name):
         '''Automatically read or create a buiding block based on its name'''
