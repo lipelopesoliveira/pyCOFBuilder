@@ -94,6 +94,43 @@ def read_xyz(path, file_name):
         return None
 
 
+def read_pdb(path, file_name):
+    """
+    Reads a file in format `.pdb` from the `path` given and returns
+    a list containg the N atom labels and a Nx3 array contaning
+    the atoms coordinates.
+
+    Parameters
+    ----------
+    path : str
+        Path to the file.
+    file_name : str
+        Name of the `pdb` file. Does not neet to contain the `.pdb` extention.
+
+    Returns
+    -------
+    atom_labels : list
+        List of strings containing containg the N atom labels.
+    atom_pos : numpy array
+        Nx3 array contaning the atoms coordinates
+    """
+
+    # Remove the extention if exists
+    file_name = file_name.split('.')[0]
+
+    if not os.path.exists(os.path.join(path, file_name + '.pdb')):
+        raise FileNotFoundError(f'File {file_name} not found!')
+
+    temp_file = open(os.path.join(path, file_name + '.pdb'), 'r').read().splitlines()
+
+    cellParameters = np.array([i.split()[1:] for i in temp_file if 'CRYST1' in i][0]).astype(float)
+
+    AtomTypes = [i.split()[2] for i in temp_file if 'ATOM' in i]
+    CartPos = np.array([i.split()[4:7] for i in temp_file if 'ATOM' in i]).astype(float)
+
+    return cellParameters, AtomTypes, CartPos
+
+
 def read_gjf(path, file_name):
     """
     Reads a file in format `.gjf` from the `path` given and returns
