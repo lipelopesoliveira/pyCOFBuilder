@@ -197,6 +197,46 @@
 
 
 
+<div class="viewcode-block" id="read_pdb">
+<a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.io_tools.read_pdb">[docs]</a>
+<span class="k">def</span> <span class="nf">read_pdb</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reads a file in format `.pdb` from the `path` given and returns</span>
+<span class="sd">    a list containg the N atom labels and a Nx3 array contaning</span>
+<span class="sd">    the atoms coordinates.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path : str</span>
+<span class="sd">        Path to the file.</span>
+<span class="sd">    file_name : str</span>
+<span class="sd">        Name of the `pdb` file. Does not neet to contain the `.pdb` extention.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    atom_labels : list</span>
+<span class="sd">        List of strings containing containg the N atom labels.</span>
+<span class="sd">    atom_pos : numpy array</span>
+<span class="sd">        Nx3 array contaning the atoms coordinates</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Remove the extention if exists</span>
+    <span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">file_name</span> <span class="o">+</span> <span class="s1">&#39;.pdb&#39;</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;File </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s1"> not found!&#39;</span><span class="p">)</span>
+
+    <span class="n">temp_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">file_name</span> <span class="o">+</span> <span class="s1">&#39;.pdb&#39;</span><span class="p">),</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+
+    <span class="n">cellParameters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">i</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">temp_file</span> <span class="k">if</span> <span class="s1">&#39;CRYST1&#39;</span> <span class="ow">in</span> <span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="n">AtomTypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">temp_file</span> <span class="k">if</span> <span class="s1">&#39;ATOM&#39;</span> <span class="ow">in</span> <span class="n">i</span><span class="p">]</span>
+    <span class="n">CartPos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">i</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">temp_file</span> <span class="k">if</span> <span class="s1">&#39;ATOM&#39;</span> <span class="ow">in</span> <span class="n">i</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">cellParameters</span><span class="p">,</span> <span class="n">AtomTypes</span><span class="p">,</span> <span class="n">CartPos</span></div>
+
+
+
 <div class="viewcode-block" id="read_gjf">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.io_tools.read_gjf">[docs]</a>
 <span class="k">def</span> <span class="nf">read_gjf</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>

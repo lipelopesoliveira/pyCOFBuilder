@@ -200,6 +200,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#pycofbuilder.io_tools.read_cif"><code class="docutils literal notranslate"><span class="pre">read_cif()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pycofbuilder.io_tools.read_gjf"><code class="docutils literal notranslate"><span class="pre">read_gjf()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pycofbuilder.io_tools.read_json"><code class="docutils literal notranslate"><span class="pre">read_json()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pycofbuilder.io_tools.read_pdb"><code class="docutils literal notranslate"><span class="pre">read_pdb()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pycofbuilder.io_tools.read_xyz"><code class="docutils literal notranslate"><span class="pre">read_xyz()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pycofbuilder.io_tools.save_chemjson"><code class="docutils literal notranslate"><span class="pre">save_chemjson()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pycofbuilder.io_tools.save_cif"><code class="docutils literal notranslate"><span class="pre">save_cif()</span></code></a></li>
@@ -1742,6 +1743,29 @@ the atoms coordinates.</p>
 <dt class="sig sig-object py" id="pycofbuilder.io_tools.read_json">
 <span class="sig-prename descclassname"><span class="pre">pycofbuilder.io_tools.</span></span><span class="sig-name descname"><span class="pre">read_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/io_tools.html#read_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.io_tools.read_json" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycofbuilder.io_tools.read_pdb">
+<span class="sig-prename descclassname"><span class="pre">pycofbuilder.io_tools.</span></span><span class="sig-name descname"><span class="pre">read_pdb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycofbuilder/io_tools.html#read_pdb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycofbuilder.io_tools.read_pdb" title="Link to this definition"></a></dt>
+<dd><p>Reads a file in format <cite>.pdb</cite> from the <cite>path</cite> given and returns
+a list containg the N atom labels and a Nx3 array contaning
+the atoms coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>str</em>) – Path to the file.</p></li>
+<li><p><strong>file_name</strong> (<em>str</em>) – Name of the <cite>pdb</cite> file. Does not neet to contain the <cite>.pdb</cite> extention.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>atom_labels</strong> (<em>list</em>) – List of strings containing containg the N atom labels.</p></li>
+<li><p><strong>atom_pos</strong> (<em>numpy array</em>) – Nx3 array contaning the atoms coordinates</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pycofbuilder.io_tools.read_xyz">
