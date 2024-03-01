@@ -86,6 +86,7 @@ Here you will find a list of tutorials on how to use pyCOFBuilder to generate an
    :maxdepth: 1
 
    tutorials/bb_creation
+   tutorials/creating_mofs
 
 .. toctree::
    :maxdepth: 2
