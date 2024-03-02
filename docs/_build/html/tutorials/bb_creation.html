@@ -23,7 +23,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="pyCOFBuilder package" href="../pycofbuilder.html" />
+    <link rel="next" title="Generating MOF structures with pyCOFBuilder" href="creating_mofs.html" />
     <link rel="prev" title="Functional Groups (R)" href="../building_blocks/Func.html" /> 
 </head>
 
@@ -77,6 +77,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#using-the-new-building-block-in-pycofbuilder">Using the new building block in pyCOFBuilder</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="creating_mofs.html">Generating MOF structures with pyCOFBuilder</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Code contents:</span></p>
 <ul>
@@ -119,7 +120,7 @@
 <div class="admonition important">
 <p class="admonition-title">Important</p>
 <p>Don’t forget to add the special points (Q, X, or <span class="raw-html">R<sub>y</sub></span>.) in the structure of the molecule you want to add to pyCOFBuilder, as in the image below</p>
-<a class="reference internal image-reference" href="../_images/new_buiding_block.jpeg"><img alt="Special points in the structure of the molecule" class="align-center" src="../_images/new_buiding_block.jpeg" style="width: 800px;" /></a>
+<a class="reference internal image-reference" href="../_images/new_buiding_block.png"><img alt="Special points in the structure of the molecule" class="align-center" src="../_images/new_buiding_block.png" style="width: 800px;" /></a>
 </div>
 <section id="creating-a-new-building-block-structure-file">
 <h2>Creating a new building block structure file<a class="headerlink" href="#creating-a-new-building-block-structure-file" title="Link to this heading"></a></h2>
@@ -129,7 +130,7 @@
 <p>You don’t actually need to add any point for functionalization if you don’t want to functionalize the organic core. However, in case you want to add functionalization points to the organic core you
 it is necessary to add pseudoatoms <code class="docutils literal notranslate"><span class="pre">Ry</span></code>, where <code class="docutils literal notranslate"><span class="pre">y</span></code> is a number between 1 and 9, to the structure of the organic core. The distance between the <code class="docutils literal notranslate"><span class="pre">Ry</span></code> and the carbon (or any other atom it is attached)
 atom should be set to 0.5 Å.</p>
-<a class="reference internal image-reference" href="../_images/new_organic_core.jpeg"><img alt="Special points in the structure of the molecule for a organic core" class="align-center" src="../_images/new_organic_core.jpeg" style="width: 800px;" /></a>
+<a class="reference internal image-reference" href="../_images/new_organic_core.png"><img alt="Special points in the structure of the molecule for a organic core" class="align-center" src="../_images/new_organic_core.png" style="width: 800px;" /></a>
 </section>
 <hr class="docutils" />
 <section id="connection-groups">
@@ -138,7 +139,7 @@ atom should be set to 0.5 Å.</p>
 the building block and the linkers.</p>
 <p>For example, if you want to create a connection group with a distance of 1.5 Å between the connection points, you should set the distance between the <code class="docutils literal notranslate"><span class="pre">Q</span></code> and the carbon atom to 1.0 Å
 once the distance between the <code class="docutils literal notranslate"><span class="pre">C</span></code> and the <code class="docutils literal notranslate"><span class="pre">Q</span></code> points in the organic core is 0.5 Å. The same applies to the <code class="docutils literal notranslate"><span class="pre">X</span></code> point.</p>
-<a class="reference internal image-reference" href="../_images/new_connection_group.jpeg"><img alt="Special points in the structure of the molecule for a connection group" class="align-center" src="../_images/new_connection_group.jpeg" style="width: 800px;" /></a>
+<a class="reference internal image-reference" href="../_images/new_connection_group.png"><img alt="Special points in the structure of the molecule for a connection group" class="align-center" src="../_images/new_connection_group.png" style="width: 800px;" /></a>
 </section>
 <hr class="docutils" />
 <section id="functional-groups">
@@ -146,7 +147,7 @@ once the distance between the <code class="docutils literal notranslate"><span c
 <p>For the functional groups the distance from the pseudoatom <code class="docutils literal notranslate"><span class="pre">R</span></code> and the atom connected directly to it should be set in a way to get the final espected distance between the atoms after the functionalization.
 For example, if you want to add a <code class="docutils literal notranslate"><span class="pre">Cl</span></code> atom as functional group, you should set the distance between the <code class="docutils literal notranslate"><span class="pre">R</span></code> and the <code class="docutils literal notranslate"><span class="pre">Cl</span></code> atom to 1.27 Å to obtain a final distance of 1.77 Å between the
 <code class="docutils literal notranslate"><span class="pre">C</span></code> atom of the organic core and the <code class="docutils literal notranslate"><span class="pre">Cl</span></code> atoms.</p>
-<a class="reference internal image-reference" href="../_images/new_functional_group.jpeg"><img alt="Special points in the structure of the molecule for a functional group" class="align-center" src="../_images/new_functional_group.jpeg" style="width: 800px;" /></a>
+<a class="reference internal image-reference" href="../_images/new_functional_group.png"><img alt="Special points in the structure of the molecule for a functional group" class="align-center" src="../_images/new_functional_group.png" style="width: 800px;" /></a>
 </section>
 </section>
 <hr class="docutils" />
@@ -311,7 +312,7 @@ Q<span class="w">                  </span><span class="m">0</span>.00000000<span
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../building_blocks/Func.html" class="btn btn-neutral float-left" title="Functional Groups (R)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../pycofbuilder.html" class="btn btn-neutral float-right" title="pyCOFBuilder package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="creating_mofs.html" class="btn btn-neutral float-right" title="Generating MOF structures with pyCOFBuilder" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

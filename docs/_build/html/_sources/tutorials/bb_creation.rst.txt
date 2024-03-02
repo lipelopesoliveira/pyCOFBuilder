@@ -15,7 +15,7 @@ All the files required to generate a new building block (organic core, connectio
 .. important::
    Don't forget to add the special points (Q, X, or :raw-html:`R<sub>y</sub>`.) in the structure of the molecule you want to add to pyCOFBuilder, as in the image below
 
-   .. image:: ../img/new_buiding_block.jpeg
+   .. image:: ../img/new_buiding_block.png
       :width: 800
       :align: center
       :alt: Special points in the structure of the molecule
@@ -34,7 +34,7 @@ You don't actually need to add any point for functionalization if you don't want
 it is necessary to add pseudoatoms ``Ry``, where ``y`` is a number between 1 and 9, to the structure of the organic core. The distance between the ``Ry`` and the carbon (or any other atom it is attached) 
 atom should be set to 0.5 Å.
 
-.. image:: ../img/new_organic_core.jpeg
+.. image:: ../img/new_organic_core.png
    :width: 800
    :align: center
    :alt: Special points in the structure of the molecule for a organic core
@@ -50,7 +50,7 @@ the building block and the linkers.
 For example, if you want to create a connection group with a distance of 1.5 Å between the connection points, you should set the distance between the ``Q`` and the carbon atom to 1.0 Å
 once the distance between the ``C`` and the ``Q`` points in the organic core is 0.5 Å. The same applies to the ``X`` point.
 
-.. image:: ../img/new_connection_group.jpeg
+.. image:: ../img/new_connection_group.png
    :width: 800
    :align: center
    :alt: Special points in the structure of the molecule for a connection group
@@ -64,7 +64,7 @@ For the functional groups the distance from the pseudoatom ``R`` and the atom co
 For example, if you want to add a ``Cl`` atom as functional group, you should set the distance between the ``R`` and the ``Cl`` atom to 1.27 Å to obtain a final distance of 1.77 Å between the 
 ``C`` atom of the organic core and the ``Cl`` atoms.
 
-.. image:: ../img/new_functional_group.jpeg
+.. image:: ../img/new_functional_group.png
    :width: 800
    :align: center
    :alt: Special points in the structure of the molecule for a functional group
