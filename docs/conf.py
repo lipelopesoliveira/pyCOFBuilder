@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.abspath('../src'))
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'pycofbuilder'
+project = 'pyCOFBuilder'
 copyright = '2024, Felipe L. Oliveira'
 author = 'Felipe L. Oliveira'
 release = '0.0.6'
@@ -28,7 +28,8 @@ release = '0.0.6'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
-    'sphinx.ext.napoleon'
+    'sphinx.ext.napoleon',
+    'sphinx_tabs.tabs'
 ]
 
 templates_path = ['_templates']
@@ -39,3 +40,12 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
+
+html_logo = "img/header-logo.png"
+
+html_show_sourcelink = True
+
+html_theme_options = {
+    'logo_only': False,
+    'display_version': True,
+}

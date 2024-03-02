@@ -60,9 +60,9 @@
         }
     },
     "properties": {
-        "smiles": "[Q]B(=NB([Q])=N1)N=B1[Q]",
-        "code": "TRZN",
-        "xsmiles": "[*]B(=NB([*])=N1)N=B1[*]",
+        "smiles": "[Q]B(=OB([Q])=O1)O=B1[Q]",
+        "code": "TOTB",
+        "xsmiles": "[*]B(=OB([*])=O1)O=B1[*]",
         "xsmiles_label": "|$Q;;;;Q;;;;Q$|"
     }
 }

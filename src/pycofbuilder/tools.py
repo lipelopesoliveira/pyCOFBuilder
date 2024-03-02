@@ -68,6 +68,8 @@ def unit_vector(vector):
 def angle(v1, v2, unit='degree'):
     """
     Calculates the angle between two vectors v1 and v2.
+
+    Parameters
     ----------
     v1 : array
         (N,1) matrix with N dimensions
@@ -75,6 +77,7 @@ def angle(v1, v2, unit='degree'):
         (N,1) matrix with N dimensions
     unit : str
         Unit of the output. Could be 'degree', 'radians' or 'cos'.
+
     Returns
     -------
     angle : float
@@ -97,6 +100,8 @@ def angle(v1, v2, unit='degree'):
 def rotation_matrix_from_vectors(vec1, vec2):
     '''
     Find the rotation matrix that aligns vec1 to vec2
+
+    Parameters
     ----------
     vec1 : array
         (3,3) array
@@ -112,7 +117,10 @@ def rotation_matrix_from_vectors(vec1, vec2):
     c = np.dot(a, b)
     s = np.linalg.norm(v)
     if s != 0:
-        kmat = np.array([[0, -v[2], v[1]], [v[2], 0, -v[0]], [-v[1], v[0], 0]])
+        kmat = np.array([[0, -v[2], v[1]],
+                         [v[2], 0, -v[0]],
+                         [-v[1], v[0], 0]])
+
         rotation_matrix = np.eye(3) + kmat + kmat.dot(kmat) * ((1 - c) / (s ** 2))
         return rotation_matrix
     else:
@@ -276,7 +284,7 @@ def get_fractional_to_cartesian_matrix(cell_a: float,
                                        alpha: float,
                                        beta: float,
                                        gamma: float,
-                                       angle_in_degrees: bool = True):
+                                       angle_in_degrees: bool = True) -> np.array(float):
     """
     Return the transformation matrix that converts fractional coordinates to
     cartesian coordinates.
@@ -324,10 +332,11 @@ def get_cartesian_to_fractional_matrix(a: float,
                                        alpha: float,
                                        beta: float,
                                        gamma: float,
-                                       angle_in_degrees: bool = True):
+                                       angle_in_degrees: bool = True) -> np.array(float):
     """
     Return the transformation matrix that converts cartesian coordinates to
     fractional coordinates.
+
     Parameters
     ----------
     a, b, c : float
@@ -336,9 +345,10 @@ def get_cartesian_to_fractional_matrix(a: float,
         The angles between the sides.
     angle_in_degrees : bool
         True if alpha, beta and gamma are expressed in degrees.
+
     Returns
     -------
-    T_matrix : array_like
+    T_matrix : np.array
         The 3x3 rotation matrix. ``R_frac = np.dot(T_matrix, R_cart)``.
     """
     if angle_in_degrees:
@@ -365,12 +375,15 @@ def get_cartesian_to_fractional_matrix(a: float,
     return T_matrix
 
 
-def get_reciprocal_vectors(cell):
-    '''
-    Get the reciprocal vectors of a cell given in cell parameters of cell vectors
+def get_reciprocal_vectors(cell) -> tuple:
+    """
+    Get the reciprocal vectors of a cell given in cell parameters of cell vectors.
+
+    Parameters
     ----------
     cell : array
         (3,1) array for cell vectors or (6,1) array for cell parameters
+
     Returns
     -------
     b1 : array
@@ -379,7 +392,8 @@ def get_reciprocal_vectors(cell):
         (3,1) array containing b_2 vector in the reciprocal space
     b3 : array
         (3,1) array containing b_3 vector in the reciprocal space
-    '''
+    """
+
     if len(cell) == 3:
         v1, v2, v3 = cell
     if len(cell) == 6:
@@ -394,9 +408,12 @@ def get_reciprocal_vectors(cell):
     return b1, b2, b3
 
 
-def get_kgrid(cell, distance=0.3):
-    '''Get the k-points grid in the reciprocal space with a given distance for a
+def get_kgrid(cell, distance=0.3) -> tuple:
+    """
+    Get the k-points grid in the reciprocal space with a given distance for a
     cell given in cell parameters of cell vectors.
+
+    Parameters
     ----------
     cell : array
         (3,1) array for cell vectors or (6,1) array for cell parameters
@@ -410,7 +427,7 @@ def get_kgrid(cell, distance=0.3):
         Number of points in the y direction on reciprocal space
     kz : int
         Number of points in the z direction on reciprocal space
-    '''
+    """
 
     b1, b2, b3 = get_reciprocal_vectors(cell)
 
@@ -455,6 +472,8 @@ def calculate_UnitCells(cell, cutoff):
     and `c` are and the length in the perpendicular directions would be the projections
     of the crystallographic vectors on the vectors `a x b`, `b x c`, and `c x a`.
     (here `x` means cross product)
+
+    Parameters
     ----------
     cell_matrix : array
         (3,3) cell vectors or (6,1)
@@ -527,7 +546,10 @@ def cellpar_to_lammpsbox(a: float,
 
 
 def find_index(element, e_list):
-    '''Finds the index of a given element in a list
+    """
+    Finds the index of a given element in a list
+
+    Parameters
     ----------
     element : string
         String containing the label of the element in e_list
@@ -537,14 +559,21 @@ def find_index(element, e_list):
     ----------
     i : int
         The index of element in the e_list
-    '''
+    """
+
+    index = None
     for i in range(len(e_list)):
         if np.array_equal(e_list[i], element):
-            return i
+            index = i
+            break
+    return index
 
 
-def change_X_atoms(atom_labels, atom_pos, bond_atom):
-    ''' Changes the X atom for the desired bond_atom or remove it if bond_atom == 'R'.
+def change_X_atoms(atom_labels, atom_pos, bond_atom) -> tuple:
+    '''
+    Changes the X atom for the desired bond_atom or remove it if bond_atom == 'R'.
+
+    Parameters
     ----------
     atom_labels : list
         List containing the atom labels
@@ -570,8 +599,30 @@ def change_X_atoms(atom_labels, atom_pos, bond_atom):
     return label, pos
 
 
-def closest_atom(label_1, pos_1, labels, pos):
-    '''Find the closest atom to a given atom'''
+def closest_atom(label_1: str, pos_1: list, labels: list, pos: list):
+    '''
+    Find the closest atom to a given atom
+
+    Parameters
+    ----------
+    label_1 : string
+        String containing the label of the atom
+    pos_1 : list
+        Array containing the position of the atom
+    labels : list
+        List containing the all the atom labels on the structure
+    pos : list
+        List containing the all the atom positions on the structure
+
+    Returns
+    ----------
+    closest_label : string
+        String containing the label of the closest atom
+    closest_position : array
+        Array containing the position of the closest atom
+    euclidian_distance : float
+        Euclidian distance between the two atoms
+    '''
 
     list_labels = []
     list_pos = []
@@ -639,6 +690,17 @@ def get_bond_atom(connector_1: str, connector_2: str) -> str:
             bond_atom = bond_dict[group]
 
     return bond_atom
+
+
+def get_framework_symm_text(name, lattice, hall, space_group, space_number, symm_op):
+    '''Get the text for the framework symmop'''
+    text = '{:<60s} {:^12s} {:<4s} {:^4s} #{:^5s}   {:^2} sym. op.'.format(name,
+                                                                           lattice,
+                                                                           hall.lstrip('-'),
+                                                                           space_group,
+                                                                           space_number,
+                                                                           symm_op)
+    return text
 
 
 def print_framework_name(name, lattice, hall, space_group, space_number, symm_op):

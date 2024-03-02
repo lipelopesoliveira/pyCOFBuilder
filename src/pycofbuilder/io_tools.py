@@ -56,7 +56,7 @@ def save_csv(path, file_name, data, delimiter=',', head=False):
     file_temp.close()
 
 
-def read_xyz_file(path, file_name):
+def read_xyz(path, file_name):
     """
     Reads a file in format `.xyz` from the `path` given and returns
     a list containg the N atom labels and a Nx3 array contaning
@@ -94,7 +94,44 @@ def read_xyz_file(path, file_name):
         return None
 
 
-def read_gjf_file(path, file_name):
+def read_pdb(path, file_name):
+    """
+    Reads a file in format `.pdb` from the `path` given and returns
+    a list containg the N atom labels and a Nx3 array contaning
+    the atoms coordinates.
+
+    Parameters
+    ----------
+    path : str
+        Path to the file.
+    file_name : str
+        Name of the `pdb` file. Does not neet to contain the `.pdb` extention.
+
+    Returns
+    -------
+    atom_labels : list
+        List of strings containing containg the N atom labels.
+    atom_pos : numpy array
+        Nx3 array contaning the atoms coordinates
+    """
+
+    # Remove the extention if exists
+    file_name = file_name.split('.')[0]
+
+    if not os.path.exists(os.path.join(path, file_name + '.pdb')):
+        raise FileNotFoundError(f'File {file_name} not found!')
+
+    temp_file = open(os.path.join(path, file_name + '.pdb'), 'r').read().splitlines()
+
+    cellParameters = np.array([i.split()[1:] for i in temp_file if 'CRYST1' in i][0]).astype(float)
+
+    AtomTypes = [i.split()[2] for i in temp_file if 'ATOM' in i]
+    CartPos = np.array([i.split()[4:7] for i in temp_file if 'ATOM' in i]).astype(float)
+
+    return cellParameters, AtomTypes, CartPos
+
+
+def read_gjf(path, file_name):
     """
     Reads a file in format `.gjf` from the `path` given and returns
     a list containg the N atom labels and a Nx3 array contaning
@@ -989,7 +1026,7 @@ def convert_gjf_2_xyz(path, file_name):
 
     file_name = file_name.split('.')[0]
 
-    atom_labels, atom_pos = read_gjf_file(path, file_name + '.gjf')
+    atom_labels, atom_pos = read_gjf(path, file_name + '.gjf')
 
     save_xyz(path, file_name + '.xyz', atom_labels, atom_pos)
 
@@ -998,7 +1035,7 @@ def convert_xyz_2_gjf(path, file_name):
 
     file_name = file_name.split('.')[0]
 
-    atom_labels, atom_pos = read_xyz_file(path, file_name + '.xyz')
+    atom_labels, atom_pos = read_xyz(path, file_name + '.xyz')
 
     save_xyz(path, file_name + '.gjf', atom_labels, atom_pos)
 
@@ -1228,9 +1265,9 @@ def generate_mol_dict(path, file_name, name, code, smiles):
     xsmiles, xsmiles_label, composition = smiles_to_xsmiles(smiles)
 
     if file_name.endswith('gjf'):
-        atom_types, atom_pos = read_gjf_file(path, file_name)
+        atom_types, atom_pos = read_gjf(path, file_name)
     elif file_name.endswith('xyz'):
-        atom_types, atom_pos = read_xyz_file(path, file_name)
+        atom_types, atom_pos = read_xyz(path, file_name)
 
     mol_dict = {
         "name": name,

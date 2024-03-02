@@ -1,3 +1,4 @@
 {
-    "python.analysis.typeCheckingMode": "off"
+    "python.analysis.typeCheckingMode": "basic",
+    "esbonio.sphinx.confDir": ""
 }

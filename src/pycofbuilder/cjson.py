@@ -65,6 +65,7 @@ class ChemJSON:
         self.partial_charges = None
 
         self.properties = None
+        self.results = []
 
     # Create a custom representation of the class
     def __repr__(self):
@@ -126,6 +127,12 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
         Sets the properties of the structure.
         '''
         self.properties = properties
+
+    def set_results(self, results):
+        '''
+        Sets the results of the structure.
+        '''
+        self.results = results
 
     def set_cell_parameters(self, cell_parameters):
         '''
@@ -244,6 +251,8 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
 
         if 'properties' in cjson_data:
             self.set_properties(cjson_data['properties'])
+        if 'results' in cjson_data:
+            self.set_results(cjson_data['results'])
         if 'partialCharges' in cjson_data:
             self.partial_charges = cjson_data['partialCharges']
 
@@ -380,6 +389,8 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
             structure_dict['partialCharges'] = self.partial_charges
 
         structure_dict['properties'] = self.properties
+
+        structure_dict['results'] = self.results
 
         return structure_dict
 

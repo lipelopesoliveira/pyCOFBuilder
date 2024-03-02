@@ -32,6 +32,6 @@ _ROOT = os.path.abspath(os.path.dirname(__file__))
 
 __author__ = "Felipe Lopes de Oliveira"
 __license__ = "MIT"
-__version__ = '0.0.5'
+__version__ = '0.0.6'
 __email__ = "felipe.lopes@nano.ufrj.br"
 __status__ = "Development"
