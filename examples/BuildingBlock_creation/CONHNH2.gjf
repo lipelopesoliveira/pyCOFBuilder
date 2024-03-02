@@ -1,0 +1,18 @@
+%chk=C:\Users\lipel\OneDrive\Documentos\GitHub\pyCOFBuilder\examples\BuildingBlock_creation\CONHNH2.chk
+# hf/3-21g geom=connectivity
+
+Title Card Required
+
+0 2
+ X                  1.71075651   -0.38510178   -0.46752538
+ C                  1.20481002   -0.50517738   -0.46752538
+ H                  0.47029255    0.27288693   -0.46752538
+ N                  0.78364166   -1.91355134   -0.46752538
+ H                  1.47010503   -2.64071379   -0.46920466
+ X                  0.28742571   -2.03131803   -0.46666895
+
+ 1 2 1.0 3 1.0
+ 2
+ 3 4 1.0
+ 4
+
