@@ -55,6 +55,7 @@ Tutorials
 Here you will find a list of tutorials on how to use pyCOFBuilder to generate and manipulate COF structures.
 
 * :doc:`tutorials/bb_creation`
+* :doc:`tutorials/creating_mofs`
 
 
 .. toctree::
