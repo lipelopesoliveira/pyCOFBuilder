@@ -538,7 +538,7 @@ class Framework():
         if self.stacking == 'A':
             c = slab
 
-        # Create the lattice 
+        # Create the lattice
         self.cellMatrix = Lattice.from_parameters(a, b, c, alpha, beta, gamma)
         self.cellParameters = np.array([a, b, c, alpha, beta, gamma]).astype(float)
 
@@ -3958,7 +3958,7 @@ class Framework():
                                             str(self.space_group),
                                             str(self.space_group_n),
                                             len(symm_op))
-        
+
         self.logger.info(symm_text)
 
         return [self.name,
