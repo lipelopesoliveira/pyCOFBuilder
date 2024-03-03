@@ -1,3 +1,59 @@
+Metadata-Version: 2.1
+Name: pycofbuilder
+Version: 0.0.7
+Summary: A package for Covalent Organic Frameworks sturcture creation based on the reticular approach.
+Home-page: https://github.com/lipelopesoliveira/pyCOFBuilder
+Author: Felipe Lopes Oliveira
+Author-email: Felipe Lopes <felipe.lopes@nano.ufrj.br>
+License: MIT License
+        
+        Copyright (c) 2023, Felipe Lopes de Oliveira
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+Project-URL: Homepage, https://github.com/lipelopesoliveira/pyCOFBuilder
+Project-URL: Issues, https://github.com/lipelopesoliveira/pyCOFBuilder/issues
+Project-URL: Documentation, https://lipelopesoliveira.github.io/pyCOFBuilder/docs/_build/html/index.html
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Intended Audience :: Science/Research
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Scientific/Engineering :: Information Analysis
+Classifier: Topic :: Scientific/Engineering :: Physics
+Classifier: Topic :: Scientific/Engineering :: Chemistry
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: os
+Requires-Dist: math
+Requires-Dist: simplejason
+Requires-Dist: numpy>=1.6.3
+Requires-Dist: scipy>=1.2
+Requires-Dist: pymatgen>=2022.0.8
+Requires-Dist: jupyter
+Requires-Dist: jupyterlab
+Requires-Dist: pandas
+Requires-Dist: tqdm
+Requires-Dist: gemmi
+Requires-Dist: ase
+
 # pyCOFBuilder
 
 ![puCOFBuilder](docs/img/header.png)
@@ -28,13 +84,7 @@ conda env create --file environment.yml
 
 ## Installation
 
-You can install pyCOFBuilder using pip:
-
-```Shell
-pip install pycofbuilder
-```
-
-Alternativelly, you can use pyCOFBuilder by manually import it using the `sys` module, as exemplified below:
+Currently the best way to use pyCOFBuilder is to manually import it using the `sys` module, as exemplified below:
 
 ```python
 # importing module
