@@ -1,0 +1,25 @@
+[project]
+name = "pycofbuilder"
+version = '0.0.6'
+authors = [
+  { name="Felipe Lopes", email="felipe.lopes@nano.ufrj.br" },
+]
+description = 'A package for Covalent Organic Frameworks sturcture creation based on the reticular approach.'
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.9',
+    "Intended Audience :: Science/Research",
+    "License :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
+
+[project.urls]
+Homepage = "https://github.com/lipelopesoliveira/pyCOFBuilder"
+Issues = "https://github.com/lipelopesoliveira/pyCOFBuilder/issues"
