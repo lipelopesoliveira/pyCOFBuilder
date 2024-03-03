@@ -20,12 +20,23 @@ from pycofbuilder.framework import Framework
 import pycofbuilder.tools as Tools
 import pycofbuilder.io_tools as IO_Tools
 
+# Import ChemJSON
+import pycofbuilder.chemjson as ChemJSON
+
+# Import Exceptions
+import pycofbuilder.exceptions as Exceptions
+
+# Import Logger
+import pycofbuilder.logger as Logger
+
 __all__ = [
     'BuildingBlock',
     'Framework',
     'Tools',
     'IO_Tools',
-    'ChemJSON'
+    'ChemJSON',
+    'Exceptions',
+    'Logger'
     ]
 
 _ROOT = os.path.abspath(os.path.dirname(__file__))

@@ -5,12 +5,38 @@ Change Log
 Notable project changes since release v0.0.1 Alpha (09/06/2022).
 
 
-Unreleased
-==========
+v0.0.6 Beta (02/03/2024)
+========================
 
+New features
+------------
+
+- A web-based documentation of pyCOFBuilder, as a result of #51
+- Possibility to create 3D nets with `DIA` and `DIA_A` topology as a result of #54 
+- Possibility to create 3D nets with `BOR` topology as a result of #54 
+- Add new D4 organic cores:
+  - ADAM
+  - SBFE
+  - TDAT
+  - TKAT
+  - TKPM
+- Add new custom exceptions:
+  - `BondLenghError` exception that is raised when the distance between two atoms on the structure are smaller than a distance thresshold. It is controlled by the `dist_threshold` variable on the `Framework` class (0.8 angstrom by default)
+  - `BBConnectivityError` exception raised when the building block connectivity is not valid.
+  - `ConnectionGroupError` exception raised when the connection group is not valid.
+  - `MissingXError` exception raised when the custom building block is missing X atoms.
+- The `CJSON` module now has the capability to read and write results from simulations. 
+- Add the possibility to create MOF structures
+- Add a new log system that can print on the screen or save on a file the log.
+
+Bugfixes
+--------
+
+- It's now much easier to create and use custom building blocks.
+- HXL-A and KDG are working properly now.
 
 v0.0.2 Beta (17/06/2022)
-=================
+========================
 
 Added 
 -----
@@ -25,13 +51,13 @@ Added
 - Add the class methods documentations
 
 Know bugs
------
+---------
 
 - KGM and KGM-A nets do not generate the proper structure
 - HXL-A and KDG stakings are not tested
 
 v0.0.1 Alpha (09/06/2022)
-=================
+=========================
 
 Added
 -----
