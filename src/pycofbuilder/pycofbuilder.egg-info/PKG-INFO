@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: pycofbuilder
-Version: 0.0.7
+Version: 0.0.7.2
 Summary: A package for Covalent Organic Frameworks sturcture creation based on the reticular approach.
 Home-page: https://github.com/lipelopesoliveira/pyCOFBuilder
 Author: Felipe Lopes Oliveira
@@ -41,9 +41,7 @@ Classifier: Topic :: Software Development :: Libraries :: Python Modules
 Requires-Python: >=3.10
 Description-Content-Type: text/markdown
 License-File: LICENSE
-Requires-Dist: os
-Requires-Dist: math
-Requires-Dist: simplejason
+Requires-Dist: simplejson
 Requires-Dist: numpy>=1.6.3
 Requires-Dist: scipy>=1.2
 Requires-Dist: pymatgen>=2022.0.8
@@ -84,7 +82,13 @@ conda env create --file environment.yml
 
 ## Installation
 
-Currently the best way to use pyCOFBuilder is to manually import it using the `sys` module, as exemplified below:
+You can install pyCOFBuilder using pip:
+
+```Shell
+pip install pycofbuilder
+```
+
+Alternativelly, you can use pyCOFBuilder by manually import it using the `sys` module, as exemplified below:
 
 ```python
 # importing module
