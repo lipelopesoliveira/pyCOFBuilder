@@ -1,0 +1,33 @@
+{
+    "chemical json": 1,
+    "name": "iodine",
+    "formula": "R1I1",
+    "atoms": {
+        "elements": {
+            "type": [
+                "I",
+                "R"
+            ],
+            "number": [
+                53,
+                0.0
+            ]
+        },
+        "coords": {
+            "3d": [
+                1.30475,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "properties": {
+        "smiles": "[R]I",
+        "code": "I",
+        "xsmiles": "[*]I",
+        "xsmiles_label": "|$R$|"
+    }
+}

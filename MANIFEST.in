@@ -1,1 +1,7 @@
 include LICENSE
+
+include src/pycofbuilder/data/func_groups/*.cjson
+include src/pycofbuilder/data/conector/*.cjson
+include src/pycofbuilder/data/core/*/*.cjson
+
+recursive-include src/pycofbuilder/data *

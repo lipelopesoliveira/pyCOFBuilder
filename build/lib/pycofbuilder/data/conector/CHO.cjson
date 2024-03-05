@@ -1,0 +1,43 @@
+{
+    "chemical json": 1,
+    "name": "aldehyde",
+    "formula": "H1X1C1Q1",
+    "atoms": {
+        "elements": {
+            "type": [
+                "Q",
+                "C",
+                "X",
+                "H"
+            ],
+            "number": [
+                0.0,
+                6,
+                0.0,
+                1
+            ]
+        },
+        "coords": {
+            "3d": [
+                0.0,
+                0.0,
+                0.0,
+                0.95,
+                0.0,
+                0.0,
+                1.67508507,
+                -0.99023162,
+                0.0,
+                1.59769069,
+                0.90200463,
+                0.0
+            ]
+        }
+    },
+    "properties": {
+        "smiles": "[Q]C([H])=O",
+        "code": "CHO",
+        "xsmiles": "[*]C([H])=O",
+        "xsmiles_label": "|$Q;;;$|"
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "chemical json": 1,
+    "name": "hidroxylamine",
+    "formula": "X1O1Q1",
+    "atoms": {
+        "elements": {
+            "type": [
+                "Q",
+                "X",
+                "O"
+            ],
+            "number": [
+                0.0,
+                0.0,
+                8
+            ]
+        },
+        "coords": {
+            "3d": [
+                0.0,
+                0.0,
+                0.0,
+                0.881,
+                0.0,
+                0.0,
+                1.30826423,
+                1.33288775,
+                0.0
+            ]
+        }
+    },
+    "properties": {
+        "smiles": "[Q]NO",
+        "code": "NHOH",
+        "xsmiles": "[*]NO",
+        "xsmiles_label": "|$Q;;$|"
+    }
+}

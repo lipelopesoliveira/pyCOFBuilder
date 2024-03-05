@@ -1,0 +1,38 @@
+{
+    "chemical json": 1,
+    "name": "methyl",
+    "formula": "Q1H1X1",
+    "atoms": {
+        "elements": {
+            "type": [
+                "Q",
+                "H",
+                "X"
+            ],
+            "number": [
+                0.0,
+                1,
+                0.0
+            ]
+        },
+        "coords": {
+            "3d": [
+                0.0,
+                0.0,
+                0.0,
+                1.1,
+                1.0,
+                0.0,
+                0.881,
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "properties": {
+        "smiles": "[Q]CH",
+        "code": "CHH",
+        "xsmiles": "[*]CH",
+        "xsmiles_label": "|$Q;;H$|"
+    }
+}

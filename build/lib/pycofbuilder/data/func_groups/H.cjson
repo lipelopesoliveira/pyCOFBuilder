@@ -1,0 +1,33 @@
+{
+    "chemical json": 1,
+    "name": "hydrogen",
+    "formula": "R1H1",
+    "atoms": {
+        "elements": {
+            "type": [
+                "H",
+                "R"
+            ],
+            "number": [
+                1,
+                0.0
+            ]
+        },
+        "coords": {
+            "3d": [
+                0.0992,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "properties": {
+        "smiles": "[R][H]",
+        "code": "H",
+        "xsmiles": "[*][H]",
+        "xsmiles_label": "|$R;$|"
+    }
+}

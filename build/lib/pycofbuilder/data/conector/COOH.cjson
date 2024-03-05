@@ -1,0 +1,43 @@
+{
+    "chemical json": 1,
+    "name": "carboxylic acid",
+    "formula": "X1C1O1Q1",
+    "atoms": {
+        "elements": {
+            "type": [
+                "Q",
+                "C",
+                "X",
+                "O"
+            ],
+            "number": [
+                0.0,
+                6,
+                0.0,
+                8
+            ]
+        },
+        "coords": {
+            "3d": [
+                0.0,
+                0.0,
+                0.0,
+                0.95,
+                0.0,
+                0.0,
+                1.67508507,
+                -0.99023162,
+                0.0,
+                1.7420061,
+                0.9500463,
+                0.0
+            ]
+        }
+    },
+    "properties": {
+        "smiles": "[Q]C([O])=O",
+        "code": "COOH",
+        "xsmiles": "[*]C([O])=O",
+        "xsmiles_label": "|$Q;;;$|"
+    }
+}

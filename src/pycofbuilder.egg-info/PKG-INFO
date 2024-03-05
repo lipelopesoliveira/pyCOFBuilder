@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: pycofbuilder
-Version: 0.0.7.4
+Version: 0.0.7.6
 Summary: A package for Covalent Organic Frameworks sturcture creation based on the reticular approach.
 Home-page: https://github.com/lipelopesoliveira/pyCOFBuilder
 Author: Felipe Lopes Oliveira

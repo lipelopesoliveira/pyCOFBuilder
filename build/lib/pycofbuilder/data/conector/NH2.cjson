@@ -1,0 +1,33 @@
+{
+    "chemical json": 1,
+    "name": "amine",
+    "formula": "X1Q1",
+    "atoms": {
+        "elements": {
+            "type": [
+                "Q",
+                "X"
+            ],
+            "number": [
+                0.0,
+                0.0
+            ]
+        },
+        "coords": {
+            "3d": [
+                0.0,
+                0.0,
+                0.0,
+                0.8,
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "properties": {
+        "smiles": "[Q]N",
+        "code": "NH2",
+        "xsmiles": "[*]N",
+        "xsmiles_label": "|$Q;$|"
+    }
+}

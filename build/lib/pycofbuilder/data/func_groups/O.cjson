@@ -1,0 +1,33 @@
+{
+    "chemical json": 1,
+    "name": "keto",
+    "formula": "O1R1",
+    "atoms": {
+        "elements": {
+            "type": [
+                "O",
+                "R"
+            ],
+            "number": [
+                8,
+                0.0
+            ]
+        },
+        "coords": {
+            "3d": [
+                0.33475,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "properties": {
+        "smiles": "[R]=O",
+        "code": "O",
+        "xsmiles": "[*]=O",
+        "xsmiles_label": "|$R;$|"
+    }
+}

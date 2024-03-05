@@ -6,7 +6,7 @@ with open('LICENSE') as f:
     license = f.read()
 
 
-VERSION = '0.0.7.4'
+VERSION = '0.0.7.6'
 DESCRIPTION = 'A package for Covalent Organic Frameworks sturcture assembly.'
 
 setup(
@@ -19,6 +19,7 @@ setup(
     url='https://github.com/lipelopesoliveira/pyCOFBuilder',
     license=license,
     package_dir={'': 'src'},
+    package_data={'pycofbuilder': ['pycofbuilder/data/*']},
     install_requires=['simplejson',
                       'numpy>=1.6.3',
                       'scipy>=1.2',
