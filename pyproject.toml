@@ -1,6 +1,8 @@
+# pyproject.toml
+
 [project]
 name = "pycofbuilder"
-version = '0.0.7.2'
+version = '0.0.7.3'
 authors = [
   { name="Felipe Lopes", email="felipe.lopes@nano.ufrj.br" },
 ]

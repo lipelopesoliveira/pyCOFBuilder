@@ -21,7 +21,7 @@ import pycofbuilder.tools as Tools
 import pycofbuilder.io_tools as IO_Tools
 
 # Import ChemJSON
-import pycofbuilder.chemjson as ChemJSON
+import pycofbuilder.cjson as ChemJSON
 
 # Import Exceptions
 import pycofbuilder.exceptions as Exceptions
