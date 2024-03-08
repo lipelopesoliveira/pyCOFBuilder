@@ -33,11 +33,11 @@ from pycofbuilder.tools import (get_bond_atom,
                                 rotation_matrix_from_vectors,
                                 unit_vector,
                                 angle,
-                                get_framework_symm_text)
+                                get_framework_symm_text,
+                                get_bonds)
 
 # Import pycofbuilder io_tools
-from pycofbuilder.io_tools import (save_json,
-                                   save_chemjson,
+from pycofbuilder.io_tools import (save_chemjson,
                                    save_cif,
                                    save_xyz,
                                    save_turbomole,
@@ -120,6 +120,7 @@ class Framework():
         self.symm_tol = kwargs.get('symm_tol', 0.1)
         self.angle_tol = kwargs.get('angle_tol', 0.5)
         self.dist_threshold = kwargs.get('dist_threshold', 0.8)
+        self.bond_threshold = kwargs.get('bond_threshold', 1.3)
 
         self.bb1_name = None
         self.bb2_name = None
@@ -132,6 +133,7 @@ class Framework():
         self.atom_labels = []
         self.cellMatrix = np.eye(3)
         self.cellParameters = np.array([1, 1, 1, 90, 90, 90]).astype(float)
+        self.bonds = []
 
         self.lattice_sgs = None
         self.space_group = None
@@ -368,9 +370,24 @@ class Framework():
 
         result = net_build_dict[net](bb1, bb2, stacking, **kwargs)
 
+        structure = Structure(
+            self.cellMatrix,
+            self.atom_types,
+            self.atom_pos,
+            coords_are_cartesian=True,
+            site_properties={'source': self.atom_labels}
+        )
+
+        self.bonds = get_bonds(structure, self.bond_threshold)
+
         return result
 
-    def save(self, fmt: str = 'cif', supercell: list = [1, 1, 1], save_dir=None, primitive=False) -> None:
+    def save(self, 
+             fmt: str = 'cif',
+             supercell: list = [1, 1, 1],
+             save_dir=None,
+             primitive=False,
+             save_bonds=True) -> None:
         '''
         Save the structure in a specif file format.
 
@@ -392,7 +409,6 @@ class Framework():
         '''
 
         save_dict = {
-            'json': save_json,
             'cjson': save_chemjson,
             'cif': save_cif,
             'xyz': save_xyz,
@@ -422,6 +438,8 @@ class Framework():
 
         final_structure = structure.make_supercell(supercell, in_place=False)
 
+        bonds = get_bonds(final_structure, self.bond_threshold)
+
         structure_dict = final_structure.as_dict()
 
         cell = structure_dict['lattice']['matrix']
@@ -440,7 +458,8 @@ class Framework():
                        cell=cell,
                        atom_types=atom_types,
                        atom_labels=atom_labels,
-                       atom_pos=atom_pos)
+                       atom_pos=atom_pos,
+                       bonds=bonds)
 
 # --------------- Net creation methods -------------------------- #
 
