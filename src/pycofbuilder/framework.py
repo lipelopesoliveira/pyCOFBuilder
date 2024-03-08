@@ -438,7 +438,10 @@ class Framework():
 
         final_structure = structure.make_supercell(supercell, in_place=False)
 
-        bonds = get_bonds(final_structure, self.bond_threshold)
+        if save_bonds:
+            bonds = get_bonds(final_structure, self.bond_threshold)
+        else:
+            bonds = []
 
         structure_dict = final_structure.as_dict()
 
