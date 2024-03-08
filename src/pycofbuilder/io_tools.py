@@ -1048,7 +1048,7 @@ loop_
         u, v, w = atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]
         if atom_charges:
             atom_labels[i] = f"{atom_types[i]}{str(i + 1)}_{atom_labels[i]}"
-            cif_text += '{:<7}    {} {:>15.9f} {:>15.9f} {:>15.9f} {:>10.5f}\n'.format(
+            cif_text += '{:<15}    {} {:>15.9f} {:>15.9f} {:>15.9f} {:>10.5f}\n'.format(
                 f"{atom_types[i]}{str(i + 1)}_{atom_labels[i]}",
                 atom_types[i],
                 u,
@@ -1057,7 +1057,7 @@ loop_
                 atom_charges[i])
         else:
             atom_labels[i] = f"{atom_types[i]}{str(i + 1)}_{atom_labels[i]}"
-            cif_text += '{:<7}    {} {:>15.9f} {:>15.9f} {:>15.9f}\n'.format(
+            cif_text += '{:<15}    {} {:>15.9f} {:>15.9f} {:>15.9f}\n'.format(
                 f"{atom_types[i]}{str(i + 1)}_{atom_labels[i]}",
                 atom_types[i],
                 u,
@@ -1071,7 +1071,7 @@ loop_
         cif_text += '_geom_bond_distance\n'
 
         for bond in bonds:
-            cif_text += f'{atom_labels[bond[0]]:6} {atom_labels[bond[1]]:6} {bond[2]:.5f}\n'
+            cif_text += f'{atom_labels[bond[0]]:10} {atom_labels[bond[1]]:10} {bond[2]:.5f}\n'
 
     # Write cif_text to file
     cif_file = open(os.path.join(path, file_name + '.cif'), 'w')
