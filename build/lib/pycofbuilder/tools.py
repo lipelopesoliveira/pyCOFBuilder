@@ -1004,3 +1004,65 @@ def cell_to_ibrav(cell):
                   'celldm(6)': np.cos(np.deg2rad(gamma))}
 
     return celldm
+
+
+def is_bonded(atom1: str, atom2: str, dist: float, cutoff: float = 1.3):
+    """
+    Determine if two atoms are bonded based on the distance between them.
+    Two atoms are considered bonded if the distance between them is less than
+    the sum of their covalent radii multiplied by a cutoff factor.
+
+    Parameters
+    ----------
+    atom1 : str
+        Label of the first atom
+    atom2 : str
+        Label of the second atom
+    dist : float
+        Distance between the two atoms
+    cutoff : float
+        Cutoff factor for the covalent radii. Default: 1.3
+    """
+
+    periodic_table = elements_dict(property='covalent_radius')
+
+    # Get the covalent radii of the two atoms
+    cr_1 = periodic_table[atom1]
+    cr_2 = periodic_table[atom2]
+
+    # Calculate max bond distance
+    max_bond_distance = (cr_1 + cr_2) * cutoff
+
+    if dist < 0.6:
+        print('Distance between atoms is less than 0.6 Å. Check if the structure is correct.')
+
+    # Check if the distance is less than the cutoff
+    if 0.6 < dist <= max_bond_distance:
+        return True
+    else:
+        return False
+
+
+def get_bonds(structure, cutoff=1.3):
+    """
+    Get the bonded atoms in a structure based on the distance between them.
+
+    Parameters
+    ----------
+    structure : pymatgen.Structure
+        Structure object of pymatgen
+    cutoff : float
+        Cutoff factor for the covalent radii. Default: 1.3 Å
+    """
+
+    atom_types = [i.as_dict()['species'][0]['element'] for i in structure.sites]
+
+    # Get bonded atoms
+    center_indices, points_indies, _, bond_distances = structure.get_neighbor_list(5)
+    bonded_atoms = np.array([center_indices, points_indies, bond_distances]).T
+
+    bonded_atoms = [i for i in bonded_atoms if is_bonded(atom_types[int(i[0])], atom_types[int(i[1])], i[2], cutoff)]
+
+    bonded_atoms = [[int(i[0]), int(i[1]), i[2]] for i in bonded_atoms]
+
+    return bonded_atoms
