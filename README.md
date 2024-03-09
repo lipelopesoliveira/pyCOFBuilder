@@ -5,6 +5,8 @@
 
 [![image](https://img.shields.io/pypi/v/pycofbuilder.svg)](https://pypi.python.org/pypi/pycofbuilder/)
 [![Pyversions](https://img.shields.io/pypi/pyversions/pycofbuilder.svg?style=flat-square&label=Python%20Versions)](https://pypi.python.org/pypi/pycofbuilder)
+[![PyPI Downloads](https://img.shields.io/pypi/dm/pycofbuilder?logo=pypi&logoColor=white&color=blue&label=PyPI)](https://pypi.org/project/pycofbuilder)
+[![Paper](https://img.shields.io/badge/arXiv-2310.14822v2-blue?logo=arxiv&logoColor=white)](https://arxiv.org/abs/2310.14822)
 
 # What is pyCOFBuilder?
 
