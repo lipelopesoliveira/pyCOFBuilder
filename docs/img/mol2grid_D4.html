@@ -1,0 +1,562 @@
+<html>
+  <meta charset="utf-8">
+  <head>
+    <style>
+    #mols2grid.gridcontainer {
+    display: block;
+    padding-left: 1em;
+    max-width: 3232px;
+    width: 3232px;
+}
+#mols2grid .cell {
+    border: 1px solid #cccccc;
+    text-align: center;
+    vertical-align: top;
+    max-width: 400px;
+    width: 400px;
+    font-family: 'DejaVu', sans-serif;
+    font-size: 12pt;
+    padding: 0;
+    margin: 0px;
+    float: left;
+}
+#mols2grid .cell:hover {
+    background-color: #e7e7e7 !important;
+}
+#mols2grid .cell .data-img {
+    padding: 0;
+    margin: 0;
+}
+#mols2grid .cell img, #mols2grid .cell svg {
+    max-width: 100%;
+    height: auto;
+    padding: 0;
+}
+#mols2grid .data {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    display: block;
+}
+#mols2grid .arrow-asc:after {
+    content: '↑';
+    text-align: right;
+    float:right;
+}
+#mols2grid .arrow-desc:after {
+    content: '↓';
+    text-align: right;
+    float:right;
+}
+    /* custom CSS */
+    
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@rdkit/rdkit@2022.3.1/Code/MinimalLib/dist/RDKit_minimal.js"></script>
+    <!-- custom header -->
+    
+  </head>
+  <body>
+    <div id="mols2grid" class="gridcontainer grid-default">
+      <div class="row mb-3">
+        <div class="list"><div class="cell" data-mols2grid-id="0"><input type="checkbox" class="position-relative float-left cached_checkbox"><div class="data data-Name"></div><a tabindex="0" class="data data-img mols2grid-tooltip" data-toggle="popover" data-content="."></a><div class="data data-Code"></div><div class="data data-SMILES" style="display: none;"></div></div></div>
+      </div>
+      <div class="d-inline">
+        <ul class="pagination float-left"></ul>
+        <div id="controls" class="d-flex flex-row float-right">
+          
+          <div id="chkbox-dropdown" class="dropdown">
+    <button class="btn btn-light dropdown-toggle" type="button" id="chkboxDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">☑</button>
+    <div class="dropdown-menu" aria-labelledby="checkboxDropdownMenu">
+        <button id="btn-chkbox-all" class="dropdown-item" type="button">Check all</button>
+        <button id="btn-chkbox-match" class="dropdown-item" type="button">Check matching</button>
+        <button id="btn-chkbox-none" class="dropdown-item" type="button">Uncheck all</button>
+        <button id="btn-chkbox-invert" class="dropdown-item" type="button">Invert</button>
+        <div class="dropdown-divider"></div>
+        <button id="btn-chkbox-copy" class="dropdown-item" type="button">Copy to clipboard</button>
+        <button id="btn-chkbox-dlsmi" class="dropdown-item" type="button">Save SMILES</button>
+        <button id="btn-chkbox-dlcsv" class="dropdown-item" type="button">Save CSV</button>
+    </div>
+</div>
+          
+          <div id="sort-dropdown" class="dropdown pl-2">
+            <button class="btn btn-light dropdown-toggle" type="button" id="sortDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Sort by
+            </button>
+            <div class="dropdown-menu" aria-labelledby="sortDropdownMenu">
+              
+              
+              
+              
+              
+              <button class="dropdown-item sort-btn arrow-asc active" type="button" data-name="mols2grid-id">Index</button>
+              
+              
+              
+              
+              
+              <button class="dropdown-item sort-btn " type="button" data-name="data-Name">Name</button>
+              
+              
+              
+              
+              
+              <button class="dropdown-item sort-btn " type="button" data-name="data-Code">Code</button>
+              
+              
+              
+              <button class="dropdown-item sort-btn" type="button" data-name="checkbox">Selected</button>
+              
+            </div>
+          </div>
+          <div class="input-group row pl-4">
+            <input type="text" id="searchbar" class="form-control" placeholder="Search" aria-label="Search" aria-describedby="basic-addon1">
+            <div class="input-group-append">
+              <button id="searchBtn" class="btn btn-light dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">🔎</button>
+              <div class="dropdown-menu dropdown-menu-right">
+                <button id="txtSearch" class="search-btn dropdown-item active">Text</button>
+                <button id="smartsSearch" class="search-btn dropdown-item">SMARTS</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+    // list.js
+var listObj = new List('mols2grid', {
+    valueNames: [{data: ['mols2grid-id']}, 'data-SMILES', 'data-Code', 'data-img', 'data-Name', {attr: 'data-content', name: 'mols2grid-tooltip'}],
+    item: '<div class="cell" data-mols2grid-id="0"><input type="checkbox" class="position-relative float-left cached_checkbox"><div class="data data-Name"></div><a tabindex="0" class="data data-img mols2grid-tooltip" data-toggle="popover" data-content="."></a><div class="data data-Code"></div><div class="data data-SMILES" style="display: none;"></div></div>',
+    page: 48,
+    pagination: {
+        name: "pagination",
+        item: '<li class="page-item"><a class="page page-link" href="#" onclick="event.preventDefault()"></a></li>',
+        innerWindow: 1,
+        outerWindow: 1,
+    },
+});
+listObj.remove("mols2grid-id", "0");
+listObj.add([{"data-Code": "ADAM", "data-img": null, "data-Name": "adamantane", "data-SMILES": "C1C2(CC3(CC1(CC(C2)(C3)[*])[*])[*])[*] |$;;;;;;;;;;Q;Q;Q;Q$|", "mols2grid-id": 0, "mols2grid-tooltip": "<strong>Name</strong>: adamantane<br><strong>Code</strong>: ADAM"}, {"data-Code": "TKDM", "data-img": null, "data-Name": "tetra([1,1-biphenyl]-4-yl)methane", "data-SMILES": "[*]C1=C([*])C(C(C2=C([*])C([*])=C(C3=C([*])C([*])=C([*])C([*])=C3[*])C([*])=C2[*])(C4=C([*])C([*])=C(C5=C([*])C([*])=C([*])C([*])=C5[*])C([*])=C4[*])C6=C([*])C([*])=C(C7=C([*])C([*])=C([*])C([*])=C7[*])C([*])=C6[*])=C([*])C([*])=C1C8=C([*])C([*])=C([*])C([*])=C8[*] |$R5;;;R6;;;;;R7;;R8;;;;R3;;R4;;Q;;R1;;R2;;R5;;R6;;;R7;;R8;;;;R3;;R4;;Q;;R1;;R2;;R5;;R6;;;R7;;R8;;;;R3;;R4;;Q;;R1;;R2;;R5;;R6;;R7;;R8;;;;R3;;R4;;Q;;R1;;R2$|", "mols2grid-id": 1, "mols2grid-tooltip": "<strong>Name</strong>: tetra([1,1-biphenyl]-4-yl)methane<br><strong>Code</strong>: TKDM"}, {"data-Code": "TTPM", "data-img": null, "data-Name": "tetraphenylmethane", "data-SMILES": "[*]C(C([*])=C1[*])=C([*])C([*])=C1C(C2=C([*])C([*])=C([*])C([*])=C2[*])(C3=C([*])C([*])=C([*])C([*])=C3[*])C4=C([*])C([*])=C([*])C([*])=C4[*] |$Q;;;R1;;R2;;R4;;R3;;;;;R3;;R4;;Q;;R1;;R2;;;R3;;R4;;Q;;R1;;R2;;;R3;;R4;;Q;;R1;;R2$|", "mols2grid-id": 2, "mols2grid-tooltip": "<strong>Name</strong>: tetraphenylmethane<br><strong>Code</strong>: TTPM"}, {"data-Code": "TKAT", "data-img": null, "data-Name": "tetraphenyladamantane", "data-SMILES": "[*]C1=C([*])C([C@@]23C[C@H]4C(C5=C([*])C([*])=C([*])C([*])=C5[*])[C@@H](C2)[C@H](C6=C([*])C([*])=C([*])C([*])=C6[*])[C@@H](C3)[C@@H]4C7=C([*])C([*])=C([*])C([*])=C7[*])=C([*])C([*])=C1[*] |$R1;;;R2;;;;;;;;;R3;;R4;;Q;;R1;;R2;;;;;;;;R3;;R4;;Q;;R1;;R2;;;;;;;;R3;;R4;;Q;;R1;;R2;;R3;;R4;;Q$|", "mols2grid-id": 3, "mols2grid-tooltip": "<strong>Name</strong>: tetraphenyladamantane<br><strong>Code</strong>: TKAT"}, {"data-Code": "SBFE", "data-img": null, "data-Name": "9,9-spirobi[fluorene]", "data-SMILES": "[*]C(C([*])=C1[*])=C([*])C2=C1C3(C(C([*])=C([*])C([*])=C4[*])=C4C5=C3C([*])=C([*])C([*])=C5[*])C6=C2C([*])=C([*])C([*])=C6[*] |$Q;;;R1;;R2;;R3;;;;;;R2;;R1;;Q;;R3;;;;;R2;;R1;;Q;;R3;;;;R3;;Q;;R1;;R2$|", "mols2grid-id": 4, "mols2grid-tooltip": "<strong>Name</strong>: 9,9-spirobi[fluorene]<br><strong>Code</strong>: SBFE"}, {"data-Code": "TDAT", "data-img": null, "data-Name": "tetradiphenyladamantane", "data-SMILES": "[*]C1=C([*])C(C23C[C@H]4C(C5=C([*])C([*])=C(C6=C([*])C([*])=C([*])C([*])=C6[*])C([*])=C5[*])[C@@H](C2)[C@H](C7=C([*])C([*])=C(C8=C([*])C([*])=C([*])C([*])=C8[*])C([*])=C7[*])[C@@H](C3)[C@@H]4C9=C([*])C([*])=C(C%10=C([*])C([*])=C([*])C([*])=C%10[*])C([*])=C9[*])=C([*])C([*])=C1C%11=C([*])C([*])=C([*])C([*])=C%11[*] |$R5;;;R6;;;;;;;;;R7;;R8;;;;R3;;R4;;Q;;R1;;R2;;R5;;R6;;;;;;;;R7;;R8;;;;R3;;R4;;Q;;R1;;R2;;R5;;R6;;;;;;;;R7;;R8;;;;R3;;R4;;Q;;R1;;R2;;R5;;R6;;R7;;R8;;;;R3;;R4;;Q;;R1;;R2$|", "mols2grid-id": 5, "mols2grid-tooltip": "<strong>Name</strong>: tetradiphenyladamantane<br><strong>Code</strong>: TDAT"}]);
+// filter
+if (window.parent.mols2grid_lists === undefined) {
+    window.parent.mols2grid_lists = {};
+}
+window.parent.mols2grid_lists["default"] = listObj;
+
+
+// selection
+class MolStorage extends Map {
+    multi_set(_id, _smiles) {
+        for (let i=0; i < _id.length; i++) {
+            this.set(_id[i], _smiles[i]);
+        }
+    }
+    multi_del(_id) {
+        for (let i=0; i < _id.length; i++) {
+            this.delete(_id[i]);
+        };
+    }
+    to_dict() {
+        var content = "{";
+        for (let [key, value] of this) {
+            content += key + ":" + JSON.stringify(value) + ",";
+        }
+        content = content.length > 1 ? content.slice(0, -1) : content;
+        content += "}";
+        return content
+    }
+    download_smi(fileName) {
+        var content = "SMILES index\n";
+        for (let [key, value] of this) {
+            content += value + " " + key + "\n";
+        }
+        var a = document.createElement("a");
+        var file = new Blob([content], {type: "text/plain"});
+        a.href = URL.createObjectURL(file);
+        a.download = fileName;
+        a.click();
+        a.remove();
+    }
+}
+var SELECTION = new MolStorage();
+
+
+
+// kernel
+var kernel_env = null;
+if (window.parent.IPython !== undefined) {
+    // Jupyter notebook
+    kernel_env = "jupyter";
+    var kernel = window.parent.IPython.notebook.kernel;
+    kernel.execute('from mols2grid.select import register as _m2g_reg')
+    function add_selection(grid_id, _id, smiles) {
+        SELECTION.multi_set(_id, smiles);
+        kernel.execute("_m2g_reg.add_selection('"+grid_id+"', "+JSON.stringify(_id)+","+JSON.stringify(smiles)+")");
+    }
+    function del_selection(grid_id, _id) {
+        SELECTION.multi_del(_id);
+        kernel.execute("_m2g_reg.del_selection('"+grid_id+"', "+JSON.stringify(_id)+")");
+    }
+} else if (window.parent.google !== undefined) {
+    // Google colab
+    kernel_env = "colab";
+    var kernel = window.parent.google.colab.kernel;
+    function add_selection(grid_id, _id, smiles) {
+        SELECTION.multi_set(_id, smiles);
+        (async function() {
+        const result = await kernel.invokeFunction('_m2g_reg.add_selection',
+                                                   [grid_id, _id, smiles], {});
+        })();
+    }
+    function del_selection(grid_id, _id) {
+        SELECTION.multi_del(_id);
+        (async function() {
+        const result = await kernel.invokeFunction('_m2g_reg.del_selection',
+                                                   [grid_id, _id], {});
+        })();
+    }
+} else {
+    function add_selection(grid_id, _id, smiles) {
+        SELECTION.multi_set(_id, smiles);
+    }
+    function del_selection(grid_id, _id) {
+        SELECTION.multi_del(_id);
+    }
+}
+
+
+
+
+// sort
+var sort_field = "mols2grid-id";
+var sort_order = "asc";
+function mols2gridSortFunction(itemA, itemB, options) {
+    var x = itemA.values()[options.valueName];
+    var y = itemB.values()[options.valueName];
+    if (typeof x === "number") {
+        if (isFinite(x - y)) {
+            return x - y; 
+        } else {
+            return isFinite(x) ? -1 : 1;
+        }
+    } else {
+        x = x.toLowerCase();
+        y = y.toLowerCase();
+        return (x < y) ? -1: (x > y) ? 1: 0;
+    }
+}
+function checkboxSort(itemA, itemB, options) {
+    if (itemA.elm !== undefined) {
+        var checkedA = itemA.elm.firstChild.checked;
+        if (itemB.elm !== undefined) {
+            var checkedB = itemB.elm.firstChild.checked;
+            if (checkedA && !checkedB) {
+                return -1;
+            } else if (!checkedA && checkedB) {
+                return 1;
+            } else {
+                return 0;
+            }
+        } else {
+            return -1;
+        }
+    } else if (itemB.elm !== undefined) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+$('#mols2grid button.sort-btn').click(function(e) {
+    var _field = $(this).attr("data-name");
+    if (_field == sort_field) {
+        $(this).removeClass("arrow-" + sort_order)
+        sort_order = (sort_order === "desc") ? "asc" : "desc";
+    } else {
+        $('#mols2grid button.sort-btn.active').removeClass("active arrow-" + sort_order);
+        sort_order = "asc";
+        sort_field = _field;
+        $(this).addClass("active");
+    }
+    $(this).addClass("arrow-" + sort_order)
+    if (sort_field == "checkbox") {
+        listObj.sort("mols2grid-id", {order: sort_order, sortFunction: checkboxSort});
+    } else {
+        listObj.sort(_field, {order: sort_order, sortFunction: mols2gridSortFunction});
+    }
+});
+
+
+
+
+// tooltips
+$.fn.tooltip.Constructor.Default.whiteList.span = ['style']
+listObj.on("updated", function (list) {
+    $(function () {
+        // hide previous popovers
+        $('#mols2grid a.page-link').click(function(e) {
+            $('.mols2grid-tooltip[data-toggle="popover"]').popover('hide')
+        });
+        // create new popover
+        $('.mols2grid-tooltip[data-toggle="popover"]').popover({
+            placement: 'bottom',
+            trigger: 'click hover',
+            html: true,
+            sanitize: false,
+        });
+    })
+});
+
+
+
+// selection modifyers and export options
+// check all
+$('#btn-chkbox-all').click(function (e) {
+    var _id = [];
+    var _smiles = [];
+    listObj.items.forEach(function (item) {
+        if (item.elm) {
+            item.elm.getElementsByTagName("input")[0].checked = true;
+        } else {
+            item.show()
+            item.elm.getElementsByTagName("input")[0].checked = true;
+            item.hide()
+        }
+        _id.push(item.values()["mols2grid-id"]);
+        _smiles.push(item.values()["data-SMILES"]);
+    });
+    add_selection("default", _id, _smiles);
+});
+// check matching
+$('#btn-chkbox-match').click(function (e) {
+    var _id = [];
+    var _smiles = [];
+    listObj.matchingItems.forEach(function (item) {
+        if (item.elm) {
+            item.elm.getElementsByTagName("input")[0].checked = true;
+        } else {
+            item.show()
+            item.elm.getElementsByTagName("input")[0].checked = true;
+            item.hide()
+        }
+        _id.push(item.values()["mols2grid-id"]);
+        _smiles.push(item.values()["data-SMILES"]);
+    });
+    add_selection("default", _id, _smiles);
+});
+// uncheck all
+$('#btn-chkbox-none').click(function (e) {
+    var _id = [];
+    listObj.items.forEach(function (item) {
+        if (item.elm) {
+            item.elm.getElementsByTagName("input")[0].checked = false;
+        } else {
+            item.show()
+            item.elm.getElementsByTagName("input")[0].checked = false;
+            item.hide()
+        }
+        _id.push(item.values()["mols2grid-id"]);
+    });
+    del_selection("default", _id);
+});
+// invert
+$('#btn-chkbox-invert').click(function (e) {
+    var _id_add = [];
+    var _id_del = [];
+    var _smiles = [];
+    listObj.items.forEach(function (item) {
+        if (item.elm) {
+            var chkbox = item.elm.getElementsByTagName("input")[0]
+            chkbox.checked = !chkbox.checked;
+        } else {
+            item.show()
+            var chkbox = item.elm.getElementsByTagName("input")[0]
+            chkbox.checked = !chkbox.checked;
+            item.hide()
+        }
+        if (chkbox.checked) {
+            _id_add.push(item.values()["mols2grid-id"]);
+            _smiles.push(item.values()["data-SMILES"]);
+        } else {
+            _id_del.push(item.values()["mols2grid-id"]);
+        }
+    });
+    del_selection("default", _id_del);
+    add_selection("default", _id_add, _smiles);
+});
+// copy to clipboard
+$("#btn-chkbox-copy").click(function(e) {
+    navigator.clipboard.writeText(SELECTION.to_dict());
+});
+// export smiles
+$("#btn-chkbox-dlsmi").click(function(e) {
+    SELECTION.download_smi("selection.smi");
+});
+// export CSV
+$("#btn-chkbox-dlcsv").click(function(e) {
+    var sep = "\t"
+    // same order as subset + tooltip
+    var columns = Array.from(listObj.items[0].elm.querySelectorAll("div.data"))
+                       .map(elm => elm.classList[1]);
+    // remove 'data-'
+    var header = columns.map(name => name.slice(5));
+    // csv content
+    header = ["index"].concat(header).join(sep);
+    var content = header + "\n";
+    for (let [index, smiles] of SELECTION.entries()) {
+        var data = listObj.items[index].values();
+        content += index;
+        columns.forEach((key) => {
+            content += sep + data[key];
+        })
+        content += "\n";
+    }
+    var a = document.createElement("a");
+    var file = new Blob([content], {type: "text/csv"});
+    a.href = URL.createObjectURL(file);
+    a.download = "selection.csv";
+    a.click();
+    a.remove();
+});
+// update selection on checkbox click
+listObj.on("updated", function (list) {
+    $("input:checkbox").change(function() {
+        var _id = parseInt($(this).closest(".cell").attr("data-mols2grid-id"));
+        if (this.checked) {
+            var _smiles = $($(this).siblings(".data-SMILES")[0]).text();
+            add_selection("default", [_id], [_smiles]);
+        } else {
+            del_selection("default", [_id]);
+        }
+    }); 
+});
+
+
+
+
+
+// generate images for the currently displayed molecules
+var draw_opts = {"fixedBondLength": 20, "bondLineWidth": 2, "width": 400, "height": 150};
+var json_draw_opts = JSON.stringify(draw_opts);
+
+var smarts_matches = {};
+
+// Load RDKit
+window
+.initRDKitModule()
+.then(function(RDKit) {
+    console.log('RDKit version: ', RDKit.version());
+    window.RDKit = RDKit;
+    window.RDKitModule = RDKit;
+
+    // search bar
+    function SmartsSearch(query, columns) {
+    var smiles_col = columns[0];
+    smarts_matches = {};
+    var query = $('#mols2grid #searchbar').val();
+    var qmol = RDKit.get_qmol(query);
+    if (qmol.is_valid()) {
+        listObj.items.forEach(function (item) {
+            var smiles = item.values()[smiles_col]
+            var mol = RDKit.get_mol(smiles, '{"removeHs": false }');
+            if (mol.is_valid()) {
+                var results = mol.get_substruct_matches(qmol);
+                if (results === "\{\}") {
+                    item.found = false;
+                } else {
+                    item.found = true;
+                    
+                    results = JSON.parse(results);
+                    
+                    var highlights = {"atoms": [], "bonds": []};
+                    results.forEach(function (match) {
+                        highlights["atoms"].push(...match.atoms)
+                        highlights["bonds"].push(...match.bonds)
+                    });
+                    
+                    var index = item.values()["mols2grid-id"];
+                    smarts_matches[index] = highlights;
+                    
+                }
+            } else {
+                item.found = false;
+            }
+            mol.delete();
+        });
+    }
+    qmol.delete();
+}
+var search_type = "Text";
+$('#mols2grid .search-btn').click(function() {
+    search_type = $(this).text();
+    $('#mols2grid button.search-btn.active').removeClass("active");
+    $(this).addClass("active");
+});
+$('#mols2grid #searchbar').on("keyup", function(e) {
+    var query = e.target.value;
+    if (search_type === "Text") {
+        smarts_matches = {};
+        listObj.search(query, ['data-Name', 'data-Code', 'data-Name', 'data-Code']);
+    } else {
+        listObj.search(query, ["data-SMILES"], SmartsSearch);
+    }
+});
+
+    
+    // generate images for the currently displayed molecules
+RDKit.prefer_coordgen(true);
+function draw_mol(smiles, index, template_mol) {
+    var mol = RDKit.get_mol(smiles, '{"removeHs": false }');
+    var svg = "";
+    if (mol.is_valid()) {
+        var highlights = smarts_matches[index];
+        if (highlights) {
+            var details = Object.assign({}, draw_opts, highlights);
+            details = JSON.stringify(details);
+            mol.generate_aligned_coords(template_mol, true);
+        } else {
+            var details = json_draw_opts;
+        }
+        svg = mol.get_svg_with_highlights(details);
+    }
+    mol.delete();
+    if (svg == "") {
+        return '<svg width="400" height="150" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 400 150"></svg>';
+    }
+    return svg;
+}
+listObj.on("updated", function (list) {
+    var query = $('#mols2grid #searchbar').val();
+    var template_mol;
+    if (query === "") {
+        smarts_matches = {};
+        template_mol = null;
+    } else {
+        template_mol = RDKit.get_qmol(query);
+        template_mol.set_new_coords(true);
+    }
+    $('#mols2grid .cell').each(function() {
+        var $t = $(this);
+        var smiles = $t.children(".data-SMILES").first().text();
+        var index = parseInt(this.getAttribute("data-mols2grid-id"));
+        var svg = draw_mol(smiles, index, template_mol);
+        $t.children(".data-img").html(svg);
+    });
+    if (template_mol) {
+        template_mol.delete();
+    }
+});
+    
+
+    // trigger update to activate tooltips, draw images, setup callbacks...
+    listObj.update();
+    // resize iframe to fit content
+    if (window.frameElement) {
+        window.parent.fit_height(window.frameElement);
+    }
+});
+    </script>
+  </body>
+</html>

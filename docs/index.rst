@@ -45,6 +45,7 @@ Here you will find a list of the building blocks that are currently available in
 * :doc:`building_blocks/L2`
 * :doc:`building_blocks/T3`
 * :doc:`building_blocks/S4`
+* :doc:`building_blocks/D4`
 * :doc:`building_blocks/H6`
 * :doc:`building_blocks/Q`
 * :doc:`building_blocks/Func`

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pycofbuilder.io_tools &mdash; pyCOFBuilder 0.0.7.3 documentation</title>
+  <title>pycofbuilder.io_tools &mdash; pyCOFBuilder 0.0.7.6 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../_static/tabs.css?v=a5c4661c" />
@@ -15,7 +15,7 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=835efeea"></script>
+        <script src="../../_static/documentation_options.js?v=db576054"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="../../_static/tabs.js?v=3030b3cb"></script>
@@ -352,28 +352,39 @@
 
 <div class="viewcode-block" id="save_xsf">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.io_tools.save_xsf">[docs]</a>
-<span class="k">def</span> <span class="nf">save_xsf</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-             <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-             <span class="n">cell</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
-             <span class="n">atom_types</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-             <span class="n">atom_pos</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-             <span class="n">atom_labels</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-             <span class="n">frac_coords</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">save_xsf</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+             <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+             <span class="n">cell</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+             <span class="n">atom_types</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+             <span class="n">atom_labels</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+             <span class="n">atom_pos</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+             <span class="n">atom_charges</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">bonds</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">bond_orders</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">frac_coords</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Save a file in format `.xsf` on the `path`.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    path : str</span>
-<span class="sd">        Path to the file.</span>
+<span class="sd">        Path to the save the file.</span>
 <span class="sd">    file_name : str</span>
-<span class="sd">        Name of the file. Does not neet to contain the `.xsf` extention.</span>
+<span class="sd">        Name of the file. Does not neet to contain the extention.</span>
 <span class="sd">    cell : numpy array</span>
 <span class="sd">        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.</span>
+<span class="sd">    atom_types : list</span>
+<span class="sd">        List of strings containing containg the N atom types</span>
 <span class="sd">    atom_label : list</span>
-<span class="sd">        List of strings containing containg the N atom label.</span>
+<span class="sd">        List of strings containing containg the N atom labels</span>
 <span class="sd">    atom_pos : list</span>
 <span class="sd">        Nx3 array contaning the atoms coordinates.</span>
+<span class="sd">    atom_charges : list</span>
+<span class="sd">        List of strings containing containg the N atom partial charges.</span>
+<span class="sd">    bonds : list</span>
+<span class="sd">        List of lists containing the index of the bonded atoms and the bond length.</span>
+<span class="sd">    frac_coords : bool</span>
+<span class="sd">        If True, the coordinates are in fractional coordinates.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -408,31 +419,39 @@
 
 <div class="viewcode-block" id="save_pqr">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.io_tools.save_pqr">[docs]</a>
-<span class="k">def</span> <span class="nf">save_pqr</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-             <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-             <span class="n">cell</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
-             <span class="n">atom_types</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-             <span class="n">atom_pos</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-             <span class="n">atom_labels</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-             <span class="n">partial_charges</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-             <span class="n">frac_coords</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">save_pqr</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+             <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+             <span class="n">cell</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+             <span class="n">atom_types</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+             <span class="n">atom_labels</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+             <span class="n">atom_pos</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+             <span class="n">atom_charges</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">bonds</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">bond_orders</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">frac_coords</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Save a file in format `.pqr` on the `path`.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    path : str</span>
-<span class="sd">        Path to the file.</span>
+<span class="sd">        Path to the save the file.</span>
 <span class="sd">    file_name : str</span>
-<span class="sd">        Name of the file. Does not neet to contain the `.pqr` extention.</span>
+<span class="sd">        Name of the file. Does not neet to contain the extention.</span>
 <span class="sd">    cell : numpy array</span>
 <span class="sd">        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.</span>
+<span class="sd">    atom_types : list</span>
+<span class="sd">        List of strings containing containg the N atom types</span>
 <span class="sd">    atom_label : list</span>
-<span class="sd">        List of strings containing containg the N atom partial charges.</span>
+<span class="sd">        List of strings containing containg the N atom labels</span>
 <span class="sd">    atom_pos : list</span>
 <span class="sd">        Nx3 array contaning the atoms coordinates.</span>
-<span class="sd">    partial_charges: list</span>
+<span class="sd">    atom_charges : list</span>
 <span class="sd">        List of strings containing containg the N atom partial charges.</span>
+<span class="sd">    bonds : list</span>
+<span class="sd">        List of lists containing the index of the bonded atoms and the bond length.</span>
+<span class="sd">    frac_coords : bool</span>
+<span class="sd">        If True, the coordinates are in fractional coordinates.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -455,7 +474,7 @@
                                                                                         <span class="n">cell</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span>
                                                                                         <span class="n">cell</span><span class="p">[</span><span class="mi">5</span><span class="p">]))</span>
 
-    <span class="k">if</span> <span class="n">partial_charges</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">atom_charges</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">atom_line</span> <span class="o">=</span> <span class="s1">&#39;ATOM   </span><span class="si">{:&gt;4}</span><span class="s1"> </span><span class="si">{:&gt;2}</span><span class="s1">   MOL A   0    </span><span class="si">{:&gt;8.3f}{:&gt;8.3f}{:&gt;8.3f}</span><span class="s1">   </span><span class="si">{:&gt;15}</span><span class="se">\n</span><span class="s1">&#39;</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">atom_pos</span><span class="p">)):</span>
             <span class="n">pqr_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">atom_line</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
@@ -472,8 +491,16 @@
                                             <span class="n">atom_pos</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
                                             <span class="n">atom_pos</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
                                             <span class="n">atom_pos</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span>
-                                            <span class="n">partial_charges</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                            <span class="n">atom_charges</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
                                             <span class="n">atom_types</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+
+    <span class="k">if</span> <span class="n">bonds</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">bond_orders</span><span class="p">:</span>
+        <span class="n">bond_orders</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bonds</span><span class="p">))]</span>
+
+    <span class="k">if</span> <span class="n">bonds</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bonds</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">bond_orders</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
+                <span class="n">pqr_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;CONECT </span><span class="si">{</span><span class="n">bonds</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">:</span><span class="s1">4</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">bonds</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">:</span><span class="s1">4</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
     <span class="n">pqr_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
@@ -481,28 +508,39 @@
 
 <div class="viewcode-block" id="save_pdb">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.io_tools.save_pdb">[docs]</a>
-<span class="k">def</span> <span class="nf">save_pdb</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-             <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-             <span class="n">cell</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
-             <span class="n">atom_types</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-             <span class="n">atom_pos</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-             <span class="n">atom_labels</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-             <span class="n">frac_coords</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">save_pdb</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+             <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+             <span class="n">cell</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+             <span class="n">atom_types</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+             <span class="n">atom_labels</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+             <span class="n">atom_pos</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+             <span class="n">atom_charges</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">bonds</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">bond_orders</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">frac_coords</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Save a file in format `.pdb` on the `path`.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    path : str</span>
-<span class="sd">        Path to the file.</span>
+<span class="sd">        Path to the save the file.</span>
 <span class="sd">    file_name : str</span>
-<span class="sd">        Name of the file. Does not neet to contain the `.pdb` extention.</span>
+<span class="sd">        Name of the file. Does not neet to contain the extention.</span>
 <span class="sd">    cell : numpy array</span>
 <span class="sd">        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.</span>
+<span class="sd">    atom_types : list</span>
+<span class="sd">        List of strings containing containg the N atom types</span>
 <span class="sd">    atom_label : list</span>
-<span class="sd">        List of strings containing containg the N atom partial charges.</span>
+<span class="sd">        List of strings containing containg the N atom labels</span>
 <span class="sd">    atom_pos : list</span>
-<span class="sd">        Nx3 array contaning the atoms coordinates in cartesian form.</span>
+<span class="sd">        Nx3 array contaning the atoms coordinates.</span>
+<span class="sd">    atom_charges : list</span>
+<span class="sd">        List of strings containing containg the N atom partial charges.</span>
+<span class="sd">    bonds : list</span>
+<span class="sd">        List of lists containing the index of the bonded atoms and the bond length.</span>
+<span class="sd">    frac_coords : bool</span>
+<span class="sd">        If True, the coordinates are in fractional coordinates.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -535,40 +573,57 @@
                                         <span class="n">atom_pos</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span>
                                         <span class="n">atom_types</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
 
+    <span class="k">if</span> <span class="n">bonds</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">bond_orders</span><span class="p">:</span>
+        <span class="n">bond_orders</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bonds</span><span class="p">))]</span>
+
+    <span class="k">if</span> <span class="n">bonds</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bonds</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">bond_orders</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
+                <span class="n">pdb_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;CONECT </span><span class="si">{</span><span class="n">bonds</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">:</span><span class="s1">4</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">bonds</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">:</span><span class="s1">4</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
     <span class="n">pdb_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
 
 
 <div class="viewcode-block" id="save_gjf">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.io_tools.save_gjf">[docs]</a>
-<span class="k">def</span> <span class="nf">save_gjf</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-             <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-             <span class="n">cell</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-             <span class="n">atom_types</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-             <span class="n">atom_pos</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-             <span class="n">atom_labels</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-             <span class="n">frac_coords</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-             <span class="n">text</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;opt pm6&#39;</span><span class="p">):</span>
-
+<span class="k">def</span> <span class="nf">save_gjf</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+             <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+             <span class="n">cell</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+             <span class="n">atom_types</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+             <span class="n">atom_labels</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+             <span class="n">atom_pos</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+             <span class="n">atom_charges</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">bonds</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">bond_orders</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">frac_coords</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+             <span class="n">header</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;opt pm6&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Save a file in format `.gjf` on the `path`.</span>
+<span class="sd">    Save a file in format `.pqr` on the `path`.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    path : str</span>
-<span class="sd">        Path to the file.</span>
+<span class="sd">        Path to the save the file.</span>
 <span class="sd">    file_name : str</span>
-<span class="sd">        Name of the file. Does not neet to contain the `.gjf` extention.</span>
+<span class="sd">        Name of the file. Does not neet to contain the extention.</span>
 <span class="sd">    cell : numpy array</span>
 <span class="sd">        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.</span>
+<span class="sd">    atom_types : list</span>
+<span class="sd">        List of strings containing containg the N atom types</span>
 <span class="sd">    atom_label : list</span>
-<span class="sd">        List of strings containing containg the N atom partial charges.</span>
+<span class="sd">        List of strings containing containg the N atom labels</span>
 <span class="sd">    atom_pos : list</span>
 <span class="sd">        Nx3 array contaning the atoms coordinates.</span>
-<span class="sd">    text : str</span>
+<span class="sd">    atom_charges : list</span>
+<span class="sd">        List of strings containing containg the N atom partial charges.</span>
+<span class="sd">    bonds : list</span>
+<span class="sd">        List of lists containing the index of the bonded atoms and the bond length.</span>
+<span class="sd">    frac_coords : bool</span>
+<span class="sd">        If True, the coordinates are in fractional coordinates.</span>
+<span class="sd">    header : str</span>
 <span class="sd">        Parameters for Gaussian calculations.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
         <span class="n">cell</span> <span class="o">=</span> <span class="n">cellpar_to_cell</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span>
 
@@ -581,7 +636,7 @@
 
     <span class="n">temp_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">file_name</span> <span class="o">+</span> <span class="s1">&#39;.gjf&#39;</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
     <span class="n">temp_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;%chk=</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s1">.chk </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-    <span class="n">temp_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;# </span><span class="si">{</span><span class="n">text</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">temp_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;# </span><span class="si">{</span><span class="n">header</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="n">temp_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="n">temp_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="n">temp_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -603,28 +658,39 @@
 
 <div class="viewcode-block" id="save_xyz">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.io_tools.save_xyz">[docs]</a>
-<span class="k">def</span> <span class="nf">save_xyz</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-             <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-             <span class="n">cell</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
-             <span class="n">atom_types</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-             <span class="n">atom_pos</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-             <span class="n">atom_labels</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-             <span class="n">frac_coords</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">save_xyz</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+             <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+             <span class="n">cell</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+             <span class="n">atom_types</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+             <span class="n">atom_labels</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+             <span class="n">atom_pos</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+             <span class="n">atom_charges</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">bonds</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">bond_orders</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">frac_coords</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Save a file in format `.xyz` on the `path`.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    path : str</span>
-<span class="sd">        Path to the file.</span>
+<span class="sd">        Path to the save the file.</span>
 <span class="sd">    file_name : str</span>
-<span class="sd">        Name of the file. Does not neet to contain the `.xyz` extention.</span>
-<span class="sd">    atom_types : list</span>
-<span class="sd">        List of strings containing containg the N atom types</span>
-<span class="sd">    atom_pos : list</span>
-<span class="sd">        Nx3 array contaning the atoms coordinates.</span>
+<span class="sd">        Name of the file. Does not neet to contain the extention.</span>
 <span class="sd">    cell : numpy array</span>
 <span class="sd">        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.</span>
+<span class="sd">    atom_types : list</span>
+<span class="sd">        List of strings containing containg the N atom types</span>
+<span class="sd">    atom_label : list</span>
+<span class="sd">        List of strings containing containg the N atom labels</span>
+<span class="sd">    atom_pos : list</span>
+<span class="sd">        Nx3 array contaning the atoms coordinates.</span>
+<span class="sd">    atom_charges : list</span>
+<span class="sd">        List of strings containing containg the N atom partial charges.</span>
+<span class="sd">    bonds : list</span>
+<span class="sd">        List of lists containing the index of the bonded atoms and the bond length.</span>
+<span class="sd">    frac_coords : bool</span>
+<span class="sd">        If True, the coordinates are in fractional coordinates.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
@@ -657,27 +723,39 @@
 
 <div class="viewcode-block" id="save_turbomole">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.io_tools.save_turbomole">[docs]</a>
-<span class="k">def</span> <span class="nf">save_turbomole</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                   <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                   <span class="n">cell</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
-                   <span class="n">atom_types</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                   <span class="n">atom_pos</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                   <span class="n">atom_labels</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                   <span class="n">frac_coords</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Save the structure in Turbomole .coord format</span>
+<span class="k">def</span> <span class="nf">save_turbomole</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                   <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                   <span class="n">cell</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+                   <span class="n">atom_types</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+                   <span class="n">atom_labels</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+                   <span class="n">atom_pos</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+                   <span class="n">atom_charges</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                   <span class="n">bonds</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                   <span class="n">bond_orders</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                   <span class="n">frac_coords</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Save the structure in Turbomole .coord format on the `path`.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    path : str</span>
-<span class="sd">        Path to the file.</span>
+<span class="sd">        Path to the save the file.</span>
 <span class="sd">    file_name : str</span>
-<span class="sd">        Name of the file. Does not neet to contain the `.coord` extention.</span>
+<span class="sd">        Name of the file. Does not neet to contain the extention.</span>
 <span class="sd">    cell : numpy array</span>
 <span class="sd">        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.</span>
+<span class="sd">    atom_types : list</span>
+<span class="sd">        List of strings containing containg the N atom types</span>
 <span class="sd">    atom_label : list</span>
-<span class="sd">        List of strings containing containg the N atom partial charges.</span>
+<span class="sd">        List of strings containing containg the N atom labels</span>
 <span class="sd">    atom_pos : list</span>
 <span class="sd">        Nx3 array contaning the atoms coordinates.</span>
+<span class="sd">    atom_charges : list</span>
+<span class="sd">        List of strings containing containg the N atom partial charges.</span>
+<span class="sd">    bonds : list</span>
+<span class="sd">        List of lists containing the index of the bonded atoms and the bond length.</span>
+<span class="sd">    frac_coords : bool</span>
+<span class="sd">        If True, the coordinates are in fractional coordinates.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">cell</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
@@ -708,29 +786,39 @@
 
 <div class="viewcode-block" id="save_vasp">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.io_tools.save_vasp">[docs]</a>
-<span class="k">def</span> <span class="nf">save_vasp</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-              <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-              <span class="n">cell</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
-              <span class="n">atom_types</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-              <span class="n">atom_pos</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-              <span class="n">atom_labels</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-              <span class="n">frac_coords</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Save the structure in VASP .vasp format</span>
+<span class="k">def</span> <span class="nf">save_vasp</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+              <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+              <span class="n">cell</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+              <span class="n">atom_types</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+              <span class="n">atom_labels</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+              <span class="n">atom_pos</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+              <span class="n">atom_charges</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+              <span class="n">bonds</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+              <span class="n">bond_orders</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+              <span class="n">frac_coords</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Save the structure in VASP .vasp format on the `path`.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    path : str</span>
-<span class="sd">        Path to the file.</span>
+<span class="sd">        Path to the save the file.</span>
 <span class="sd">    file_name : str</span>
-<span class="sd">        Name of the file. Does not neet to contain the `.vasp` extention.</span>
+<span class="sd">        Name of the file. Does not neet to contain the extention.</span>
 <span class="sd">    cell : numpy array</span>
 <span class="sd">        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.</span>
+<span class="sd">    atom_types : list</span>
+<span class="sd">        List of strings containing containg the N atom types</span>
 <span class="sd">    atom_label : list</span>
-<span class="sd">        List of strings containing containg the N atom partial charges.</span>
+<span class="sd">        List of strings containing containg the N atom labels</span>
 <span class="sd">    atom_pos : list</span>
 <span class="sd">        Nx3 array contaning the atoms coordinates.</span>
-<span class="sd">    coords_are_cartesian : bool</span>
-<span class="sd">        If True, the coordinates are in cartesian coordinates.</span>
+<span class="sd">    atom_charges : list</span>
+<span class="sd">        List of strings containing containg the N atom partial charges.</span>
+<span class="sd">    bonds : list</span>
+<span class="sd">        List of lists containing the index of the bonded atoms and the bond length.</span>
+<span class="sd">    frac_coords : bool</span>
+<span class="sd">        If True, the coordinates are in fractional coordinates.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">cell</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
@@ -770,15 +858,19 @@
 
 <div class="viewcode-block" id="save_qe">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.io_tools.save_qe">[docs]</a>
-<span class="k">def</span> <span class="nf">save_qe</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">cell</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
-            <span class="n">atom_types</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">atom_pos</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">atom_labels</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">frac_coords</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-            <span class="n">calc_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;scf&#39;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="k">def</span> <span class="nf">save_qe</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">cell</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+            <span class="n">atom_types</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+            <span class="n">atom_labels</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+            <span class="n">atom_pos</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+            <span class="n">atom_charges</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">bonds</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">bond_orders</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">frac_coords</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">calc_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;scf&#39;</span><span class="p">,</span>
+            <span class="n">kspacing</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Save the structure in Quantum Espresso .pwscf format.</span>
 
 <span class="sd">    The `input_dict` can be used to specify the input parameters for the</span>
@@ -793,20 +885,28 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    path : str</span>
-<span class="sd">        Path to the file.</span>
+<span class="sd">        Path to the save the file.</span>
 <span class="sd">    file_name : str</span>
-<span class="sd">        Name of the file. Does not neet to contain the `.pwscf` extention.</span>
+<span class="sd">        Name of the file. Does not neet to contain the extention.</span>
 <span class="sd">    cell : numpy array</span>
 <span class="sd">        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.</span>
+<span class="sd">    atom_types : list</span>
+<span class="sd">        List of strings containing containg the N atom types</span>
 <span class="sd">    atom_label : list</span>
-<span class="sd">        List of strings containing containg the N atom labels.</span>
+<span class="sd">        List of strings containing containg the N atom labels</span>
 <span class="sd">    atom_pos : list</span>
 <span class="sd">        Nx3 array contaning the atoms coordinates.</span>
+<span class="sd">    atom_charges : list</span>
+<span class="sd">        List of strings containing containg the N atom partial charges.</span>
+<span class="sd">    bonds : list</span>
+<span class="sd">        List of lists containing the index of the bonded atoms and the bond length.</span>
 <span class="sd">    frac_coords : bool</span>
 <span class="sd">        If True, the coordinates are in fractional coordinates.</span>
 <span class="sd">    calc_type : str</span>
-<span class="sd">       Type of pw.x calculation. Can be &#39;scf&#39;, &#39;nscf&#39;, &#39;bands&#39;, and &#39;vc-relax&#39;.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">        Type of calculation. Can be &#39;scf&#39;, &#39;vc-relax&#39;, &#39;relax&#39;, &#39;md&#39;, &#39;vc-md&#39;, &#39;vc-tddft&#39;, &#39;tddft&#39;.</span>
+<span class="sd">    kspacing : float</span>
+<span class="sd">        Kpoints spacing in 1/Angstrom.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
         <span class="n">cell_matrix</span> <span class="o">=</span> <span class="n">cellpar_to_cell</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span>
@@ -857,7 +957,7 @@
     <span class="c1"># If the kpoints grid is not specified, calculate it automatically</span>
     <span class="k">if</span> <span class="s1">&#39;k_points&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">input_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
         <span class="k">if</span> <span class="s1">&#39;kspacing&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">input_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;kspacing&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.3</span>
+            <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;kspacing&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kspacing</span>
         <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;kpoints&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_kgrid</span><span class="p">(</span><span class="n">cell_matrix</span><span class="p">,</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;kspacing&#39;</span><span class="p">])</span>
 
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">file_name</span> <span class="o">+</span> <span class="s1">&#39;.pwscf&#39;</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -949,57 +1049,16 @@
 
 
 
-<div class="viewcode-block" id="save_json">
-<a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.io_tools.save_json">[docs]</a>
-<span class="k">def</span> <span class="nf">save_json</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">cell</span><span class="p">,</span> <span class="n">atom_types</span><span class="p">,</span> <span class="n">atom_pos</span><span class="p">,</span> <span class="n">atom_labels</span><span class="p">,</span> <span class="n">frac_coords</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Save a file in format `.json` on the `path`.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    path : str</span>
-<span class="sd">        Path to the file.</span>
-<span class="sd">    file_name : str</span>
-<span class="sd">        Name of the file. Does not neet to contain the `.cif` extention.</span>
-<span class="sd">    atom_label : list</span>
-<span class="sd">        List of strings containing containg the N atom partial charges.</span>
-<span class="sd">    atom_pos : list</span>
-<span class="sd">        Nx3 array contaning the atoms coordinates.</span>
-<span class="sd">    cell : numpy array</span>
-<span class="sd">        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-
-    <span class="n">cof_json</span> <span class="o">=</span> <span class="n">create_COF_json</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-        <span class="n">cell_par</span> <span class="o">=</span> <span class="n">cell_to_cellpar</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">cell</span><span class="p">))</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-        <span class="n">cell_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
-        <span class="n">cell_par</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-        <span class="n">cell_matrix</span> <span class="o">=</span> <span class="n">cellpar_to_cell</span><span class="p">(</span><span class="n">cell_par</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-
-    <span class="n">cof_json</span><span class="p">[</span><span class="s1">&#39;system&#39;</span><span class="p">][</span><span class="s1">&#39;geo_opt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-
-    <span class="n">cof_json</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;cell_matrix&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell_matrix</span>
-    <span class="n">cof_json</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;cell_parameters&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell_par</span>
-    <span class="n">cof_json</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;atom_labels&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">atom_types</span><span class="p">)</span>
-    <span class="n">cof_json</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;atom_pos&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">atom_pos</span><span class="p">)</span>
-
-    <span class="n">write_json</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">cof_json</span><span class="p">)</span></div>
-
-
-
 <div class="viewcode-block" id="save_chemjson">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.io_tools.save_chemjson">[docs]</a>
-<span class="k">def</span> <span class="nf">save_chemjson</span><span class="p">(</span><span class="n">path</span><span class="p">,</span>
-                  <span class="n">file_name</span><span class="p">,</span>
-                  <span class="n">cell</span><span class="p">,</span>
-                  <span class="n">atom_types</span><span class="p">,</span>
-                  <span class="n">atom_pos</span><span class="p">,</span>
-                  <span class="n">atom_labels</span><span class="p">,</span>
+<span class="k">def</span> <span class="nf">save_chemjson</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                  <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                  <span class="n">cell</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+                  <span class="n">atom_types</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+                  <span class="n">atom_labels</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+                  <span class="n">atom_pos</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+                  <span class="n">atom_charges</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                  <span class="n">bonds</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                   <span class="n">frac_coords</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Save a file in format `.json` on the `path`.</span>
@@ -1007,15 +1066,23 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    path : str</span>
-<span class="sd">        Path to the file.</span>
+<span class="sd">        Path to the save the file.</span>
 <span class="sd">    file_name : str</span>
-<span class="sd">        Name of the file. Does not neet to contain the `.cif` extention.</span>
-<span class="sd">    atom_label : list</span>
-<span class="sd">        List of strings containing containg the N atom partial charges.</span>
-<span class="sd">    atom_pos : list</span>
-<span class="sd">        Nx3 array contaning the atoms coordinates.</span>
+<span class="sd">        Name of the file. Does not neet to contain the extention.</span>
 <span class="sd">    cell : numpy array</span>
 <span class="sd">        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.</span>
+<span class="sd">    atom_types : list</span>
+<span class="sd">        List of strings containing containg the N atom types</span>
+<span class="sd">    atom_label : list</span>
+<span class="sd">        List of strings containing containg the N atom labels</span>
+<span class="sd">    atom_pos : list</span>
+<span class="sd">        Nx3 array contaning the atoms coordinates.</span>
+<span class="sd">    atom_charges : list</span>
+<span class="sd">        List of strings containing containg the N atom partial charges.</span>
+<span class="sd">    bonds : list</span>
+<span class="sd">        List of lists containing the index of the bonded atoms and the bond length.</span>
+<span class="sd">    frac_coords : bool</span>
+<span class="sd">        If True, the coordinates are in fractional coordinates.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -1032,7 +1099,8 @@
                                       <span class="n">AtomTypes</span><span class="o">=</span><span class="n">atom_types</span><span class="p">,</span>
                                       <span class="n">AtomPositions</span><span class="o">=</span><span class="n">atom_pos</span><span class="p">,</span>
                                       <span class="n">AtomLabels</span><span class="o">=</span><span class="n">atom_labels</span><span class="p">,</span>
-                                      <span class="n">CartesianPositions</span><span class="o">=</span><span class="ow">not</span> <span class="n">frac_coords</span><span class="p">)</span>
+                                      <span class="n">CartesianPositions</span><span class="o">=</span><span class="ow">not</span> <span class="n">frac_coords</span><span class="p">,</span>
+                                      <span class="n">BondIndexes</span><span class="o">=</span><span class="n">bonds</span><span class="p">)</span>
 
     <span class="n">write_json</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">chemJSON</span><span class="p">)</span></div>
 
@@ -1040,13 +1108,14 @@
 
 <div class="viewcode-block" id="save_cif">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.io_tools.save_cif">[docs]</a>
-<span class="k">def</span> <span class="nf">save_cif</span><span class="p">(</span><span class="n">path</span><span class="p">,</span>
-             <span class="n">file_name</span><span class="p">,</span>
-             <span class="n">cell</span><span class="p">,</span>
-             <span class="n">atom_types</span><span class="p">,</span>
-             <span class="n">atom_pos</span><span class="p">,</span>
-             <span class="n">atom_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-             <span class="n">partial_charges</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="k">def</span> <span class="nf">save_cif</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+             <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+             <span class="n">cell</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+             <span class="n">atom_types</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+             <span class="n">atom_labels</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+             <span class="n">atom_pos</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+             <span class="n">atom_charges</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">bonds</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
              <span class="n">frac_coords</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Save a file in format `.cif` on the `path`.</span>
@@ -1054,15 +1123,23 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    path : str</span>
-<span class="sd">        Path to the file.</span>
+<span class="sd">        Path to the save the file.</span>
 <span class="sd">    file_name : str</span>
-<span class="sd">        Name of the file. Does not neet to contain the `.cif` extention.</span>
-<span class="sd">    atom_label : list</span>
-<span class="sd">        List of strings containing containg the N atom partial charges.</span>
-<span class="sd">    atom_pos : list</span>
-<span class="sd">        Nx3 array contaning the atoms coordinates.</span>
+<span class="sd">        Name of the file. Does not neet to contain the extention.</span>
 <span class="sd">    cell : numpy array</span>
 <span class="sd">        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.</span>
+<span class="sd">    atom_types : list</span>
+<span class="sd">        List of strings containing containg the N atom types</span>
+<span class="sd">    atom_label : list</span>
+<span class="sd">        List of strings containing containg the N atom labels</span>
+<span class="sd">    atom_pos : list</span>
+<span class="sd">        Nx3 array contaning the atoms coordinates.</span>
+<span class="sd">    atom_charges : list</span>
+<span class="sd">        List of strings containing containg the N atom partial charges.</span>
+<span class="sd">    bonds : list</span>
+<span class="sd">        List of lists containing the index of the bonded atoms and the bond length.</span>
+<span class="sd">    frac_coords : bool</span>
+<span class="sd">        If True, the coordinates are in fractional coordinates.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -1080,7 +1157,7 @@
 
 <span class="s2">_audit_creation_date     </span><span class="si">{</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-</span><span class="si">%d</span><span class="s2">-%m&quot;</span><span class="p">)</span><span class="si">}</span>
 <span class="s2">_audit_creation_method   pyCOFBuilder</span>
-<span class="s2">_audit_author_name       &#39;Felipe Lopes de Oliveira&#39;</span>
+<span class="s2">_audit_author_name       &#39;</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">getlogin</span><span class="p">()</span><span class="si">}</span><span class="s2">&#39;</span>
 
 <span class="s2">_chemical_name_common                  &#39;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&#39;</span>
 <span class="s2">_cell_length_a                          </span><span class="si">{</span><span class="n">a</span><span class="si">:</span><span class="s2">&gt;10.6f</span><span class="si">}</span>
@@ -1104,7 +1181,7 @@
 <span class="s2">   _atom_site_fract_z</span>
 <span class="s2">&quot;&quot;&quot;</span>
 
-    <span class="k">if</span> <span class="n">partial_charges</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">atom_charges</span><span class="p">:</span>
         <span class="n">cif_text</span> <span class="o">+=</span> <span class="s1">&#39;   _atom_site_charge</span><span class="se">\n</span><span class="s1">&#39;</span>
 
     <span class="k">if</span> <span class="n">frac_coords</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
@@ -1114,21 +1191,32 @@
 
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">atom_pos</span><span class="p">)):</span>
         <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">atom_pos</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">atom_pos</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">atom_pos</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">partial_charges</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span><span class="p">:</span>
-            <span class="n">cif_text</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">{:&lt;7}</span><span class="s1">    </span><span class="si">{}</span><span class="s1"> </span><span class="si">{:&gt;15.9f}</span><span class="s1"> </span><span class="si">{:&gt;15.9f}</span><span class="s1"> </span><span class="si">{:&gt;15.9f}</span><span class="s1"> </span><span class="si">{:&gt;10.5f}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="k">if</span> <span class="n">atom_charges</span><span class="p">:</span>
+            <span class="n">atom_labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">atom_types</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}{</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">atom_labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">cif_text</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">{:&lt;15}</span><span class="s1">    </span><span class="si">{}</span><span class="s1"> </span><span class="si">{:&gt;15.9f}</span><span class="s1"> </span><span class="si">{:&gt;15.9f}</span><span class="s1"> </span><span class="si">{:&gt;15.9f}</span><span class="s1"> </span><span class="si">{:&gt;10.5f}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">atom_types</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}{</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">atom_labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
                 <span class="n">atom_types</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
                 <span class="n">u</span><span class="p">,</span>
                 <span class="n">v</span><span class="p">,</span>
                 <span class="n">w</span><span class="p">,</span>
-                <span class="n">partial_charges</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">atom_charges</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">cif_text</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">{:&lt;7}</span><span class="s1">    </span><span class="si">{}</span><span class="s1"> </span><span class="si">{:&gt;15.9f}</span><span class="s1"> </span><span class="si">{:&gt;15.9f}</span><span class="s1"> </span><span class="si">{:&gt;15.9f}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">atom_labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">atom_types</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}{</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">atom_labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">cif_text</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">{:&lt;15}</span><span class="s1">    </span><span class="si">{}</span><span class="s1"> </span><span class="si">{:&gt;15.9f}</span><span class="s1"> </span><span class="si">{:&gt;15.9f}</span><span class="s1"> </span><span class="si">{:&gt;15.9f}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">atom_types</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}{</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">atom_labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
                 <span class="n">atom_types</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
                 <span class="n">u</span><span class="p">,</span>
                 <span class="n">v</span><span class="p">,</span>
                 <span class="n">w</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">bonds</span><span class="p">:</span>
+        <span class="n">cif_text</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">loop_</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">cif_text</span> <span class="o">+=</span> <span class="s1">&#39;_geom_bond_atom_site_label_1</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">cif_text</span> <span class="o">+=</span> <span class="s1">&#39;_geom_bond_atom_site_label_2</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">cif_text</span> <span class="o">+=</span> <span class="s1">&#39;_geom_bond_distance</span><span class="se">\n</span><span class="s1">&#39;</span>
+
+        <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="n">bonds</span><span class="p">:</span>
+            <span class="n">cif_text</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">atom_labels</span><span class="p">[</span><span class="n">bond</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="si">:</span><span class="s1">10</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">atom_labels</span><span class="p">[</span><span class="n">bond</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="si">:</span><span class="s1">10</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">bond</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">:</span><span class="s1">.5f</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
 
     <span class="c1"># Write cif_text to file</span>
     <span class="n">cif_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">file_name</span> <span class="o">+</span> <span class="s1">&#39;.cif&#39;</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
@@ -1364,10 +1452,10 @@
                            <span class="n">CellParameters</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                            <span class="n">CellMatrix</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                            <span class="n">AtomTypes</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                           <span class="n">AtomLabels</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[],</span>
                            <span class="n">AtomPositions</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                            <span class="n">CartesianPositions</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                           <span class="n">AtomLabels</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[],</span>
-                           <span class="n">Bonds</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[],</span>
+                           <span class="n">BondIndexes</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[],</span>
                            <span class="n">BondOrders</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[],</span>
                            <span class="n">PartialCharges</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{},</span>
                            <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
@@ -1383,11 +1471,20 @@
 <span class="sd">        List with the cell parameters.</span>
 <span class="sd">    CellMatrix : list</span>
 <span class="sd">        List with the cell matrix. Optional</span>
+<span class="sd">    AtomTypes : list</span>
+<span class="sd">        List with the atom types.</span>
 <span class="sd">    AtomLabels : list</span>
 <span class="sd">        List with the atom labels.</span>
 <span class="sd">    AtomPositions : list</span>
 <span class="sd">        List with the atom positions.</span>
-
+<span class="sd">    CartesianPositions : bool</span>
+<span class="sd">        If True, the coordinates are in cartesian coordinates.</span>
+<span class="sd">    BondIndexes : list</span>
+<span class="sd">        List with the bonds indexes and bond length.</span>
+<span class="sd">    BondOrders : list</span>
+<span class="sd">        List with the bond orders.</span>
+<span class="sd">    PartialCharges : dict</span>
+<span class="sd">        Dictionary with the partial charges.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">chemJSON</span> <span class="o">=</span> <span class="n">create_empty_CJSON</span><span class="p">()</span>
@@ -1427,10 +1524,16 @@
         <span class="n">CartPosition</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">V_cart</span><span class="p">,</span> <span class="n">atom</span><span class="p">)</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">AtomPositions</span><span class="p">])</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
         <span class="n">chemJSON</span><span class="p">[</span><span class="s1">&#39;atoms&#39;</span><span class="p">][</span><span class="s1">&#39;coords&#39;</span><span class="p">][</span><span class="s1">&#39;3d&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CartPosition</span>
 
-    <span class="n">chemJSON</span><span class="p">[</span><span class="s1">&#39;atoms&#39;</span><span class="p">][</span><span class="s1">&#39;PartialCharges&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">PartialCharges</span>
+    <span class="k">if</span> <span class="n">PartialCharges</span> <span class="o">!=</span> <span class="p">{}:</span>
+        <span class="n">chemJSON</span><span class="p">[</span><span class="s1">&#39;atoms&#39;</span><span class="p">][</span><span class="s1">&#39;PartialCharges&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">PartialCharges</span>
 
-    <span class="n">chemJSON</span><span class="p">[</span><span class="s1">&#39;bonds&#39;</span><span class="p">][</span><span class="s1">&#39;connections&#39;</span><span class="p">][</span><span class="s1">&#39;index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Bonds</span>
-    <span class="n">chemJSON</span><span class="p">[</span><span class="s1">&#39;bonds&#39;</span><span class="p">][</span><span class="s1">&#39;order&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">BondOrders</span>
+    <span class="n">bond_indexes</span> <span class="o">=</span> <span class="p">[[</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">BondIndexes</span><span class="p">]</span>
+    <span class="n">bond_indexes</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">bond_indexes</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">row</span><span class="p">]</span>
+
+    <span class="n">bond_orders</span> <span class="o">=</span> <span class="n">BondOrders</span> <span class="k">if</span> <span class="n">BondOrders</span> <span class="o">!=</span> <span class="p">[]</span> <span class="k">else</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">bond_indexes</span><span class="p">)</span>
+
+    <span class="n">chemJSON</span><span class="p">[</span><span class="s1">&#39;bonds&#39;</span><span class="p">][</span><span class="s1">&#39;connections&#39;</span><span class="p">][</span><span class="s1">&#39;index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bond_indexes</span>
+    <span class="n">chemJSON</span><span class="p">[</span><span class="s1">&#39;bonds&#39;</span><span class="p">][</span><span class="s1">&#39;order&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bond_orders</span>
 
     <span class="k">return</span> <span class="n">chemJSON</span></div>
 
