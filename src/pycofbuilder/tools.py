@@ -759,7 +759,7 @@ def smiles_to_xsmiles(smiles_string: str) -> str:
         String containing the composition
     '''
     SPECIAL_ATOMS = ['Q', 'R', 'X']
-    REGULAR_ATOMS = ['C', 'N', 'H', 'O', 'S', 'B']
+    REGULAR_ATOMS = ['C', 'N', 'H', 'O', 'S', 'B', 'F']
 
     xsmiles = ''
     labels = []
