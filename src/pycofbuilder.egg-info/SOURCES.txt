@@ -21,7 +21,6 @@ src/pycofbuilder/data/periodic_table.json
 src/pycofbuilder/data/topology.py
 src/pycofbuilder/data/__pycache__/__init__.cpython-311.pyc
 src/pycofbuilder/data/__pycache__/topology.cpython-311.pyc
-src/pycofbuilder/data/__pycache__/topology.cpython-39.pyc
 src/pycofbuilder/data/conector/BOH2.cjson
 src/pycofbuilder/data/conector/Br.cjson
 src/pycofbuilder/data/conector/CH2CN.cjson
@@ -113,6 +112,7 @@ src/pycofbuilder/data/core/T3/TPTZ.cjson
 src/pycofbuilder/data/core/T3/TRZN.cjson
 src/pycofbuilder/data/core/T3/__init__.py
 src/pycofbuilder/data/func_groups/Br.cjson
+src/pycofbuilder/data/func_groups/CF3.cjson
 src/pycofbuilder/data/func_groups/CH3.cjson
 src/pycofbuilder/data/func_groups/CHO.cjson
 src/pycofbuilder/data/func_groups/CHS.cjson

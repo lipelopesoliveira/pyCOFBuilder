@@ -2,7 +2,7 @@
 
 [project]
 name = "pycofbuilder"
-version = '0.0.8'
+version = '0.0.8.1'
 authors = [
   { name="Felipe Lopes", email="felipe.lopes@nano.ufrj.br" },
 ]
