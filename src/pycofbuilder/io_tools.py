@@ -533,10 +533,10 @@ def save_gjf(path: str,
 
 def save_xyz(path: str,
              file_name: str,
-             cell: list,
              atom_types: list,
-             atom_labels: list,
              atom_pos: list,
+             atom_labels: list = None,
+             cell: list = None,
              atom_charges: list = None,
              bonds: list = None,
              bond_orders: list = None,
@@ -566,8 +566,8 @@ def save_xyz(path: str,
         If True, the coordinates are in fractional coordinates.
     """
 
-    if len(cell) == 3:
-        cell = cell_to_cellpar(cell)
+    if cell:
+        cell = cell_to_cellpar(cell) if len(cell) == 3 else cell
 
     if frac_coords:
         # Convert to fractional coordinates
@@ -628,7 +628,7 @@ def save_turbomole(path: str,
         If True, the coordinates are in fractional coordinates.
     """
 
-    if cell.shape == (3, 3):
+    if np.array(cell).shape == (3, 3):
         cell = cell_to_cellpar(cell)
 
     if frac_coords:
@@ -688,7 +688,7 @@ def save_vasp(path: str,
         If True, the coordinates are in fractional coordinates.
     """
 
-    if cell.shape == 6:
+    if np.array(cell).shape == 6:
         cell = cellpar_to_cell(cell)
 
     unique_atoms = []
@@ -1128,7 +1128,11 @@ def convert_xyz_2_gjf(path, file_name):
 
     atom_labels, atom_pos = read_xyz(path, file_name + '.xyz')
 
-    save_xyz(path, file_name + '.gjf', atom_labels, atom_pos)
+    save_gjf(path=path,
+             file_name=file_name + '.gjf',
+             atom_types=atom_labels,
+             atom_pos=atom_pos,
+             cell=[10, 10, 10, 90, 90, 90])
 
 
 def convert_cif_2_xyz(path, file_name, supercell=[1, 1, 1]):
