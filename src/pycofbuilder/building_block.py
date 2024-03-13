@@ -192,14 +192,15 @@ class BuildingBlock():
     def get_Q_points(self, atom_types, atom_pos):
         '''Get the Q points in a molecule'''
 
-        Q_labels, Q_pos = [], []
+        Q_labels, Q_pos, Q_index = [], [], []
 
-        for i in range(len(atom_types)):
-            if atom_types[i] == 'Q':
-                Q_labels += [atom_types[i]]
+        for i, atom in enumerate(atom_types):
+            if atom == 'Q':
+                Q_labels += [atom]
                 Q_pos += [atom_pos[i]]
+                Q_index += [i]
 
-        return Q_labels, np.array(Q_pos)
+        return Q_labels, np.array(Q_pos), Q_index
 
     def get_R_points(self, atom_types, atom_pos):
         """
@@ -397,12 +398,12 @@ class BuildingBlock():
         conector_pos = connector.cartesian_positions
 
         # Get the position of the Q points in the structure
-        _, Q_vec = self.get_Q_points(self.atom_types, self.atom_pos)
+        _, Q_vec, Q_idx = self.get_Q_points(self.atom_types, self.atom_pos)
 
         # Remove the Q atoms from structure
-        self.atom_types = self.atom_types[:-4]
-        self.atom_pos = self.atom_pos[:-4]
-        self.atom_labels = self.atom_labels[:-4]
+        self.atom_types = np.array([self.atom_types[i] for i in range(len(self.atom_types)) if i not in Q_idx])
+        self.atom_pos = np.array([self.atom_pos[i] for i in range(len(self.atom_pos)) if i not in Q_idx])
+        self.atom_labels = np.array([self.atom_labels[i] for i in range(len(self.atom_labels)) if i not in Q_idx])
 
         # Create the vector Q in the structure
         QS_vector = Q_vec[0]
@@ -561,8 +562,11 @@ class BuildingBlock():
         self.composition = core.formula
         self.atom_labels = ['C']*len(self.atom_types)
 
-        pref_orientation = unit_vector(
-            self.get_Q_points(core.atomic_types, core.cartesian_positions)[1][0])
+        if symmetry == 'D4':
+            pref_orientation = unit_vector(
+                self.get_Q_points(core.atomic_types, core.cartesian_positions)[1][0])
+        else:
+            pref_orientation = [0, 1, 0]
 
         if symmetry == 'D4':
             self.add_connection_group_symm(conector)
