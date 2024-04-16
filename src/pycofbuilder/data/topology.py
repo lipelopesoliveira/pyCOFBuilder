@@ -44,8 +44,8 @@ TOPOLOGY_DICT = {
             ]
         },
     'SQL': {
-        'a': 2/np.sqrt(2),
-        'b': 2/np.sqrt(2),
+        'a': 1,
+        'b': 1,
         'c': 3.6,
         'alpha': 90,
         'beta': 90,
@@ -59,8 +59,8 @@ TOPOLOGY_DICT = {
         'edges': []
         },
     'SQL_A': {
-        'a': 4/np.sqrt(2),
-        'b': 4/np.sqrt(2),
+        'a': 1,
+        'b': 1,
         'c': 3.6,
         'alpha': 90,
         'beta': 90,

@@ -60,6 +60,7 @@ src/pycofbuilder/data/core/L2/BENZ.cjson
 src/pycofbuilder/data/core/L2/BPNY.cjson
 src/pycofbuilder/data/core/L2/BPYB.cjson
 src/pycofbuilder/data/core/L2/BTPH.cjson
+src/pycofbuilder/data/core/L2/DFDB.cjson
 src/pycofbuilder/data/core/L2/DFFE.cjson
 src/pycofbuilder/data/core/L2/DHPI.cjson
 src/pycofbuilder/data/core/L2/DHSI.cjson
@@ -85,6 +86,7 @@ src/pycofbuilder/data/core/L2/TPDI.cjson
 src/pycofbuilder/data/core/L2/TPNY.cjson
 src/pycofbuilder/data/core/L2/TTPH.cjson
 src/pycofbuilder/data/core/L2/__init__.py
+src/pycofbuilder/data/core/R4/TPDT.cjson
 src/pycofbuilder/data/core/S4/CoBTC.cjson
 src/pycofbuilder/data/core/S4/CuBTC.cjson
 src/pycofbuilder/data/core/S4/NiBTC.gjf

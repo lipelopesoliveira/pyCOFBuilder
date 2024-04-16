@@ -382,7 +382,7 @@ class Framework():
 
         return result
 
-    def save(self, 
+    def save(self,
              fmt: str = 'cif',
              supercell: list = [1, 1, 1],
              save_dir=None,
@@ -1285,8 +1285,8 @@ class Framework():
                 len(symm_op)]
 
     def create_sql_structure(self,
-                             BB_S4_A: str,
-                             BB_S4_B: str,
+                             BB_A: str,
+                             BB_B: str,
                              stacking: str = 'AA',
                              slab: float = 10.0,
                              shift_vector: list = [1.0, 1.0, 0],
@@ -1325,52 +1325,61 @@ class Framework():
         """
 
         connectivity_error = 'Building block {} must present connectivity {} not {}'
-        if BB_S4_A.connectivity != 4:
-            self.logger.error(connectivity_error.format('A', 4, BB_S4_A.connectivity))
-            raise BBConnectivityError(4, BB_S4_A.connectivity)
-        if BB_S4_B.connectivity != 4:
-            self.logger.error(connectivity_error.format('B', 4, BB_S4_B.connectivity))
-            raise BBConnectivityError(4, BB_S4_B.connectivity)
+        if BB_A.connectivity != 4:
+            self.logger.error(connectivity_error.format('A', 4, BB_A.connectivity))
+            raise BBConnectivityError(4, BB_A.connectivity)
+        if BB_B.connectivity != 4:
+            self.logger.error(connectivity_error.format('B', 4, BB_B.connectivity))
+            raise BBConnectivityError(4, BB_B.connectivity)
 
-        self.name = f'{BB_S4_A.name}-{BB_S4_B.name}-SQL-{stacking}'
+        self.name = f'{BB_A.name}-{BB_B.name}-SQL-{stacking}'
         self.topology = 'SQL'
         self.staking = stacking
         self.dimension = 2
 
-        self.charge = BB_S4_A.charge + BB_S4_B.charge
-        self.chirality = BB_S4_A.chirality or BB_S4_B.chirality
+        self.charge = BB_A.charge + BB_B.charge
+        self.chirality = BB_A.chirality or BB_B.chirality
 
         self.logger.debug(f'Starting the creation of {self.name}')
 
+        # Get the positions of the "X" atoms
+        _, X_A = BB_A.get_X_points()
+        _, X_B = BB_B.get_X_points()
+
+        # Calculate the alpha angle for the rotation of the building blocks
+        alpha_A = -np.arctan2(X_A[0][1] - X_A[-1][1], X_A[0][0] - X_A[-1][0])
+        alpha_B = -np.arctan2(X_B[0][1] - X_B[-1][1], X_B[0][0] - X_B[-1][0])
+
         # Detect the bond atom from the connection groups type
-        bond_atom = get_bond_atom(BB_S4_A.conector, BB_S4_B.conector)
+        bond_atom = get_bond_atom(BB_A.conector, BB_B.conector)
 
         self.logger.debug('{} detected as bond atom for groups {} and {}'.format(bond_atom,
-                                                                                 BB_S4_A.conector,
-                                                                                 BB_S4_B.conector))
+                                                                                 BB_A.conector,
+                                                                                 BB_B.conector))
 
         # Replace "X" the building block
-        BB_S4_A.replace_X(bond_atom)
+        BB_A.replace_X(bond_atom)
 
         # Remove the "X" atoms from the the building block
-        BB_S4_A.remove_X()
-        BB_S4_B.remove_X()
+        BB_A.remove_X()
+        BB_B.remove_X()
 
         # Get the topology information
         topology_info = TOPOLOGY_DICT[self.topology]
 
         # Measure the base size of the building blocks
-        size = BB_S4_A.size[0] + BB_S4_B.size[0]
+        size_A = (np.abs(BB_A.size[0] * np.sin(alpha_A)) + np.abs(BB_B.size[0] * np.cos(alpha_B))) * 2
+        size_B = (np.abs(BB_A.size[0] * np.cos(alpha_A)) + np.abs(BB_B.size[0] * np.cos(alpha_B))) * 2
 
         # Calculate the delta size to add to the c parameter
-        delta_a = abs(max(np.transpose(BB_S4_A.atom_pos)[2])) + abs(min(np.transpose(BB_S4_B.atom_pos)[2]))
-        delta_b = abs(max(np.transpose(BB_S4_A.atom_pos)[2])) + abs(min(np.transpose(BB_S4_B.atom_pos)[2]))
+        delta_a = abs(max(np.transpose(BB_A.atom_pos)[2])) + abs(min(np.transpose(BB_B.atom_pos)[2]))
+        delta_b = abs(max(np.transpose(BB_A.atom_pos)[2])) + abs(min(np.transpose(BB_B.atom_pos)[2]))
 
         delta_max = max([delta_a, delta_b])
 
         # Calculate the cell parameters
-        a = topology_info['a'] * size
-        b = topology_info['b'] * size
+        a = topology_info['a'] * size_A
+        b = topology_info['b'] * size_B
         c = topology_info['c'] + delta_max
         alpha = topology_info['alpha']
         beta = topology_info['beta']
@@ -1389,28 +1398,26 @@ class Framework():
         self.atom_pos = []
 
         # Add the first building block to the structure
-        vertice_data = topology_info['vertices'][0]
-        self.atom_types += BB_S4_A.atom_types
-        vertice_pos = np.array(vertice_data['position'])*a
+        self.atom_types += BB_A.atom_types
+        vertice_pos = np.array([0, 0, 0])
 
-        R_Matrix = R.from_euler('z', vertice_data['angle'], degrees=True).as_matrix()
+        R_Matrix = R.from_euler('z', -alpha_A, degrees=False).as_matrix()
 
-        rotated_pos = np.dot(BB_S4_A.atom_pos, R_Matrix) + vertice_pos
+        rotated_pos = np.dot(BB_A.atom_pos, R_Matrix)
         self.atom_pos += rotated_pos.tolist()
 
-        self.atom_labels += ['C1' if i == 'C' else i for i in BB_S4_A.atom_labels]
+        self.atom_labels += ['C1' if i == 'C' else i for i in BB_A.atom_labels]
 
         # Add the second building block to the structure
-        vertice_data = topology_info['vertices'][1]
-        self.atom_types += BB_S4_B.atom_types
-        vertice_pos = np.array(vertice_data['position'])*a
+        self.atom_types += BB_B.atom_types
+        vertice_pos = np.array([a/2, b/2, 0])
 
-        R_Matrix = R.from_euler('z', vertice_data['angle'], degrees=True).as_matrix()
+        R_Matrix = R.from_euler('z', -alpha_B, degrees=False).as_matrix()
 
-        rotated_pos = np.dot(BB_S4_B.atom_pos, R_Matrix) + vertice_pos
+        rotated_pos = np.dot(BB_B.atom_pos, R_Matrix) + vertice_pos
         self.atom_pos += rotated_pos.tolist()
 
-        self.atom_labels += ['C2' if i == 'C' else i for i in BB_S4_B.atom_labels]
+        self.atom_labels += ['C2' if i == 'C' else i for i in BB_B.atom_labels]
 
         StartingFramework = Structure(
             self.cellMatrix,
@@ -1752,6 +1759,12 @@ class Framework():
 
         self.logger.debug(f'Starting the creation of {self.name}')
 
+        # Get the position of the "X" atoms
+        _, X_S4 = BB_S4.get_X_points()
+
+        # Calculate the alpha angle for the rotation of the building blocks
+        alpha_S4 = -np.arctan2(X_S4[0][1] - X_S4[-1][1], X_S4[0][0] - X_S4[-1][0])
+
         # Detect the bond atom from the connection groups type
         bond_atom = get_bond_atom(BB_S4.conector, BB_L2.conector)
 
@@ -1770,7 +1783,8 @@ class Framework():
         topology_info = TOPOLOGY_DICT[self.topology]
 
         # Measure the base size of the building blocks
-        size = BB_S4.size[0] + BB_L2.size[0]
+        size_A = ((BB_S4.size[0] + BB_L2.size[0]) * np.abs(np.sin(alpha_S4))) * 4
+        size_B = ((BB_S4.size[0] + BB_L2.size[0]) * np.abs(np.cos(alpha_S4))) * 4
 
         # Calculate the delta size to add to the c parameter
         delta_a = abs(max(np.transpose(BB_S4.atom_pos)[2])) + abs(min(np.transpose(BB_S4.atom_pos)[2]))
@@ -1779,8 +1793,8 @@ class Framework():
         delta_max = max([delta_a, delta_b])
 
         # Calculate the cell parameters
-        a = topology_info['a'] * size
-        b = topology_info['b'] * size
+        a = topology_info['a'] * size_A
+        b = topology_info['b'] * size_B
         c = topology_info['c'] + delta_max
         alpha = topology_info['alpha']
         beta = topology_info['beta']
@@ -1801,21 +1815,23 @@ class Framework():
         # Add the building blocks to the structure
         for vertice_data in topology_info['vertices']:
             self.atom_types += BB_S4.atom_types
-            vertice_pos = np.array(vertice_data['position'])*a
+            vertice_pos = np.array(vertice_data['position']) * np.array([a, b, c])
 
-            R_Matrix = R.from_euler('z', vertice_data['angle'], degrees=True).as_matrix()
+            R_Matrix = R.from_euler('z', -alpha_S4, degrees=False).as_matrix()
 
             rotated_pos = np.dot(BB_S4.atom_pos, R_Matrix) + vertice_pos
             self.atom_pos += rotated_pos.tolist()
 
             self.atom_labels += ['C1' if i == 'C' else i for i in BB_S4.atom_labels]
 
-        # Add the building blocks to the structure
-        for edge_data in topology_info['edges']:
-            self.atom_types += BB_L2.atom_types
-            edge_pos = np.array(edge_data['position'])*a
+        L2_angle_list = [-alpha_S4, alpha_S4, -alpha_S4, alpha_S4]
 
-            R_Matrix = R.from_euler('z', edge_data['angle'], degrees=True).as_matrix()
+        # Add the building blocks to the structure
+        for i, edge_data in enumerate(topology_info['edges']):
+            self.atom_types += BB_L2.atom_types
+            edge_pos = np.array(edge_data['position']) * np.array([a, b, c])
+
+            R_Matrix = R.from_euler('z', L2_angle_list[i], degrees=False).as_matrix()
 
             rotated_pos = np.dot(BB_L2.atom_pos, R_Matrix) + edge_pos
             self.atom_pos += rotated_pos.tolist()
@@ -2927,8 +2943,8 @@ class Framework():
                 len(symm_op)]
 
     def create_fxt_structure(self,
-                             BB_S4_A: str,
-                             BB_S4_B: str,
+                             BB_R4_A: str,
+                             BB_R4_B: str,
                              stacking: str = 'AA',
                              print_result: bool = True,
                              slab: float = 10.0,
@@ -2940,10 +2956,10 @@ class Framework():
 
         Parameters
         ----------
-        BB_S4_A : BuildingBlock, required
-            The BuildingBlock object of the tetrapodal Buiding Block A
-        BB_S4_B : BuildingBlock, required
-            The BuildingBlock object of the tetrapodal Buiding Block B
+        BB_R4_A : BuildingBlock, required
+            The BuildingBlock object of the rectangular tetrapodal Buiding Block A
+        BB_R4_B : BuildingBlock, required
+            The BuildingBlock object of the rectangular tetrapodal Buiding Block B
         stacking : str, optional
             The stacking pattern of the COF layers (default is 'AA')
         print_result : bool, optional
@@ -2968,46 +2984,50 @@ class Framework():
         """
 
         connectivity_error = 'Building block {} must present connectivity {} not {}'
-        if BB_S4_A.connectivity != 4:
-            self.logger.error(connectivity_error.format('A', 4, BB_S4_A.connectivity))
-            raise BBConnectivityError(4, BB_S4_A.connectivity)
-        if BB_S4_B.connectivity != 4:
-            self.logger.error(connectivity_error.format('B', 4, BB_S4_B.connectivity))
-            raise BBConnectivityError(4, BB_S4_B.connectivity)
+        if BB_R4_A.connectivity != 4:
+            self.logger.error(connectivity_error.format('A', 4, BB_R4_A.connectivity))
+            raise BBConnectivityError(4, BB_R4_A.connectivity)
+        if BB_R4_B.connectivity != 4:
+            self.logger.error(connectivity_error.format('B', 4, BB_R4_B.connectivity))
+            raise BBConnectivityError(4, BB_R4_B.connectivity)
 
-        self.name = f'{BB_S4_A.name}-{BB_S4_B.name}-FXT-{stacking}'
+        self.name = f'{BB_R4_A.name}-{BB_R4_B.name}-FXT-{stacking}'
         self.topology = 'FXT'
         self.staking = stacking
         self.dimension = 2
 
-        self.charge = BB_S4_A.charge + BB_S4_B.charge
-        self.chirality = BB_S4_A.chirality or BB_S4_B.chirality
+        self.charge = BB_R4_A.charge + BB_R4_B.charge
+        self.chirality = BB_R4_A.chirality or BB_R4_B.chirality
 
         self.logger.debug(f'Starting the creation of {self.name}')
 
         # Detect the bond atom from the connection groups type
-        bond_atom = get_bond_atom(BB_S4_A.conector, BB_S4_B.conector)
+        bond_atom = get_bond_atom(BB_R4_A.conector, BB_R4_B.conector)
 
         self.logger.debug('{} detected as bond atom for groups {} and {}'.format(bond_atom,
-                                                                                 BB_S4_A.conector,
-                                                                                 BB_S4_B.conector))
+                                                                                 BB_R4_A.conector,
+                                                                                 BB_R4_B.conector))
+
+        # Get the position of the X atom in the building blocks
+        BB_R4_A.get_X_points(bond_atom)
+        BB_R4_B.get_X_points(bond_atom)
 
         # Replace "X" the building block
-        BB_S4_A.replace_X(bond_atom)
+        BB_R4_A.replace_X(bond_atom)
 
         # Remove the "X" atoms from the the building block
-        BB_S4_A.remove_X()
-        BB_S4_B.remove_X()
+        BB_R4_A.remove_X()
+        BB_R4_B.remove_X()
 
         # Get the topology information
         topology_info = TOPOLOGY_DICT[self.topology]
 
         # Measure the base size of the building blocks
-        size = 2 * (BB_S4_A.size[0] + BB_S4_B.size[0])
+        size = 2 * (BB_R4_A.size[0] + BB_R4_B.size[0])
 
         # Calculate the delta size to add to the c parameter
-        delta_a = abs(max(np.transpose(BB_S4_A.atom_pos)[2])) + abs(min(np.transpose(BB_S4_B.atom_pos)[2]))
-        delta_b = abs(max(np.transpose(BB_S4_A.atom_pos)[2])) + abs(min(np.transpose(BB_S4_B.atom_pos)[2]))
+        delta_a = abs(max(np.transpose(BB_R4_A.atom_pos)[2])) + abs(min(np.transpose(BB_R4_B.atom_pos)[2]))
+        delta_b = abs(max(np.transpose(BB_R4_A.atom_pos)[2])) + abs(min(np.transpose(BB_R4_B.atom_pos)[2]))
 
         delta_max = max([delta_a, delta_b])
 
@@ -3033,27 +3053,27 @@ class Framework():
 
         # Add the first building block to the structure
         vertice_data = topology_info['vertices'][0]
-        self.atom_types += BB_S4_A.atom_types
+        self.atom_types += BB_R4_A.atom_types
         vertice_pos = np.array(vertice_data['position'])*a
 
         R_Matrix = R.from_euler('z', vertice_data['angle'], degrees=True).as_matrix()
 
-        rotated_pos = np.dot(BB_S4_A.atom_pos, R_Matrix) + vertice_pos
+        rotated_pos = np.dot(BB_R4_A.atom_pos, R_Matrix) + vertice_pos
         self.atom_pos += rotated_pos.tolist()
 
-        self.atom_labels += ['C1' if i == 'C' else i for i in BB_S4_A.atom_labels]
+        self.atom_labels += ['C1' if i == 'C' else i for i in BB_R4_A.atom_labels]
 
         # Add the second building block to the structure
         for vertice_data in topology_info['vertices'][1:]:
-            self.atom_types += BB_S4_B.atom_types
+            self.atom_types += BB_R4_B.atom_types
             vertice_pos = np.array(vertice_data['position'])*a
 
             R_Matrix = R.from_euler('z', vertice_data['angle'], degrees=True).as_matrix()
 
-            rotated_pos = np.dot(BB_S4_B.atom_pos, R_Matrix) + vertice_pos
+            rotated_pos = np.dot(BB_R4_B.atom_pos, R_Matrix) + vertice_pos
             self.atom_pos += rotated_pos.tolist()
 
-            self.atom_labels += ['C2' if i == 'C' else i for i in BB_S4_B.atom_labels]
+            self.atom_labels += ['C2' if i == 'C' else i for i in BB_R4_B.atom_labels]
 
         StartingFramework = Structure(
             self.cellMatrix,

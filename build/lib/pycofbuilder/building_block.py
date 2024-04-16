@@ -63,7 +63,7 @@ class BuildingBlock():
 
         self.available_symmetry = ['L2',
                                    'T3',
-                                   'S4', 'D4',  # 'R4'
+                                   'S4', 'D4', 'R4',
                                    'H6',  # 'O6', 'P6'
                                    # 'C8', 'A8', 'E8'
                                    # 'B12', 'I12', 'U12', 'X12'
@@ -659,7 +659,7 @@ class BuildingBlock():
         if symm in self.available_symmetry:
             symm_check = True
         else:
-            print('ERROR!: Building Block symmetry must be L2, T3, S4, or H6.')
+            print('ERROR!: Building Block symmetry be one of the following:', ','.join(self.available_symmetry))
             symm_check = False
 
         if core in BB_dict[symm]:
