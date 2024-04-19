@@ -8,6 +8,7 @@
 [![PyPI Downloads](https://img.shields.io/pypi/dm/pycofbuilder?logo=pypi&style=flat-square&logoColor=white&color=blue&label=PyPI)](https://pypi.org/project/pycofbuilder)
 [![GitHub release](https://img.shields.io/github/release/lipelopesoliveira/pycofbuilder.svg?style=flat-square&logo=github)](https://GitHub.com/lipelopesoliveira/pycofbuilder/releases/)
 [![Paper](https://img.shields.io/badge/arXiv-2310.14822v2-red?logo=arxiv&logoColor=white&style=flat-square)](https://arxiv.org/abs/2310.14822)
+[![Paper](https://img.shields.io/badge/JCIM-10.1021/acs.jcim.3c01918-red?logo=acs&logoColor=white&style=flat-square)](https://doi.org/10.1021/acs.jcim.3c01918)
 [![GitHub license](https://img.shields.io/github/license/lipelopesoliveira/pycofbuilder.svg?style=flat-square)](https://github.com/lipelopesoliveira/pycofbuilder/blob/master/LICENSE)
 
 # What is pyCOFBuilder?
