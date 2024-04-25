@@ -9,9 +9,9 @@ authors:
   orcid: "https://orcid.org/0000-0001-6048-4690"
 title: "pyCOFBuilder: A python package for automated assembly of Covalent Organic Framework structures"
 version: 0.0.8.3
-doi: 10.48550/arXiv.2310.14822
-date-released: 2023-10-23
-url: "https://arxiv.org/abs/2310.14822"
+doi: 10.1021/acs.jcim.3c01918
+date-released: 2024-03-30
+url: "https://doi.org/10.1021/acs.jcim.3c01918"
 preferred-citation:
   type: article
   authors:
@@ -21,7 +21,10 @@ preferred-citation:
   - family-names: "Mothé Esteves"
     given-names: "Pierre"
     orcid: "https://orcid.org/0000-0001-6048-4690"
-  doi: "10.48550/arXiv.2310.14822"
-  journal: "arXiv preprint arXiv:2310.14822"
+  doi: 10.1021/acs.jcim.3c01918
+  journal: "J. Chem. Inf. Model."
   title: "pyCOFBuilder: A python package for automated assembly of Covalent Organic Framework structures"
-  year: 2023
+  year: 2024
+  volume: 64
+  number: 8
+  pages: 3278-3289
