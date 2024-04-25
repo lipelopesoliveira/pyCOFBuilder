@@ -162,5 +162,5 @@ If you find **pyCOFBuilder** useful in your research please consider citing the 
 
 > F. L. Oliveira and P. M. Esteves,
 > _pyCOFBuilder: A python package for automated creation of Covalent Organic Framework models based on the reticular approach_
->
-> _arxiv.org/abs/2310.14822_ [DOI](https://doi.org/10.48550/arXiv.2310.14822)
+> J. Chem. Inf. Model. 2024, 64, 8, 3278–3289
+> _10.1021/acs.jcim.3c01918_ [DOI](https://doi.org/10.1021/acs.jcim.3c01918)
