@@ -436,14 +436,14 @@ class Framework():
                 site_properties={'source': self.atom_labels}
             )
 
-        final_structure = structure.make_supercell(supercell, in_place=False)
+        structure.make_supercell(supercell)
 
         if save_bonds:
-            bonds = get_bonds(final_structure, self.bond_threshold)
+            bonds = get_bonds(structure, self.bond_threshold)
         else:
             bonds = []
 
-        structure_dict = final_structure.as_dict()
+        structure_dict = structure.as_dict()
 
         cell = structure_dict['lattice']['matrix']
 
