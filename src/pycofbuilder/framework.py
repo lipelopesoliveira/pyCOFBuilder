@@ -281,10 +281,10 @@ class Framework():
             A tuple with the building blocks names, the net and the stacking.
         """
 
-        string_error = 'FrameworkName must be in the format: BB1_BB2_Net_Stacking'
+        string_error = 'FrameworkName must be a string'
         assert isinstance(FrameworkName, str), string_error
 
-        name_error = 'FrameworkName must be in the format: BB1_BB2_Net_Stacking'
+        name_error = 'FrameworkName must be in the format: BB1-BB2-Net-Stacking'
         assert len(FrameworkName.split('-')) == 4, name_error
 
         bb1_name, bb2_name, Net, Stacking = FrameworkName.split('-')
