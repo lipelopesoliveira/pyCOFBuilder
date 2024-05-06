@@ -218,7 +218,9 @@ class Framework():
         return fram_str
 
     def get_n_atoms(self) -> int:
-        ''' Returns the number of atoms in the unitary cell'''
+        """
+        Returns the number of atoms in the unitary cell
+        """
         return len(self.atom_types)
 
     def get_available_topologies(self, dimensionality: str = 'all', print_result: bool = True):
