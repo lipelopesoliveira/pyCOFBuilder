@@ -13,7 +13,8 @@ from scipy.spatial import distance
 
 
 def elements_dict(property='atomic_mass'):
-    '''Returns a dictionary containing the elements symbol and its selected property.
+    """
+    Returns a dictionary containing the elements symbol and its selected property.
 
     Parameters
     ----------
@@ -38,7 +39,7 @@ def elements_dict(property='atomic_mass'):
     -------
     prop_dic : dictionary
         A dictionary containing the elements symbol and its respective property.
-    '''
+    """
 
     file_name = os.path.join(os.path.dirname(__file__), 'data', 'periodic_table.json')
 
@@ -98,7 +99,7 @@ def angle(v1, v2, unit='degree'):
 
 
 def rotation_matrix_from_vectors(vec1, vec2):
-    '''
+    """
     Find the rotation matrix that aligns vec1 to vec2
 
     Parameters
@@ -111,7 +112,7 @@ def rotation_matrix_from_vectors(vec1, vec2):
     -------
     rotation_matrix : array
         A transform matrix (3x3) which when applied to vec1, aligns it with vec2.
-    '''
+    """
     a, b = (vec1 / np.linalg.norm(vec1)).reshape(3), (vec2 / np.linalg.norm(vec2)).reshape(3)
     v = np.cross(a, b)
     c = np.dot(a, b)
@@ -463,7 +464,7 @@ def create_CellBox(A, B, C, alpha, beta, gamma):
 
 
 def calculate_UnitCells(cell, cutoff):
-    '''
+    """
     Calculate the number of unit cell repetitions so that all supercell lengths are larger than
     twice the interaction potential cut-off radius.
 
@@ -481,7 +482,7 @@ def calculate_UnitCells(cell, cutoff):
     -------
     superCell
         (3,1) list containg the number of repiting units in `x`, `y`, `z` directions.
-    '''
+    """
 
     # Make sure that the cell is in the format of cell matrix
     if len(cell) == 6:
@@ -570,7 +571,7 @@ def find_index(element, e_list):
 
 
 def change_X_atoms(atom_labels, atom_pos, bond_atom) -> tuple:
-    '''
+    """
     Changes the X atom for the desired bond_atom or remove it if bond_atom == 'R'.
 
     Parameters
@@ -585,7 +586,7 @@ def change_X_atoms(atom_labels, atom_pos, bond_atom) -> tuple:
         List containing the processed atom labels
     pos : list
         List containing the processed atom position
-    '''
+    """
     label, pos = [], []
 
     for i in range(len(atom_labels)):
@@ -600,7 +601,7 @@ def change_X_atoms(atom_labels, atom_pos, bond_atom) -> tuple:
 
 
 def closest_atom(label_1: str, pos_1: list, labels: list, pos: list):
-    '''
+    """
     Find the closest atom to a given atom
 
     Parameters
@@ -622,7 +623,7 @@ def closest_atom(label_1: str, pos_1: list, labels: list, pos: list):
         Array containing the position of the closest atom
     euclidian_distance : float
         Euclidian distance between the two atoms
-    '''
+    """
 
     list_labels = []
     list_pos = []
@@ -645,7 +646,9 @@ def closest_atom(label_1: str, pos_1: list, labels: list, pos: list):
 
 
 def closest_atom_struc(label_1, pos_1, labels, pos):
-    '''Finds the closest atom on the structure to a given atom'''
+    """
+    Finds the closest atom on the structure to a given atom
+    """
 
     list_labels = []
     list_pos = []
@@ -665,9 +668,9 @@ def closest_atom_struc(label_1, pos_1, labels, pos):
 
 
 def get_bond_atom(connector_1: str, connector_2: str) -> str:
-    '''
+    """
     Get the atom that will be used to bond two building blocks.
-    '''
+    """
 
     bond_dict = {
         'NH2': 'N',
@@ -693,7 +696,9 @@ def get_bond_atom(connector_1: str, connector_2: str) -> str:
 
 
 def get_framework_symm_text(name, lattice, hall, space_group, space_number, symm_op):
-    '''Get the text for the framework symmop'''
+    """
+    Get the text for the framework symmop
+    """
     text = '{:<60s} {:^12s} {:<4s} {:^4s} #{:^5s}   {:^2} sym. op.'.format(name,
                                                                            lattice,
                                                                            hall.lstrip('-'),
@@ -704,7 +709,9 @@ def get_framework_symm_text(name, lattice, hall, space_group, space_number, symm
 
 
 def print_framework_name(name, lattice, hall, space_group, space_number, symm_op):
-    '''Print the results of the created structure'''
+    """
+    Print the results of the created structure
+    """
     print('{:<60s} {:^12s} {:<4s} {:^4s} #{:^5s}   {:^2} sym. op.'.format(name,
                                                                           lattice,
                                                                           hall.lstrip('-'),
@@ -741,7 +748,7 @@ def formula_from_atom_list(AtomLabels: list) -> str:
 
 
 def smiles_to_xsmiles(smiles_string: str) -> str:
-    '''
+    """
     Converts a SMILES string to an extended SMILES string with labels
 
     Parameters
@@ -757,7 +764,7 @@ def smiles_to_xsmiles(smiles_string: str) -> str:
         xsmiles labels for images with the special labels
     composition : str
         String containing the composition
-    '''
+    """
     SPECIAL_ATOMS = ['Q', 'R', 'X']
     REGULAR_ATOMS = ['C', 'N', 'H', 'O', 'S', 'B', 'F']
 
@@ -908,14 +915,14 @@ def ibrav_to_cell(ibrav, celldm1, celldm2, celldm3, celldm4, celldm5, celldm6):
 
 
 def equal_value(val1, val2, threshold=1e-3) -> bool:
-    '''
+    """
     Determine if two values are equal based on a given threshold.
-    '''
+    """
     return abs(val1 - val2) <= threshold
 
 
 def classify_unit_cell(cell, thr=1e-3) -> str:
-    '''
+    """
     Determine the bravais lattice based on the cell lattice.
     The cell lattice can be the cell parameters as (6,1) array or
     the cell vectors as (3x3) array.
@@ -934,7 +941,7 @@ def classify_unit_cell(cell, thr=1e-3) -> str:
     -------
     cell_type : string
         Bravais lattice.
-    '''
+    """
 
     if len(cell) == 3:
         a, b, c, alpha, beta, gamma = cell_to_cellpar(cell)
@@ -961,9 +968,9 @@ def classify_unit_cell(cell, thr=1e-3) -> str:
 
 
 def cell_to_ibrav(cell):
-    '''
+    """
     Return the ibrav number for a given cell.
-    '''
+    """
 
     if len(cell) == 3:
         a, b, c, alpha, beta, gamma = cell_to_cellpar(cell)

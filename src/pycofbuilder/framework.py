@@ -388,7 +388,7 @@ class Framework():
              save_dir=None,
              primitive=False,
              save_bonds=True) -> None:
-        '''
+        """
         Save the structure in a specif file format.
 
         Parameters
@@ -406,7 +406,7 @@ class Framework():
         primitive : bool, optional
             If True, the primitive cell is saved. Otherwise, the conventional cell is saved.
             Default: False
-        '''
+        """
 
         save_dict = {
             'cjson': save_chemjson,
@@ -471,7 +471,7 @@ class Framework():
                              BB_T3_B,
                              stacking: str = 'AA',
                              slab: float = 10.0,
-                             shift_vector: list = [1.0, 1.0, 0],
+                             shift_vector: list = (1.0, 1.0, 0),
                              tilt_angle: float = 5.0):
         """Creates a COF with HCB network.
 
@@ -3854,9 +3854,9 @@ class Framework():
 
         rotated_list = [
              R.from_rotvec(
-                 angle * unit_vector(topology_info['vertices'][0]['align_v']), degrees=False
+                 a * unit_vector(topology_info['vertices'][0]['align_v']), degrees=False
                  ).apply(Q_vertice_pos)
-             for angle in np.linspace(0, 2*np.pi, 360)
+             for a in np.linspace(0, 2*np.pi, 360)
              ]
 
         # Calculate the angle between the vertice_pos and the elements of rotated_list
@@ -3885,9 +3885,9 @@ class Framework():
 
         rotated_list = [
              R.from_rotvec(
-                 angle * unit_vector(topology_info['vertices'][0]['align_v']), degrees=False
+                 a * unit_vector(topology_info['vertices'][0]['align_v']), degrees=False
                  ).apply(Q_vertice_pos)
-             for angle in np.linspace(0, 2*np.pi, 360)
+             for a in np.linspace(0, 2*np.pi, 360)
              ]
 
         # Calculate the angle between the vertice_pos and the elements of rotated_list
@@ -4098,9 +4098,9 @@ class Framework():
 
         rotated_list = [
              R.from_rotvec(
-                 angle * unit_vector(topology_info['vertices'][0]['align_v']), degrees=False
+                 a * unit_vector(topology_info['vertices'][0]['align_v']), degrees=False
                  ).apply(Q_vertice_pos)
-             for angle in np.linspace(0, 2*np.pi, 360)
+             for a in np.linspace(0, 2*np.pi, 360)
              ]
 
         # Calculate the angle between the vertice_pos and the elements of rotated_list
