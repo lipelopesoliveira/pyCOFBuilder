@@ -13,6 +13,7 @@ import numpy as np
 # Import pymatgen
 from pymatgen.core import Lattice, Structure
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
+from pymatgen.transformations.advanced_transformations import CubicSupercellTransformation
 
 from scipy.spatial.transform import Rotation as R
 
@@ -465,6 +466,51 @@ class Framework():
                        atom_labels=atom_labels,
                        atom_pos=atom_pos,
                        bonds=bonds)
+
+    def make_cubic(self,
+                   min_length=10,
+                   force_diagonal=False,
+                   force_90_degrees=True,
+                   min_atoms=None,
+                   max_atoms=None,
+                   angle_tolerance=1e-3):
+        """
+        Transform the primitive structure into a supercell with alpha, beta, and
+        gamma equal to 90 degrees. The algorithm will iteratively increase the size
+        of the supercell until the largest inscribed cube's side length is at least 'min_length'
+        and the number of atoms in the supercell falls in the range ``min_atoms < n < max_atoms``.
+
+        Parameters
+        ----------
+        min_length : float, optional
+            Minimum length of the cubic cell (default is 10)
+        force_diagonal : bool, optional
+            If True, generate a transformation with a diagonal transformation matrix (default is False)
+        force_90_degrees : bool, optional
+            If True, force the angles to be 90 degrees (default is True)
+        min_atoms : int, optional
+            Minimum number of atoms in the supercell (default is None)
+        max_atoms : int, optional
+            Maximum number of atoms in the supercell (default is None)
+        angle_tolerance : float, optional
+            The angle tolerance for the transformation (default is 1e-3)
+        """
+
+        cubic_dict = CubicSupercellTransformation(
+            min_length=min_length,
+            force_90_degrees=force_90_degrees,
+            force_diagonal=force_diagonal,
+            min_atoms=min_atoms,
+            max_atoms=max_atoms,
+            angle_tolerance=angle_tolerance
+            ).apply_transformation(self.prim_structure).as_dict()
+
+        self.cellMatrix = np.array(cubic_dict['lattice']['matrix']).astype(float)
+        self.cellParameters = cell_to_cellpar(self.cellMatrix)
+
+        self.atom_types = [i['label'] for i in cubic_dict['sites']]
+        self.atom_pos = [i['xyz'] for i in cubic_dict['sites']]
+        self.atom_labels = [i['properties']['source'] for i in cubic_dict['sites']]
 
 # --------------- Net creation methods -------------------------- #
 
