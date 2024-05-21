@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: pycofbuilder
-Version: 0.0.8.3
+Version: 0.0.8.4
 Summary: A package for Covalent Organic Frameworks sturcture creation based on the reticular approach.
 Home-page: https://github.com/lipelopesoliveira/pyCOFBuilder
 Author: Felipe Lopes Oliveira
@@ -62,6 +62,7 @@ Requires-Dist: ase
 [![PyPI Downloads](https://img.shields.io/pypi/dm/pycofbuilder?logo=pypi&style=flat-square&logoColor=white&color=blue&label=PyPI)](https://pypi.org/project/pycofbuilder)
 [![GitHub release](https://img.shields.io/github/release/lipelopesoliveira/pycofbuilder.svg?style=flat-square&logo=github)](https://GitHub.com/lipelopesoliveira/pycofbuilder/releases/)
 [![Paper](https://img.shields.io/badge/arXiv-2310.14822v2-red?logo=arxiv&logoColor=white&style=flat-square)](https://arxiv.org/abs/2310.14822)
+[![Paper](https://img.shields.io/badge/JCIM-10.1021/acs.jcim.3c01918-red?logo=acs&logoColor=white&style=flat-square)](https://doi.org/10.1021/acs.jcim.3c01918)
 [![GitHub license](https://img.shields.io/github/license/lipelopesoliveira/pycofbuilder.svg?style=flat-square)](https://github.com/lipelopesoliveira/pycofbuilder/blob/master/LICENSE)
 
 # What is pyCOFBuilder?
@@ -215,5 +216,5 @@ If you find **pyCOFBuilder** useful in your research please consider citing the 
 
 > F. L. Oliveira and P. M. Esteves,
 > _pyCOFBuilder: A python package for automated creation of Covalent Organic Framework models based on the reticular approach_
->
-> _arxiv.org/abs/2310.14822_ [DOI](https://doi.org/10.48550/arXiv.2310.14822)
+> J. Chem. Inf. Model. 2024, 64, 8, 3278–3289
+> _10.1021/acs.jcim.3c01918_ [DOI](https://doi.org/10.1021/acs.jcim.3c01918)

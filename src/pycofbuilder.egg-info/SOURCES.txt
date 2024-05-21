@@ -38,6 +38,7 @@ src/pycofbuilder/data/conector/OH2.cjson
 src/pycofbuilder/data/conector/__init__.py
 src/pycofbuilder/data/core/__init__.py
 src/pycofbuilder/data/core/D4/ADAM.cjson
+src/pycofbuilder/data/core/D4/CUBA.cjson
 src/pycofbuilder/data/core/D4/SBFE.cjson
 src/pycofbuilder/data/core/D4/TDAT.cjson
 src/pycofbuilder/data/core/D4/TKAT.cjson
@@ -73,6 +74,7 @@ src/pycofbuilder/data/core/L2/IITT.cjson
 src/pycofbuilder/data/core/L2/INDE.cjson
 src/pycofbuilder/data/core/L2/INFL.cjson
 src/pycofbuilder/data/core/L2/INTO.cjson
+src/pycofbuilder/data/core/L2/NAP2.cjson
 src/pycofbuilder/data/core/L2/NAPT.cjson
 src/pycofbuilder/data/core/L2/NDTP.cjson
 src/pycofbuilder/data/core/L2/PHEN.cjson
@@ -86,15 +88,20 @@ src/pycofbuilder/data/core/L2/TPDI.cjson
 src/pycofbuilder/data/core/L2/TPNY.cjson
 src/pycofbuilder/data/core/L2/TTPH.cjson
 src/pycofbuilder/data/core/L2/__init__.py
+src/pycofbuilder/data/core/R4/ATTP.cjson
+src/pycofbuilder/data/core/R4/ETKB.cjson
+src/pycofbuilder/data/core/R4/PRLN.cjson
 src/pycofbuilder/data/core/R4/TPDT.cjson
+src/pycofbuilder/data/core/R4/TPLN.cjson
 src/pycofbuilder/data/core/S4/CoBTC.cjson
 src/pycofbuilder/data/core/S4/CuBTC.cjson
 src/pycofbuilder/data/core/S4/NiBTC.gjf
+src/pycofbuilder/data/core/S4/OTPR.cjson
 src/pycofbuilder/data/core/S4/PHPR.cjson
 src/pycofbuilder/data/core/S4/PORP.cjson
 src/pycofbuilder/data/core/S4/PTCA.cjson
+src/pycofbuilder/data/core/S4/TBPR.cjson
 src/pycofbuilder/data/core/S4/ZnBTC.cjson
-src/pycofbuilder/data/core/S4/__init__.py
 src/pycofbuilder/data/core/T3/BENZ.cjson
 src/pycofbuilder/data/core/T3/BRZN.cjson
 src/pycofbuilder/data/core/T3/BTTP.cjson
