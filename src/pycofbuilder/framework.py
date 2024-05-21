@@ -1860,7 +1860,7 @@ class Framework():
         self.atom_labels = []
         self.atom_pos = []
 
-        # Add the building blocks to the structure
+        # Add the S4 building blocks to the structure
         for vertice_data in topology_info['vertices']:
             self.atom_types += BB_S4.atom_types
             vertice_pos = np.array(vertice_data['position']) * np.array([a, b, c])
@@ -1874,7 +1874,7 @@ class Framework():
 
         L2_angle_list = [-alpha_S4, alpha_S4, -alpha_S4, alpha_S4]
 
-        # Add the building blocks to the structure
+        # Add the L2 building blocks to the structure
         for i, edge_data in enumerate(topology_info['edges']):
             self.atom_types += BB_L2.atom_types
             edge_pos = np.array(edge_data['position']) * np.array([a, b, c])
