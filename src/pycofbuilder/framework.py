@@ -4684,9 +4684,16 @@ class Framework():
         for site in [0, 1]:
             BB = copy.deepcopy(BB_D4_A)
 
+            BB.align_to(topology_info['vertices'][site]['align_v'])
+            BB.rotate_around(rotation_axis=topology_info['vertices'][site]['align_v'],
+                             angle=topology_info['vertices'][site]['angle'])
+
             BB.shift(np.array(topology_info['vertices'][site]['position'])*alat)
+
             BB.replace_X(bond_atom)
             BB.remove_X()
+
+            # Update the structure
             self.atom_types += BB.atom_types
             self.atom_pos += BB.atom_pos.tolist()
             self.atom_labels += ['C1' if i == 'C' else i for i in BB.atom_labels]
@@ -4694,7 +4701,12 @@ class Framework():
         for site in [2, 3]:
             BB = copy.deepcopy(BB_D4_B)
 
+            BB.align_to(topology_info['vertices'][site]['align_v'])
+            BB.rotate_around(rotation_axis=topology_info['vertices'][site]['align_v'],
+                             angle=topology_info['vertices'][site]['angle'])
+
             BB.shift(np.array(topology_info['vertices'][site]['position'])*alat)
+
             BB.remove_X()
             self.atom_types += BB.atom_types
             self.atom_pos += BB.atom_pos.tolist()

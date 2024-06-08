@@ -263,9 +263,9 @@ TOPOLOGY_DICT = {
         'vertice_connectivity': 4,
         'edge_connectivity': 4,
         'vertices': [
-            {'position': [0.00000000, 0.57735027, 0.10206206], 'angle': 0, 'align_v': [0, 0, 1]},
+            {'position': [0.00000000, 0.57735027, 0.10206206], 'angle': 180, 'align_v': [0, 0, 1]},
             {'position': [0.50000000, 0.28867513, 0.91855856], 'angle': 0, 'align_v': [0, 0, 1]},
-            {'position': [0.00000000, 0.57735027, 0.71443444], 'angle': 180, 'align_v': [0, 0, -1]},
+            {'position': [0.00000000, 0.57735027, 0.71443444], 'angle': 0, 'align_v': [0, 0, -1]},
             {'position': [0.50000000, 0.28867513, 1.53093094], 'angle': 180, 'align_v': [0, 0, -1]},
             ],
         'edges': []
@@ -283,8 +283,8 @@ TOPOLOGY_DICT = {
         'vertices': [
             {'position': [1/3, 2/3, 1/16], 'angle': 0, 'align_v': [0, 0, 1]},
             {'position': [2/3, 2/3, 9/16], 'angle': 0, 'align_v': [0, 0, 1]},
-            {'position': [1/3, 2/3, 7/16], 'angle': 180, 'align_v': [0, 0, -1]},
-            {'position': [2/3, 1/3, 15/16], 'angle': 180, 'align_v': [0, 0, -1]},
+            {'position': [1/3, 2/3, 7/16], 'angle': 0, 'align_v': [0, 0, -1]},
+            {'position': [2/3, 1/3, 15/16], 'angle': 0, 'align_v': [0, 0, -1]},
             ],
         'edges': []
         },
