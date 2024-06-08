@@ -2,7 +2,7 @@
 # To learn more about the format of this file, see https://docs.trunk.io/reference/trunk-yaml
 version: 0.1
 cli:
-  version: 1.22.0
+  version: 1.22.1
 # Trunk provides extensibility via plugins. (https://docs.trunk.io/plugins)
 plugins:
   sources:
@@ -19,18 +19,18 @@ lint:
   enabled:
     - bandit@1.7.8
     - black@24.4.2
-    - checkov@3.2.75
+    - checkov@3.2.128
     - git-diff-check
     - isort@5.13.2
-    - markdownlint@0.40.0
-    - osv-scanner@1.7.2
+    - markdownlint@0.41.0
+    - osv-scanner@1.7.4
     - oxipng@9.1.1
-    - prettier@3.2.5
-    - ruff@0.4.2
-    - svgo@3.2.0
+    - prettier@3.3.1
+    - ruff@0.4.8
+    - svgo@3.3.2
     - taplo@0.8.1
-    - trivy@0.50.4
-    - trufflehog@3.74.0
+    - trivy@0.52.0
+    - trufflehog@3.78.0
     - yamllint@1.35.1
 actions:
   disabled:

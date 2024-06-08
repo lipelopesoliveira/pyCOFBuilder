@@ -3,6 +3,49 @@ Change Log
 **********
 
 
+v0.0.8.5 Beta (16/04/2024)
+========================
+
+New features
+------------
+
+- Added new building blocks:
+  - L2: DFDB
+  - R4: TPDT
+
+Bugfixes
+--------
+
+- Fixed the bug that prevent the generation of `SQL` and `SQL_A` nets with `R4` building block.
+
+
+v0.0.8.4 Beta (16/04/2024)
+========================
+
+New features
+------------
+
+The new method Framework.make_cubic() generates a cubic super-cell with the structure, allowing the creation of membranes or perpendicular boxes easier. The result is not necessarily a cubic unit cell, but a cell with angles equal to 90 and cell parameters as close as possible to cubic.
+
+- Added new building blocks:
+
+  - L2
+    - NAP2
+  - S4
+    - OTPR
+    - TBPR
+  - R4
+    - ATTP
+    - PRLN
+    - TPLN
+    - ETKB
+
+Bugfixes
+--------
+
+- Fixed a bug in the creation of the `DIA` and `DIA_A` nets.
+- Fix the position of the atoms on `CH2CN` and `CHO` connection groups.
+
 v0.0.8.3 Beta (16/04/2024)
 ========================
 
