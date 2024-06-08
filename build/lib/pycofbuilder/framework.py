@@ -13,6 +13,7 @@ import numpy as np
 # Import pymatgen
 from pymatgen.core import Lattice, Structure
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
+from pymatgen.transformations.advanced_transformations import CubicSupercellTransformation
 
 from scipy.spatial.transform import Rotation as R
 
@@ -218,7 +219,9 @@ class Framework():
         return fram_str
 
     def get_n_atoms(self) -> int:
-        ''' Returns the number of atoms in the unitary cell'''
+        """
+        Returns the number of atoms in the unitary cell
+        """
         return len(self.atom_types)
 
     def get_available_topologies(self, dimensionality: str = 'all', print_result: bool = True):
@@ -281,10 +284,10 @@ class Framework():
             A tuple with the building blocks names, the net and the stacking.
         """
 
-        string_error = 'FrameworkName must be in the format: BB1_BB2_Net_Stacking'
+        string_error = 'FrameworkName must be a string'
         assert isinstance(FrameworkName, str), string_error
 
-        name_error = 'FrameworkName must be in the format: BB1_BB2_Net_Stacking'
+        name_error = 'FrameworkName must be in the format: BB1-BB2-Net-Stacking'
         assert len(FrameworkName.split('-')) == 4, name_error
 
         bb1_name, bb2_name, Net, Stacking = FrameworkName.split('-')
@@ -388,7 +391,7 @@ class Framework():
              save_dir=None,
              primitive=False,
              save_bonds=True) -> None:
-        '''
+        """
         Save the structure in a specif file format.
 
         Parameters
@@ -406,7 +409,7 @@ class Framework():
         primitive : bool, optional
             If True, the primitive cell is saved. Otherwise, the conventional cell is saved.
             Default: False
-        '''
+        """
 
         save_dict = {
             'cjson': save_chemjson,
@@ -436,14 +439,14 @@ class Framework():
                 site_properties={'source': self.atom_labels}
             )
 
-        final_structure = structure.make_supercell(supercell, in_place=False)
+        structure.make_supercell(supercell)
 
         if save_bonds:
-            bonds = get_bonds(final_structure, self.bond_threshold)
+            bonds = get_bonds(structure, self.bond_threshold)
         else:
             bonds = []
 
-        structure_dict = final_structure.as_dict()
+        structure_dict = structure.as_dict()
 
         cell = structure_dict['lattice']['matrix']
 
@@ -464,6 +467,51 @@ class Framework():
                        atom_pos=atom_pos,
                        bonds=bonds)
 
+    def make_cubic(self,
+                   min_length=10,
+                   force_diagonal=False,
+                   force_90_degrees=True,
+                   min_atoms=None,
+                   max_atoms=None,
+                   angle_tolerance=1e-3):
+        """
+        Transform the primitive structure into a supercell with alpha, beta, and
+        gamma equal to 90 degrees. The algorithm will iteratively increase the size
+        of the supercell until the largest inscribed cube's side length is at least 'min_length'
+        and the number of atoms in the supercell falls in the range ``min_atoms < n < max_atoms``.
+
+        Parameters
+        ----------
+        min_length : float, optional
+            Minimum length of the cubic cell (default is 10)
+        force_diagonal : bool, optional
+            If True, generate a transformation with a diagonal transformation matrix (default is False)
+        force_90_degrees : bool, optional
+            If True, force the angles to be 90 degrees (default is True)
+        min_atoms : int, optional
+            Minimum number of atoms in the supercell (default is None)
+        max_atoms : int, optional
+            Maximum number of atoms in the supercell (default is None)
+        angle_tolerance : float, optional
+            The angle tolerance for the transformation (default is 1e-3)
+        """
+
+        cubic_dict = CubicSupercellTransformation(
+            min_length=min_length,
+            force_90_degrees=force_90_degrees,
+            force_diagonal=force_diagonal,
+            min_atoms=min_atoms,
+            max_atoms=max_atoms,
+            angle_tolerance=angle_tolerance
+            ).apply_transformation(self.prim_structure).as_dict()
+
+        self.cellMatrix = np.array(cubic_dict['lattice']['matrix']).astype(float)
+        self.cellParameters = cell_to_cellpar(self.cellMatrix)
+
+        self.atom_types = [i['label'] for i in cubic_dict['sites']]
+        self.atom_pos = [i['xyz'] for i in cubic_dict['sites']]
+        self.atom_labels = [i['properties']['source'] for i in cubic_dict['sites']]
+
 # --------------- Net creation methods -------------------------- #
 
     def create_hcb_structure(self,
@@ -471,7 +519,7 @@ class Framework():
                              BB_T3_B,
                              stacking: str = 'AA',
                              slab: float = 10.0,
-                             shift_vector: list = [1.0, 1.0, 0],
+                             shift_vector: list = (1.0, 1.0, 0),
                              tilt_angle: float = 5.0):
         """Creates a COF with HCB network.
 
@@ -1812,7 +1860,7 @@ class Framework():
         self.atom_labels = []
         self.atom_pos = []
 
-        # Add the building blocks to the structure
+        # Add the S4 building blocks to the structure
         for vertice_data in topology_info['vertices']:
             self.atom_types += BB_S4.atom_types
             vertice_pos = np.array(vertice_data['position']) * np.array([a, b, c])
@@ -1826,7 +1874,7 @@ class Framework():
 
         L2_angle_list = [-alpha_S4, alpha_S4, -alpha_S4, alpha_S4]
 
-        # Add the building blocks to the structure
+        # Add the L2 building blocks to the structure
         for i, edge_data in enumerate(topology_info['edges']):
             self.atom_types += BB_L2.atom_types
             edge_pos = np.array(edge_data['position']) * np.array([a, b, c])
@@ -3854,9 +3902,9 @@ class Framework():
 
         rotated_list = [
              R.from_rotvec(
-                 angle * unit_vector(topology_info['vertices'][0]['align_v']), degrees=False
+                 a * unit_vector(topology_info['vertices'][0]['align_v']), degrees=False
                  ).apply(Q_vertice_pos)
-             for angle in np.linspace(0, 2*np.pi, 360)
+             for a in np.linspace(0, 2*np.pi, 360)
              ]
 
         # Calculate the angle between the vertice_pos and the elements of rotated_list
@@ -3885,9 +3933,9 @@ class Framework():
 
         rotated_list = [
              R.from_rotvec(
-                 angle * unit_vector(topology_info['vertices'][0]['align_v']), degrees=False
+                 a * unit_vector(topology_info['vertices'][0]['align_v']), degrees=False
                  ).apply(Q_vertice_pos)
-             for angle in np.linspace(0, 2*np.pi, 360)
+             for a in np.linspace(0, 2*np.pi, 360)
              ]
 
         # Calculate the angle between the vertice_pos and the elements of rotated_list
@@ -4098,9 +4146,9 @@ class Framework():
 
         rotated_list = [
              R.from_rotvec(
-                 angle * unit_vector(topology_info['vertices'][0]['align_v']), degrees=False
+                 a * unit_vector(topology_info['vertices'][0]['align_v']), degrees=False
                  ).apply(Q_vertice_pos)
-             for angle in np.linspace(0, 2*np.pi, 360)
+             for a in np.linspace(0, 2*np.pi, 360)
              ]
 
         # Calculate the angle between the vertice_pos and the elements of rotated_list
