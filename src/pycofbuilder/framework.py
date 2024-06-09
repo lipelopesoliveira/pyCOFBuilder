@@ -4659,7 +4659,7 @@ class Framework():
         # Measure the base size of the building blocks
         size = np.average(BB_D4_A.size) + np.average(BB_D4_B.size)
 
-        alat = 3/2 * size * np.cos(np.radians(19.5)) / np.cos(np.radians(30))
+        alat = 3/2 * size * np.cos(np.radians(19.4712)) / np.cos(np.radians(30))
 
         # Calculate the primitive cell vector assuming perfect tetrahedical building blocks
         self.cellMatrix = Lattice(alat*np.array(topology_info['lattice']))
