@@ -3,6 +3,7 @@
 [project]
 name = "pycofbuilder"
 version = '0.0.8.5'
+license = {file = "LICENSE"}
 authors = [
   { name="Felipe Lopes", email="felipe.lopes@nano.ufrj.br" },
 ]

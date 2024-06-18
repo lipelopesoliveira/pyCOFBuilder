@@ -3,7 +3,7 @@
 from setuptools import setup
 
 with open('LICENSE') as f:
-    license = f.read()
+    license_file = f.readlines()
 
 
 VERSION = '0.0.8.5'
@@ -17,7 +17,7 @@ setup(
     author='Felipe Lopes Oliveira',
     author_email='felipe.lopes@nano.ufrj.br',
     url='https://github.com/lipelopesoliveira/pyCOFBuilder',
-    license=license,
+    license=license_file,
     package_dir={'': 'src'},
     package_data={'pycofbuilder': ['pycofbuilder/data/*']},
     install_requires=['simplejson',
