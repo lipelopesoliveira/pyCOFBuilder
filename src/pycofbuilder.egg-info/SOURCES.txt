@@ -14,13 +14,14 @@ src/pycofbuilder/tools.py
 src/pycofbuilder.egg-info/PKG-INFO
 src/pycofbuilder.egg-info/SOURCES.txt
 src/pycofbuilder.egg-info/dependency_links.txt
-src/pycofbuilder.egg-info/requires.txt
 src/pycofbuilder.egg-info/top_level.txt
 src/pycofbuilder/data/__init__.py
 src/pycofbuilder/data/periodic_table.json
 src/pycofbuilder/data/topology.py
 src/pycofbuilder/data/__pycache__/__init__.cpython-311.pyc
+src/pycofbuilder/data/__pycache__/__init__.cpython-312.pyc
 src/pycofbuilder/data/__pycache__/topology.cpython-311.pyc
+src/pycofbuilder/data/__pycache__/topology.cpython-312.pyc
 src/pycofbuilder/data/conector/BOH2.cjson
 src/pycofbuilder/data/conector/Br.cjson
 src/pycofbuilder/data/conector/CH2CN.cjson
@@ -69,6 +70,7 @@ src/pycofbuilder/data/core/L2/DPBY.cjson
 src/pycofbuilder/data/core/L2/DPDA.cjson
 src/pycofbuilder/data/core/L2/DPEL.cjson
 src/pycofbuilder/data/core/L2/DPEY.cjson
+src/pycofbuilder/data/core/L2/ECBZ.cjson
 src/pycofbuilder/data/core/L2/HDZN.cjson
 src/pycofbuilder/data/core/L2/IITT.cjson
 src/pycofbuilder/data/core/L2/INDE.cjson
