@@ -362,7 +362,7 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
             'formula': self.formula,
         }
         if self.cell_parameters is not None:
-            structure_dict['unit cell'] = {
+            structure_dict['unitCell'] = {
                 'a': self.cell_parameters[0],
                 'b': self.cell_parameters[1],
                 'c': self.cell_parameters[2],
