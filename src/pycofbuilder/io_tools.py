@@ -165,7 +165,14 @@ def read_gjf(path, file_name):
         atom_labels = [i[0] for i in atoms]
         atom_pos = np.array([[float(i[1]), float(i[2]), float(i[3])] for i in atoms])
 
-        return atom_labels, atom_pos
+        cell_matrix = [i for i in temp_file if 'Tv' in i]
+
+        if cell_matrix:
+            cell_matrix = np.array([i[1:] for i in cell_matrix]).astype(float)
+        else:
+            cell_matrix = None
+
+        return atom_labels, atom_pos, cell_matrix
     else:
         print(f'File {file_name} not found!')
         return None

@@ -7,7 +7,7 @@ with open('LICENSE') as f:
 
 
 VERSION = '0.0.8.5'
-DESCRIPTION = 'A package for Covalent Organic Frameworks sturcture assembly.'
+DESCRIPTION = 'A package for Covalent Organic Frameworks structure assembly based on specific building block, topology and functional groups based on the reticular approach.'
 
 setup(
     name='pyCOFBuilder',

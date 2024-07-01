@@ -2,7 +2,6 @@
 
 ![puCOFBuilder](docs/img/header.png)
 
-
 [![image](https://img.shields.io/pypi/v/pycofbuilder.svg?style=flat-square&logoColor=green)](https://pypi.python.org/pypi/pycofbuilder/)
 [![Pyversions](https://img.shields.io/pypi/pyversions/pycofbuilder.svg?style=flat-square&label=Python%20Versions)](https://pypi.python.org/pypi/pycofbuilder)
 [![PyPI Downloads](https://img.shields.io/pypi/dm/pycofbuilder?logo=pypi&style=flat-square&logoColor=white&color=blue&label=PyPI)](https://pypi.org/project/pycofbuilder)
