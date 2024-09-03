@@ -10,7 +10,7 @@
 [![Paper](https://img.shields.io/badge/JCIM-10.1021/acs.jcim.3c01918-red?logo=acs&logoColor=white&style=flat-square)](https://doi.org/10.1021/acs.jcim.3c01918)
 [![GitHub license](https://img.shields.io/github/license/lipelopesoliveira/pycofbuilder.svg?style=flat-square)](https://github.com/lipelopesoliveira/pycofbuilder/blob/master/LICENSE)
 
-# What is pyCOFBuilder?
+## What is pyCOFBuilder?
 
 **pyCOFBuilder** is a simple and powerful python package to automatically assembly COF structures with specifics building blocks, topologies, and functionalizations following the reticular approach to build and represent COF structures. The project was developed to address the need for generation of COFs structures in a high-throughput style, based on a nomenclature tha allows direct sctructural feature interpretation from a simple name. The package uses [pymatgen](https://pymatgen.org/) to create the structures.
 

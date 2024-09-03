@@ -397,7 +397,7 @@ class Framework():
 
     def save(self,
              fmt: str = 'cif',
-             supercell: list = [1, 1, 1],
+             supercell: list = (1, 1, 1),
              save_dir=None,
              primitive=False,
              save_bonds=True) -> None:
@@ -939,7 +939,7 @@ class Framework():
                                BB_L2: str,
                                stacking: str = 'AA',
                                slab: float = 10.0,
-                               shift_vector: list = [1.0, 1.0, 0],
+                               shift_vector: list = (1.0, 1.0, 0),
                                tilt_angle: float = 5.0):
         """Creates a COF with HCB-A network.
 
@@ -1347,7 +1347,7 @@ class Framework():
                              BB_B: str,
                              stacking: str = 'AA',
                              slab: float = 10.0,
-                             shift_vector: list = [1.0, 1.0, 0],
+                             shift_vector: list = (1.0, 1.0, 0),
                              tilt_angle: float = 5.0):
         """Creates a COF with SQL network.
 
@@ -1766,7 +1766,7 @@ class Framework():
                                stacking: str = 'AA',
                                c_parameter_base: float = 3.6,
                                slab: float = 10.0,
-                               shift_vector: list = [1.0, 1.0, 0],
+                               shift_vector: list = (1.0, 1.0, 0),
                                tilt_angle: float = 5.0):
         """Creates a COF with SQL-A network.
 
@@ -2185,7 +2185,7 @@ class Framework():
                              stacking: str = 'AA',
                              print_result: bool = True,
                              slab: float = 10.0,
-                             shift_vector: list = [1.0, 1.0, 0],
+                             shift_vector: list = (1.0, 1.0, 0),
                              tilt_angle: float = 5.0):
         """Creates a COF with KGD network.
 
@@ -2596,7 +2596,7 @@ class Framework():
                                stacking: str = 'AA',
                                print_result: bool = True,
                                slab: float = 10.0,
-                               shift_vector: list = [1.0, 1.0, 0],
+                               shift_vector: list = (1.0, 1.0, 0),
                                tilt_angle: float = 5.0):
         """Creates a COF with HXL-A network.
 
@@ -3006,7 +3006,7 @@ class Framework():
                              stacking: str = 'AA',
                              print_result: bool = True,
                              slab: float = 10.0,
-                             shift_vector: list = [1.0, 1.0, 0],
+                             shift_vector: list = (1.0, 1.0, 0),
                              tilt_angle: float = 5.0):
         """Creates a COF with FXT network.
 
@@ -3423,7 +3423,7 @@ class Framework():
                                c_parameter_base: float = 3.6,
                                print_result: bool = True,
                                slab: float = 10.0,
-                               shift_vector: list = [1.0, 1.0, 0],
+                               shift_vector: list = (1.0, 1.0, 0),
                                tilt_angle: float = 5.0):
         """Creates a COF with FXT-A network.
 
