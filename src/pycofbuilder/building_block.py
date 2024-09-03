@@ -64,9 +64,7 @@ class BuildingBlock():
         self.available_symmetry = ['L2',
                                    'T3',
                                    'S4', 'D4', 'R4',
-                                   'H6',  # 'O6', 'P6'
-                                   # 'C8', 'A8', 'E8'
-                                   # 'B12', 'I12', 'U12', 'X12'
+                                   'H6',  # To implement: 'O6', 'P6', 'C8', 'A8', 'E8', 'B12', 'I12', 'U12', 'X12'
                                    ]
 
         # Check if bb_out_path exists and try to create it if not
