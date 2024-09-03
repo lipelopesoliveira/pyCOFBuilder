@@ -285,7 +285,7 @@ def get_fractional_to_cartesian_matrix(cell_a: float,
                                        alpha: float,
                                        beta: float,
                                        gamma: float,
-                                       angle_in_degrees: bool = True) -> np.array(float):
+                                       angle_in_degrees: bool = True) -> np.ndarray:
     """
     Return the transformation matrix that converts fractional coordinates to
     cartesian coordinates.
@@ -333,7 +333,7 @@ def get_cartesian_to_fractional_matrix(a: float,
                                        alpha: float,
                                        beta: float,
                                        gamma: float,
-                                       angle_in_degrees: bool = True) -> np.array(float):
+                                       angle_in_degrees: bool = True) -> np.ndarray:
     """
     Return the transformation matrix that converts cartesian coordinates to
     fractional coordinates.
@@ -679,6 +679,7 @@ def get_bond_atom(connector_1: str, connector_2: str) -> str:
         'CONHNH2': 'N',
         'CHNNH2': 'N',
         'COOH': 'N',
+        'CCH3O': 'N',
         'BOH2': 'B',
         'OH2': 'B',
         'Cl': 'X',
@@ -687,7 +688,7 @@ def get_bond_atom(connector_1: str, connector_2: str) -> str:
         'CH3': 'C'
     }
 
-    bond_atom = None
+    bond_atom = ''
     for group in list(bond_dict.keys()):
         if group in [connector_1, connector_2]:
             bond_atom = bond_dict[group]
@@ -747,7 +748,7 @@ def formula_from_atom_list(AtomLabels: list) -> str:
     return formula
 
 
-def smiles_to_xsmiles(smiles_string: str) -> str:
+def smiles_to_xsmiles(smiles_string: str) -> tuple[str, str, str]:
     """
     Converts a SMILES string to an extended SMILES string with labels
 
@@ -946,7 +947,7 @@ def classify_unit_cell(cell, thr=1e-3) -> str:
     if len(cell) == 3:
         a, b, c, alpha, beta, gamma = cell_to_cellpar(cell)
 
-    cell_type = None
+    cell_type = ''
 
     if equal_value(alpha, 90, thr) and equal_value(beta, 90, thr) and equal_value(gamma, 90, thr):
         if equal_value(a, b, thr) and equal_value(b, c, thr):
