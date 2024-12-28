@@ -3,6 +3,30 @@ Change Log
 **********
 
 
+v0.0.8.7 Beta (29/12/2024)
+========================
+
+New features
+------------
+
+- Added new connection groups:
+  - CCH3O
+  
+- Added new building blocks:
+  - L2: PRZN2
+  
+v0.0.8.6 Beta (03/09/2024)
+========================
+
+New features
+------------
+
+- Added new connection groups:
+  - CCH3O
+  
+- Added new building blocks:
+  - L2: PRZN
+
 v0.0.8.5 Beta (16/04/2024)
 ========================
 
