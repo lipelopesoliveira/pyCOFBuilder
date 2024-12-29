@@ -3001,12 +3001,12 @@ class Framework():
                 len(symm_op)]
 
     def create_fxt_structure(self,
-                             BB_R4_A: str,
-                             BB_R4_B: str,
+                             BB_R4_A: BuildingBlock,
+                             BB_R4_B: BuildingBlock,
                              stacking: str = 'AA',
                              print_result: bool = True,
                              slab: float = 10.0,
-                             shift_vector: list = (1.0, 1.0, 0),
+                             shift_vector: list = (1.0, 1.0, 0.0),
                              tilt_angle: float = 5.0):
         """Creates a COF with FXT network.
 
@@ -3025,7 +3025,7 @@ class Framework():
         slab : float, optional
             Default parameter for the interlayer slab (default is 10.0)
         shift_vector: list, optional
-            Shift vector for the AAl and AAt stakings (defatult is [1.0,1.0,0])
+            Shift vector for the AAl and AAt stakings (defatult is [1.0,1.0,0.0])
         tilt_angle: float, optional
             Tilt angle for the AAt staking in degrees (default is 5.0)
 
@@ -3049,8 +3049,8 @@ class Framework():
             self.logger.error(connectivity_error.format('B', 4, BB_R4_B.connectivity))
             raise BBConnectivityError(4, BB_R4_B.connectivity)
 
-        self.name = f'{BB_R4_A.name}-{BB_R4_B.name}-FXT-{stacking}'
-        self.topology = 'FXT'
+        self.name = f'{BB_R4_A.name}-{BB_R4_B.name}-KGM-{stacking}'
+        self.topology = 'KGM'
         self.staking = stacking
         self.dimension = 2
 

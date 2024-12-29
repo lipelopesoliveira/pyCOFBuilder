@@ -8,6 +8,7 @@ This module contains the tools used by pyCOFBuilder.
 
 import os
 import simplejson
+from itertools import combinations
 import numpy as np
 from scipy.spatial import distance
 
@@ -145,6 +146,49 @@ def rmsd(V, W):
     diff = np.array(V) - np.array(W)
     N = len(V)
     return np.sqrt((diff * diff).sum() / N)
+
+
+def calculate_sides(points):
+    """
+    Calculate the lengths of the sides of a geometric shape defined by a set of points in 3D space.
+
+    This function takes an array of 3D points and computes the unique side lengths of the shape
+    formed by these points. The sides are calculated as the Euclidean distances
+    between pairs of points.
+
+    Parameters:
+    -----------
+    points : numpy.ndarray
+        A 2D array of shape (n, 3), where n is the number of points. Each row represents the
+        coordinates of a point (x, y, z).
+
+    Returns:
+    --------
+    numpy.ndarray
+        A sorted array of unique side lengths of the geometric shape.
+
+    Raises:
+    -------
+    ValueError
+        If the input is not a 2D numpy array with shape (n, 3).
+
+    Example:
+    --------
+    >>> points = np.array([[0, 0, 0], [0, 2, 0], [2, 0, 0], [2, 2, 0]])
+    >>> calculate_sides(points)
+    array([2., 2.82842712])
+    """
+    if not isinstance(points, np.ndarray) or points.ndim != 2 or points.shape[1] != 3:
+        raise ValueError("Input must be a 2D numpy array of shape (n, 3).")
+
+    # Calculate all pairwise distances
+    distances = [
+        np.linalg.norm(points[i] - points[j])
+        for i, j in combinations(range(len(points)), 2)
+    ]
+
+    # Return sorted unique distances
+    return np.sort(np.unique(distances))
 
 
 def cell_to_cellpar(cell, radians=False):

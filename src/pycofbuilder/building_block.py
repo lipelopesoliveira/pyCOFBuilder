@@ -15,7 +15,8 @@ from pycofbuilder.tools import (rotation_matrix_from_vectors,
                                 closest_atom,
                                 closest_atom_struc,
                                 find_index,
-                                unit_vector)
+                                unit_vector,
+                                calculate_sides)
 from pycofbuilder.io_tools import (read_xyz, save_xyz, read_gjf)
 from pycofbuilder.cjson import ChemJSON
 
@@ -93,6 +94,11 @@ class BuildingBlock():
         '''Return a deep copy of the BuildingBlock object'''
         return copy.deepcopy(self)
 
+    @property
+    def n_atoms(self):
+        ''' Returns the number of atoms in the unitary cell'''
+        return len(self.atom_types)
+
     def from_file(self, path, file_name):
         '''Read a building block from a file'''
         extension = file_name.split('.')[-1]
@@ -117,7 +123,7 @@ class BuildingBlock():
         self.align_to(pref_orientation)
 
     def from_name(self, name):
-        '''Automatically read or create a buiding block based on its name'''
+        """Automatically read or create a buiding block based on its name"""
 
         # Check the existence of the building block files
         symm_check, core_check, conector_check, funcGroup_check = self.check_existence(name)
@@ -143,10 +149,6 @@ class BuildingBlock():
                                  *possible_funcGroups)
         if self.save_bb:
             self.save()
-
-    def n_atoms(self):
-        ''' Returns the number of atoms in the unitary cell'''
-        return len(self.atom_types)
 
     def print_structure(self):
         """
@@ -225,6 +227,20 @@ class BuildingBlock():
                     R_dict[key] += [atom_pos[i]]
 
         return R_dict
+
+    def get_sizes(self):
+        '''
+        Get the sizes of the building blocks
+
+        Returns
+        -------
+        list
+            List with the sizes of the building blocks
+        '''
+
+        x_points = self.get_X_points()[1]
+
+        return calculate_sides(x_points)
 
     def calculate_size(self):
         '''Calculate the size of the building block'''
