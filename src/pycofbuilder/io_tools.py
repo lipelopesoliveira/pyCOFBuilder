@@ -136,6 +136,7 @@ def read_gjf(path, file_name) -> tuple:
     cellMatrix : numpy array
         3x3 array contaning the cell vectors.
     """
+
     # Remove the extention if exists
     file_name = file_name.split('.')[0]
 
@@ -494,17 +495,13 @@ def save_pdb(path: str,
 
 def save_gjf(path: str,
              file_name: str,
-             cell: list,
-             atom_types: list,
-             atom_labels: list,
-             atom_pos: list,
-             atom_charges: list = None,
-             bonds: list = None,
-             bond_orders: list = None,
+             atomTypes: list,
+             atomPos: list,
+             cell: list = [],
              frac_coords=False,
-             header: str = 'opt pm6'):
+             **kwargs) -> None:
     """
-    Save a file in format `.pqr` on the `path`.
+    Save a file in format `.gjf` on the `path`.
 
     Parameters
     ----------
@@ -512,52 +509,48 @@ def save_gjf(path: str,
         Path to the save the file.
     file_name : str
         Name of the file. Does not neet to contain the extention.
-    cell : numpy array
-        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
-    atom_types : list
+    atomTypes : list
         List of strings containing containg the N atom types
-    atom_label : list
-        List of strings containing containg the N atom labels
-    atom_pos : list
+    atomPos : list
         Nx3 array contaning the atoms coordinates.
-    atom_charges : list
-        List of strings containing containg the N atom partial charges.
-    bonds : list
-        List of lists containing the index of the bonded atoms and the bond length.
-    frac_coords : bool
-        If True, the coordinates are in fractional coordinates.
-    header : str
-        Parameters for Gaussian calculations.
+    cell : list, optional
+        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
+    frac_coords : bool, optional
+        If True, the coordinates are in fractional coordinates and will be converted to cartesian. Default is False.
     """
+
+    file_name = file_name.split('.')[0]
+
     if len(cell) == 6:
         cell = cellpar_to_cell(cell)
 
     if frac_coords:
         # Convert to fractional coordinates
         frac_matrix = get_fractional_to_cartesian_matrix(*cell_to_cellpar(cell))
-        atom_pos = [np.dot(frac_matrix, [i[0], i[1], i[2]]) for i in atom_pos]
+        atomPos = [np.dot(frac_matrix, [i[0], i[1], i[2]]) for i in atomPos]
 
-    file_name = file_name.split('.')[0]
+    gjf_file = []
+    gjf_file.append('opt pm6')
+    gjf_file.append('')
 
-    temp_file = open(os.path.join(path, file_name + '.gjf'), 'w')
-    temp_file.write(f'%chk={file_name}.chk \n')
-    temp_file.write(f'# {header}\n')
-    temp_file.write('\n')
-    temp_file.write(f'{file_name}\n')
-    temp_file.write('\n')
-    temp_file.write('0 1 \n')
+    gjf_file.append(file_name)
+    gjf_file.append('')
+    gjf_file.append('0 1')
 
-    for i in range(len(atom_types)):
-        temp_file.write('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(atom_types[i],
-                                                                     atom_pos[i][0],
-                                                                     atom_pos[i][1],
-                                                                     atom_pos[i][2]))
-    if cell is not None:
-        for i in range(len(cell)):
-            temp_file.write('Tv   {:>15.7f}{:>15.7f}{:>15.7f}\n'.format(*cell[i]))
+    for i in range(len(atomPos)):
+        gjf_file.append('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(atomTypes[i],
+                                                                     atomPos[i][0],
+                                                                     atomPos[i][1],
+                                                                     atomPos[i][2]))
+    if cell:
+        for i in cell:
+            gjf_file.append('Tv   {:>15.7f}{:>15.7f}{:>15.7f}\n'.format(*i))
 
-    temp_file.write('\n\n')
-    temp_file.close()
+    gjf_file.append('')
+    gjf_file.append('')
+
+    with open(os.path.join(path, file_name + '.gjf'), 'w') as f:
+        f.write('\n'.join(gjf_file))
 
 
 def save_xyz(path: str,
