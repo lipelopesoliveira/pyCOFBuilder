@@ -38,15 +38,17 @@ def read_xyz(path: str, file_name: str, extxyz=False) -> tuple:
         Path to the file.
     file_name : str
         Name of the `xyz` file. Does not neet to contain the `.xyz` extention.
+    extxyz : bool
+        If True, the function will consider the extended xyz file format and use ase library to read the file.
 
     Returns
     -------
-    atom_labels : list
+    atonTypes : list
         List of strings containing containg the N atom labels.
-    atom_pos : numpy array
+    cartPos : numpy array
         Nx3 array contaning the atoms coordinates
-    extxyz : bool
-        If True, the function will consider the extended xyz file format and use ase library to read the file.
+    cellMatrix : numpy array
+        3x3 array contaning the cell vectors.
     """
 
     # Remove the extention if exists
@@ -90,10 +92,12 @@ def read_pdb(path, file_name):
 
     Returns
     -------
-    atom_labels : list
+    atonTypes : list
         List of strings containing containg the N atom labels.
-    atom_pos : numpy array
+    cartPos : numpy array
         Nx3 array contaning the atoms coordinates
+    cellMatrix : numpy array
+        3x3 array contaning the cell vectors.
     """
 
     # Remove the extention if exists
@@ -178,14 +182,14 @@ def read_cif(path, file_name, useASE=False, usePymatgen=False):
 
     Returns
     -------
-    cell : numpy array
-        3x3 array contaning the cell vectors.
-    atom_labels : list
+    atomTypes : list
         List of strings containing containg the N atom labels.
-    atom_pos : numpy array
+    cartPos : numpy array
         Nx3 array contaning the atoms coordinates
-    charges : list
-        List of strings containing containg the N atom partial charges.
+    cellMatrix : numpy array
+        3x3 array contaning the cell vectors.
+    partialCharges : list
+        List of floats containing the N atom partial charges.
     """
 
     # Remove the extention if exists
@@ -897,7 +901,7 @@ def convert_cif_2_qe(out_path, file_name):
         Name of the file. Does not neet to contain the `.cif` extention.
     """
 
-    cell, atom_labels, atom_pos, _ = read_cif(out_path, file_name, has_charges=False)
+    cell, atom_labels, atom_pos, _ = read_cif(out_path, file_name)
 
     print(cell, atom_labels, atom_pos)
 
