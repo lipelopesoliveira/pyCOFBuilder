@@ -732,18 +732,17 @@ def save_vasp(path: str,
     with open(os.path.join(path, file_name + '.vasp'), 'w') as f:
         f.write('\n'.join(temp_file))
 
+
 def save_qe(path: str,
             file_name: str,
             cell: list,
-            atom_types: list,
-            atom_labels: list,
-            atom_pos: list,
-            atom_charges: list = None,
-            bonds: list = None,
-            bond_orders: list = None,
+            atomTypes: list,
+            atomLabels: list,
+            atomPos: list,
             frac_coords=False,
             calc_type: str = 'scf',
-            kspacing: float = 0.3):
+            kspacing: float = 0.3,
+            **kwargs) -> None:
     """
     Save the structure in Quantum Espresso .pwscf format.
 
@@ -764,16 +763,12 @@ def save_qe(path: str,
         Name of the file. Does not neet to contain the extention.
     cell : numpy array
         Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
-    atom_types : list
+    atomTypes : list
         List of strings containing containg the N atom types
-    atom_label : list
+    atomLabels : list
         List of strings containing containg the N atom labels
-    atom_pos : list
+    atomPos : list
         Nx3 array contaning the atoms coordinates.
-    atom_charges : list
-        List of strings containing containg the N atom partial charges.
-    bonds : list
-        List of lists containing the index of the bonded atoms and the bond length.
     frac_coords : bool
         If True, the coordinates are in fractional coordinates.
     calc_type : str
@@ -806,8 +801,8 @@ def save_qe(path: str,
         'nstep': 1000}
 
     input_dict['system'] = {
-        'nat': len(atom_types),
-        'ntyp': len(set(atom_types)),
+        'nat': len(atomTypes),
+        'ntyp': len(set(atomTypes)),
         'ecutwfc': 40,
         'ecutrho': 360,
         'vdw_corr': "'grimme-d3'",
@@ -862,7 +857,7 @@ def save_qe(path: str,
             f.write('/\n\n')
 
         f.write('ATOMIC_SPECIES\n')
-        for atom in set(atom_types):
+        for atom in set(atomTypes):
             f.write(f" {atom}   {elements_dict()[atom]:>9.5f}  {atom}.PSEUDO.UPF\n")
         f.write('\n')
 
@@ -878,12 +873,12 @@ def save_qe(path: str,
 
         f.write(f'ATOMIC_POSITIONS ({coords_type})\n')
 
-        for i, atom in enumerate(atom_pos):
-            f.write('{:<5s}{:>15.9f}{:>15.9f}{:>15.9f}   ! {:5}\n'.format(atom_types[i],
+        for i, atom in enumerate(atomPos):
+            f.write('{:<5s}{:>15.9f}{:>15.9f}{:>15.9f}   ! {:5}\n'.format(atomTypes[i],
                                                                           atom[0],
                                                                           atom[1],
                                                                           atom[2],
-                                                                          atom_labels[i]))
+                                                                          atomLabels[i]))
 
         f.write('\n')
         f.write('K_POINTS automatic\n')
