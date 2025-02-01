@@ -7,13 +7,16 @@ This module contains tools for input and output file manipulation used by pyCOFB
 """
 
 import os
+import warnings
+import gemmi
+import json
+
 from datetime import date
 import numpy as np
 
 from ase.io import read
 from pymatgen.io.cif import CifParser
-import gemmi
-import json
+
 
 from pycofbuilder.tools import (elements_dict,
                                 cell_to_cellpar,
@@ -210,7 +213,7 @@ def read_cif(path, file_name, useASE=False, usePymatgen=False):
                 symm_elements = len(cif.find_loop(loop_name))
 
         if symm_elements == 0 or symm_elements > 1:
-            print('The CIF file is not in P1 symmetry. The structure will be read using pyMatGen.')
+            warnings.warn('The CIF file is not in P1 symmetry. The structure will be read using pyMatGen.')
             usePymatgen = True
 
     if useASE:
