@@ -13,6 +13,7 @@ import numpy as np
 from ase.io import read
 from pymatgen.io.cif import CifParser
 import gemmi
+import json
 
 from pycofbuilder.tools import (elements_dict,
                                 cell_to_cellpar,
@@ -316,7 +317,7 @@ def save_xsf(path: str,
     file_name = file_name.split('.')[0]
 
     if len(cellMatrix) == 6:
-        cellMatrix = cellpar_to_cell(cellMatrix)
+        cellMatrix = cellpar_to_cell(cellMatrix)  # type: ignore
 
     if frac_coords:
         # Convert to fractional coordinates
@@ -527,7 +528,7 @@ def save_gjf(path: str,
     file_name = file_name.split('.')[0]
 
     if len(cell) == 6:
-        cell = cellpar_to_cell(cell)
+        cell = cellpar_to_cell(cell)  # type: ignore
 
     if frac_coords:
         # Convert to fractional coordinates
@@ -590,7 +591,7 @@ def save_xyz(path: str,
     file_name = file_name.split('.')[0]
 
     if len(cell) == 3:
-        cell = cellpar_to_cell(cell)
+        cell = cellpar_to_cell(cell)  # type: ignore
 
     if frac_coords:
         # Convert to fractional coordinates
@@ -703,7 +704,7 @@ def save_vasp(path: str,
     file_name = file_name.split('.')[0]
 
     if np.array(cell).shape == 6:
-        cell = cellpar_to_cell(cell)
+        cell = cellpar_to_cell(cell)  # type: ignore
 
     unique_atoms = []
     for i in atomTypes:
@@ -1097,4 +1098,6 @@ def generate_mol_dict(path, file_name, name, code, smiles):
 
     print(mol_dict)
 
-    write_json(path, file_name.split('.')[0], mol_dict)
+    # Write the dictionary to a json file
+    with open(os.path.join(path, file_name.split('.')[0] + '.json'), 'w') as f:
+        json.dump(mol_dict, f, indent=4)
