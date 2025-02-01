@@ -341,7 +341,7 @@ def save_pqr(path: str,
              file_name: str,
              atomTypes: list,
              atomPos: list,
-             cellMatrix: list = [],
+             cell: list = [],
              partialCharges: list = [],
              frac_coords=False,
              atomLabels: list = [],
@@ -360,7 +360,7 @@ def save_pqr(path: str,
         List of strings containing containg the N atom types
     atomPos : list
         Nx3 array contaning the atoms coordinates.
-    cellMatrix : list, optional
+    cell : list, optional
         Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
     partialCharges : list, optional
         List of strings containing containg the N atom partial charges.
@@ -376,8 +376,8 @@ def save_pqr(path: str,
 
     file_name = file_name.split('.')[0]
 
-    if len(cellMatrix) == 3:
-        cell = cell_to_cellpar(cellMatrix)
+    if len(cell) == 3:
+        cell = cell_to_cellpar(cell)  # type: ignore
 
     if frac_coords:
         # Convert to fractional coordinates
@@ -389,8 +389,8 @@ def save_pqr(path: str,
     pqr_file.append('REMARK   4')
     pqr_file.append(f'REMARK   Created by pyCOFBuilder on {date.today()}')
 
-    if len(cellMatrix) > 0:
-        pqr_file.append('CRYST1{:>9.3f}{:>9.3f}{:>9.3f}{:>7.2f}{:>7.2f}{:>7.2f} P1'.format(*cellMatrix))
+    if len(cell) > 0:
+        pqr_file.append('CRYST1{:>9.3f}{:>9.3f}{:>9.3f}{:>7.2f}{:>7.2f}{:>7.2f} P1'.format(*cell))
 
     if len(partialCharges) == 0:
         partialCharges = [0 for i in range(len(atomTypes))]
@@ -422,68 +422,63 @@ def save_pqr(path: str,
 
 def save_pdb(path: str,
              file_name: str,
-             cell: list,
-             atom_types: list,
-             atom_labels: list,
-             atom_pos: list,
-             atom_charges: list = None,
-             bonds: list = None,
-             bond_orders: list = None,
-             frac_coords=False):
+             atomTypes: list,
+             atomPos: list,
+             cell: list = [],
+             frac_coords=False,
+             atomLabels: list = [],
+             bonds: list = [],
+             bond_orders: list = [],
+             **kwargs) -> None:
     """
     Save a file in format `.pdb` on the `path`.
 
-    Parameters
-    ----------
     path : str
         Path to the save the file.
     file_name : str
         Name of the file. Does not neet to contain the extention.
-    cell : numpy array
-        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
-    atom_types : list
+    atomTypes : list
         List of strings containing containg the N atom types
-    atom_label : list
-        List of strings containing containg the N atom labels
-    atom_pos : list
+    atomPos : list
         Nx3 array contaning the atoms coordinates.
-    atom_charges : list
-        List of strings containing containg the N atom partial charges.
-    bonds : list
+    cell : list, optional
+        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
+    frac_coords : bool, optional
+        If True, the coordinates are in fractional coordinates and will be converted to cartesian. Default is False.
+    atomLabels : list, optional
+        List of strings containing containg the N atom labels.
+    bonds : list, optional
         List of lists containing the index of the bonded atoms and the bond length.
-    frac_coords : bool
-        If True, the coordinates are in fractional coordinates.
+    bond_orders : list, optional
+        List of integers containing the bond orders.
     """
 
     file_name = file_name.split('.')[0]
 
     if len(cell) == 3:
-        cell = cell_to_cellpar(cell)
+        cell = cell_to_cellpar(cell)  # type: ignore
 
     if frac_coords:
         # Convert to fractional coordinates
         frac_matrix = get_fractional_to_cartesian_matrix(*cell)
-        atom_pos = [np.dot(frac_matrix, [i[0], i[1], i[2]]) for i in atom_pos]
+        atomPos = [np.dot(frac_matrix, [i[0], i[1], i[2]]) for i in atomPos]
 
-    pdb_file = open(os.path.join(path, file_name + '.pdb'), 'w')
-    pdb_file.write(f'TITLE       {file_name}  \n')
-    pdb_file.write('REMARK   pyCOFBuilder\n')
-    pdb_file.write('CRYST1{:>9.3f}{:>9.3f}{:>9.3f}{:>7.2f}{:>7.2f}{:>7.2f} P1\n'.format(cell[0],
-                                                                                        cell[1],
-                                                                                        cell[2],
-                                                                                        cell[3],
-                                                                                        cell[4],
-                                                                                        cell[5]))
+    pdb_file = []
+    pdb_file.append(f'TITLE       {file_name}')
+    pdb_file.append(f'REMARK   Created by pyCOFBuilder on {date.today()}')
 
-    atom_line = 'ATOM   {:>4} {:>2}   MOL     {:>13.3f}{:>8.3f}{:>8.3f}  1.00  0.00  {:>11}\n'
+    if len(cell) > 0:
+        pdb_file.append('CRYST1{:>9.3f}{:>9.3f}{:>9.3f}{:>7.2f}{:>7.2f}{:>7.2f} P1'.format(*cell))
 
-    for i in range(len(atom_pos)):
-        pdb_file.write(atom_line.format(i+1,
-                                        atom_types[i],
-                                        atom_pos[i][0],
-                                        atom_pos[i][1],
-                                        atom_pos[i][2],
-                                        atom_types[i]))
+    atom_line = 'ATOM   {:>4} {:>2}   MOL     {:>13.3f}{:>8.3f}{:>8.3f}  1.00  0.00  {:>11}'
+
+    for i in range(len(atomPos)):
+        pdb_file.append(atom_line.format(i+1,
+                                         atomTypes[i],
+                                         atomPos[i][0],
+                                         atomPos[i][1],
+                                         atomPos[i][2],
+                                         atomLabels[i]))
 
     if bonds and not bond_orders:
         bond_orders = [1 for i in range(len(bonds))]
@@ -491,9 +486,10 @@ def save_pdb(path: str,
     if bonds:
         for i in range(len(bonds)):
             for j in range(bond_orders[i]):
-                pdb_file.write(f'CONECT {bonds[i][0] + 1:4} {bonds[i][1] + 1:4}\n')
+                pdb_file.append(f'CONECT {bonds[i][0] + 1:4} {bonds[i][1] + 1:4}')
 
-    pdb_file.close()
+    with open(os.path.join(path, file_name + '.pdb'), 'w') as f:
+        f.write('\n'.join(pdb_file))
 
 
 def save_gjf(path: str,
