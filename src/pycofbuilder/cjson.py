@@ -369,7 +369,7 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
                 'alpha': self.cell_parameters[3],
                 'beta': self.cell_parameters[4],
                 'gamma': self.cell_parameters[5],
-                'cellVectors': self.cell_matrix.flatten().tolist()
+                'cellVectors': np.array(self.cell_matrix).flatten().tolist()
             }
 
         structure_dict['atoms'] = {

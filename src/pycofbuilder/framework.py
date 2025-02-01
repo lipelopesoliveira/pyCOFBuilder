@@ -400,7 +400,8 @@ class Framework():
              supercell: list = (1, 1, 1),
              save_dir=None,
              primitive=False,
-             save_bonds=True) -> None:
+             save_bonds=True,
+             save_labels=False) -> None:
         """
         Save the structure in a specif file format.
 
@@ -418,6 +419,12 @@ class Framework():
             `out` folder created in the current directory.
         primitive : bool, optional
             If True, the primitive cell is saved. Otherwise, the conventional cell is saved.
+            Default: False
+        save_bonds : bool, optional
+            If True, the bonds are saved in the structure.
+            Default: True
+        save_labels : bool, optional
+            If True, the atom labels are saved in the structure.
             Default: False
         """
 
@@ -462,6 +469,12 @@ class Framework():
 
         atom_types = [site['species'][0]['element'] for site in structure_dict['sites']]
         atom_labels = [site['properties']['source'] for site in structure_dict['sites']]
+
+        if save_labels:
+            atom_labels = ['{}{}_{}'.format(atom_types[i], i, atom_labels[i]) for i in range(len(atom_types))] 
+        else:
+            atom_labels = [atom_types[i] + str(i) for i in range(len(atom_types))]
+
         atom_pos = [site['xyz'] for site in structure_dict['sites']]
 
         if save_dir is None:
@@ -472,9 +485,9 @@ class Framework():
         save_dict[fmt](path=save_path,
                        file_name=self.name,
                        cell=cell,
-                       atom_types=atom_types,
-                       atom_labels=atom_labels,
-                       atom_pos=atom_pos,
+                       atomTypes=atom_types,
+                       atomLabels=atom_labels,
+                       atomPos=atom_pos,
                        bonds=bonds)
 
     def make_cubic(self,
