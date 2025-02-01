@@ -3,10 +3,10 @@
 from setuptools import setup
 
 with open('LICENSE') as f:
-    license_file = f.readlines()
+    license_file = f.read().splitlines()
 
 
-VERSION = '0.0.8.6'
+VERSION = '0.0.8.7'
 DESCRIPTION = 'A package for Covalent Organic Frameworks sturcture assembly.'
 
 setup(
