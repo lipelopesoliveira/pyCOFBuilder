@@ -11,8 +11,8 @@ from datetime import date
 import numpy as np
 
 from ase.io import read
-from ase.cell import Cell
 from pymatgen.io.cif import CifParser
+import gemmi
 
 import simplejson
 from pycofbuilder.tools import (elements_dict,
@@ -93,9 +93,9 @@ def read_xyz(path: str, file_name: str, extxyz=False) -> tuple:
     if extxyz:
         atoms = read(os.path.join(path, file_name + '.xyz'))
 
-        atomTypes = atoms.get_chemical_symbols()
-        cartPos = atoms.get_positions()
-        cellMatrix = atoms.get_cell()
+        atomTypes = atoms.get_chemical_symbols()  # type: ignore
+        cartPos = atoms.get_positions()  # type: ignore
+        cellMatrix = atoms.get_cell()  # type: ignore
 
     else:
         temp_file = open(os.path.join(path, file_name + '.xyz'), 'r').readlines()
@@ -192,7 +192,7 @@ def read_gjf(path, file_name) -> tuple:
     return atonTypes, cartPos, cellMatrix
 
 
-def read_cif(path, file_name):
+def read_cif(path, file_name, useASE=False, usePymatgen=False):
     """
     Reads a file in format `.cif` from the `path` given and returns
     a list containg the N atom labels and a Nx3 array contaning
@@ -204,6 +204,10 @@ def read_cif(path, file_name):
         Path to the file.
     file_name : str
         Name of the `cif` file. Does not neet to contain the `.cif` extention.
+    useASE : bool
+        If True, the function will use ASE library to read the file.
+    usePymatgen : bool
+        If True, the function will use Pymatgen library to read the file.
 
     Returns
     -------
@@ -220,43 +224,61 @@ def read_cif(path, file_name):
     # Remove the extention if exists
     file_name = file_name.split('.')[0]
 
-    if os.path.exists(os.path.join(path, file_name + '.cif')):
+    if not os.path.exists(os.path.join(path, file_name + '.cif')):
+        raise FileNotFoundError(f'File {file_name} not found!')
 
-        temp_file = open(os.path.join(path, file_name + '.cif'), 'r').readlines()
-        cell = []
-        atom_label = []
-        atom_pos = []
-        charges = []
-        has_charges = False
-        for i in temp_file:
-            if 'cell_length_a' in i:
-                cell += [float(i.split()[-1])]
-            if 'cell_length_b' in i:
-                cell += [float(i.split()[-1])]
-            if 'cell_length_c' in i:
-                cell += [float(i.split()[-1])]
-            if 'cell_angle_alpha' in i:
-                cell += [float(i.split()[-1])]
-            if '_cell_angle_beta' in i:
-                cell += [float(i.split()[-1])]
-            if '_cell_angle_gamma' in i:
-                cell += [float(i.split()[-1])]
-            if '_atom_site_charge' in i:
-                has_charges = True
+    if not useASE and not usePymatgen:
+        cif = gemmi.cif.read_file(os.path.join(path, file_name + '.cif')).sole_block()
 
-        for i in temp_file:
-            line = i.split()
-            if len(line) > 1 and line[0] in elements_dict().keys():
-                atom_label += [line[0]]
-                atom_pos += [[float(j) for j in line[2:5]]]
-                if has_charges:
-                    charges += [float(line[-1])]
-        cell = cellpar_to_cell(cell)
+        # Check if the cif is not with P1 symmetry
+        symm_elements = 0
+        for loop_name in ['_symmetry_equiv_pos_as_xyz', '_space_group_symop_operation_xyz']:
+            if len(cif.find_loop(loop_name)) != 0:
+                symm_elements = len(cif.find_loop(loop_name))
 
-        return cell, atom_label, atom_pos, charges
+        if symm_elements == 0 or symm_elements > 1:
+            print('The CIF file is not in P1 symmetry. The structure will be read using pyMatGen.')
+            usePymatgen = True
+
+    if useASE:
+        atoms = read(os.path.join(path, file_name + '.cif'))
+        atomTypes = atoms.get_chemical_symbols()  # type: ignore
+        cartPos = atoms.get_positions()  # type: ignore
+        cellMatrix = atoms.get_cell()  # type: ignore
+        partialCharges = [0 for i in range(len(atomTypes))]
+
+    elif usePymatgen:
+        parser = CifParser(os.path.join(path, file_name + '.cif'))
+        structure = parser.get_structures()[0]
+
+        atomTypes = [str(i) for i in structure.species]
+        cartPos = structure.cart_coords
+        cellMatrix = structure.lattice.matrix
+        partialCharges = [0 for i in range(len(atomTypes))]
+
     else:
-        print(f'File {file_name} not found!')
-        return None
+        cif = gemmi.cif.read_file(os.path.join(path, file_name + '.cif')).sole_block()
+        a = float(cif.find_value('_cell_length_a').split('(')[0])
+        b = float(cif.find_value('_cell_length_b').split('(')[0])
+        c = float(cif.find_value('_cell_length_c').split('(')[0])
+        beta = float(cif.find_value('_cell_angle_beta').split('(')[0])
+        gamma = float(cif.find_value('_cell_angle_gamma').split('(')[0])
+        alpha = float(cif.find_value('_cell_angle_alpha').split('(')[0])
+
+        cellMatrix = cellpar_to_cell([a, b, c, alpha, beta, gamma])
+
+        atomTypes = cif.find_values('_atom_site_type_symbol')
+        atom_site_fract_x = np.array(cif.find_values('_atom_site_fract_x')).astype(float)
+        atom_site_fract_y = np.array(cif.find_values('_atom_site_fract_y')).astype(float)
+        atom_site_fract_z = np.array(cif.find_values('_atom_site_fract_z')).astype(float)
+
+        cartPos = np.array([np.dot(cellMatrix, [i, j, k]) for i, j, k in zip(atom_site_fract_x,
+                                                                             atom_site_fract_y,
+                                                                             atom_site_fract_z)])
+
+        partialCharges = np.array(cif.find_values('_atom_site_charge')).astype(float)
+
+    return atomTypes, cartPos, cellMatrix, partialCharges
 
 
 def save_xsf(path: str,
