@@ -7,7 +7,6 @@ This module contains tools for input and output file manipulation used by pyCOFB
 """
 
 import os
-import pwd
 from datetime import date
 import numpy as np
 
@@ -165,14 +164,7 @@ def read_gjf(path, file_name):
         atom_labels = [i[0] for i in atoms]
         atom_pos = np.array([[float(i[1]), float(i[2]), float(i[3])] for i in atoms])
 
-        cell_matrix = [i for i in temp_file if 'Tv' in i]
-
-        if cell_matrix:
-            cell_matrix = np.array([i[1:] for i in cell_matrix]).astype(float)
-        else:
-            cell_matrix = None
-
-        return atom_labels, atom_pos, cell_matrix
+        return atom_labels, atom_pos
     else:
         print(f'File {file_name} not found!')
         return None
@@ -1020,7 +1012,7 @@ data_{file_name}
 
 _audit_creation_date     {date.today().strftime("%Y-%d-%m")}
 _audit_creation_method   pyCOFBuilder
-_audit_author_name       '{pwd.getpwuid(os.getuid())[0]}'
+_audit_author_name       '{os.getlogin()}'
 
 _chemical_name_common                  '{file_name}'
 _cell_length_a                          {a:>10.6f}
