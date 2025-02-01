@@ -24,7 +24,7 @@ from pycofbuilder.tools import (elements_dict,
                                 cell_to_ibrav)
 
 
-def save_csv(path: str, file_name: str, data: list, delimiter: str = ',', head: list=[]):
+def save_csv(path: str, file_name: str, data: list, delimiter: str = ',', head: list = []):
     """
     Saves a file in format `.csv`.
 
@@ -38,7 +38,7 @@ def save_csv(path: str, file_name: str, data: list, delimiter: str = ',', head: 
         Data to be saved.
     delimiter: str
         Delimiter of the columns. `,` is the default.
-    head : str
+    head : list
         Names of the columns.
     """
 
