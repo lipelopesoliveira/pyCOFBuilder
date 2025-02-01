@@ -7,6 +7,7 @@ This module contains tools for input and output file manipulation used by pyCOFB
 """
 
 import os
+
 import warnings
 import gemmi
 import json

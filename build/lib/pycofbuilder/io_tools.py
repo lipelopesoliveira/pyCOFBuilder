@@ -7,7 +7,6 @@ This module contains tools for input and output file manipulation used by pyCOFB
 """
 
 import os
-import pwd
 from datetime import date
 import numpy as np
 
@@ -1013,7 +1012,7 @@ data_{file_name}
 
 _audit_creation_date     {date.today().strftime("%Y-%d-%m")}
 _audit_creation_method   pyCOFBuilder
-_audit_author_name       '{pwd.getpwuid(os.getuid())[0]}'
+_audit_author_name       '{os.getlogin()}'
 
 _chemical_name_common                  '{file_name}'
 _cell_length_a                          {a:>10.6f}

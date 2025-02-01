@@ -93,6 +93,15 @@ Bugfixes
 - Fixed a bug in the creation of the `DIA` and `DIA_A` nets.
 - Fix the position of the atoms on `CH2CN` and `CHO` connection groups.
 
+v0.0.8.7 Beta (01/02/2025)
+========================
+
+Bugfixes
+--------
+
+- Remove the `pwd` library to ensure compatibility with Windows systems.
+
+
 v0.0.8.3 Beta (16/04/2024)
 ========================
 
