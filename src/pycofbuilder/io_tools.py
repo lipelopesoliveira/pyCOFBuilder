@@ -620,7 +620,7 @@ def save_turbomole(path: str,
                    atomPos: list,
                    cell: list = [],
                    frac_coords=False,
-                   *kwargs) -> None:
+                   **kwargs) -> None:
     """
     Save the structure in Turbomole .coord format on the `path`.
 
@@ -639,6 +639,8 @@ def save_turbomole(path: str,
     frac_coords : bool, optional
         If True, the coordinates are in fractional coordinates and will be converted to cartesian. Default is False.
     """
+
+    file_name = file_name.split('.')[0]
 
     if np.array(cell).shape == (3, 3):
         cell = cell_to_cellpar(cell)  # type: ignore
@@ -669,14 +671,11 @@ def save_turbomole(path: str,
 
 def save_vasp(path: str,
               file_name: str,
-              cell: list,
-              atom_types: list,
-              atom_labels: list,
-              atom_pos: list,
-              atom_charges: list = None,
-              bonds: list = None,
-              bond_orders: list = None,
-              frac_coords=False):
+              atomTypes: list,
+              atomPos: list,
+              cell: list = [],
+              frac_coords=False,
+              **kwargs) -> None:
     """
     Save the structure in VASP .vasp format on the `path`.
 
@@ -686,55 +685,52 @@ def save_vasp(path: str,
         Path to the save the file.
     file_name : str
         Name of the file. Does not neet to contain the extention.
-    cell : numpy array
-        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
-    atom_types : list
+    atomTypes : list
         List of strings containing containg the N atom types
-    atom_label : list
-        List of strings containing containg the N atom labels
-    atom_pos : list
+    atomPos : list
         Nx3 array contaning the atoms coordinates.
-    atom_charges : list
-        List of strings containing containg the N atom partial charges.
-    bonds : list
-        List of lists containing the index of the bonded atoms and the bond length.
-    frac_coords : bool
-        If True, the coordinates are in fractional coordinates.
+    cell : list, optional
+        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
+    frac_coords : bool, optional
+        If True, the coordinates are in fractional coordinates and will be converted to cartesian. Default is False.
     """
+
+    file_name = file_name.split('.')[0]
 
     if np.array(cell).shape == 6:
         cell = cellpar_to_cell(cell)
 
     unique_atoms = []
-    for i in atom_types:
+    for i in atomTypes:
         if i not in unique_atoms:
             unique_atoms.append(i)
 
-    composition_dict = {i: atom_types.count(i) for i in unique_atoms}
+    composition_dict = {i: atomTypes.count(i) for i in unique_atoms}
 
-    with open(os.path.join(path, file_name + '.vasp'), 'w') as temp_file:
-        temp_file.write(f'{file_name}\n')
-        temp_file.write('1.0\n')
+    temp_file = []
 
-        for i in range(3):
-            temp_file.write('{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(cell[i][0],
-                                                                   cell[i][1],
-                                                                   cell[i][2]))
+    temp_file.append(file_name)
+    temp_file.append('1.0')
 
-        temp_file.write(' '.join(composition_dict.keys()) + '\n')
-        temp_file.write(' '.join([str(i) for i in composition_dict.values()]) + '\n')
+    for i in range(3):
+        temp_file.append('{:>15.7f}{:>15.7f}{:>15.7f}'.format(*cell[i]))
 
-        if frac_coords:
-            temp_file.write('Direct\n')
-        else:
-            temp_file.write('Cartesian\n')
+    temp_file.append(' '.join(composition_dict.keys()))
+    temp_file.append(' '.join([str(i) for i in composition_dict.values()]))
 
-        for i in range(len(atom_types)):
-            temp_file.write('{:>15.7f}{:>15.7f}{:>15.7f}   {:<5s}\n'.format(atom_pos[i][0],
-                                                                            atom_pos[i][1],
-                                                                            atom_pos[i][2],
-                                                                            atom_types[i]))
+    if frac_coords:
+        temp_file.append('Direct')
+    else:
+        temp_file.append('Cartesian')
 
+    for i in range(len(atomTypes)):
+        temp_file.append('{:>15.7f}{:>15.7f}{:>15.7f}   {:<5s}'.format(atomPos[i][0],
+                                                                       atomPos[i][1],
+                                                                       atomPos[i][2],
+                                                                       atomPos[i]))
+
+    with open(os.path.join(path, file_name + '.vasp'), 'w') as f:
+        f.write('\n'.join(temp_file))
 
 def save_qe(path: str,
             file_name: str,
