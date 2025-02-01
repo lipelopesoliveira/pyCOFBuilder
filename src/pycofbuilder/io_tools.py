@@ -24,7 +24,7 @@ from pycofbuilder.tools import (elements_dict,
                                 cell_to_ibrav)
 
 
-def save_csv(path, file_name, data, delimiter=',', head=False):
+def save_csv(path: str, file_name: str, data: list, delimiter: str = ',', head: list=[]):
     """
     Saves a file in format `.csv`.
 
@@ -46,14 +46,16 @@ def save_csv(path, file_name, data, delimiter=',', head=False):
     file_name = file_name.split('.')[0]
     file_name = os.path.join(path, file_name + '.csv')
 
-    file_temp = open(file_name, 'w')
-    if head is not False:
-        file_temp.write(head)
+    content = []
 
-    for i in range(len(data)):
-        file_temp.write(delimiter.join([str(j) for j in data[i]]) + '\n')
+    if len(head) > 0:
+        content.append(delimiter.join(head))
 
-    file_temp.close()
+    for i in data:
+        content.append(delimiter.join([str(j) for j in i]))
+
+    with open(file_name, 'w') as f:
+        f.write('\n'.join(content))
 
 
 def read_xyz(path, file_name):
