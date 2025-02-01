@@ -19,7 +19,7 @@ New features
 Bugfixes
 --------
 
-- 
+- Fix bond types not following the CCDC conventions.
 
 v0.0.8.7 Beta (29/12/2024)
 ========================
