@@ -26,40 +26,6 @@ from pycofbuilder.tools import (elements_dict,
                                 cell_to_ibrav)
 
 
-def save_csv(path: str, file_name: str, data: list, delimiter: str = ',', head: list = []) -> None:
-    """
-    Saves a file in format `.csv`.
-
-    Parameters
-    ----------
-    path : str
-        Path to the file.
-    file_name : str
-        Name of the `csv` file. Does not neet to contain the `.csv` extention.
-    data : list
-        Data to be saved.
-    delimiter: str
-        Delimiter of the columns. `,` is the default.
-    head : list
-        Names of the columns.
-    """
-
-    # Remove the extention if exists
-    file_name = file_name.split('.')[0]
-    file_name = os.path.join(path, file_name + '.csv')
-
-    content = []
-
-    if len(head) > 0:
-        content.append(delimiter.join(head))
-
-    for i in data:
-        content.append(delimiter.join([str(j) for j in i]))
-
-    with open(file_name, 'w') as f:
-        f.write('\n'.join(content))
-
-
 def read_xyz(path: str, file_name: str, extxyz=False) -> tuple:
     """
     Reads a file in format `.xyz` from the given `path` and returns
@@ -281,16 +247,47 @@ def read_cif(path, file_name, useASE=False, usePymatgen=False):
     return atomTypes, cartPos, cellMatrix, partialCharges
 
 
+def save_csv(path: str, file_name: str, data: list, delimiter: str = ',', head: list = []) -> None:
+    """
+    Saves a file in format `.csv`.
+
+    Parameters
+    ----------
+    path : str
+        Path to the file.
+    file_name : str
+        Name of the `csv` file. Does not neet to contain the `.csv` extention.
+    data : list
+        Data to be saved.
+    delimiter: str
+        Delimiter of the columns. `,` is the default.
+    head : list
+        Names of the columns.
+    """
+
+    # Remove the extention if exists
+    file_name = file_name.split('.')[0]
+    file_name = os.path.join(path, file_name + '.csv')
+
+    content = []
+
+    if len(head) > 0:
+        content.append(delimiter.join(head))
+
+    for i in data:
+        content.append(delimiter.join([str(j) for j in i]))
+
+    with open(file_name, 'w') as f:
+        f.write('\n'.join(content))
+
+
 def save_xsf(path: str,
              file_name: str,
-             cell: list,
-             atom_types: list,
-             atom_labels: list,
-             atom_pos: list,
-             atom_charges: list = None,
-             bonds: list = None,
-             bond_orders: list = None,
-             frac_coords=False):
+             atomTypes: list,
+             atomPos: list,
+             cellMatrix: list,
+             frac_coords=False,
+             **kwargs):
     """
     Save a file in format `.xsf` on the `path`.
 
@@ -300,47 +297,41 @@ def save_xsf(path: str,
         Path to the save the file.
     file_name : str
         Name of the file. Does not neet to contain the extention.
-    cell : numpy array
-        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
-    atom_types : list
+    atomTypes : list
         List of strings containing containg the N atom types
-    atom_label : list
-        List of strings containing containg the N atom labels
-    atom_pos : list
+    atomPos : list
         Nx3 array contaning the atoms coordinates.
-    atom_charges : list
-        List of strings containing containg the N atom partial charges.
-    bonds : list
-        List of lists containing the index of the bonded atoms and the bond length.
+    cellMatrix : numpy array
+        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
     frac_coords : bool
         If True, the coordinates are in fractional coordinates.
     """
 
     file_name = file_name.split('.')[0]
 
-    if len(cell) == 6:
-        cell = cellpar_to_cell(cell)
+    if len(cellMatrix) == 6:
+        cellMatrix = cellpar_to_cell(cellMatrix)
 
     if frac_coords:
         # Convert to fractional coordinates
-        frac_matrix = get_fractional_to_cartesian_matrix(*cell_to_cellpar(cell))
-        atom_pos = [np.dot(frac_matrix, [i[0], i[1], i[2]]) for i in atom_pos]
+        frac_matrix = get_fractional_to_cartesian_matrix(*cell_to_cellpar(cellMatrix))
+        atomPos = [np.dot(frac_matrix, [i[0], i[1], i[2]]) for i in atomPos]
 
     xsf_file = open(os.path.join(path, file_name + '.xsf'), 'w')
     xsf_file.write(' CRYSTAL\n')
     xsf_file.write('  PRIMVEC\n')
 
-    for i in range(len(cell)):
-        xsf_file.write(f'  {cell[i][0]:>15.9f}    {cell[i][1]:>15.9f}    {cell[i][2]:>15.9f}\n')
+    for i in range(len(cellMatrix)):
+        xsf_file.write(f'  {cellMatrix[i][0]:>15.9f}    {cellMatrix[i][1]:>15.9f}    {cellMatrix[i][2]:>15.9f}\n')
 
     xsf_file.write('   PRIMCOORD\n')
-    xsf_file.write(f'           {len(atom_pos)}           1\n')
+    xsf_file.write(f'           {len(atomPos)}           1\n')
 
-    for i in range(len(atom_pos)):
-        xsf_file.write('{:3s}        {:>15.9f}    {:>15.9f}    {:>15.9f}\n'.format(atom_types[i],
-                                                                                   atom_pos[i][0],
-                                                                                   atom_pos[i][1],
-                                                                                   atom_pos[i][2]))
+    for i in range(len(atomPos)):
+        xsf_file.write('{:3s}        {:>15.9f}    {:>15.9f}    {:>15.9f}\n'.format(atomTypes[i],
+                                                                                   atomPos[i][0],
+                                                                                   atomPos[i][1],
+                                                                                   atomPos[i][2]))
 
     xsf_file.close()
 
