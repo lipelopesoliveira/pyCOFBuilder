@@ -10,6 +10,8 @@ import os
 from datetime import date
 import numpy as np
 
+from ase.io import read
+from ase.cell import Cell
 from pymatgen.io.cif import CifParser
 
 import simplejson
@@ -58,7 +60,7 @@ def save_csv(path: str, file_name: str, data: list, delimiter: str = ',', head: 
         f.write('\n'.join(content))
 
 
-def read_xyz(path: str, file_name: str) -> tuple:
+def read_xyz(path: str, file_name: str, extxyz=False) -> tuple:
     """
     Reads a file in format `.xyz` from the given `path` and returns
     a list containg the N atom labels and a Nx3 array contaning
@@ -77,6 +79,8 @@ def read_xyz(path: str, file_name: str) -> tuple:
         List of strings containing containg the N atom labels.
     atom_pos : numpy array
         Nx3 array contaning the atoms coordinates
+    extxyz : bool
+        If True, the function will consider the extended xyz file format and use ase library to read the file.
     """
 
     # Remove the extention if exists
@@ -86,14 +90,23 @@ def read_xyz(path: str, file_name: str) -> tuple:
     if not os.path.exists(os.path.join(path, file_name + '.xyz')):
         raise FileNotFoundError(f'File {file_name} not found!')
 
-    temp_file = open(os.path.join(path, file_name + '.xyz'), 'r').readlines()
+    if extxyz:
+        atoms = read(os.path.join(path, file_name + '.xyz'))
 
-    atoms = [i.split() for i in temp_file[2:]]
+        atomTypes = atoms.get_chemical_symbols()
+        cartPos = atoms.get_positions()
+        cellMatrix = atoms.get_cell()
 
-    atom_labels = [i[0] for i in atoms if len(i) > 1]
-    atom_pos = np.array([[float(i[1]), float(i[2]), float(i[3])] for i in atoms if len(i) > 1])
+    else:
+        temp_file = open(os.path.join(path, file_name + '.xyz'), 'r').readlines()
 
-    return atom_labels, atom_pos
+        atoms = [i.split() for i in temp_file[2:]]
+
+        atomTypes = [i[0] for i in atoms if len(i) > 1]
+        cartPos = np.array([[float(i[1]), float(i[2]), float(i[3])] for i in atoms if len(i) > 1])
+        cellMatrix = np.eye(3) * 10
+
+    return atomTypes, cartPos, cellMatrix
 
 
 def read_pdb(path, file_name):
@@ -127,13 +140,15 @@ def read_pdb(path, file_name):
 
     cellParameters = np.array([i.split()[1:] for i in temp_file if 'CRYST1' in i][0]).astype(float)
 
-    AtomTypes = [i.split()[2] for i in temp_file if 'ATOM' in i]
-    CartPos = np.array([i.split()[4:7] for i in temp_file if 'ATOM' in i]).astype(float)
+    cellMatrix = cellpar_to_cell(cellParameters)
 
-    return cellParameters, AtomTypes, CartPos
+    atomTypes = [i.split()[2] for i in temp_file if 'ATOM' in i]
+    cartPos = np.array([i.split()[4:7] for i in temp_file if 'ATOM' in i]).astype(float)
+
+    return atomTypes, cartPos, cellMatrix
 
 
-def read_gjf(path, file_name):
+def read_gjf(path, file_name) -> tuple:
     """
     Reads a file in format `.gjf` from the `path` given and returns
     a list containg the N atom labels and a Nx3 array contaning
@@ -148,28 +163,33 @@ def read_gjf(path, file_name):
 
     Returns
     -------
-    atom_labels : list
+    atonTypes : list
         List of strings containing containg the N atom labels.
-    atom_pos : numpy array
+    cartPos : numpy array
         Nx3 array contaning the atoms coordinates
+    cellMatrix : numpy array
+        3x3 array contaning the cell vectors.
     """
     # Remove the extention if exists
     file_name = file_name.split('.')[0]
 
-    if os.path.exists(os.path.join(path, file_name + '.gjf')):
+    if not os.path.exists(os.path.join(path, file_name + '.gjf')):
+        raise FileNotFoundError(f'File {file_name} not found!')
 
-        temp_file = open(os.path.join(path, file_name + '.gjf'), 'r').readlines()
-        temp_file = [i.split() for i in temp_file if i != '\n']
+    temp_file = open(os.path.join(path, file_name + '.gjf'), 'r').readlines()
+    temp_file = [i.split() for i in temp_file if i != '\n']
 
-        atoms = [i for i in temp_file if i[0] in elements_dict()]
+    atoms = [i for i in temp_file if i[0] in elements_dict()]
 
-        atom_labels = [i[0] for i in atoms]
-        atom_pos = np.array([[float(i[1]), float(i[2]), float(i[3])] for i in atoms])
+    atonTypes = [i[0] for i in atoms]
+    cartPos = np.array([[float(i[1]), float(i[2]), float(i[3])] for i in atoms])
 
-        return atom_labels, atom_pos
-    else:
-        print(f'File {file_name} not found!')
-        return None
+    cellMatrix = [i for i in temp_file if 'Tv' in i]
+
+    if cellMatrix:
+        cellMatrix = np.array([i[1:] for i in cellMatrix]).astype(float)
+
+    return atonTypes, cartPos, cellMatrix
 
 
 def read_cif(path, file_name):
