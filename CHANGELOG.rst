@@ -3,6 +3,15 @@ Change Log
 **********
 
 
+v0.0.8.7 Beta (01/02/2025)
+========================
+
+Bugfixes
+--------
+
+- Remove the `pwd` library to ensure compatibility with Windows systems.
+
+
 v0.0.8.3 Beta (16/04/2024)
 ========================
 
