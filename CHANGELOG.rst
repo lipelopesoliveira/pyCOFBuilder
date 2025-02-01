@@ -2,6 +2,18 @@
 Change Log
 **********
 
+v0.0.8.8 Beta (29/12/2024)
+========================
+
+New features
+------------
+
+- 
+
+Bugfixes
+--------
+
+- 
 
 v0.0.8.7 Beta (29/12/2024)
 ========================
@@ -14,6 +26,11 @@ New features
   
 - Added new building blocks:
   - L2: PRZN2
+
+Bugfixes
+--------
+
+- Remove the `pwd`` library to ensure compatibility with Windows systems.
   
 v0.0.8.6 Beta (03/09/2024)
 ========================
