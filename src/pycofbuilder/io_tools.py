@@ -77,7 +77,7 @@ def read_xyz(path: str, file_name: str, extxyz=False) -> tuple:
 
         atomTypes = [i[0] for i in atoms if len(i) > 1]
         cartPos = np.array([[float(i[1]), float(i[2]), float(i[3])] for i in atoms if len(i) > 1])
-        cellMatrix = np.eye(3) * 10
+        cellMatrix = np.zeros((3, 3))
 
     return atomTypes, cartPos, cellMatrix
 
@@ -611,7 +611,7 @@ def save_xyz(path: str,
     if cell:
         header += 'Lattice="{:>15.7f} {:>15.7f} {:>15.7f} {:>15.7f} {:>15.7f} {:>15.7f}" pbc="T T T"'.format(*cell)
 
-    xyz_file.append(header + ' species:S:1:pos:R:3:initial_charges:R:1')
+    xyz_file.append(header + ' species:S:1:pos:R:3:charge:R:1')
 
     for i in range(len(atomTypes)):
         xyz_file.append('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}{:>15.7f}'.format(atomTypes[i],

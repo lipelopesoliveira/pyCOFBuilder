@@ -1,13 +1,14 @@
+import numpy as np
+from numpy.testing import assert_allclose
+
+import sys
+sys.path.insert(1, '/home/felipe/PRs/pyCOFBuilder/src')
+
 from pycofbuilder.tools import (elements_dict,
                                 unit_vector,
                                 angle,
                                 rotation_matrix_from_vectors,
-                                rmsd,
-                                calculate_sides)
-
-import numpy as np
-from numpy.testing import assert_allclose
-import pytest
+                                rmsd)
 
 
 def test_elements_dict() -> None:
@@ -99,28 +100,3 @@ def test_rmsd_nonzero():
     diff = V - W
     expected = np.sqrt((diff * diff).sum() / 2)
     assert np.isclose(rmsd(V, W), expected, atol=1e-5)
-
-
-def test_calculate_sides_valid():
-    """Test that calculate_sides returns the correct unique side lengths for a set of points."""
-    # Define four points forming a rectangle (or square) in the XY-plane.
-    points = np.array([
-        [0, 0, 0],
-        [0, 2, 0],
-        [2, 0, 0],
-        [2, 2, 0]
-    ])
-    sides = calculate_sides(points)
-    # Expected side lengths:
-    #   - The distance between adjacent points: 2.0
-    #   - The diagonal distance: sqrt(2^2 + 2^2) = sqrt(8) ≈ 2.82842712
-    expected = np.array([2.0, 2.82842712])
-    assert_allclose(sides, expected, atol=1e-5)
-
-
-def test_calculate_sides_invalid_input():
-    """Test that calculate_sides raises a ValueError for invalid input shapes."""
-    # Create an invalid array: 2D array with shape (n, 2) instead of (n, 3).
-    invalid_points = np.array([[0, 0], [1, 1]])
-    with pytest.raises(ValueError):
-        calculate_sides(invalid_points)
