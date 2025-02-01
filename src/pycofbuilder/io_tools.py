@@ -203,6 +203,7 @@ def read_cif(path, file_name, useASE=False, usePymatgen=False):
     if not os.path.exists(os.path.join(path, file_name + '.cif')):
         raise FileNotFoundError(f'File {file_name} not found!')
 
+    # Check if the cif files is in P1 symmetry
     if not useASE and not usePymatgen:
         cif = gemmi.cif.read_file(os.path.join(path, file_name + '.cif')).sole_block()
 
@@ -221,11 +222,11 @@ def read_cif(path, file_name, useASE=False, usePymatgen=False):
         atomTypes = atoms.get_chemical_symbols()  # type: ignore
         cartPos = atoms.get_positions()  # type: ignore
         cellMatrix = atoms.get_cell()  # type: ignore
-        partialCharges = [0 for i in range(len(atomTypes))]
+        partialCharges = atoms.get_initial_charges()  # type: ignore
 
     elif usePymatgen:
         parser = CifParser(os.path.join(path, file_name + '.cif'))
-        structure = parser.get_structures()[0]
+        structure = parser.parse_structures()[0]
 
         atomTypes = [str(i) for i in structure.species]
         cartPos = structure.cart_coords
@@ -243,7 +244,7 @@ def read_cif(path, file_name, useASE=False, usePymatgen=False):
 
         cellMatrix = cellpar_to_cell([a, b, c, alpha, beta, gamma])
 
-        atomTypes = cif.find_values('_atom_site_type_symbol')
+        atomTypes = list(cif.find_values('_atom_site_type_symbol'))
         atom_site_fract_x = np.array(cif.find_values('_atom_site_fract_x')).astype(float)
         atom_site_fract_y = np.array(cif.find_values('_atom_site_fract_y')).astype(float)
         atom_site_fract_z = np.array(cif.find_values('_atom_site_fract_z')).astype(float)
