@@ -889,6 +889,127 @@ def save_qe(path: str,
         f.write(' {} {} {} 1 1 1\n'.format(*input_dict['kpoints']))
 
 
+def save_cif(path: str,
+             file_name: str,
+             atomTypes: list,
+             atomPos: list,
+             cell: list = [],
+             atomLabels: list = [],
+             partialCharges: list[float] = [],
+             bonds: list = [],
+             bondTypes: list = [],
+             frac_coords=False,
+             renormalize_charges=False,
+             **kwargs) -> None:
+    """
+    Save a file in format `.cif` on the `path`.
+
+    Parameters
+    ----------
+    path : str
+        Path to the save the file.
+    file_name : str
+        Name of the file. Does not neet to contain the extention.
+    atomTypes : list
+        List of strings containing containg the N atom types
+    atomPos : list
+        Nx3 array contaning the atoms coordinates.
+    cell : numpy array
+        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
+    atomLabels : list
+        List of strings containing containg the N atom labels
+    partialCharges : list
+        List of strings containing containg the N atom partial charges.
+    bonds : list
+        List of lists containing the index of the bonded atoms and the bond length.
+    bondTypes : list
+        List of strings containing the bond types. Can be singe (S), double (D), triple (T), or aromatic (A).
+    frac_coords : bool
+        If True, the coordinates are in fractional coordinates.
+    renormalize_charges : bool
+        If True, the charges will be renormalized to the total charge of the system.
+    """
+
+    file_name = file_name.split('.')[0]
+
+    if len(cell) == 3:
+        a, b, c, alpha, beta, gamma = cell_to_cellpar(cell)
+    if len(cell) == 6:
+        a, b, c, alpha, beta, gamma = cell
+
+    if renormalize_charges and partialCharges:
+        partialCharges = np.array(partialCharges) - np.mean(partialCharges)  # type: ignore
+
+    if not partialCharges:
+        partialCharges = [0 for i in range(len(atomTypes))]
+
+    if not atomLabels:
+        atomLabels = [f'{atomTypes[i]}{i+1}' for i in range(len(atomTypes))]
+
+    cif_text = f"""\
+data_{file_name}
+
+_audit_creation_date     {date.today().strftime("%Y-%d-%m")}
+_audit_creation_method   pyCOFBuilder
+_audit_author_name       '{os.getlogin()}'
+
+_chemical_name_common                  '{file_name}'
+_cell_length_a                          {a:>10.6f}
+_cell_length_b                          {b:>10.6f}
+_cell_length_c                          {c:>10.6f}
+_cell_angle_alpha                       {alpha:>6.2f}
+_cell_angle_beta                        {beta:>6.2f}
+_cell_angle_gamma                       {gamma:>6.2f}
+_space_group_name_H-M_alt               'P 1'
+_space_group_IT_number                  1
+
+loop_
+_symmetry_equiv_pos_as_xyz
+   'x, y, z'
+
+loop_
+   _atom_site_label
+   _atom_site_type_symbol
+   _atom_site_fract_x
+   _atom_site_fract_y
+   _atom_site_fract_z
+   _atom_site_charge
+"""
+
+    if not frac_coords:
+        # Convert to fractional coordinates
+        frac_matrix = get_cartesian_to_fractional_matrix(a, b, c, alpha, beta, gamma)
+        atomPos = [np.dot(frac_matrix, [i[0], i[1], i[2]]) for i in atomPos]
+
+    for i, pos in enumerate(atomPos):
+        u, v, w = pos[0], pos[1], pos[2]
+
+        cif_text += '{:<15}    {} {:>15.9f} {:>15.9f} {:>15.9f} {:>10.5f}\n'.format(
+                atomLabels[i],
+                atomTypes[i],
+                u,
+                v,
+                w,
+                partialCharges[i])
+
+    if bonds:
+        cif_text += '\nloop_\n'
+        cif_text += '_geom_bond_atom_site_label_1\n'
+        cif_text += '_geom_bond_atom_site_label_2\n'
+        cif_text += '_geom_bond_distance\n'
+        cif_text += '_geom_bond_site_symmetry_2\n'
+        cif_text += '_ccdc_geom_bond_type\n'
+
+        if not bondTypes:
+            bondTypes = ['S' for i in range(len(bonds))]
+
+        for i, bond in enumerate(bonds):
+            cif_text += f'{atomLabels[bond[0]]:10} {atomLabels[bond[1]]:10} {bond[2]:.5f}  .  {bondTypes[i]}\n'
+
+    with open(os.path.join(path, file_name + '.cif'), 'w') as f:
+        f.write(cif_text)
+
+
 def convert_cif_2_qe(out_path, file_name):
     """
     Convert a cif file to a Quantum Espresso input file
@@ -970,122 +1091,6 @@ def save_chemjson(path: str,
                                       BondIndexes=bonds)
 
     write_json(path, file_name, chemJSON)
-
-
-def save_cif(path: str,
-             file_name: str,
-             cell: list,
-             atom_types: list,
-             atom_labels: list,
-             atom_pos: list,
-             atom_charges: list = None,
-             bonds: list = None,
-             frac_coords=False):
-    """
-    Save a file in format `.cif` on the `path`.
-
-    Parameters
-    ----------
-    path : str
-        Path to the save the file.
-    file_name : str
-        Name of the file. Does not neet to contain the extention.
-    cell : numpy array
-        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
-    atom_types : list
-        List of strings containing containg the N atom types
-    atom_label : list
-        List of strings containing containg the N atom labels
-    atom_pos : list
-        Nx3 array contaning the atoms coordinates.
-    atom_charges : list
-        List of strings containing containg the N atom partial charges.
-    bonds : list
-        List of lists containing the index of the bonded atoms and the bond length.
-    frac_coords : bool
-        If True, the coordinates are in fractional coordinates.
-    """
-
-    file_name = file_name.split('.')[0]
-
-    if len(cell) == 3:
-        a, b, c, alpha, beta, gamma = cell_to_cellpar(cell)
-    if len(cell) == 6:
-        a, b, c, alpha, beta, gamma = cell
-
-    if atom_labels is None:
-        atom_labels = [''] * len(atom_types)
-
-    cif_text = f"""\
-data_{file_name}
-
-_audit_creation_date     {date.today().strftime("%Y-%d-%m")}
-_audit_creation_method   pyCOFBuilder
-_audit_author_name       '{os.getlogin()}'
-
-_chemical_name_common                  '{file_name}'
-_cell_length_a                          {a:>10.6f}
-_cell_length_b                          {b:>10.6f}
-_cell_length_c                          {c:>10.6f}
-_cell_angle_alpha                       {alpha:>6.2f}
-_cell_angle_beta                        {beta:>6.2f}
-_cell_angle_gamma                       {gamma:>6.2f}
-_space_group_name_H-M_alt               'P 1'
-_space_group_IT_number                  1
-
-loop_
-_symmetry_equiv_pos_as_xyz
-   'x, y, z'
-
-loop_
-   _atom_site_label
-   _atom_site_type_symbol
-   _atom_site_fract_x
-   _atom_site_fract_y
-   _atom_site_fract_z
-"""
-
-    if atom_charges:
-        cif_text += '   _atom_site_charge\n'
-
-    if frac_coords is False:
-        # Convert to fractional coordinates
-        frac_matrix = get_cartesian_to_fractional_matrix(a, b, c, alpha, beta, gamma)
-        atom_pos = [np.dot(frac_matrix, [i[0], i[1], i[2]]) for i in atom_pos]
-
-    for i in range(len(atom_pos)):
-        u, v, w = atom_pos[i][0], atom_pos[i][1], atom_pos[i][2]
-        if atom_charges:
-            atom_labels[i] = f"{atom_types[i]}{str(i + 1)}_{atom_labels[i]}"
-            cif_text += '{:<15}    {} {:>15.9f} {:>15.9f} {:>15.9f} {:>10.5f}\n'.format(
-                f"{atom_types[i]}{str(i + 1)}_{atom_labels[i]}",
-                atom_types[i],
-                u,
-                v,
-                w,
-                atom_charges[i])
-        else:
-            atom_labels[i] = f"{atom_types[i]}{str(i + 1)}_{atom_labels[i]}"
-            cif_text += '{:<15}    {} {:>15.9f} {:>15.9f} {:>15.9f}\n'.format(
-                f"{atom_types[i]}{str(i + 1)}_{atom_labels[i]}",
-                atom_types[i],
-                u,
-                v,
-                w)
-
-    if bonds:
-        cif_text += '\nloop_\n'
-        cif_text += '_geom_bond_atom_site_label_1\n'
-        cif_text += '_geom_bond_atom_site_label_2\n'
-        cif_text += '_geom_bond_distance\n'
-
-        for bond in bonds:
-            cif_text += f'{atom_labels[bond[0]]:10} {atom_labels[bond[1]]:10} {bond[2]:.5f}\n'
-
-    # Write cif_text to file
-    cif_file = open(os.path.join(path, file_name + '.cif'), 'w')
-    cif_file.write(cif_text)
-    cif_file.close()
 
 
 def convert_json_2_cif(origin_path, file_name, destiny_path, charge_type='None'):
