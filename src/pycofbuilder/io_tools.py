@@ -616,14 +616,11 @@ def save_xyz(path: str,
 
 def save_turbomole(path: str,
                    file_name: str,
-                   cell: list,
-                   atom_types: list,
-                   atom_labels: list,
-                   atom_pos: list,
-                   atom_charges: list = None,
-                   bonds: list = None,
-                   bond_orders: list = None,
-                   frac_coords=False):
+                   atomTypes: list,
+                   atomPos: list,
+                   cell: list = [],
+                   frac_coords=False,
+                   *kwargs) -> None:
     """
     Save the structure in Turbomole .coord format on the `path`.
 
@@ -633,45 +630,41 @@ def save_turbomole(path: str,
         Path to the save the file.
     file_name : str
         Name of the file. Does not neet to contain the extention.
-    cell : numpy array
-        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
-    atom_types : list
+    atomTypes : list
         List of strings containing containg the N atom types
-    atom_label : list
-        List of strings containing containg the N atom labels
-    atom_pos : list
+    atomPos : list
         Nx3 array contaning the atoms coordinates.
-    atom_charges : list
-        List of strings containing containg the N atom partial charges.
-    bonds : list
-        List of lists containing the index of the bonded atoms and the bond length.
-    frac_coords : bool
-        If True, the coordinates are in fractional coordinates.
+    cell : list, optional
+        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
+    frac_coords : bool, optional
+        If True, the coordinates are in fractional coordinates and will be converted to cartesian. Default is False.
     """
 
     if np.array(cell).shape == (3, 3):
-        cell = cell_to_cellpar(cell)
+        cell = cell_to_cellpar(cell)  # type: ignore
 
     if frac_coords:
         # Convert to fractional coordinates
         frac_matrix = get_fractional_to_cartesian_matrix(*cell)
-        atom_pos = [np.dot(frac_matrix, [i[0], i[1], i[2]]) for i in atom_pos]
+        atomPos = [np.dot(frac_matrix, [i[0], i[1], i[2]]) for i in atomPos]
 
-    with open(os.path.join(path, file_name + '.coord'), 'w') as temp_file:
-        temp_file.write('$coord angs\n')
+    temp_file = ['$coord angs']
 
-        for i in range(len(atom_types)):
-            temp_file.write('{:>15.7f}{:>15.7f}{:>15.7f}   {:<5s}\n'.format(atom_pos[i][0],
-                                                                            atom_pos[i][1],
-                                                                            atom_pos[i][2],
-                                                                            atom_types[i]))
+    for i in range(len(atomTypes)):
+        temp_file.append('{:>15.7f}{:>15.7f}{:>15.7f}   {:<5s}'.format(atomPos[i][0],
+                                                                       atomPos[i][1],
+                                                                       atomPos[i][2],
+                                                                       atomTypes[i]))
 
-        temp_file.write('$periodic 3\n')
-        temp_file.write('$cell\n')
-        temp_file.write('{}  {}  {}  {}  {}  {}\n'.format(*cell))
-        temp_file.write('$opt\n')
-        temp_file.write('   engine=inertial\n')
-        temp_file.write('$end\n')
+    temp_file.append('$periodic 3')
+    temp_file.append('$cell')
+    temp_file.append('{}  {}  {}  {}  {}  {}'.format(*cell))
+    temp_file.append('$opt')
+    temp_file.append('   engine=inertial')
+    temp_file.append('$end')
+
+    with open(os.path.join(path, file_name + '.coord'), 'w') as f:
+        f.write('\n'.join(temp_file))
 
 
 def save_vasp(path: str,
