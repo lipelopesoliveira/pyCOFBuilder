@@ -555,16 +555,14 @@ def save_gjf(path: str,
 
 def save_xyz(path: str,
              file_name: str,
-             atom_types: list,
-             atom_pos: list,
-             atom_labels: list = None,
-             cell: list = None,
-             atom_charges: list = None,
-             bonds: list = None,
-             bond_orders: list = None,
-             frac_coords=False):
+             atomTypes: list,
+             atomPos: list,
+             cell: list = [],
+             partialCharges: list = [],
+             frac_coords=False,
+             **kwargs) -> None:
     """
-    Save a file in format `.xyz` on the `path`.
+    Save a file in format `.pqr` on the `path`.
 
     Parameters
     ----------
@@ -572,47 +570,48 @@ def save_xyz(path: str,
         Path to the save the file.
     file_name : str
         Name of the file. Does not neet to contain the extention.
-    cell : numpy array
-        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
-    atom_types : list
+    atomTypes : list
         List of strings containing containg the N atom types
-    atom_label : list
-        List of strings containing containg the N atom labels
-    atom_pos : list
+    atomPos : list
         Nx3 array contaning the atoms coordinates.
-    atom_charges : list
+    cell : list, optional
+        Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
+    partialCharges : list, optional
         List of strings containing containg the N atom partial charges.
-    bonds : list
-        List of lists containing the index of the bonded atoms and the bond length.
-    frac_coords : bool
-        If True, the coordinates are in fractional coordinates.
+    frac_coords : bool, optional
+        If True, the coordinates are in fractional coordinates and will be converted to cartesian. Default is False.
     """
-
-    if cell:
-        cell = cell_to_cellpar(cell) if len(cell) == 3 else cell
-
-    if frac_coords:
-        # Convert to fractional coordinates
-        frac_matrix = get_fractional_to_cartesian_matrix(cell)
-        atom_pos = [np.dot(frac_matrix, [i[0], i[1], i[2]]) for i in atom_pos]
 
     file_name = file_name.split('.')[0]
 
-    temp_file = open(os.path.join(path, file_name + '.xyz'), 'w')
-    temp_file.write(f'{len(atom_types)}\n')
+    if len(cell) == 3:
+        cell = cellpar_to_cell(cell)
 
-    if cell is None:
-        temp_file.write(f'{file_name}\n')
-    else:
-        temp_file.write(f'{cell[0]}  {cell[1]}  {cell[2]}  {cell[3]}  {cell[4]}  {cell[5]}\n')
+    if frac_coords:
+        # Convert to fractional coordinates
+        frac_matrix = get_fractional_to_cartesian_matrix(*cell)
+        atomPos = [np.dot(frac_matrix, [i[0], i[1], i[2]]) for i in atomPos]
 
-    for i in range(len(atom_types)):
-        temp_file.write('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(atom_types[i],
-                                                                     atom_pos[i][0],
-                                                                     atom_pos[i][1],
-                                                                     atom_pos[i][2]))
+    if len(partialCharges) == 0:
+        partialCharges = [0.0 for i in range(len(atomTypes))]
 
-    temp_file.close()
+    xyz_file = []
+    xyz_file.append(f'{len(atomTypes)}')
+    header = ''
+    if cell:
+        header += 'Lattice="{:>15.7f} {:>15.7f} {:>15.7f} {:>15.7f} {:>15.7f} {:>15.7f}" pbc="T T T"'.format(*cell)
+
+    xyz_file.append(header + ' species:S:1:pos:R:3:initial_charges:R:1')
+
+    for i in range(len(atomTypes)):
+        xyz_file.append('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}{:>15.7f}'.format(atomTypes[i],
+                                                                            atomPos[i][0],
+                                                                            atomPos[i][1],
+                                                                            atomPos[i][2],
+                                                                            partialCharges[i]))
+
+    with open(os.path.join(path, file_name + '.xyz'), 'w') as f:
+        f.write('\n'.join(xyz_file))
 
 
 def save_turbomole(path: str,
