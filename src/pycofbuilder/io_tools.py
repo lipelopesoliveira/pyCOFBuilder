@@ -317,23 +317,24 @@ def save_xsf(path: str,
         frac_matrix = get_fractional_to_cartesian_matrix(*cell_to_cellpar(cellMatrix))
         atomPos = [np.dot(frac_matrix, [i[0], i[1], i[2]]) for i in atomPos]
 
-    xsf_file = open(os.path.join(path, file_name + '.xsf'), 'w')
-    xsf_file.write(' CRYSTAL\n')
-    xsf_file.write('  PRIMVEC\n')
+    xsf_file = []
+    xsf_file.append('CRYSTAL')
+    xsf_file.append('PRIMVEC')
 
     for i in range(len(cellMatrix)):
-        xsf_file.write(f'  {cellMatrix[i][0]:>15.9f}    {cellMatrix[i][1]:>15.9f}    {cellMatrix[i][2]:>15.9f}\n')
+        xsf_file.append(f'  {cellMatrix[i][0]:>15.9f}    {cellMatrix[i][1]:>15.9f}    {cellMatrix[i][2]:>15.9f}')
 
-    xsf_file.write('   PRIMCOORD\n')
-    xsf_file.write(f'           {len(atomPos)}           1\n')
+    xsf_file.append('   PRIMCOORD')
+    xsf_file.append(f'           {len(atomPos)}           1')
 
     for i in range(len(atomPos)):
-        xsf_file.write('{:3s}        {:>15.9f}    {:>15.9f}    {:>15.9f}\n'.format(atomTypes[i],
-                                                                                   atomPos[i][0],
-                                                                                   atomPos[i][1],
-                                                                                   atomPos[i][2]))
+        xsf_file.append('{:3s}        {:>15.9f}    {:>15.9f}    {:>15.9f}'.format(atomTypes[i],
+                                                                                  atomPos[i][0],
+                                                                                  atomPos[i][1],
+                                                                                  atomPos[i][2]))
 
-    xsf_file.close()
+    with open(os.path.join(path, file_name + '.xsf'), 'w') as f:
+        f.write('\n'.join(xsf_file))
 
 
 def save_pqr(path: str,
