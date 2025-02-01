@@ -15,6 +15,8 @@ New features
   - `CJSON`
   - `Framework`
   - `BuildingBlock`
+- Add the LON and LON-A nets.
+- Add the FXT and FXT-A nets.
 
 Bugfixes
 --------
