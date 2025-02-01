@@ -24,7 +24,6 @@ from pycofbuilder.tools import (elements_dict,
                                 get_fractional_to_cartesian_matrix,
                                 get_cartesian_to_fractional_matrix,
                                 get_kgrid,
-                                formula_from_atom_list,
                                 smiles_to_xsmiles,
                                 cell_to_ibrav)
 
@@ -113,12 +112,22 @@ def read_pdb(path, file_name):
 
     temp_file = open(os.path.join(path, file_name + '.pdb'), 'r').read().splitlines()
 
-    cellParameters = np.array([i.split()[1:] for i in temp_file if 'CRYST1' in i][0]).astype(float)
+    has_cell = any(['CRYST1' in i for i in temp_file])
 
-    cellMatrix = cellpar_to_cell(cellParameters)
+    if has_cell:
+        cellParameters = np.array([i.split()[1:] for i in temp_file if 'CRYST1' in i][0]).astype(float)
+        cellMatrix = cellpar_to_cell(cellParameters)
+    else:
+        cellParameters = np.zeros(6)
+        cellMatrix = np.zeros((3, 3))
 
-    atomTypes = [i.split()[2] for i in temp_file if 'ATOM' in i]
-    cartPos = np.array([i.split()[4:7] for i in temp_file if 'ATOM' in i]).astype(float)
+    if any(['ATOM' in i for i in temp_file]):
+        atomTypes = [i.split()[2] for i in temp_file if 'ATOM' in i]
+        cartPos = np.array([i.split()[5:8] for i in temp_file if 'ATOM' in i]).astype(float)
+
+    else:
+        atomTypes = [i.split()[-1] for i in temp_file if 'HETATM' in i]
+        cartPos = np.array([i.split()[3:6] for i in temp_file if 'HETATM' in i]).astype(float)
 
     return atomTypes, cartPos, cellMatrix
 
@@ -164,6 +173,8 @@ def read_gjf(path, file_name) -> tuple:
 
     if cellMatrix:
         cellMatrix = np.array([i[1:] for i in cellMatrix]).astype(float)
+    else:
+        cellMatrix = np.zeros((3, 3))
 
     return atonTypes, cartPos, cellMatrix
 
@@ -221,12 +232,11 @@ def read_cif(path, file_name, useASE=False, usePymatgen=False):
         atoms = read(os.path.join(path, file_name + '.cif'))
         atomTypes = atoms.get_chemical_symbols()  # type: ignore
         cartPos = atoms.get_positions()  # type: ignore
-        cellMatrix = atoms.get_cell()  # type: ignore
+        cellMatrix = np.array(atoms.get_cell())
         partialCharges = atoms.get_initial_charges()  # type: ignore
 
     elif usePymatgen:
-        parser = CifParser(os.path.join(path, file_name + '.cif'))
-        structure = parser.parse_structures()[0]
+        structure = CifParser(os.path.join(path, file_name + '.cif')).get_structures(primitive=False)[0]
 
         atomTypes = [str(i) for i in structure.species]
         cartPos = structure.cart_coords
@@ -245,6 +255,11 @@ def read_cif(path, file_name, useASE=False, usePymatgen=False):
         cellMatrix = cellpar_to_cell([a, b, c, alpha, beta, gamma])
 
         atomTypes = list(cif.find_values('_atom_site_type_symbol'))
+
+        if len(atomTypes) == 0:
+            atomTypes = list(cif.find_values('_atom_site_label'))
+            atomTypes = [i.rstrip('0123456789') for i in atomTypes]
+
         atom_site_fract_x = np.array(cif.find_values('_atom_site_fract_x')).astype(float)
         atom_site_fract_y = np.array(cif.find_values('_atom_site_fract_y')).astype(float)
         atom_site_fract_z = np.array(cif.find_values('_atom_site_fract_z')).astype(float)
