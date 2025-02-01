@@ -43,10 +43,25 @@ class BasicToolsTest(unittest.TestCase):
     def test_cell_to_cellpar(self):
         pass
 
-class BasicIOToolsTest(unittest.TestCase):
+
+class BasicCJsonTest(unittest.TestCase):
     """Basic test of IO_Tools module."""
 
-    def test_read_cif(self):
+    def test_default(self):
+        pass
+
+
+class BasicBuildBlockTest(unittest.TestCase):
+    """Basic test of IO_Tools module."""
+
+    def test_default(self):
+        pass
+
+
+class BasicFrameworkTest(unittest.TestCase):
+    """Basic test of IO_Tools module."""
+
+    def test_default(self):
         pass
 
 

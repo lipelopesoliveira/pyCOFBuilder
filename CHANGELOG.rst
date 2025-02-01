@@ -2,13 +2,19 @@
 Change Log
 **********
 
-v0.0.8.8 Beta (29/12/2024)
+v0.0.8.8 Beta (01/02/2025)
 ========================
 
 New features
 ------------
 
 - Refactor `IO_Tools` module to improve the code quality and readability.
+- Add unit tests with pytest for the modules:
+  - `IO_Tools`
+  - `Tools`
+  - `CJSON`
+  - `Framework`
+  - `BuildingBlock`
 
 Bugfixes
 --------
