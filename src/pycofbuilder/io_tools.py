@@ -14,7 +14,6 @@ from ase.io import read
 from pymatgen.io.cif import CifParser
 import gemmi
 
-import simplejson
 from pycofbuilder.tools import (elements_dict,
                                 cell_to_cellpar,
                                 cellpar_to_cell,
@@ -24,6 +23,8 @@ from pycofbuilder.tools import (elements_dict,
                                 formula_from_atom_list,
                                 smiles_to_xsmiles,
                                 cell_to_ibrav)
+
+from pycofbuilder.cjson import ChemJSON
 
 
 def read_xyz(path: str, file_name: str, extxyz=False) -> tuple:
@@ -1010,43 +1011,14 @@ loop_
         f.write(cif_text)
 
 
-def convert_cif_2_qe(out_path, file_name):
-    """
-    Convert a cif file to a Quantum Espresso input file
-
-    Parameters
-    ----------
-    out_path : str
-        Path to the file.
-    file_name : str
-        Name of the file. Does not neet to contain the `.cif` extention.
-    """
-
-    cell, atom_labels, atom_pos, _ = read_cif(out_path, file_name)
-
-    print(cell, atom_labels, atom_pos)
-
-    save_qe(out_path,
-            file_name,
-            cell,
-            atom_labels,
-            atom_pos,
-            coords_are_cartesian=True,
-            supercell=False,
-            angs=False,
-            ecut=40,
-            erho=360,
-            k_dist=0.3)
-
-
 def save_chemjson(path: str,
                   file_name: str,
                   cell: list,
-                  atom_types: list,
-                  atom_labels: list,
-                  atom_pos: list,
-                  atom_charges: list = None,
-                  bonds: list = None,
+                  atomTypes: list,
+                  atomLabels: list,
+                  atomPos: list,
+                  partialCharges: list = [],
+                  bonds: list = [],
                   frac_coords=False):
     """
     Save a file in format `.json` on the `path`.
@@ -1059,14 +1031,14 @@ def save_chemjson(path: str,
         Name of the file. Does not neet to contain the extention.
     cell : numpy array
         Can be a 3x3 array contaning the cell vectors or a list with the 6 cell parameters.
-    atom_types : list
+    atomTypes : list
         List of strings containing containg the N atom types
-    atom_label : list
+    atomLabels : list
         List of strings containing containg the N atom labels
-    atom_pos : list
+    atomPos : list
         Nx3 array contaning the atoms coordinates.
-    atom_charges : list
-        List of strings containing containg the N atom partial charges.
+    partialCharges : list
+        List of floats containing containg the N atom partial charges.
     bonds : list
         List of lists containing the index of the bonded atoms and the bond length.
     frac_coords : bool
@@ -1074,171 +1046,29 @@ def save_chemjson(path: str,
     """
 
     file_name = file_name.split('.')[0]
+
+    data = ChemJSON()
+
     if len(cell) == 6:
-        CellParameters = cell
-        CellMatrix = None
-    if len(cell) == 3:
-        CellParameters = None
-        CellMatrix = cell
-
-    chemJSON = create_structure_CJSON(StructureName=file_name.split('.')[0],
-                                      CellParameters=CellParameters,
-                                      CellMatrix=CellMatrix,
-                                      AtomTypes=atom_types,
-                                      AtomPositions=atom_pos,
-                                      AtomLabels=atom_labels,
-                                      CartesianPositions=not frac_coords,
-                                      BondIndexes=bonds)
-
-    write_json(path, file_name, chemJSON)
-
-
-def convert_json_2_cif(origin_path, file_name, destiny_path, charge_type='None'):
-    """
-    Convert a file in format `.json` to `.cif`.
-
-    Parameters
-    ----------
-    origin_path : str
-        Path to the '.json' file.
-    file_name : str
-        Name of the file. Does not neet to contain the `.json` extention.
-    destiny_path : str
-        path where the `.cif` file will be saved.
-    """
-
-    framework_JSON = read_json(origin_path, file_name)
-
-    cell = framework_JSON['geometry']['cell_matrix']
-    atom_labels = framework_JSON['geometry']['atom_labels']
-    atom_pos = framework_JSON['geometry']['atom_pos']
-
-    if charge_type + '_charges' in list(framework_JSON['system'].keys()):
-        partial_charges = framework_JSON['geometry'][charge_type + '_charges']
+        data.set_cell_parameters(cell)
+    elif len(cell) == 3:
+        data.set_cell_matrix(cell)
     else:
-        partial_charges = False
+        raise ValueError('Cell parameters not provided.')
 
-    save_cif(destiny_path,
-             file_name,
-             cell,
-             atom_labels,
-             atom_pos,
-             partial_charges,
-             frac_coords=False)
+    data.set_atomic_types(atomTypes)
 
+    if frac_coords:
+        data.set_fractional_positions(atomPos)
+    else:
+        data.set_cartesian_positions(atomPos)
 
-def convert_gjf_2_xyz(path, file_name):
+    if partialCharges:
+        pass
+    if atomLabels:
+        pass
 
-    file_name = file_name.split('.')[0]
-
-    atom_labels, atom_pos = read_gjf(path, file_name + '.gjf')
-
-    save_xyz(path, file_name + '.xyz', atom_labels, atom_pos)
-
-
-def convert_xyz_2_gjf(path, file_name):
-
-    file_name = file_name.split('.')[0]
-
-    atom_labels, atom_pos = read_xyz(path, file_name + '.xyz')
-
-    save_gjf(path=path,
-             file_name=file_name + '.gjf',
-             atom_types=atom_labels,
-             atom_pos=atom_pos,
-             cell=[10, 10, 10, 90, 90, 90])
-
-
-def convert_cif_2_xyz(path, file_name, supercell=[1, 1, 1]):
-
-    file_name = file_name.split('.')[0]
-
-    structure = CifParser(os.path.join(path, file_name + '.cif')).get_structures(primitive=True)[0]
-
-    structure.make_supercell([[supercell[0], 0, 0], [0, supercell[1], 0], [0, 0, supercell[2]]])
-
-    dict_sctructure = structure.as_dict()
-
-    a, b, c = dict_sctructure['lattice']['a']
-    b = dict_sctructure['lattice']['b']
-    c = dict_sctructure['lattice']['c']
-
-    alpha = round(dict_sctructure['lattice']['alpha'])
-    beta = round(dict_sctructure['lattice']['beta'])
-    gamma = round(dict_sctructure['lattice']['gamma'])
-
-    atom_labels = [i['label'] for i in dict_sctructure['sites']]
-
-    atom_pos = [i['xyz'] for i in dict_sctructure['sites']]
-
-    temp_file = open(os.path.join(path, file_name + '.xyz'), 'w')
-    temp_file.write(f'{len(atom_labels)} \n')
-
-    temp_file.write(f'{a}  {b}  {c}  {alpha}  {beta}  {gamma}\n')
-
-    for i in range(len(atom_labels)):
-        temp_file.write('{:<5s}{:>15.7f}{:>15.7f}{:>15.7f}\n'.format(atom_labels[i],
-                                                                     atom_pos[i][0],
-                                                                     atom_pos[i][1],
-                                                                     atom_pos[i][2]))
-
-    temp_file.close()
-
-
-def write_json(path, name, COF_json):
-
-    name = name.split('.')[0]
-
-    if os.path.exists(path) is not True:
-        os.mkdir(path)
-
-    save_path = os.path.join(path, name + '.cjson')
-
-    with open(save_path, 'w', encoding='utf-8') as f:
-        simplejson.dump(COF_json,
-                        f,
-                        ensure_ascii=False,
-                        separators=(',', ':'),
-                        indent=2,
-                        ignore_nan=True)
-
-
-def read_json(path, name):
-
-    cof_path = os.path.join(path, name + '.json')
-
-    with open(cof_path, 'r') as r:
-        json_object = simplejson.loads(r.read())
-
-    return json_object
-
-
-def create_COF_json(name) -> dict:
-    """
-    Create a empty dictionary with the COF information.
-    """
-
-    system_info = 'Informations about the system.'
-    geometry_info = 'Informations about the geometry.'
-    optimization_info = 'Information about the optimization process.'
-    adsorption_info = 'Information about the adsorption simulation experiments on RASPA2'
-    textural_info = 'Information about the textural properties'
-    spectrum_info = 'Information about spectra simulation.'
-    experimental_info = 'Experimental data DRX, FTIR, ssNMR, UV-VIS...'
-
-    COF_json = {'system': {'description': system_info,
-                           'name': name,
-                           'geo_opt': True,
-                           'execution_times_seconds': {}},
-                'geometry': {'description': geometry_info},
-                'optimization': {'description': optimization_info},
-                'adsorption': {'description': adsorption_info},
-                'textural': {'description': textural_info},
-                'spectrum': {'description': spectrum_info},
-                'experimental': {'description': experimental_info}
-                }
-
-    return COF_json
+    data.write_cjson(path, file_name + '.cjson')
 
 
 def create_empty_CJSON() -> dict:

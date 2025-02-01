@@ -13,7 +13,7 @@ import numpy as np
 from scipy.spatial import distance
 
 
-def elements_dict(property='atomic_mass'):
+def elements_dict(property='atomic_mass') -> dict:
     """
     Returns a dictionary containing the elements symbol and its selected property.
 
@@ -60,14 +60,14 @@ def elements_dict(property='atomic_mass'):
     return prop_dic
 
 
-def unit_vector(vector):
+def unit_vector(vector) -> np.ndarray:
     """Return a unit vector in the same direction as x."""
     y = np.array(vector, dtype='float')
     norm = y / np.linalg.norm(y)
     return norm
 
 
-def angle(v1, v2, unit='degree'):
+def angle(v1, v2, unit='degree') -> float:
     """
     Calculates the angle between two vectors v1 and v2.
 
@@ -99,7 +99,7 @@ def angle(v1, v2, unit='degree'):
     return angle
 
 
-def rotation_matrix_from_vectors(vec1, vec2):
+def rotation_matrix_from_vectors(vec1, vec2) -> np.ndarray:
     """
     Find the rotation matrix that aligns vec1 to vec2
 
@@ -129,7 +129,7 @@ def rotation_matrix_from_vectors(vec1, vec2):
         return np.identity(3)
 
 
-def rmsd(V, W):
+def rmsd(V, W) -> float:
     """
     Calculate Root-mean-square deviation from two sets of vectors V and W.
     Parameters
@@ -191,7 +191,7 @@ def calculate_sides(points):
     return np.sort(np.unique(distances))
 
 
-def cell_to_cellpar(cell, radians=False):
+def cell_to_cellpar(cell, radians=False) -> np.ndarray:
     """Returns the cell parameters [a, b, c, alpha, beta, gamma]
     given a 3x3 cell matrix.
 
@@ -229,7 +229,7 @@ def cell_to_cellpar(cell, radians=False):
     return np.array(lengths + angles)
 
 
-def cellpar_to_cell(cellpar, ab_normal=(0, 0, 1), a_direction=None):
+def cellpar_to_cell(cellpar, ab_normal=(0, 0, 1), a_direction=None) -> np.ndarray:
     """Return a 3x3 cell matrix from cell parameters (a,b,c,alpha,beta, and gamma).
 
     Angles must be in degrees.
@@ -485,7 +485,7 @@ def get_kgrid(cell, distance=0.3) -> tuple:
     return kx, ky, kz
 
 
-def create_CellBox(A, B, C, alpha, beta, gamma):
+def create_CellBox(A, B, C, alpha, beta, gamma) -> np.ndarray:
     """Creates the CellBox using the same expression as RASPA."""
 
     tempd = (np.cos(alpha) - np.cos(gamma) * np.cos(beta)) / np.sin(gamma)
@@ -507,7 +507,7 @@ def create_CellBox(A, B, C, alpha, beta, gamma):
     return CellBox
 
 
-def calculate_UnitCells(cell, cutoff):
+def calculate_UnitCells(cell, cutoff) -> np.ndarray:
     """
     Calculate the number of unit cell repetitions so that all supercell lengths are larger than
     twice the interaction potential cut-off radius.
