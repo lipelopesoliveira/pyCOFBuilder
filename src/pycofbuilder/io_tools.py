@@ -232,7 +232,7 @@ def read_cif(path, file_name, useASE=False, usePymatgen=False):
         atoms = read(os.path.join(path, file_name + '.cif'))
         atomTypes = atoms.get_chemical_symbols()  # type: ignore
         cartPos = atoms.get_positions()  # type: ignore
-        cellMatrix = np.array(atoms.get_cell())
+        cellMatrix = np.array(atoms.get_cell())  # type: ignore
         partialCharges = atoms.get_initial_charges()  # type: ignore
 
     elif usePymatgen:
