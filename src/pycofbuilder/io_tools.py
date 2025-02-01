@@ -24,7 +24,7 @@ from pycofbuilder.tools import (elements_dict,
                                 cell_to_ibrav)
 
 
-def save_csv(path: str, file_name: str, data: list, delimiter: str = ',', head: list = []):
+def save_csv(path: str, file_name: str, data: list, delimiter: str = ',', head: list = []) -> None:
     """
     Saves a file in format `.csv`.
 
@@ -58,9 +58,9 @@ def save_csv(path: str, file_name: str, data: list, delimiter: str = ',', head: 
         f.write('\n'.join(content))
 
 
-def read_xyz(path, file_name):
+def read_xyz(path: str, file_name: str) -> tuple:
     """
-    Reads a file in format `.xyz` from the `path` given and returns
+    Reads a file in format `.xyz` from the given `path` and returns
     a list containg the N atom labels and a Nx3 array contaning
     the atoms coordinates.
 
@@ -82,18 +82,18 @@ def read_xyz(path, file_name):
     # Remove the extention if exists
     file_name = file_name.split('.')[0]
 
-    if os.path.exists(os.path.join(path, file_name + '.xyz')):
-        temp_file = open(os.path.join(path, file_name + '.xyz'), 'r').readlines()
+    # Check if the file exists
+    if not os.path.exists(os.path.join(path, file_name + '.xyz')):
+        raise FileNotFoundError(f'File {file_name} not found!')
 
-        atoms = [i.split() for i in temp_file[2:]]
+    temp_file = open(os.path.join(path, file_name + '.xyz'), 'r').readlines()
 
-        atom_labels = [i[0] for i in atoms if len(i) > 1]
-        atom_pos = np.array([[float(i[1]), float(i[2]), float(i[3])] for i in atoms if len(i) > 1])
+    atoms = [i.split() for i in temp_file[2:]]
 
-        return atom_labels, atom_pos
-    else:
-        print(f'File {file_name} not found!')
-        return None
+    atom_labels = [i[0] for i in atoms if len(i) > 1]
+    atom_pos = np.array([[float(i[1]), float(i[2]), float(i[3])] for i in atoms if len(i) > 1])
+
+    return atom_labels, atom_pos
 
 
 def read_pdb(path, file_name):

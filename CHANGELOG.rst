@@ -8,7 +8,7 @@ v0.0.8.8 Beta (29/12/2024)
 New features
 ------------
 
-- 
+- Refactor `IO_Tools` module to improve the code quality and readability.
 
 Bugfixes
 --------
