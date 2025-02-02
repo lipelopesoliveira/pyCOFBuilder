@@ -37,6 +37,7 @@ Known bugs
 - The positioning of the building blocks on FXT and FXT-A nets is still not perfect.
 - On FXT and FXT-A nets the cell parameters for R4 building blocks are not being calculated correctly.
 - The BOR network is not working properly.
+- The LON-A network is not implemented yet.
 
 v0.0.8.7 Beta (29/12/2024)
 ========================

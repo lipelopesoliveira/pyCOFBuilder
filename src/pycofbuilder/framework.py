@@ -4635,7 +4635,7 @@ class Framework():
                              **kwargs):
         """Creates a COF with LON network.
 
-        The LON net is composed of one tetrapodal tetrahedical building block.
+        The LON net is composed of two tetrapodal tetrahedical building blocks.
 
         Parameters
         ----------
