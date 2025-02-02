@@ -25,6 +25,7 @@ Bugfixes
 - Fix bond types not following the CCDC conventions.
 - Fix a bug where the folder for building blocks was created even if the user did not want to save the building blocks.
 - Fix a bug where the save_dir was not created if it did not exist.
+- Fix the `out_path` variable on the `Framework` class to save the structure on the correct folder.
 
 
 Known bugs
