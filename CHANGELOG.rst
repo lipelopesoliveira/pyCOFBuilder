@@ -26,6 +26,14 @@ Bugfixes
 - Fix a bug where the folder for building blocks was created even if the user did not want to save the building blocks.
 - Fix a bug where the save_dir was not created if it did not exist.
 
+
+Known bugs
+----------
+
+- The `geometry` module is not fully implemented yet.
+- The calculation of bonds is taking too long for large structures.
+- The bond assignment is done after the structure is created, which can lead to errors in the structure creation. The bond assignment should be done before the structure creation, and the bonds betweeen building blocks should be assigned manually on the creation of the structure.
+
 v0.0.8.7 Beta (29/12/2024)
 ========================
 

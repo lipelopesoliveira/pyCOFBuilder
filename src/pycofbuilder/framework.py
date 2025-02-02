@@ -109,7 +109,7 @@ class Framework():
 
         self.name: str = name
 
-        self.out_path: str = kwargs.get('out_dir', os.path.join(os.getcwd(), 'out'))
+        self.out_path: str = kwargs.get('out_path', os.path.join(os.getcwd(), 'out'))
         self.save_bb: bool = kwargs.get('save_bb', True)
         self.bb_out_path: str = kwargs.get('bb_out_path', os.path.join(self.out_path, 'building_blocks'))
 
@@ -3064,8 +3064,8 @@ class Framework():
             self.logger.error(connectivity_error.format('B', 4, BB_R4_B.connectivity))
             raise BBConnectivityError(4, BB_R4_B.connectivity)
 
-        self.name = f'{BB_R4_A.name}-{BB_R4_B.name}-KGM-{stacking}'
-        self.topology = 'KGM'
+        self.name = f'{BB_R4_A.name}-{BB_R4_B.name}-FXT-{stacking}'
+        self.topology = 'FXT'
         self.staking = stacking
         self.dimension = 2
 
@@ -3080,10 +3080,6 @@ class Framework():
         self.logger.debug('{} detected as bond atom for groups {} and {}'.format(bond_atom,
                                                                                  BB_R4_A.conector,
                                                                                  BB_R4_B.conector))
-
-        # Get the position of the X atom in the building blocks
-        BB_R4_A.get_X_points(bond_atom)
-        BB_R4_B.get_X_points(bond_atom)
 
         # Replace "X" the building block
         BB_R4_A.replace_X(bond_atom)
