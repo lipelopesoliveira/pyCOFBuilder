@@ -3081,6 +3081,18 @@ class Framework():
                                                                                  BB_R4_A.conector,
                                                                                  BB_R4_B.conector))
 
+        # Find the d' vector to realign the S4/R4 building blocks
+        for bb in [BB_R4_A, BB_R4_B]:
+            x_vec = bb.get_X_points()[1]
+
+            R_Matrix = R.from_euler('z',
+                                    angle([0, 1, 0], (x_vec[0] + x_vec[1]) / 2),
+                                    degrees=True).as_matrix()
+
+            rotated_pos = np.dot(bb.atom_pos, R_Matrix)
+
+            bb.atom_pos = rotated_pos
+
         # Replace "X" the building block
         BB_R4_A.replace_X(bond_atom)
 
@@ -3494,6 +3506,16 @@ class Framework():
                                                                                  BB_S4.conector,
                                                                                  BB_L2.conector))
 
+        x_vec = BB_S4.get_X_points()[1]
+
+        R_Matrix = R.from_euler('z',
+                                angle([0, 1, 0], (x_vec[0] + x_vec[1]) / 2),
+                                degrees=True).as_matrix()
+
+        rotated_pos = np.dot(BB_S4.atom_pos, R_Matrix)
+
+        BB_S4.atom_pos = rotated_pos
+        
         # Replace "X" the building block
         BB_L2.replace_X(bond_atom)
 

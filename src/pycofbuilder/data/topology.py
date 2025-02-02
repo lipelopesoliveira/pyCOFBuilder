@@ -160,11 +160,11 @@ TOPOLOGY_DICT = {
         'beta': 90,
         'gamma': 120,
         'vertice_connectivity': 4,
-        'edge_connectivity': 2,
+        'edge_connectivity': 0,
         'vertices': [
-            {'position': [1/4, 3*np.sqrt(3)/12, 0], 'angle': -15},
-            {'position': [0.5, 0, 0], 'angle': 45},
-            {'position': [-1/4, 3*np.sqrt(3)/12, 0], 'angle': 15}
+            {'position': [0.5, 0, 0], 'angle': 0},
+            {'position': [1/4, np.sqrt(3)/4, 0], 'angle': -60},
+            {'position': [-1/4, np.sqrt(3)/4, 0], 'angle': 60}
             ],
         'edges': []
         },
@@ -178,17 +178,17 @@ TOPOLOGY_DICT = {
         'vertice_connectivity': 4,
         'edge_connectivity': 2,
         'vertices': [
-            {'position': [1/4, 3*np.sqrt(3)/12, 0], 'angle': -15},
-            {'position': [0.5, 0, 0], 'angle': 45},
-            {'position': [-1/4, 3*np.sqrt(3)/12, 0], 'angle': 15}
+            {'position': [0.5, 0, 0], 'angle': 0},
+            {'position': [1/4, np.sqrt(3)/4, 0], 'angle': -60},
+            {'position': [-1/4, np.sqrt(3)/4, 0], 'angle': 60}
             ],
         'edges': [
-            {'position': [22/64, 7*np.sqrt(3)/64, 0], 'angle': -30},
-            {'position': [85/128, 7*np.sqrt(3)/64, 0], 'angle': 30},
-            {'position': [4/8, 35*np.sqrt(3)/128, 0], 'angle': 90},
-            {'position': [0, 29*np.sqrt(3)/128, 0], 'angle': 90},
-            {'position': [21/128, 25*np.sqrt(3)/64, 0], 'angle': -30},
-            {'position': [-21/128, 25*np.sqrt(3)/64, 0], 'angle': 30},
+            {'position': [0.341475, 0.19715, 0], 'angle': -30},
+            {'position': [0.6758525, 0.19715, 0], 'angle': 30},
+            {'position': [0.5, 0.471724, 0], 'angle': 90},
+            {'position': [0, 0.394301, 0], 'angle': 90},
+            {'position': [0.1558525, 0.6668875, 0], 'angle': -30},
+            {'position': [-0.158525, 0.668875, 0], 'angle': 30},
             ]
         },
     'DIA': {

@@ -85,10 +85,11 @@ class BuildingBlock():
         return self.structure_as_string()
 
     def __repr__(self):
-        return 'BuildingBlock({}, {}, {}, {})'.format(self.symmetry,
-                                                      self.core,
-                                                      self.conector,
-                                                      self.funcGroups)
+        return 'BuildingBlock(symmetry={}, core={}, connector={}, funcGroups={})'.format(
+            self.symmetry,
+            self.core,
+            self.conector,
+            self.funcGroups)
 
     def copy(self):
         '''Return a deep copy of the BuildingBlock object'''
