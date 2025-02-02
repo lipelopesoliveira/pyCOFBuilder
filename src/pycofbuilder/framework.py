@@ -482,6 +482,8 @@ class Framework():
         else:
             save_path = save_dir
 
+        os.makedirs(save_path, exist_ok=True)
+
         save_dict[fmt](path=save_path,
                        file_name=self.name,
                        cell=cell,

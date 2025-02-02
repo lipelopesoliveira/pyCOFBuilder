@@ -69,7 +69,7 @@ class BuildingBlock():
                                    ]
 
         # Check if bb_out_path exists and try to create it if not
-        if self.save_bb != '':
+        if self.save_bb:
             os.makedirs(self.bb_out_path, exist_ok=True)
 
         # If a name is provided create building block from this name
@@ -627,8 +627,8 @@ class BuildingBlock():
         if extension == 'xyz':
             save_xyz(path=self.bb_out_path,
                      file_name=self.name + '.xyz',
-                     atom_types=self.atom_types,
-                     atom_pos=self.atom_pos)
+                     atomTypes=self.atom_types,
+                     atomPos=self.atom_pos)
 
     def get_available_core(self):
         '''Get the list of available cores'''
