@@ -471,7 +471,7 @@ class Framework():
         atom_labels = [site['properties']['source'] for site in structure_dict['sites']]
 
         if save_labels:
-            atom_labels = ['{}{}_{}'.format(atom_types[i], i, atom_labels[i]) for i in range(len(atom_types))] 
+            atom_labels = ['{}{}_{}'.format(atom_types[i], i, atom_labels[i]) for i in range(len(atom_types))]
         else:
             atom_labels = [atom_types[i] + str(i) for i in range(len(atom_types))]
 
@@ -3515,7 +3515,7 @@ class Framework():
         rotated_pos = np.dot(BB_S4.atom_pos, R_Matrix)
 
         BB_S4.atom_pos = rotated_pos
-        
+
         # Replace "X" the building block
         BB_L2.replace_X(bond_atom)
 
@@ -4384,6 +4384,9 @@ class Framework():
                 5. number of the space group,
                 6. number of operation symmetry
         """
+
+        raise NotImplementedError('The BOR network is not implemented yet')
+
         connectivity_error = 'Building block {} must present connectivity {} not {}'
         if BB_D4.connectivity != 4:
             self.logger.error(connectivity_error.format('A', 4, BB_D4.connectivity))
@@ -4864,4 +4867,5 @@ class Framework():
                                d_param_base: float = 7.2,
                                print_result: bool = True,
                                **kwargs):
-        pass
+
+        raise NotImplementedError('The LON-A network is not fully implemented yet')
