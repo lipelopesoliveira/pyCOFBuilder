@@ -4357,7 +4357,7 @@ class Framework():
                              **kwargs):
         """Creates a COF with BOR network.
 
-        The DIA net is composed of one tetrapodal tetrahedical building block and
+        The BOR net is composed of one tetrapodal tetrahedical building block and
         one tripodal triangular building block.
 
         Parameters

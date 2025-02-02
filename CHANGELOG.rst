@@ -36,6 +36,7 @@ Known bugs
 - The bond assignment is done after the structure is created, which can lead to errors in the structure creation. The bond assignment should be done before the structure creation, and the bonds betweeen building blocks should be assigned manually on the creation of the structure.
 - The positioning of the building blocks on FXT and FXT-A nets is still not perfect.
 - On FXT and FXT-A nets the cell parameters for R4 building blocks are not being calculated correctly.
+- The BOR network is not working properly.
 
 v0.0.8.7 Beta (29/12/2024)
 ========================
