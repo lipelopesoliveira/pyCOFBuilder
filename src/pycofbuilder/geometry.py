@@ -10,7 +10,9 @@ import numpy as np
 
 
 def distance(p1: list, p2: list, ndecimals=1):
-    """Calculate the distance between two points in a N-dimentional space.
+    """Calculate the distance between two points in a N-dimentional space rounded to a given number of decimal places.
+
+    The rounding is done to avoid that small distortions generate errors when comparing distances.
 
     Parameters
     ----------

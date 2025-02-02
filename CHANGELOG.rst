@@ -17,6 +17,7 @@ New features
   - `BuildingBlock`
 - Add the LON and LON-A nets.
 - Add the FXT and FXT-A nets.
+- Add the `geometry` module to handle the geometry identification of molecular structures.
 
 Bugfixes
 --------
