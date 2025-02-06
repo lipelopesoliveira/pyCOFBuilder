@@ -4863,9 +4863,234 @@ class Framework():
     def create_lon_a_structure(self,
                                BB_D4: str,
                                BB_L2: str,
-                               interp_dg: str = '1',
+                               interp_dg: str = '0',
                                d_param_base: float = 7.2,
                                print_result: bool = True,
                                **kwargs):
 
-        raise NotImplementedError('The LON-A network is not fully implemented yet')
+        """Creates a COF with LON network.
+
+        The LON_A net is composed of one tetrapodal tetrahedical and one linear building blocks.
+
+        Parameters
+        ----------
+        BB_D4 : BuildingBlock, required
+            The BuildingBlock object of the tetrapodal tetrahedical Buiding Block
+        BB_L2 : BuildingBlock, required
+            The BuildingBlock object of the dipodal linear Buiding Block
+        interp_dg : str, optional
+            The degree of interpenetration of the framework (default is '1')
+        d_param_base : float, optional
+            The base value for interlayer distance in angstroms (default is 7.2)
+        print_result : bool, optional
+            Parameter for the control for printing the result (default is True)
+
+        Returns
+        -------
+        list
+            A list of strings containing:
+                1. the structure name,
+                2. lattice type,
+                3. hall symbol of the cristaline structure,
+                4. space group,
+                5. number of the space group,
+                6. number of operation symmetry
+        """
+        connectivity_error = 'Building block {} must present connectivity {} not {}'
+        if BB_D4.connectivity != 4:
+            self.logger.error(connectivity_error.format('A', 4, BB_D4.connectivity))
+            raise BBConnectivityError(4, BB_D4.connectivity)
+        if BB_L2.connectivity != 2:
+            self.logger.error(connectivity_error.format('B', 2, BB_L2.connectivity))
+            raise BBConnectivityError(2, BB_L2.connectivity)
+
+        self.name = f'{BB_D4.name}-{BB_L2.name}-LON_A-{interp_dg}'
+        self.topology = 'LON'
+        self.staking = interp_dg
+        self.dimension = 3
+
+        self.charge = BB_D4.charge + BB_L2.charge
+        self.chirality = BB_D4.chirality or BB_L2.chirality
+
+        self.logger.debug(f'Starting the creation of {self.name}')
+
+        # Detect the bond atom from the connection groups type
+        bond_atom = get_bond_atom(BB_D4.conector, BB_L2.conector)
+
+        self.logger.debug('{} detected as bond atom for groups {} and {}'.format(bond_atom,
+                                                                                 BB_D4.conector,
+                                                                                 BB_L2.conector))
+
+        # Get the topology information
+        topology_info = TOPOLOGY_DICT[self.topology]
+
+        # Measure the base size of the building blocks
+        size = np.average(BB_D4.size) + np.average(BB_L2.size)
+
+        alat = 3/2 * size * np.cos(np.radians(19.4712)) / np.cos(np.radians(30))
+
+        # Calculate the primitive cell vector assuming perfect tetrahedical building blocks
+        self.cellMatrix = Lattice(alat*np.array(topology_info['lattice']))
+        self.cellParameters = np.array([
+            alat * topology_info['a'],
+            alat * topology_info['b'],
+            alat * topology_info['c'],
+            topology_info['alpha'],
+            topology_info['beta'],
+            topology_info['gamma']
+            ]).astype(float)
+
+        # Create the structure
+        self.atom_types = []
+        self.atom_labels = []
+        self.atom_pos = []
+
+        # Align and rotate the building block 1 to their respective positions
+        BB_D4.align_to(topology_info['vertices'][0]['align_v'])
+
+        for site in range(4):
+            BB = copy.deepcopy(BB_D4)
+
+            BB.align_to(topology_info['vertices'][site]['align_v'])
+            BB.rotate_around(rotation_axis=topology_info['vertices'][site]['align_v'],
+                             angle=topology_info['vertices'][site]['angle'])
+
+            BB.shift(np.array(topology_info['vertices'][site]['position'])*alat)
+
+            BB.replace_X(bond_atom)
+            BB.remove_X()
+
+            # Update the structure
+            self.atom_types += BB.atom_types
+            self.atom_pos += BB.atom_pos.tolist()
+            self.atom_labels += ['C1' if i == 'C' else i for i in BB.atom_labels]
+
+        # Add the building blocks to the structure
+        for edge_data in topology_info['edges']:
+            # Copy the building block 2 object
+            BB = copy.deepcopy(BB_L2)
+
+            # Align, rotate and shift the building block 2 to their respective positions
+            BB.align_to(edge_data['align_v'])
+            BB.rotate_around(rotation_axis=edge_data['align_v'],
+                             angle=edge_data['angle'])
+            BB.shift(np.array(edge_data['position']) * alat)
+
+            BB.remove_X()
+
+            # Update the structure
+            self.atom_types += BB.atom_types
+            self.atom_pos += BB.atom_pos.tolist()
+            self.atom_labels += ['C2' if i == 'C' else i for i in BB.atom_labels]
+
+        atom_types, atom_labels, atom_pos = [], [], []
+        for n_int in range(int(self.interp_dg)):
+            int_direction = np.array([0, 0, 1]) * d_param_base * n_int
+
+            atom_types += self.atom_types
+            atom_pos += (np.array(self.atom_pos) + int_direction).tolist()
+            atom_labels += self.atom_labels
+
+        self.atom_types = atom_types
+        self.atom_pos = atom_pos
+        self.atom_labels = atom_labels
+
+        StartingFramework = Structure(
+            self.cellMatrix,
+            self.atom_types,
+            self.atom_pos,
+            coords_are_cartesian=True,
+            site_properties={'source': self.atom_labels}
+        ).get_sorted_structure()
+
+        StartingFramework.translate_sites(
+            np.ones(len(self.atom_types)).astype(int).tolist(),
+            [0, 0, 0],
+            frac_coords=True,
+            to_unit_cell=True
+            )
+
+        dict_structure = StartingFramework.as_dict()
+
+        self.cellMatrix = np.array(dict_structure['lattice']['matrix']).astype(float)
+        self.cellParameters = np.array([dict_structure['lattice']['a'],
+                                        dict_structure['lattice']['b'],
+                                        dict_structure['lattice']['c'],
+                                        dict_structure['lattice']['alpha'],
+                                        dict_structure['lattice']['beta'],
+                                        dict_structure['lattice']['gamma']]).astype(float)
+
+        self.atom_types = [i['label'] for i in dict_structure['sites']]
+        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
+        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
+        self.n_atoms = len(dict_structure['sites'])
+        self.composition = StartingFramework.formula
+
+        StartingFramework.to(os.path.join(os.getcwd(), 'TESTE_LONA.cif'), fmt='cif')
+
+        dist_matrix = StartingFramework.distance_matrix
+
+        # Check if there are any atoms closer than 0.8 A
+        for i in range(len(dist_matrix)):
+            for j in range(i+1, len(dist_matrix)):
+                if dist_matrix[i][j] < self.dist_threshold:
+                    raise BondLenghError(i, j, dist_matrix[i][j], self.dist_threshold)
+
+        # Get the simmetry information of the generated structure
+        symm = SpacegroupAnalyzer(StartingFramework,
+                                  symprec=self.symm_tol,
+                                  angle_tolerance=self.angle_tol)
+
+        try:
+            self.prim_structure = symm.get_primitive_standard_structure(keep_site_properties=True)
+
+            dict_structure = symm.get_refined_structure(keep_site_properties=True).as_dict()
+
+            self.cellMatrix = np.array(dict_structure['lattice']['matrix']).astype(float)
+            self.cellParameters = np.array([dict_structure['lattice']['a'],
+                                            dict_structure['lattice']['b'],
+                                            dict_structure['lattice']['c'],
+                                            dict_structure['lattice']['alpha'],
+                                            dict_structure['lattice']['beta'],
+                                            dict_structure['lattice']['gamma']]).astype(float)
+
+            self.atom_types = [i['label'] for i in dict_structure['sites']]
+            self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
+            self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
+            self.n_atoms = len(dict_structure['sites'])
+            self.composition = self.prim_structure.formula
+
+            self.logger.debug(self.prim_structure)
+
+            self.lattice_type = symm.get_lattice_type()
+            self.space_group = symm.get_space_group_symbol()
+            self.space_group_n = symm.get_space_group_number()
+
+            symm_op = symm.get_point_group_operations()
+            self.hall = symm.get_hall()
+
+        except Exception as e:
+            self.logger.exception(e)
+
+            self.lattice_type = 'Triclinic'
+            self.space_group = 'P1'
+            self.space_group_n = '1'
+
+            symm_op = [1]
+            self.hall = 'P 1'
+
+        symm_text = get_framework_symm_text(self.name,
+                                            str(self.lattice_type),
+                                            str(self.hall[0:2]),
+                                            str(self.space_group),
+                                            str(self.space_group_n),
+                                            len(symm_op))
+
+        self.logger.info(symm_text)
+
+        return [self.name,
+                str(self.lattice_type),
+                str(self.hall[0:2]),
+                str(self.space_group),
+                str(self.space_group_n),
+                len(symm_op)]
