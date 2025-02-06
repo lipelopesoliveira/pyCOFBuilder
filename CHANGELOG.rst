@@ -18,6 +18,7 @@ New features
 - Add the LON and LON-A nets.
 - Add the FXT and FXT-A nets.
 - Add the `geometry` module to handle the geometry identification of molecular structures.
+- Now the building blocks are not save by default. The user can activate the save of the building blocks by setting the `save_bb` variable to `True` on the `Framework` class.
 
 Bugfixes
 --------
@@ -33,6 +34,7 @@ Known bugs
 
 - The `geometry` module is not fully implemented yet.
 - The calculation of bonds is taking too long for large structures.
+- The bonds calculation does not identify the bond types.
 - The bond assignment is done after the structure is created, which can lead to errors in the structure creation. The bond assignment should be done before the structure creation, and the bonds betweeen building blocks should be assigned manually on the creation of the structure.
 - The positioning of the building blocks on FXT and FXT-A nets is still not perfect.
 - On FXT and FXT-A nets the cell parameters for R4 building blocks are not being calculated correctly.

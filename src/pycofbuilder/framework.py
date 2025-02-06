@@ -105,12 +105,12 @@ class Framework():
         Default: bb_lib
     """
 
-    def __init__(self, name: str = None, **kwargs):
+    def __init__(self, name: str | None = None, **kwargs):
 
         self.name: str = name
 
         self.out_path: str = kwargs.get('out_path', os.path.join(os.getcwd(), 'out'))
-        self.save_bb: bool = kwargs.get('save_bb', True)
+        self.save_bb: bool = kwargs.get('save_bb', False)
         self.bb_out_path: str = kwargs.get('bb_out_path', os.path.join(self.out_path, 'building_blocks'))
 
         self.logger = create_logger(level=kwargs.get('log_level', 'info'),
