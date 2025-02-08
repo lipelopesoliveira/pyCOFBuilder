@@ -18,7 +18,8 @@ New features
 - Add the LON and LON-A nets.
 - Add the FXT and FXT-A nets.
 - Add the `geometry` module to handle the geometry identification of molecular structures.
-- Now the building blocks are not save by default. The user can activate the save of the building blocks by setting the `save_bb` variable to `True` on the `Framework` class.
+- Now the building blocks are *not save by default*.
+  - The user can activate the save of the building blocks by setting the `save_bb` variable to `True` on the `Framework` class.
 
 Bugfixes
 --------
