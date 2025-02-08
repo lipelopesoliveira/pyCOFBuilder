@@ -3,7 +3,12 @@
 # Distributed under the terms of the MIT License.
 
 """
-The dictionary containing the definitions nets for a Framework buiding
+The dictionary containing the definitions nets for a Framework buiding. For each net, the the vertices and edges
+positions are defined in cartesian coordinates divided by the lattice parameters. This definition is similar to
+the alat defition used in QuantumESPRESSO, however instead of using the same alat for all dimentions, it is used
+the lattice parameters a, b and c. This definition may not be the best one, however it allows a much more
+intuitive definition of the vertices and edges positions.
+The angles are defined in degrees.
 """
 
 import numpy as np
@@ -160,11 +165,11 @@ TOPOLOGY_DICT = {
         'beta': 90,
         'gamma': 120,
         'vertice_connectivity': 4,
-        'edge_connectivity': 2,
+        'edge_connectivity': 0,
         'vertices': [
-            {'position': [1/4, 3*np.sqrt(3)/12, 0], 'angle': -15},
-            {'position': [0.5, 0, 0], 'angle': 45},
-            {'position': [-1/4, 3*np.sqrt(3)/12, 0], 'angle': 15}
+            {'position': [0.5, 0, 0], 'angle': 0},
+            {'position': [1/4, np.sqrt(3)/4, 0], 'angle': -60},
+            {'position': [-1/4, np.sqrt(3)/4, 0], 'angle': 60}
             ],
         'edges': []
         },
@@ -178,17 +183,17 @@ TOPOLOGY_DICT = {
         'vertice_connectivity': 4,
         'edge_connectivity': 2,
         'vertices': [
-            {'position': [1/4, 3*np.sqrt(3)/12, 0], 'angle': -15},
-            {'position': [0.5, 0, 0], 'angle': 45},
-            {'position': [-1/4, 3*np.sqrt(3)/12, 0], 'angle': 15}
+            {'position': [0.5, 0, 0], 'angle': 0},
+            {'position': [1/4, np.sqrt(3)/4, 0], 'angle': -60},
+            {'position': [-1/4, np.sqrt(3)/4, 0], 'angle': 60}
             ],
         'edges': [
-            {'position': [22/64, 7*np.sqrt(3)/64, 0], 'angle': -30},
-            {'position': [85/128, 7*np.sqrt(3)/64, 0], 'angle': 30},
-            {'position': [4/8, 35*np.sqrt(3)/128, 0], 'angle': 90},
-            {'position': [0, 29*np.sqrt(3)/128, 0], 'angle': 90},
-            {'position': [21/128, 25*np.sqrt(3)/64, 0], 'angle': -30},
-            {'position': [-21/128, 25*np.sqrt(3)/64, 0], 'angle': 30},
+            {'position': [0.341475, 0.19715, 0], 'angle': -30},
+            {'position': [0.6758525, 0.19715, 0], 'angle': 30},
+            {'position': [0.5, 0.471724, 0], 'angle': 90},
+            {'position': [0, 0.394301, 0], 'angle': 90},
+            {'position': [0.1558525, 0.6668875, 0], 'angle': -30},
+            {'position': [-0.158525, 0.668875, 0], 'angle': 30},
             ]
         },
     'DIA': {
@@ -249,5 +254,76 @@ TOPOLOGY_DICT = {
             {'position': [5/6, 1/6, 5/6], 'angle': 0, 'align_v': [1, 1/2, 1]},
             {'position': [5/6, 5/6, 1/6], 'angle': 10, 'align_v': [1, 1, 1]},
             ]
-        }
+        },
+    'LON': {
+        'a': 1,
+        'b': 1,
+        'c': 2 * np.sqrt(2) / np.sqrt(3),
+        'alpha': 90,
+        'beta': 90,
+        'gamma': 120,
+        'lattice': [[1, 0, 0],
+                    [-1/2, np.sqrt(3) / 2, 0],
+                    [0, 0, 2 * np.sqrt(2) / np.sqrt(3)]],
+        'vertice_connectivity': 4,
+        'edge_connectivity': 4,
+        'vertices': [
+            {'position': [0.00000000, 0.57735027, 0.10206206], 'angle': 180, 'align_v': [0, 0, 1]},
+            {'position': [0.50000000, 0.28867513, 0.91855856], 'angle': 0, 'align_v': [0, 0, 1]},
+            {'position': [0.00000000, 0.57735027, 0.71443444], 'angle': 0, 'align_v': [0, 0, -1]},
+            {'position': [0.50000000, 0.28867513, 1.53093094], 'angle': 180, 'align_v': [0, 0, -1]},
+            ],
+        'edges': []
+        },
+    'LON_A': {
+        'a': 1,
+        'b': 1,
+        'c': 2 * np.sqrt(2) / np.sqrt(3),
+        'alpha': 90,
+        'beta': 90,
+        'gamma': 120,
+        'lattice': [[1, 0, 0], [-1/2, np.sqrt(3) / 2, 0], [0, 0, 2 * np.sqrt(2) / np.sqrt(3)]],
+        'vertice_connectivity': 4,
+        'edge_connectivity': 2,
+        'vertices': [
+            {'position': [0.00000000, 0.57735027, 0.10206206], 'angle': 180, 'align_v': [0, 0, 1]},
+            {'position': [0.50000000, 0.28867513, 0.91855856], 'angle': 0, 'align_v': [0, 0, 1]},
+            {'position': [0.00000000, 0.57735027, 0.71443444], 'angle': -20, 'align_v': [0, 0, -1]},
+            {'position': [0.50000000, 0.28867513, 1.53093094], 'angle': 160, 'align_v': [0, 0, -1]},
+            ],
+        'edges': [
+            {
+                'position': [-0.00000,  0.57735,  0.40825],
+                'angle': 90.00, 'align_v': [0, 0, -1]
+            },
+            {
+                'position': [0.50000, 0.28867, 1.22474],
+                'angle': 90.00, 'align_v': [0, 0, 1]
+            },
+            {
+                'position': [0.25000, 0.43301, 0.00000],
+                'angle': 61.87, 'align_v': [-0.8165, 0.4714, 0.33333]
+            },
+            {
+                'position': [0.50000, 0.00000, 0.00000],
+                'angle': 160.53, 'align_v': [-0.0, -0.94281, 0.33333]
+            },
+            {
+                'position': [-0.25000, 0.43301, 0.00000],
+                'angle': 118.13, 'align_v': [-0.8165, -0.47141, -0.33333]
+            },
+            {
+                'position': [0.25000, 0.43301, 0.81650],
+                'angle': 61.87, 'align_v': [-0.8165, 0.4714, -0.33333]
+            },
+            {
+                'position': [0.50000, 0.00000, 0.81650],
+                'angle': 160.53, 'align_v':  [-0.0, -0.94281, -0.33333]
+            },
+            {
+                'position': [-0.25000, 0.43301, 0.81650],
+                'angle': 118.13, 'align_v': [-0.8165, -0.47141, 0.33333]
+            },
+        ]
+        },
     }

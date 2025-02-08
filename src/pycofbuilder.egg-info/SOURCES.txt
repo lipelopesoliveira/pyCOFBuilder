@@ -8,13 +8,13 @@ src/pycofbuilder/building_block.py
 src/pycofbuilder/cjson.py
 src/pycofbuilder/exceptions.py
 src/pycofbuilder/framework.py
+src/pycofbuilder/geometry.py
 src/pycofbuilder/io_tools.py
 src/pycofbuilder/logger.py
 src/pycofbuilder/tools.py
 src/pycofbuilder.egg-info/PKG-INFO
 src/pycofbuilder.egg-info/SOURCES.txt
 src/pycofbuilder.egg-info/dependency_links.txt
-src/pycofbuilder.egg-info/requires.txt
 src/pycofbuilder.egg-info/top_level.txt
 src/pycofbuilder/data/__init__.py
 src/pycofbuilder/data/periodic_table.json
@@ -84,6 +84,7 @@ src/pycofbuilder/data/core/L2/NAPT.cjson
 src/pycofbuilder/data/core/L2/NDTP.cjson
 src/pycofbuilder/data/core/L2/PHEN.cjson
 src/pycofbuilder/data/core/L2/PRZN.cjson
+src/pycofbuilder/data/core/L2/PRZN2.cjson
 src/pycofbuilder/data/core/L2/PTCD.cjson
 src/pycofbuilder/data/core/L2/PYEN.cjson
 src/pycofbuilder/data/core/L2/PYRN.cjson
@@ -158,5 +159,7 @@ src/pycofbuilder/data/func_groups/SO2H.cjson
 src/pycofbuilder/data/func_groups/SO3H.cjson
 src/pycofbuilder/data/func_groups/__init__.py
 src/pycofbuilder/data/func_groups/tBu.cjson
-tests/test_advanced.py
-tests/test_basic.py
+tests/test_dependencies.py
+tests/test_exceptions.py
+tests/test_iotools.py
+tests/test_tools.py
