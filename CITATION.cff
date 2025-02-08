@@ -8,7 +8,7 @@ authors:
   given-names: "Pierre"
   orcid: "https://orcid.org/0000-0001-6048-4690"
 title: "pyCOFBuilder: A python package for automated assembly of Covalent Organic Framework structures"
-version: 0.0.8.8
+version: 0.0.8.9
 doi: 10.1021/acs.jcim.3c01918
 date-released: 2024-03-30
 url: "https://doi.org/10.1021/acs.jcim.3c01918"

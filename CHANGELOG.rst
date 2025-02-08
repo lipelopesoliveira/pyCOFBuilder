@@ -2,7 +2,14 @@
 Change Log
 **********
 
-v0.0.8.8 Beta (01/02/2025)
+v0.0.8.8 Beta (08/02/2025)
+========================
+
+Bugfixes
+--------
+- Remove author name on the cif file
+
+v0.0.8.8 Beta (08/02/2025)
 ========================
 
 New features
