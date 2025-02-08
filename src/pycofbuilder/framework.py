@@ -4864,7 +4864,7 @@ class Framework():
                                BB_D4: BuildingBlock,
                                BB_L2: BuildingBlock,
                                interp_dg: str | int = 0,
-                               d_param_base: float = 7.2,
+                               d_param_base: float = 10,
                                print_result: bool = True,
                                **kwargs):
 
@@ -4896,18 +4896,21 @@ class Framework():
                 5. number of the space group,
                 6. number of operation symmetry
         """
+        # Get the topology information
+        topology_info = TOPOLOGY_DICT[self.topology]
+
         connectivity_error = 'Building block {} must present connectivity {} not {}'
-        if BB_D4.connectivity != 4:
-            self.logger.error(connectivity_error.format('A', 4, BB_D4.connectivity))
-            raise BBConnectivityError(4, BB_D4.connectivity)
-        if BB_L2.connectivity != 2:
-            self.logger.error(connectivity_error.format('B', 2, BB_L2.connectivity))
-            raise BBConnectivityError(2, BB_L2.connectivity)
+        if BB_D4.connectivity != topology_info['vertice_connectivity']:
+            self.logger.error(connectivity_error.format('A', topology_info['vertice_connectivity'], BB_D4.connectivity))
+            raise BBConnectivityError(topology_info['vertice_connectivity'], BB_D4.connectivity)
+        if BB_L2.connectivity != topology_info['edge_connectivity']:
+            self.logger.error(connectivity_error.format('B', topology_info['edge_connectivity'], BB_L2.connectivity))
+            raise BBConnectivityError(topology_info['edge_connectivity'], BB_L2.connectivity)
 
         # Check if stacking is present in kwargs
         if 'stacking' in kwargs:
-            self.logger.warning('The stacking parameter should not be used in 3D network,' +
-                                'the interp_dg parameter should be used instead')
+            self.logger.warning(
+                'The stacking parameter should not be used in 3D nets. The interp_dg parameter should be used instead')
 
         self.name = f'{BB_D4.name}-{BB_L2.name}-LON_A-{interp_dg}'
         self.topology = 'LON_A'
@@ -4925,14 +4928,10 @@ class Framework():
         self.logger.debug('{} detected as bond atom for groups {} and {}'.format(bond_atom,
                                                                                  BB_D4.conector,
                                                                                  BB_L2.conector))
-
-        # Get the topology information
-        topology_info = TOPOLOGY_DICT[self.topology]
-
         # Measure the base size of the building blocks
         size = np.average(BB_D4.size) + np.average(BB_L2.size)
 
-        alat = 3/2 * size * np.cos(np.radians(19.4712)) / np.cos(np.radians(30))
+        alat = 4 * size * np.cos(np.radians(35.26439))
 
         # Calculate the primitive cell vector assuming perfect tetrahedical building blocks
         self.cellMatrix = Lattice(alat*np.array(topology_info['lattice']))
@@ -4953,7 +4952,7 @@ class Framework():
         # Align and rotate the building block 1 to their respective positions
         BB_D4.align_to(topology_info['vertices'][0]['align_v'])
 
-        for site in range(1):
+        for site in range(4):
             BB = copy.deepcopy(BB_D4)
 
             BB.align_to(topology_info['vertices'][site]['align_v'])
@@ -4972,6 +4971,7 @@ class Framework():
 
         # Add the building blocks to the structure
         for edge_data in topology_info['edges']:
+
             # Copy the building block 2 object
             BB = copy.deepcopy(BB_L2)
 
@@ -4990,7 +4990,7 @@ class Framework():
 
         atom_types, atom_labels, atom_pos = [], [], []
         for n_int in range(int(self.stacking)):
-            int_direction = np.array([0, 0, 1]) * d_param_base * n_int
+            int_direction = np.array([1, 1, 1]) * d_param_base * n_int
 
             atom_types += self.atom_types
             atom_pos += (np.array(self.atom_pos) + int_direction).tolist()
