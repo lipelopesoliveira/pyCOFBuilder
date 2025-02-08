@@ -4022,8 +4022,6 @@ class Framework():
             site_properties={'source': self.atom_labels}
         ).get_sorted_structure()
 
-        StartingFramework.to(os.path.join(os.getcwd(), 'TESTE_DIA.cif'), fmt='cif')
-
         dict_structure = StartingFramework.as_dict()
 
         self.cellMatrix = np.array(dict_structure['lattice']['matrix']).astype(float)
@@ -4278,8 +4276,6 @@ class Framework():
         self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
         self.n_atoms = len(dict_structure['sites'])
         self.composition = StartingFramework.formula
-
-        StartingFramework.to(os.path.join(os.getcwd(), 'TESTE_DIA-A.cif'), fmt='cif')
 
         dist_matrix = StartingFramework.distance_matrix
 
@@ -4791,8 +4787,6 @@ class Framework():
         self.n_atoms = len(dict_structure['sites'])
         self.composition = StartingFramework.formula
 
-        StartingFramework.to(os.path.join(os.getcwd(), 'TESTE_LON.cif'), fmt='cif')
-
         dist_matrix = StartingFramework.distance_matrix
 
         # Check if there are any atoms closer than 0.8 A
@@ -5030,8 +5024,6 @@ class Framework():
         self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
         self.n_atoms = len(dict_structure['sites'])
         self.composition = StartingFramework.formula
-
-        StartingFramework.to(os.path.join(os.getcwd(), 'TESTE_LONA.cif'), fmt='cif')
 
         dist_matrix = StartingFramework.distance_matrix
 
