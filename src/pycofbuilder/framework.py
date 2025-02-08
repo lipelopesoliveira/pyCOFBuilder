@@ -4861,9 +4861,9 @@ class Framework():
                 len(symm_op)]
 
     def create_lon_a_structure(self,
-                               BB_D4: str,
-                               BB_L2: str,
-                               interp_dg: str = '0',
+                               BB_D4: BuildingBlock,
+                               BB_L2: BuildingBlock,
+                               interp_dg: str | int = 0,
                                d_param_base: float = 7.2,
                                print_result: bool = True,
                                **kwargs):
@@ -4904,8 +4904,13 @@ class Framework():
             self.logger.error(connectivity_error.format('B', 2, BB_L2.connectivity))
             raise BBConnectivityError(2, BB_L2.connectivity)
 
+        # Check if stacking is present in kwargs
+        if 'stacking' in kwargs:
+            self.logger.warning('The stacking parameter should not be used in 3D network,' +
+                                'the interp_dg parameter should be used instead')
+
         self.name = f'{BB_D4.name}-{BB_L2.name}-LON_A-{interp_dg}'
-        self.topology = 'LON'
+        self.topology = 'LON_A'
         self.staking = interp_dg
         self.dimension = 3
 
@@ -4948,7 +4953,7 @@ class Framework():
         # Align and rotate the building block 1 to their respective positions
         BB_D4.align_to(topology_info['vertices'][0]['align_v'])
 
-        for site in range(4):
+        for site in range(1):
             BB = copy.deepcopy(BB_D4)
 
             BB.align_to(topology_info['vertices'][site]['align_v'])
@@ -4984,7 +4989,7 @@ class Framework():
             self.atom_labels += ['C2' if i == 'C' else i for i in BB.atom_labels]
 
         atom_types, atom_labels, atom_pos = [], [], []
-        for n_int in range(int(self.interp_dg)):
+        for n_int in range(int(self.stacking)):
             int_direction = np.array([0, 0, 1]) * d_param_base * n_int
 
             atom_types += self.atom_types
