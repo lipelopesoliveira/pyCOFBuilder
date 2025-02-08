@@ -17,7 +17,7 @@ from ase.cell import Cell
 
 
 class ChemJSON:
-    '''
+    """
     Class to read, create and manupulate ChemJSON files.
 
     Attributes
@@ -48,7 +48,7 @@ class ChemJSON:
     partial_charges : dict
         A dictionary contaning the partial charges of the atoms on the structure.
         Example: {'DDEC': [0.1, 0.2, 0.15], 'EQeq': [0.05, 0.15, 0.19]}
-    '''
+    """
     def __init__(self):
         self.file_name = ''
         self.name = ''
@@ -69,9 +69,9 @@ class ChemJSON:
 
     # Create a custom representation of the class
     def __repr__(self):
-        '''
+        """
         Returns a custom representation of the class.
-        '''
+        """
 
         repr_string = "ChemJSON(name='{}', formula='{}', number of atoms={}".format(self.name,
                                                                                     self.formula,
@@ -81,9 +81,9 @@ class ChemJSON:
 
     # Create a custom print of the class
     def __str__(self):
-        '''
+        """
         Returns a custom print of the class.
-        '''
+        """
 
         string_string = "ChemJSON(name='{}', formula='{}', number of atoms={})\n".format(self.name,
                                                                                          self.formula,
@@ -123,41 +123,41 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
         return string_string
 
     def set_properties(self, properties):
-        '''
+        """
         Sets the properties of the structure.
-        '''
+        """
         self.properties = properties
 
     def set_results(self, results):
-        '''
+        """
         Sets the results of the structure.
-        '''
+        """
         self.results = results
 
     def set_cell_parameters(self, cell_parameters):
-        '''
+        """
         Sets the cell parameters of the structure.
-        '''
+        """
         self.cell_parameters = cell_parameters
 
         aseCell = Cell.fromcellpar(cell_parameters)
         self.cell_matrix = np.array(aseCell)
 
     def set_cell_matrix(self, cell_matrix):
-        '''
+        """
         Sets the cell matrix of the structure. The cell
         parameters will be calculated and also updated.
-        '''
+        """
         self.cell_matrix = cell_matrix
 
         aseCell = Cell(cell_matrix)
         self.cell_parameters = aseCell.cellpar()
 
     def set_cartesian_positions(self, cartesian_positions):
-        '''
+        """
         Sets the cartesian positions of the structure. The fractional
         positions will be calculated and also updated.
-        '''
+        """
         self.cartesian_positions = np.array(cartesian_positions).astype(float)
 
         if self.cell_parameters is not None:
@@ -165,10 +165,10 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
             self.fractional_positions = aseCell.scaled_positions(cartesian_positions)
 
     def set_fractional_positions(self, fractional_positions):
-        '''
+        """
         Sets the fractional positions of the structure. The cartesian
         positions will be calculated and also updated.
-        '''
+        """
         self.fractional_positions = np.array(fractional_positions).astype(float)
 
         if self.cell_parameters is not None:
@@ -176,9 +176,9 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
             self.cartesian_positions = aseCell.cartesian_positions(fractional_positions)
 
     def set_atomic_types(self, atomic_types):
-        '''
+        """
         Sets the atomic labels of the structure.
-        '''
+        """
         self.atomic_types = atomic_types
 
         self.atomic_labels = [f"{atom}{i+1}" for i, atom in enumerate(self.atomic_types)]
@@ -189,10 +189,10 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
         self.formula = ''.join([f'{atom}{self.atomic_types.count(atom)}' for atom in set(self.atomic_types)])
 
     def set_atomic_numbers(self, atomic_numbers):
-        '''
+        """
         Sets the atomic numbers of the structure. The atomic types and formula
         will be calculated and also updated.
-        '''
+        """
         self.atomic_numbers = atomic_numbers
 
         symbol_dict = elements_dict('atomic_number')
@@ -205,9 +205,9 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
         self.formula = ''.join([f'{atom}{self.atomic_types.count(atom)}' for atom in set(self.atomic_types)])
 
     def from_cjson(self, path, file_name):
-        '''
+        """
         Reads a ChemJSON file from a given path and file_name.
-        '''
+        """
         self.file_name = os.path.join(path, file_name.split('.')[0] + '.cjson')
 
         with open(self.file_name, 'r') as file:
@@ -257,9 +257,9 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
             self.partial_charges = cjson_data['partialCharges']
 
     def from_xyz(self, path, file_name):
-        '''
+        """
         Reads a XYZ file from a given path and file_name.
-        '''
+        """
 
         self.file_name = os.path.join(path, file_name.split('.')[0] + '.xyz')
         self.name = file_name.split('.')[0]
@@ -280,9 +280,9 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
         self.set_cartesian_positions(np.array(cartesian_positions))
 
     def from_gjf(self, path, file_name):
-        '''
+        """
         Reads a Gaussian input file from a given path and file_name.
-        '''
+        """
 
         self.file_name = os.path.join(path, file_name.split('.')[0] + '.gjf')
         self.name = file_name.split('.')[0]
@@ -314,9 +314,9 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
         self.set_cartesian_positions(np.array(cartesian_positions))
 
     def from_cif(self, path, file_name):
-        '''
+        """
         Reads a CIF file from a given path and file_name.
-        '''
+        """
 
         # Read the cif file and get the lattice parameters and atomic positions
         cif_filename = os.path.join(path, file_name.split('.')[0] + '.cif')
@@ -353,23 +353,23 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
             self.partial_charges = {charge_type: charges}
 
     def as_dict(self):
-        '''
+        """
         Returns the structure as a dictionary.
-        '''
+        """
         structure_dict = {
             'chemical json': 1,
             'name': self.name,
             'formula': self.formula,
         }
         if self.cell_parameters is not None:
-            structure_dict['unit cell'] = {
+            structure_dict['unitCell'] = {
                 'a': self.cell_parameters[0],
                 'b': self.cell_parameters[1],
                 'c': self.cell_parameters[2],
                 'alpha': self.cell_parameters[3],
                 'beta': self.cell_parameters[4],
                 'gamma': self.cell_parameters[5],
-                'cellVectors': self.cell_matrix.flatten().tolist()
+                'cellVectors': np.array(self.cell_matrix).flatten().tolist()
             }
 
         structure_dict['atoms'] = {
@@ -395,9 +395,9 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
         return structure_dict
 
     def write_cjson(self, path, file_name):
-        '''
+        """
         Writes a ChemJSON file to a given path and file_name.
-        '''
+        """
         self.file_name = os.path.join(path, file_name.split('.')[0] + '.cjson')
         with open(self.file_name, 'w') as file:
             simplejson.dump(self.as_dict(), file, indent=4)

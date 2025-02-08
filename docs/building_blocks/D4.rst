@@ -5,7 +5,3 @@ Please be aware that the structures below contains some errors due to problems w
 
 .. raw:: html
     :file: ../img/mol2grid_D4.html
-
-
-
-

@@ -1,4 +1,9 @@
 {
     "python.analysis.typeCheckingMode": "basic",
-    "esbonio.sphinx.confDir": ""
+    "esbonio.sphinx.confDir": "",
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
 }

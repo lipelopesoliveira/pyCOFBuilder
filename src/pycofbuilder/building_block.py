@@ -15,7 +15,8 @@ from pycofbuilder.tools import (rotation_matrix_from_vectors,
                                 closest_atom,
                                 closest_atom_struc,
                                 find_index,
-                                unit_vector)
+                                unit_vector,
+                                calculate_sides)
 from pycofbuilder.io_tools import (read_xyz, save_xyz, read_gjf)
 from pycofbuilder.cjson import ChemJSON
 
@@ -64,13 +65,11 @@ class BuildingBlock():
         self.available_symmetry = ['L2',
                                    'T3',
                                    'S4', 'D4', 'R4',
-                                   'H6',  # 'O6', 'P6'
-                                   # 'C8', 'A8', 'E8'
-                                   # 'B12', 'I12', 'U12', 'X12'
+                                   'H6',  # To implement: 'O6', 'P6', 'C8', 'A8', 'E8', 'B12', 'I12', 'U12', 'X12'
                                    ]
 
         # Check if bb_out_path exists and try to create it if not
-        if self.save_bb != '':
+        if self.save_bb:
             os.makedirs(self.bb_out_path, exist_ok=True)
 
         # If a name is provided create building block from this name
@@ -86,14 +85,20 @@ class BuildingBlock():
         return self.structure_as_string()
 
     def __repr__(self):
-        return 'BuildingBlock({}, {}, {}, {})'.format(self.symmetry,
-                                                      self.core,
-                                                      self.conector,
-                                                      self.funcGroups)
+        return 'BuildingBlock(symmetry={}, core={}, connector={}, funcGroups={})'.format(
+            self.symmetry,
+            self.core,
+            self.conector,
+            self.funcGroups)
 
     def copy(self):
         '''Return a deep copy of the BuildingBlock object'''
         return copy.deepcopy(self)
+
+    @property
+    def n_atoms(self):
+        ''' Returns the number of atoms in the unitary cell'''
+        return len(self.atom_types)
 
     def from_file(self, path, file_name):
         '''Read a building block from a file'''
@@ -119,7 +124,7 @@ class BuildingBlock():
         self.align_to(pref_orientation)
 
     def from_name(self, name):
-        '''Automatically read or create a buiding block based on its name'''
+        """Automatically read or create a buiding block based on its name"""
 
         # Check the existence of the building block files
         symm_check, core_check, conector_check, funcGroup_check = self.check_existence(name)
@@ -145,10 +150,6 @@ class BuildingBlock():
                                  *possible_funcGroups)
         if self.save_bb:
             self.save()
-
-    def n_atoms(self):
-        ''' Returns the number of atoms in the unitary cell'''
-        return len(self.atom_types)
 
     def print_structure(self):
         """
@@ -227,6 +228,20 @@ class BuildingBlock():
                     R_dict[key] += [atom_pos[i]]
 
         return R_dict
+
+    def get_sizes(self):
+        '''
+        Get the sizes of the building blocks
+
+        Returns
+        -------
+        list
+            List with the sizes of the building blocks
+        '''
+
+        x_points = self.get_X_points()[1]
+
+        return calculate_sides(x_points)
 
     def calculate_size(self):
         '''Calculate the size of the building block'''
@@ -613,8 +628,8 @@ class BuildingBlock():
         if extension == 'xyz':
             save_xyz(path=self.bb_out_path,
                      file_name=self.name + '.xyz',
-                     atom_types=self.atom_types,
-                     atom_pos=self.atom_pos)
+                     atomTypes=self.atom_types,
+                     atomPos=self.atom_pos)
 
     def get_available_core(self):
         '''Get the list of available cores'''

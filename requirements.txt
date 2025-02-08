@@ -8,3 +8,5 @@ pandas
 tqdm
 gemmi
 ase
+pytest
+pytest-cov
