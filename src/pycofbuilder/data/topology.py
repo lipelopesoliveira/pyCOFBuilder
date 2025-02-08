@@ -3,7 +3,12 @@
 # Distributed under the terms of the MIT License.
 
 """
-The dictionary containing the definitions nets for a Framework buiding
+The dictionary containing the definitions nets for a Framework buiding. For each net, the the vertices and edges
+positions are defined in cartesian coordinates divided by the lattice parameters. This definition is similar to
+the alat defition used in QuantumESPRESSO, however instead of using the same alat for all dimentions, it is used
+the lattice parameters a, b and c. This definition may not be the best one, however it allows a much more
+intuitive definition of the vertices and edges positions.
+The angles are defined in degrees.
 """
 
 import numpy as np
@@ -287,14 +292,38 @@ TOPOLOGY_DICT = {
             {'position': [0.50000000, 0.28867513, 1.53093094], 'angle': 180, 'align_v': [0, 0, -1]},
             ],
         'edges': [
-            {'position': [-0.00000050,  0.57735056,  0.25000000], 'angle': 90.00, 'align_v': [0, 0, -1]},
-            {'position': [0.50000050,  0.28867485,  0.75000000], 'angle': 90.00, 'align_v': [0, 0, 1]},
-            {'position': [0.25000000,  0.43301270,  0.00000000], 'angle': 79.20, 'align_v': [-0.3244434, 0.18731748, -0.92717239]},  # noqa
-            {'position': [0.50000000,  0.00000000,  0.00000000], 'angle': 79.20, 'align_v': [-0.3244434, 0.18731748, -0.92717239]},  # noqa
-            {'position': [-0.25000000,  0.43301270,  0.00000000], 'angle': 79.20, 'align_v': [-0.3244434, 0.18731748, -0.92717239]},  # noqa
-            {'position': [0.25000000,  0.43301270,  0.50000000], 'angle': 61.87, 'align_v': [-0.81649676, 0.47140463, -0.33333274]},  # noqa
-            {'position': [0.50000000,  0.00000000,  0.50000000], 'angle': 61.87, 'align_v':  [-0.81649676, 0.47140463, -0.33333274]},  # noqa
-            {'position': [-0.25000000,  0.43301270,  0.50000000], 'angle': 118.13, 'align_v': [0.81649676, -0.47140463, 0.33333274]},  # noqa
+            {
+                'position': [-0.00000050,  0.57735056,  0.25000000],
+                'angle': 90.00, 'align_v': [0, 0, -1]
+            },
+            {
+                'position': [0.50000050,  0.28867485,  0.75000000],
+                'angle': 90.00, 'align_v': [0, 0, 1]
+            },
+            {
+                'position': [0.25000000,  0.43301270,  0.00000000],
+                'angle': 79.20, 'align_v': [-0.3244434, 0.18731748, -0.92717239]
+            },
+            {
+                'position': [0.50000000,  0.00000000,  0.00000000],
+                'angle': 79.20, 'align_v': [-0.3244434, 0.18731748, -0.92717239]
+            },
+            {
+                'position': [-0.25000000,  0.43301270,  0.00000000],
+                'angle': 79.20, 'align_v': [-0.3244434, 0.18731748, -0.92717239]
+            },
+            {
+                'position': [0.25000000,  0.43301270,  0.50000000],
+                'angle': 61.87, 'align_v': [-0.81649676, 0.47140463, -0.33333274]
+            },
+            {
+                'position': [0.50000000,  0.00000000,  0.50000000],
+                'angle': 61.87, 'align_v':  [-0.81649676, 0.47140463, -0.33333274]
+            },
+            {
+                'position': [-0.25000000,  0.43301270,  0.50000000],
+                'angle': 118.13, 'align_v': [0.81649676, -0.47140463, 0.33333274]
+            },
         ]
         },
     }
