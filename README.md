@@ -18,6 +18,10 @@ This package is still under development and, but it is already possible to creat
 
 Learn more at the [Documentation](https://lipelopesoliveira.github.io/pyCOFBuilder/index.html)
 
+## Simple usage
+
+In case you want to use pyCOFBuilder without installing it, you can use the Google Colab notebook available [here](https://colab.research.google.com/github/lipelopesoliveira/pyCOFBuilder/blob/master/pyCOFBuilder_example.ipynb).
+
 ## Requirements
 
 0. Python >= 3.10
