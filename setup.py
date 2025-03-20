@@ -3,7 +3,7 @@
 from setuptools import setup
 
 with open('LICENSE') as f:
-    license_file = f.read().splitlines()
+    license_file = f.read()
 
 
 VERSION = '0.0.9'
