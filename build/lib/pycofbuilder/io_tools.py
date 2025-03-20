@@ -611,7 +611,7 @@ def save_xyz(path: str,
     file_name = file_name.split('.')[0]
 
     if len(cell) == 3:
-        cell = cellpar_to_cell(cell)  # type: ignore
+        cell = cell_to_cellpar(cell)  # type: ignore
 
     if frac_coords:
         # Convert to fractional coordinates
@@ -624,7 +624,8 @@ def save_xyz(path: str,
     xyz_file = []
     xyz_file.append(f'{len(atomTypes)}')
     header = ''
-    if cell:
+
+    if len(cell) == 6:
         header += 'Lattice="{:>15.7f} {:>15.7f} {:>15.7f} {:>15.7f} {:>15.7f} {:>15.7f}" pbc="T T T"'.format(*cell)
 
     xyz_file.append(header + ' species:S:1:pos:R:3:charge:R:1')
