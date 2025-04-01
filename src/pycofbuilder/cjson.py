@@ -54,18 +54,18 @@ class ChemJSON:
         self.name = ''
 
         # Structure properties
-        self.cell_parameters = [10, 10, 10, 90, 90, 90]
-        self.cell_matrix = [[10, 0, 0], [0, 10, 0], [0, 0, 10]]
-        self.cartesian_positions = None
-        self.fractional_positions = None
-        self.atomic_numbers = None
-        self.atomic_types = []
-        self.atomic_labels = None
+        self.cell_parameters = [None] * 6  # Format: [a, b, c, alpha, beta, gamma]
+        self.cell_matrix = [[None] * 3 for _ in range(3)]  # Format: 3x3 matrix
+        self.cartesian_positions = []  # Format: list of [x, y, z]
+        self.fractional_positions = []  # Format: list of [x, y, z]
+        self.atomic_numbers = []  # Format: list of atomic numbers
+        self.atomic_types = []  # Format: list of atomic types
+        self.atomic_labels = []  # Format: list of atomic labels
         self.formula = ''
-        self.partial_charges = None
+        self.partial_charges = {}  # Format: dictionary of charge types and values
 
-        self.properties = None
-        self.results = []
+        self.properties = {}  # Format: dictionary of properties
+        self.results = []  # Format: list of results
 
     # Create a custom representation of the class
     def __repr__(self):
@@ -160,7 +160,7 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
         """
         self.cartesian_positions = np.array(cartesian_positions).astype(float)
 
-        if self.cell_parameters is not None:
+        if None not in self.cell_parameters:
             aseCell = Cell.fromcellpar(self.cell_parameters)
             self.fractional_positions = aseCell.scaled_positions(cartesian_positions)
 
@@ -171,7 +171,7 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
         """
         self.fractional_positions = np.array(fractional_positions).astype(float)
 
-        if self.cell_parameters is not None:
+        if None not in self.cell_parameters:
             aseCell = Cell.fromcellpar(self.cell_parameters)
             self.cartesian_positions = aseCell.cartesian_positions(fractional_positions)
 
@@ -361,7 +361,7 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
             'name': self.name,
             'formula': self.formula,
         }
-        if self.cell_parameters is not None:
+        if None not in self.cell_parameters:
             structure_dict['unitCell'] = {
                 'a': self.cell_parameters[0],
                 'b': self.cell_parameters[1],
@@ -382,10 +382,10 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
                 }
             }
 
-        if self.cell_parameters is not None:
+        if None not in self.cell_parameters:
             structure_dict['atoms']['coords']['3dFractional'] = np.array(self.fractional_positions).flatten().tolist()
 
-        if self.partial_charges is not None:
+        if len(self.partial_charges) > 0:
             structure_dict['partialCharges'] = self.partial_charges
 
         structure_dict['properties'] = self.properties
