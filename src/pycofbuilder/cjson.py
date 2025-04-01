@@ -54,12 +54,12 @@ class ChemJSON:
         self.name = ''
 
         # Structure properties
-        self.cell_parameters = None
-        self.cell_matrix = None
+        self.cell_parameters = [10, 10, 10, 90, 90, 90]
+        self.cell_matrix = [[10, 0, 0], [0, 10, 0], [0, 0, 10]]
         self.cartesian_positions = None
         self.fractional_positions = None
         self.atomic_numbers = None
-        self.atomic_types = None
+        self.atomic_types = []
         self.atomic_labels = None
         self.formula = ''
         self.partial_charges = None
@@ -378,12 +378,12 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
                     'number': self.atomic_numbers,
                 },
                 'coords': {
-                    '3d': self.cartesian_positions.flatten().tolist(),
+                    '3d': np.array(self.cartesian_positions).flatten().tolist(),
                 }
             }
 
         if self.cell_parameters is not None:
-            structure_dict['atoms']['coords']['3dFractional'] = self.fractional_positions.flatten().tolist()
+            structure_dict['atoms']['coords']['3dFractional'] = np.array(self.fractional_positions).flatten().tolist()
 
         if self.partial_charges is not None:
             structure_dict['partialCharges'] = self.partial_charges
