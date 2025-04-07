@@ -148,7 +148,7 @@ def rmsd(V, W) -> float:
     return np.sqrt((diff * diff).sum() / N)
 
 
-def calculate_sides(points):
+def calculate_sides(points) -> np.ndarray:
     """
     Calculate the lengths of the sides of a geometric shape defined by a set of points in 3D space.
 
@@ -420,7 +420,7 @@ def get_cartesian_to_fractional_matrix(a: float,
     return T_matrix
 
 
-def get_reciprocal_vectors(cell) -> tuple:
+def get_reciprocal_vectors(cell) -> tuple[float, float, float]:
     """
     Get the reciprocal vectors of a cell given in cell parameters of cell vectors.
 
@@ -453,7 +453,7 @@ def get_reciprocal_vectors(cell) -> tuple:
     return b1, b2, b3
 
 
-def get_kgrid(cell, distance=0.3) -> tuple:
+def get_kgrid(cell, distance=0.3) -> tuple[int, int, int]:
     """
     Get the k-points grid in the reciprocal space with a given distance for a
     cell given in cell parameters of cell vectors.
@@ -507,7 +507,7 @@ def create_CellBox(A, B, C, alpha, beta, gamma) -> np.ndarray:
     return CellBox
 
 
-def calculate_UnitCells(cell, cutoff) -> np.ndarray:
+def calculate_UnitCells(cell, cutoff) -> tuple[int, int, int]:
     """
     Calculate the number of unit cell repetitions so that all supercell lengths are larger than
     twice the interaction potential cut-off radius.
@@ -559,7 +559,7 @@ def cellpar_to_lammpsbox(a: float,
                          alpha: float,
                          beta: float,
                          gamma: float,
-                         angle_in_degrees: bool = True):
+                         angle_in_degrees: bool = True) -> np.ndarray:
     """
     Return the box parameters lx, ly, lz, xy, xz, yz for LAMMPS data input.
     Parameters
@@ -590,7 +590,7 @@ def cellpar_to_lammpsbox(a: float,
     return np.array([lx, ly, lz, xy, xz, yz])
 
 
-def find_index(element, e_list):
+def find_index(element, e_list) -> int:
     """
     Finds the index of a given element in a list
 
@@ -606,11 +606,12 @@ def find_index(element, e_list):
         The index of element in the e_list
     """
 
-    index = None
+    index: int = 0
     for i in range(len(e_list)):
         if np.array_equal(e_list[i], element):
             index = i
             break
+
     return index
 
 
