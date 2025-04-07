@@ -15,6 +15,7 @@ src/pycofbuilder/tools.py
 src/pycofbuilder.egg-info/PKG-INFO
 src/pycofbuilder.egg-info/SOURCES.txt
 src/pycofbuilder.egg-info/dependency_links.txt
+src/pycofbuilder.egg-info/requires.txt
 src/pycofbuilder.egg-info/top_level.txt
 src/pycofbuilder/data/__init__.py
 src/pycofbuilder/data/periodic_table.json
