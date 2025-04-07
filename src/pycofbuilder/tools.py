@@ -60,11 +60,11 @@ def elements_dict(property='atomic_mass') -> dict:
     return prop_dic
 
 
-def unit_vector(vector) -> np.ndarray:
+def unit_vector(vector) -> list[int]:
     """Return a unit vector in the same direction as x."""
     y = np.array(vector, dtype='float')
     norm = y / np.linalg.norm(y)
-    return norm
+    return norm.tolist()
 
 
 def angle(v1, v2, unit='degree') -> float:
@@ -732,7 +732,7 @@ def get_bond_atom(connector_1: str, connector_2: str) -> str:
         'CH3': 'C'
     }
 
-    bond_atom = ''
+    bond_atom = 'N'
     for group in list(bond_dict.keys()):
         if group in [connector_1, connector_2]:
             bond_atom = bond_dict[group]
