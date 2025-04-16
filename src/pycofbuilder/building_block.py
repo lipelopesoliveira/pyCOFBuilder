@@ -101,14 +101,26 @@ class BuildingBlock():
         return len(self.atom_types)
 
     def from_file(self, path, file_name):
-        '''Read a building block from a file'''
+        '''Read a custom building block from a file.
+
+        Parameters
+        ----------
+        path : str
+            Path to the file
+        file_name : str
+            Name of the file
+        '''
         extension = file_name.split('.')[-1]
 
         read_func_dict = {'xyz': read_xyz,
                           'gjf': read_gjf}
 
+        if extension not in read_func_dict.keys():
+            raise ValueError(
+                f'File extension {extension} not supported! Only {list(read_func_dict.keys())} are supported.')
+
         self.name = file_name.rstrip(f'.{extension}')
-        self.atom_types, self.atom_pos = read_func_dict[extension](path, file_name)
+        self.atom_types, self.atom_pos, _ = read_func_dict[extension](path, file_name)
         self.atom_labels = ['C']*len(self.atom_types)
 
         if any([i == 'X' for i in self.atom_types]):
@@ -118,10 +130,8 @@ class BuildingBlock():
 
         self.centralize(by_X=True)
         self.calculate_size()
-        pref_orientation = unit_vector(
-            self.get_X_points()[1][0])
 
-        self.align_to(pref_orientation)
+        self.align_to()
 
     def from_name(self, name):
         """Automatically read or create a buiding block based on its name"""
@@ -134,6 +144,7 @@ class BuildingBlock():
                                                                                      core_check,
                                                                                      conector_check,
                                                                                      funcGroup_check)
+
         assert all([symm_check, core_check, conector_check, funcGroup_check]), error_msg
 
         self.name = name
@@ -167,6 +178,7 @@ class BuildingBlock():
             x_transposed = np.transpose(self.get_X_points()[1])
         if by_X is False:
             x_transposed = transposed
+
         cm_x = transposed[0] - np.average(x_transposed[0])
         cm_y = transposed[1] - np.average(x_transposed[1])
         cm_z = transposed[2] - np.average(x_transposed[2])
@@ -248,7 +260,7 @@ class BuildingBlock():
         _, X_pos = self.get_X_points()
         self.size = [np.linalg.norm(i) for i in X_pos]
 
-    def align_to(self, vec: list = [0, 1, 0], n: int = 0):
+    def align_to(self, vec: list[int] = [0, 1, 0], n: int = 0):
         '''
         Align the first n-th X point to a given vector
 

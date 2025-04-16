@@ -568,7 +568,7 @@ def save_gjf(path: str,
                                                                      atomPos[i][0],
                                                                      atomPos[i][1],
                                                                      atomPos[i][2]))
-    if cell:
+    if len(cell) > 0:
         for i in cell:
             gjf_file.append('Tv   {:>15.7f}{:>15.7f}{:>15.7f}\n'.format(*i))
 
