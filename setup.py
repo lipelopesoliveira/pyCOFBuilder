@@ -6,7 +6,7 @@ with open('LICENSE') as f:
     license_file = f.read()
 
 
-VERSION = '0.0.9.2'
+VERSION = '0.0.9.3'
 DESCRIPTION = 'A package for Covalent Organic Frameworks sturcture assembly.'
 
 setup(
