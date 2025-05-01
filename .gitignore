@@ -5,3 +5,4 @@ tests/__pycache__/test_dependencies.cpython-311-pytest-7.4.4.pyc
 tests/__pycache__/test_exceptions.cpython-311-pytest-7.4.4.pyc
 tests/__pycache__/test_iotools.cpython-311-pytest-7.4.4.pyc
 tests/__pycache__/test_tools.cpython-311-pytest-7.4.4.pyc
+.pypirc

@@ -10,6 +10,7 @@ import os
 import simplejson
 from itertools import combinations
 import numpy as np
+from numpy.typing import NDArray
 from scipy.spatial import distance
 
 
@@ -60,11 +61,11 @@ def elements_dict(property='atomic_mass') -> dict:
     return prop_dic
 
 
-def unit_vector(vector) -> np.ndarray:
+def unit_vector(vector: list[float] | NDArray) -> NDArray:
     """Return a unit vector in the same direction as x."""
     y = np.array(vector, dtype='float')
-    norm = y / np.linalg.norm(y)
-    return norm
+
+    return y / np.linalg.norm(y)
 
 
 def angle(v1, v2, unit='degree') -> float:
@@ -148,7 +149,7 @@ def rmsd(V, W) -> float:
     return np.sqrt((diff * diff).sum() / N)
 
 
-def calculate_sides(points):
+def calculate_sides(points) -> np.ndarray:
     """
     Calculate the lengths of the sides of a geometric shape defined by a set of points in 3D space.
 
@@ -420,7 +421,7 @@ def get_cartesian_to_fractional_matrix(a: float,
     return T_matrix
 
 
-def get_reciprocal_vectors(cell) -> tuple:
+def get_reciprocal_vectors(cell) -> tuple[float, float, float]:
     """
     Get the reciprocal vectors of a cell given in cell parameters of cell vectors.
 
@@ -453,7 +454,7 @@ def get_reciprocal_vectors(cell) -> tuple:
     return b1, b2, b3
 
 
-def get_kgrid(cell, distance=0.3) -> tuple:
+def get_kgrid(cell, distance=0.3) -> tuple[int, int, int]:
     """
     Get the k-points grid in the reciprocal space with a given distance for a
     cell given in cell parameters of cell vectors.
@@ -507,7 +508,7 @@ def create_CellBox(A, B, C, alpha, beta, gamma) -> np.ndarray:
     return CellBox
 
 
-def calculate_UnitCells(cell, cutoff) -> np.ndarray:
+def calculate_UnitCells(cell, cutoff) -> tuple[int, int, int]:
     """
     Calculate the number of unit cell repetitions so that all supercell lengths are larger than
     twice the interaction potential cut-off radius.
@@ -559,7 +560,7 @@ def cellpar_to_lammpsbox(a: float,
                          alpha: float,
                          beta: float,
                          gamma: float,
-                         angle_in_degrees: bool = True):
+                         angle_in_degrees: bool = True) -> np.ndarray:
     """
     Return the box parameters lx, ly, lz, xy, xz, yz for LAMMPS data input.
     Parameters
@@ -590,7 +591,7 @@ def cellpar_to_lammpsbox(a: float,
     return np.array([lx, ly, lz, xy, xz, yz])
 
 
-def find_index(element, e_list):
+def find_index(element, e_list) -> int:
     """
     Finds the index of a given element in a list
 
@@ -606,11 +607,12 @@ def find_index(element, e_list):
         The index of element in the e_list
     """
 
-    index = None
+    index: int = 0
     for i in range(len(e_list)):
         if np.array_equal(e_list[i], element):
             index = i
             break
+
     return index
 
 
@@ -644,49 +646,59 @@ def change_X_atoms(atom_labels, atom_pos, bond_atom) -> tuple:
     return label, pos
 
 
-def closest_atom(label_1: str, pos_1: list, labels: list, pos: list):
+def find_closest_atom(target_label: str,
+                      target_position: list | NDArray,
+                      atom_labels: list,
+                      atom_positions: list | NDArray):
     """
-    Find the closest atom to a given atom
+    Find the closest atom to a given atom in a structure.
 
     Parameters
     ----------
-    label_1 : string
-        String containing the label of the atom
-    pos_1 : list
-        Array containing the position of the atom
-    labels : list
-        List containing the all the atom labels on the structure
-    pos : list
-        List containing the all the atom positions on the structure
+    target_label : str
+        Label of the target atom.
+    target_position : list | NDArray
+        Position of the target atom as a list or numpy array.
+    atom_labels : list
+        List of all atom labels in the structure.
+    atom_positions : list | NDArray
+        List or numpy array of all atom positions in the structure.
 
     Returns
-    ----------
-    closest_label : string
-        String containing the label of the closest atom
-    closest_position : array
-        Array containing the position of the closest atom
-    euclidian_distance : float
-        Euclidian distance between the two atoms
+    -------
+    closest_label : str
+        Label of the closest atom.
+    closest_position : NDArray
+        Position of the closest atom as a numpy array.
+    euclidean_distance : float
+        Euclidean distance between the target atom and the closest atom.
     """
 
-    list_labels = []
-    list_pos = []
+    # Convert positions to numpy arrays for easier manipulation
+    target_position = np.array(target_position)
+    atom_positions = np.array(atom_positions)
 
-    for i in range(len(labels)):
-        if labels[i] != label_1:
-            list_labels += [labels[i]]
-            list_pos += [pos[i]]
+    # Filter out the target atom from the list of atoms
+    filtered_labels = []
+    filtered_positions = []
 
-    if len(list_pos) == 0:
-        return None, np.array([0, 0, 0]), None
+    for i in range(len(atom_labels)):
+        if atom_labels[i] != target_label:
+            filtered_labels.append(atom_labels[i])
+            filtered_positions.append(atom_positions[i])
 
-    closest_index = distance.cdist([pos_1], list_pos).argmin()
+    # If no other atoms are present, return default values
+    if not filtered_positions:
+        return None, np.array([0.0, 0.0, 0.0]), None
 
-    closest_label = list_labels[closest_index]
-    closest_position = list_pos[closest_index]
-    euclidian_distance = np.linalg.norm(pos_1 - list_pos[closest_index])
+    # Find the closest atom using pairwise distances
+    closest_index = distance.cdist([target_position], filtered_positions).argmin()
 
-    return closest_label, closest_position, euclidian_distance
+    closest_label = filtered_labels[closest_index]
+    closest_position = filtered_positions[closest_index]
+    euclidean_distance = np.linalg.norm(target_position - closest_position)
+
+    return closest_label, closest_position, euclidean_distance
 
 
 def closest_atom_struc(label_1, pos_1, labels, pos):
@@ -732,7 +744,7 @@ def get_bond_atom(connector_1: str, connector_2: str) -> str:
         'CH3': 'C'
     }
 
-    bond_atom = ''
+    bond_atom = 'N'
     for group in list(bond_dict.keys()):
         if group in [connector_1, connector_2]:
             bond_atom = bond_dict[group]

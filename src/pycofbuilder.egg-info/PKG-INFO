@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: pycofbuilder
-Version: 0.0.9
+Version: 0.0.9.3
 Summary: A package for Covalent Organic Frameworks sturcture creation based on the reticular approach.
 Home-page: https://github.com/lipelopesoliveira/pyCOFBuilder
 Author: Felipe Lopes Oliveira
@@ -61,6 +61,10 @@ License-File: LICENSE
 This package is still under development and, but it is already possible to create a large number of COFs structures.
 
 Learn more at the [Documentation](https://lipelopesoliveira.github.io/pyCOFBuilder/index.html)
+
+## Simple usage
+
+In case you want to use pyCOFBuilder without installing it, you can use the Google Colab notebook available [here](https://colab.research.google.com/github/lipelopesoliveira/pyCOFBuilder/blob/master/pyCOFBuilder_example.ipynb).
 
 ## Requirements
 

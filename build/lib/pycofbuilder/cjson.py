@@ -54,18 +54,21 @@ class ChemJSON:
         self.name = ''
 
         # Structure properties
-        self.cell_parameters = None
-        self.cell_matrix = None
-        self.cartesian_positions = None
-        self.fractional_positions = None
-        self.atomic_numbers = None
-        self.atomic_types = None
-        self.atomic_labels = None
-        self.formula = ''
-        self.partial_charges = None
+        self.cell_parameters: list = [None] * 6  # Format: [a, b, c, alpha, beta, gamma]
+        self.cell_matrix: list = [[None] * 3 for _ in range(3)]  # Format: 3x3 matrix
+        self.cartesian_positions: list = []  # Format: list of [x, y, z]
+        self.fractional_positions: list = []  # Format: list of [x, y, z]
+        self.atomic_numbers: list = []  # Format: list of atomic numbers
+        self.atomic_types: list = []  # Format: list of atomic types
+        self.atomic_labels: list = []  # Format: list of atomic labels
+        self.formula: str = ''
+        self.partial_charges: dict = {}  # Format: dictionary of charge types and values
 
-        self.properties = None
-        self.results = []
+        self.bonds: list = []  # Format: list of bond indexes
+        self.bond_orders: list = []  # Format: list of bond orders
+
+        self.properties: dict = {}  # Format: dictionary of properties
+        self.results: list = []  # Format: list of results
 
     # Create a custom representation of the class
     def __repr__(self):
@@ -121,8 +124,8 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
                                                                                     position[2])
 
         return string_string
-
-    def set_properties(self, properties):
+    
+    def set_properties(self, properties: dict):
         """
         Sets the properties of the structure.
         """
@@ -141,7 +144,8 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
         self.cell_parameters = cell_parameters
 
         aseCell = Cell.fromcellpar(cell_parameters)
-        self.cell_matrix = np.array(aseCell)
+        self.cell_matrix = np.array(aseCell).tolist()
+        self.cell_matrix = np.array(aseCell).tolist()
 
     def set_cell_matrix(self, cell_matrix):
         """
@@ -151,29 +155,31 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
         self.cell_matrix = cell_matrix
 
         aseCell = Cell(cell_matrix)
-        self.cell_parameters = aseCell.cellpar()
+        self.cell_parameters = aseCell.cellpar().tolist()
 
     def set_cartesian_positions(self, cartesian_positions):
         """
         Sets the cartesian positions of the structure. The fractional
         positions will be calculated and also updated.
         """
-        self.cartesian_positions = np.array(cartesian_positions).astype(float)
+        self.cartesian_positions = np.array(cartesian_positions).astype(float).tolist()
+        self.cartesian_positions = np.array(cartesian_positions).astype(float).tolist()
 
-        if self.cell_parameters is not None:
+        if None not in self.cell_parameters:
             aseCell = Cell.fromcellpar(self.cell_parameters)
-            self.fractional_positions = aseCell.scaled_positions(cartesian_positions)
+            self.fractional_positions = aseCell.scaled_positions(cartesian_positions).tolist()
 
     def set_fractional_positions(self, fractional_positions):
         """
         Sets the fractional positions of the structure. The cartesian
         positions will be calculated and also updated.
         """
-        self.fractional_positions = np.array(fractional_positions).astype(float)
+        self.fractional_positions = np.array(fractional_positions).astype(float).tolist()
+        self.fractional_positions = np.array(fractional_positions).astype(float).tolist()
 
-        if self.cell_parameters is not None:
+        if None not in self.cell_parameters:
             aseCell = Cell.fromcellpar(self.cell_parameters)
-            self.cartesian_positions = aseCell.cartesian_positions(fractional_positions)
+            self.cartesian_positions = aseCell.cartesian_positions(fractional_positions).tolist()
 
     def set_atomic_types(self, atomic_types):
         """
@@ -203,6 +209,25 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
         self.atomic_labels = [f"{atom}{i+1}" for i, atom in enumerate(self.atomic_types)]
 
         self.formula = ''.join([f'{atom}{self.atomic_types.count(atom)}' for atom in set(self.atomic_types)])
+
+    def set_bonds(self, bond_indexes: list[list], bond_orders: list = [None]):
+        """
+        Sets the bonds of the structure.
+
+        Parameters
+        ----------
+        bond_indexes : list[list], required
+            A list of lists containing the indexes of the atoms that are bonded.
+            Example: [[0, 1], [1, 2], [2, 3]]
+        bond_orders : list | None, optional
+            A list of integers containing the bond orders of the bonds.
+            Example: [1, 2, 1]
+        """
+        if bond_orders == [None]:
+            bond_orders = [1] * len(bond_indexes)
+
+        self.bonds = bond_indexes
+        self.bond_orders = bond_orders
 
     def from_cjson(self, path, file_name):
         """
@@ -248,6 +273,14 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
                     self.atomic_labels = cjson_data['atoms']['elements']['label']
                 else:
                     self.atomic_labels = [f"{atom}{i+1}" for i, atom in enumerate(self.atomic_types)]
+
+        if "bonds" in cjson_data:
+            if 'connections' in cjson_data['bonds']:
+                self.set_bonds(
+                    np.array(cjson_data['bonds']['connections']['index']).astype(int).reshape(-1, 2).tolist())
+
+            if 'order' in cjson_data['bonds']:
+                self.bond_orders = np.array(cjson_data['bonds']['order']).tolist()
 
         if 'properties' in cjson_data:
             self.set_properties(cjson_data['properties'])
@@ -352,7 +385,7 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
         if charges is not None:
             self.partial_charges = {charge_type: charges}
 
-    def as_dict(self):
+    def as_dict(self) -> dict:
         """
         Returns the structure as a dictionary.
         """
@@ -361,7 +394,7 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
             'name': self.name,
             'formula': self.formula,
         }
-        if self.cell_parameters is not None:
+        if None not in self.cell_parameters:
             structure_dict['unitCell'] = {
                 'a': self.cell_parameters[0],
                 'b': self.cell_parameters[1],
@@ -378,14 +411,21 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
                     'number': self.atomic_numbers,
                 },
                 'coords': {
-                    '3d': self.cartesian_positions.flatten().tolist(),
+                    '3d': np.array(self.cartesian_positions).flatten().tolist(),
+                    '3d': np.array(self.cartesian_positions).flatten().tolist(),
                 }
             }
 
-        if self.cell_parameters is not None:
-            structure_dict['atoms']['coords']['3dFractional'] = self.fractional_positions.flatten().tolist()
+        if len(self.bonds) > 0:
+            structure_dict['bonds'] = {
+                'connections': {'index': np.array(self.bonds).flatten().tolist()},
+                'order': self.bond_orders
+            }
 
-        if self.partial_charges is not None:
+        if None not in self.cell_parameters:
+            structure_dict['atoms']['coords']['3dFractional'] = np.array(self.fractional_positions).flatten().tolist()
+
+        if len(self.partial_charges) > 0:
             structure_dict['partialCharges'] = self.partial_charges
 
         structure_dict['properties'] = self.properties
