@@ -124,8 +124,8 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
                                                                                     position[2])
 
         return string_string
-
-    def set_properties(self, properties):
+    
+    def set_properties(self, properties: dict):
         """
         Sets the properties of the structure.
         """
@@ -145,6 +145,7 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
 
         aseCell = Cell.fromcellpar(cell_parameters)
         self.cell_matrix = np.array(aseCell).tolist()
+        self.cell_matrix = np.array(aseCell).tolist()
 
     def set_cell_matrix(self, cell_matrix):
         """
@@ -162,6 +163,7 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
         positions will be calculated and also updated.
         """
         self.cartesian_positions = np.array(cartesian_positions).astype(float).tolist()
+        self.cartesian_positions = np.array(cartesian_positions).astype(float).tolist()
 
         if None not in self.cell_parameters:
             aseCell = Cell.fromcellpar(self.cell_parameters)
@@ -172,6 +174,7 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
         Sets the fractional positions of the structure. The cartesian
         positions will be calculated and also updated.
         """
+        self.fractional_positions = np.array(fractional_positions).astype(float).tolist()
         self.fractional_positions = np.array(fractional_positions).astype(float).tolist()
 
         if None not in self.cell_parameters:
@@ -408,6 +411,7 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
                     'number': self.atomic_numbers,
                 },
                 'coords': {
+                    '3d': np.array(self.cartesian_positions).flatten().tolist(),
                     '3d': np.array(self.cartesian_positions).flatten().tolist(),
                 }
             }
