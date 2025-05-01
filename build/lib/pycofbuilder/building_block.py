@@ -9,10 +9,14 @@ The BuildingBlock class is used to create the building blocks for the Framework 
 import os
 import copy
 import numpy as np
+from numpy.typing import NDArray
+
+from ase import Atoms
+
 from scipy.spatial.transform import Rotation as R
 
 from pycofbuilder.tools import (rotation_matrix_from_vectors,
-                                closest_atom,
+                                find_closest_atom,
                                 closest_atom_struc,
                                 find_index,
                                 unit_vector,
@@ -44,23 +48,23 @@ class BuildingBlock():
         self.main_path = os.path.join(_ROOTDIR, 'data')
 
         self.connectivity = kwargs.get('connectivity', None)
-        self.size = kwargs.get('size', None)
+        self.size: float | list = kwargs.get('size', [])
         self.mass = kwargs.get('mass', None)
         self.composition = kwargs.get('composition', None)
 
-        self.atom_types = kwargs.get('atom_types', None)
-        self.atom_pos = kwargs.get('atom_pos', None)
-        self.atom_labels = kwargs.get('atom_labels', None)
+        self.atom_types: list = kwargs.get('atom_types', [])
+        self.atom_labels: list = kwargs.get('atom_labels', [])
+        self.atom_pos: NDArray = kwargs.get('atom_pos', np.array([]))
 
-        self.smiles = kwargs.get('smiles', None)
-        self.charge = kwargs.get('charge', 0)
-        self.multiplicity = kwargs.get('multiplicity', 1)
-        self.chirality = kwargs.get('chirality', 0)
-        self.symmetry = kwargs.get('symmetry', None)
+        self.smiles: str = kwargs.get('smiles', '')
+        self.charge: int = kwargs.get('charge', 0)
+        self.multiplicity: int = kwargs.get('multiplicity', 1)
+        self.chirality: int = kwargs.get('chirality', 0)
+        self.symmetry: str = kwargs.get('symmetry', '')
 
-        self.core = kwargs.get('core', None)
-        self.conector = kwargs.get('conector', None)
-        self.funcGroups = kwargs.get('funcGroups', None)
+        self.core: str = kwargs.get('core', '')
+        self.conector: str = kwargs.get('conector', '')
+        self.funcGroups: list | str = kwargs.get('funcGroups', '')
 
         self.available_symmetry = ['L2',
                                    'T3',
@@ -99,6 +103,14 @@ class BuildingBlock():
     def n_atoms(self):
         ''' Returns the number of atoms in the unitary cell'''
         return len(self.atom_types)
+    
+    def to_ase(self):
+        '''Convert the building block to ASE atoms object'''
+
+        atom_types = [i for i in self.atom_types]
+        atom_pos = np.array(self.atom_pos)
+
+        return Atoms(atom_types, positions=atom_pos)
 
     def from_file(self, path, file_name):
         '''Read a custom building block from a file.
@@ -186,7 +198,7 @@ class BuildingBlock():
         self.atom_pos = np.transpose([cm_x, cm_y, cm_z])
         return np.transpose([cm_x, cm_y, cm_z])
 
-    def get_X_points(self):
+    def get_X_points(self) -> tuple:
         '''Get the X points in a molecule'''
 
         if 'X' in self.atom_types:
@@ -260,7 +272,7 @@ class BuildingBlock():
         _, X_pos = self.get_X_points()
         self.size = [np.linalg.norm(i) for i in X_pos]
 
-    def align_to(self, vec: list[int] = [0, 1, 0], n: int = 0):
+    def align_to(self, vec = [0, 1, 0], n: int = 0):
         '''
         Align the first n-th X point to a given vector
 
@@ -278,7 +290,7 @@ class BuildingBlock():
 
         self.atom_pos = np.dot(self.atom_pos, np.transpose(R_matrix))
 
-    def rotate_around(self, rotation_axis: list = [1, 0, 0], angle: float = 0.0, degree: bool = True):
+    def rotate_around(self, rotation_axis: list | NDArray = [1, 0, 0], angle: float = 0.0, degree: bool = True):
         '''
         Rotate the molecule around a given axis
 
@@ -358,16 +370,16 @@ class BuildingBlock():
             n_conector_pos = conector_pos.copy()
 
             # Get the position of the closest atom to Q in the structure
-            close_Q_struct = closest_atom('Q',
-                                          location_Q_struct[1][i],
-                                          self.atom_types,
-                                          self.atom_pos)[1]
+            close_Q_struct = find_closest_atom('Q',
+                                            location_Q_struct[1][i],
+                                            self.atom_types,
+                                            self.atom_pos)[1]
 
             # Get the position of Q in the conection group
             location_Q_connector = self.get_Q_points(n_conector_label, n_conector_pos)
 
             # Get the position of the closest atom to Q in the conection group
-            close_Q_connector = closest_atom('Q',
+            close_Q_connector = find_closest_atom('Q',
                                              location_Q_connector[1][0],
                                              n_conector_label,
                                              n_conector_pos)[1]
@@ -390,7 +402,7 @@ class BuildingBlock():
                 self.atom_labels,
                 find_index(location_Q_struct[1][i], self.atom_pos),
                 axis=0
-            )
+            ).tolist()
 
             self.atom_pos = np.delete(
                 self.atom_pos,
@@ -409,8 +421,7 @@ class BuildingBlock():
             n_conector_label.remove('Q')
 
             self.atom_types = self.atom_types + n_conector_label
-
-            self.atom_labels = np.append(self.atom_labels, [['Q'] * len(n_conector_label)])
+            self.atom_labels = self.atom_labels +  ['Q'] * len(n_conector_label)
 
     def add_connection_group_symm(self, conector_name):
         '''Adds the functional group by which the COF will be formed from the building blocks'''
@@ -428,10 +439,11 @@ class BuildingBlock():
         _, Q_vec, Q_idx = self.get_Q_points(self.atom_types, self.atom_pos)
 
         # Remove the Q atoms from structure
-        self.atom_types = np.array([self.atom_types[i] for i in range(len(self.atom_types)) if i not in Q_idx])
-        self.atom_pos = np.array([self.atom_pos[i] for i in range(len(self.atom_pos)) if i not in Q_idx])
-        self.atom_labels = np.array([self.atom_labels[i] for i in range(len(self.atom_labels)) if i not in Q_idx])
+        self.atom_types = [self.atom_types[i] for i in range(len(self.atom_types)) if i not in Q_idx]
+        self.atom_labels = [self.atom_labels[i] for i in range(len(self.atom_labels)) if i not in Q_idx]
 
+        self.atom_pos = np.array([self.atom_pos[i] for i in range(len(self.atom_pos)) if i not in Q_idx])
+        
         # Create the vector Q in the structure
         QS_vector = Q_vec[0]
 
@@ -443,14 +455,16 @@ class BuildingBlock():
 
         # Rotate and translade the conector group to Q position in the strucutre
         conector_pos = np.dot(conector_pos, np.transpose(Rot_m)) + Q_vec[0]
+
         conector_pos = R.from_rotvec(
             -90 * unit_vector(conector_pos[1] - conector_pos[0]), degrees=True).apply(conector_pos)
 
         # Add the position of conector atoms to the main structure
         self.atom_types = list(self.atom_types) + conector_types[1:]
-        self.atom_pos = list(self.atom_pos) + list(conector_pos[1:])
-        self.atom_labels = np.append(self.atom_labels, [['Q'] * len(conector_types[1:])])
+        self.atom_labels = self.atom_labels +  [['Q'] * len(conector_types[1:])]
 
+        self.atom_pos = np.vstack([self.atom_pos, conector_pos[1:]])
+        
         # Apply the improper rotations to match S4 symmetry
         Q_vec = [unit_vector(i) for i in Q_vec]
 
@@ -460,8 +474,9 @@ class BuildingBlock():
 
         # Add the position of conector atoms to the main structure
         self.atom_types = list(self.atom_types) + conector_types[1:]
-        self.atom_pos = list(self.atom_pos) + list(R1[1:])
-        self.atom_labels = np.append(self.atom_labels, [['Q'] * len(conector_types[1:])])
+        self.atom_labels = self.atom_labels + [['Q'] * len(conector_types[1:])]
+
+        self.atom_pos = np.vstack([self.atom_pos, R1[1:]])
 
         # Second S4 axis is location_Q_struct[2]
         R2 = R.from_rotvec(120 * Q_vec[2], degrees=True).apply(conector_pos)
@@ -469,8 +484,9 @@ class BuildingBlock():
 
         # Add the position of conector atoms to the main structure
         self.atom_types = list(self.atom_types) + conector_types[1:]
-        self.atom_pos = list(self.atom_pos) + list(R2)[1:]
-        self.atom_labels = np.append(self.atom_labels, [['Q'] * len(conector_types[1:])])
+        self.atom_labels = self.atom_labels + [['Q'] * len(conector_types[1:])]
+
+        self.atom_pos = np.vstack([self.atom_pos, R2[1:]])
 
         # Third S4 axis is location_Q_struct[3]
         R3 = R.from_rotvec(120 * Q_vec[3], degrees=True).apply(conector_pos)
@@ -478,8 +494,10 @@ class BuildingBlock():
 
         # Add the position of conector atoms to the main structure
         self.atom_types = list(self.atom_types) + conector_types[1:]
-        self.atom_pos = list(self.atom_pos) + list(R3[1:])
-        self.atom_labels = np.append(self.atom_labels, [['Q'] * len(conector_types[1:])])
+        self.atom_labels = self.atom_labels + [['Q'] * len(conector_types[1:])]
+
+        self.atom_pos = np.vstack([self.atom_pos, R3[1:]])
+        
 
     def add_R_group(self, R_name, R_type):
         '''Adds group R in building blocks'''
@@ -511,7 +529,7 @@ class BuildingBlock():
             pos_R_group = self.get_R_points(n_group_label, n_group_pos)['R']
 
             # Get the position of the closest atom to R in the R group
-            close_R_group = closest_atom('R', pos_R_group[0], n_group_label, n_group_pos)[1]
+            close_R_group = find_closest_atom('R', pos_R_group[0], n_group_label, n_group_pos)[1]
 
             # Create the vector R in the structure
             v1 = close_R_struct - location_R_struct[i]
@@ -541,7 +559,7 @@ class BuildingBlock():
                 self.atom_labels,
                 find_index(location_R_struct[i], self.atom_pos),
                 axis=0
-            )
+            ).tolist()
 
             # Remove the R atoms from structure
             self.atom_pos = np.delete(
@@ -551,7 +569,7 @@ class BuildingBlock():
             )
 
             # Add the position of rotated atoms to the main structure
-            self.atom_pos = np.append(self.atom_pos, rotated_translated_group, axis=0)
+            self.atom_pos = np.vstack([self.atom_pos, rotated_translated_group])
 
             # Remove the R atoms from structure
             self.atom_types.remove(R_type)
@@ -560,7 +578,7 @@ class BuildingBlock():
             n_group_label.remove('R')
 
             self.atom_types = self.atom_types + n_group_label
-            self.atom_labels = np.append(self.atom_labels, ['R'] * len(n_group_label))
+            self.atom_labels = self.atom_labels +  ['R'] * len(n_group_label)
 
     def create_BB_structure(self,
                             symmetry='L2',
@@ -585,7 +603,7 @@ class BuildingBlock():
         self.smiles = core.properties['smiles']
 
         self.atom_types = core.atomic_types
-        self.atom_pos = core.cartesian_positions
+        self.atom_pos = np.array(core.cartesian_positions)
         self.composition = core.formula
         self.atom_labels = ['C']*len(self.atom_types)
 
@@ -641,7 +659,7 @@ class BuildingBlock():
             save_xyz(path=self.bb_out_path,
                      file_name=self.name + '.xyz',
                      atomTypes=self.atom_types,
-                     atomPos=self.atom_pos)
+                     atomPos=self.atom_pos.tolist())
 
     def get_available_core(self):
         '''Get the list of available cores'''
