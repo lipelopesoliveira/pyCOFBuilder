@@ -61,11 +61,11 @@ def elements_dict(property='atomic_mass') -> dict:
     return prop_dic
 
 
-def unit_vector(vector: list[float] | NDArray) -> list[int]:
+def unit_vector(vector: list[float] | NDArray) -> NDArray:
     """Return a unit vector in the same direction as x."""
     y = np.array(vector, dtype='float')
-    norm = y / np.linalg.norm(y)
-    return norm.tolist()
+
+    return y / np.linalg.norm(y)
 
 
 def angle(v1, v2, unit='degree') -> float:

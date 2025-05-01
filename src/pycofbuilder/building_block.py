@@ -445,6 +445,7 @@ class BuildingBlock():
 
         # Rotate and translade the conector group to Q position in the strucutre
         conector_pos = np.dot(conector_pos, np.transpose(Rot_m)) + Q_vec[0]
+
         conector_pos = R.from_rotvec(
             -90 * unit_vector(conector_pos[1] - conector_pos[0]), degrees=True).apply(conector_pos)
 
@@ -466,7 +467,6 @@ class BuildingBlock():
         self.atom_labels = self.atom_labels + [['Q'] * len(conector_types[1:])]
 
         self.atom_pos = np.vstack([self.atom_pos, R1[1:]])
-
 
         # Second S4 axis is location_Q_struct[2]
         R2 = R.from_rotvec(120 * Q_vec[2], degrees=True).apply(conector_pos)
@@ -549,7 +549,7 @@ class BuildingBlock():
                 self.atom_labels,
                 find_index(location_R_struct[i], self.atom_pos),
                 axis=0
-            )
+            ).tolist()
 
             # Remove the R atoms from structure
             self.atom_pos = np.delete(
@@ -559,7 +559,7 @@ class BuildingBlock():
             )
 
             # Add the position of rotated atoms to the main structure
-            self.atom_pos = np.append(self.atom_pos, rotated_translated_group, axis=0)
+            self.atom_pos = np.vstack([self.atom_pos, rotated_translated_group])
 
             # Remove the R atoms from structure
             self.atom_types.remove(R_type)
@@ -568,7 +568,7 @@ class BuildingBlock():
             n_group_label.remove('R')
 
             self.atom_types = self.atom_types + n_group_label
-            self.atom_labels = np.append(self.atom_labels, ['R'] * len(n_group_label))
+            self.atom_labels = self.atom_labels +  ['R'] * len(n_group_label)
 
     def create_BB_structure(self,
                             symmetry='L2',
