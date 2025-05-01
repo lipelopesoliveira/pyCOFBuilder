@@ -10,6 +10,8 @@ import os
 import copy
 import numpy as np
 
+from ase import Atoms
+
 # Import pymatgen
 from pymatgen.core import Lattice, Structure
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
@@ -536,6 +538,21 @@ class Framework():
         self.atom_types = [i['label'] for i in cubic_dict['sites']]
         self.atom_pos = [i['xyz'] for i in cubic_dict['sites']]
         self.atom_labels = [i['properties']['source'] for i in cubic_dict['sites']]
+
+
+    def to_ase(self):
+        """
+        Convert the framework to an ASE Atoms object.
+        """
+
+        atoms = Atoms(
+            symbols=self.atom_types,
+            positions=self.atom_pos,
+            cell=self.cellMatrix,
+            pbc=True
+        )
+
+        return atoms
 
 # --------------- Net creation methods -------------------------- #
 

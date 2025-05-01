@@ -11,6 +11,8 @@ import copy
 import numpy as np
 from numpy.typing import NDArray
 
+from ase import Atoms
+
 from scipy.spatial.transform import Rotation as R
 
 from pycofbuilder.tools import (rotation_matrix_from_vectors,
@@ -101,6 +103,14 @@ class BuildingBlock():
     def n_atoms(self):
         ''' Returns the number of atoms in the unitary cell'''
         return len(self.atom_types)
+    
+    def to_ase(self):
+        '''Convert the building block to ASE atoms object'''
+
+        atom_types = [i for i in self.atom_types]
+        atom_pos = np.array(self.atom_pos)
+
+        return Atoms(atom_types, positions=atom_pos)
 
     def from_file(self, path, file_name):
         '''Read a custom building block from a file.
