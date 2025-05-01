@@ -46,7 +46,7 @@ class BuildingBlock():
         self.main_path = os.path.join(_ROOTDIR, 'data')
 
         self.connectivity = kwargs.get('connectivity', None)
-        self.size = kwargs.get('size', None)
+        self.size: float | list = kwargs.get('size', [])
         self.mass = kwargs.get('mass', None)
         self.composition = kwargs.get('composition', None)
 

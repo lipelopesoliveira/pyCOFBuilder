@@ -107,7 +107,7 @@ class Framework():
 
     def __init__(self, name: str | None = None, **kwargs):
 
-        self.name: str = name
+        self.name: str | None = name
 
         self.out_path: str = kwargs.get('out_path', os.path.join(os.getcwd(), 'out'))
         self.save_bb: bool = kwargs.get('save_bb', False)
@@ -126,7 +126,7 @@ class Framework():
         self.bb1_name = None
         self.bb2_name = None
         self.topology = None
-        self.stacking = None
+        self.stacking: str | int = None
         self.smiles = None
 
         self.atom_types = []
@@ -397,7 +397,7 @@ class Framework():
 
     def save(self,
              fmt: str = 'cif',
-             supercell: list = (1, 1, 1),
+             supercell: tuple = (1, 1, 1),
              save_dir=None,
              primitive=False,
              save_bonds=True,
@@ -411,7 +411,7 @@ class Framework():
             The file format to be saved
             Can be `json`, `cif`, `xyz`, `turbomole`, `vasp`, `xsf`, `pdb`, `pqr`, `qe`.
             Default: 'cif'
-        supercell : list, optional
+        supercell : tuple, optional
             The supercell to be used to save the structure.
             Default: [1,1,1]
         save_dir : str, optional
@@ -544,7 +544,7 @@ class Framework():
                              BB_T3_B,
                              stacking: str = 'AA',
                              slab: float = 10.0,
-                             shift_vector: list = (1.0, 1.0, 0),
+                             shift_vector: tuple = (1.0, 1.0, 0),
                              tilt_angle: float = 5.0):
         """Creates a COF with HCB network.
 
@@ -560,7 +560,7 @@ class Framework():
             The stacking pattern of the COF layers (default is 'AA')
         slab : float, optional
             Default parameter for the interlayer slab (default is 10.0)
-        shift_vector: list, optional
+        shift_vector: tuple, optional
             Shift vector for the AAl and AAt stakings (defatult is [1.0,1.0,0])
         tilt_angle: float, optional
             Tilt angle for the AAt staking in degrees (default is 5.0)
@@ -702,7 +702,7 @@ class Framework():
             self.cellMatrix *= (1, 1, 2)
             self.cellParameters *= (1, 1, 2, 1, 1, 1)
 
-            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types)).tolist()
             self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
             self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
 
@@ -715,7 +715,7 @@ class Framework():
             )
 
             # Get the index of the atoms in the second sheet
-            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
+            B_list = list(np.split(np.arange(len(self.atom_types)), 2)[1])
 
             # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
             stacked_structure.translate_sites(
@@ -729,7 +729,7 @@ class Framework():
             self.cellMatrix *= (1, 1, 2)
             self.cellParameters *= (1, 1, 2, 1, 1, 1)
 
-            self.atom_types = np.concatenate((self.atom_types, self.atom_types))
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types)).tolist()
             self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
             self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
 
@@ -742,7 +742,7 @@ class Framework():
             )
 
             # Get the index of the atoms in the second sheet
-            B_list = np.split(np.arange(len(self.atom_types)), 2)[1]
+            B_list = list(np.split(np.arange(len(self.atom_types)), 2)[1])
 
             # Translate the second sheet by the vector [1/2, 0, 0.5] to generate the B positions
             stacked_structure.translate_sites(
@@ -756,7 +756,7 @@ class Framework():
             self.cellMatrix *= (1, 1, 3)
             self.cellParameters *= (1, 1, 3, 1, 1, 1)
 
-            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
+            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types)).tolist()
             self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
             self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
 
