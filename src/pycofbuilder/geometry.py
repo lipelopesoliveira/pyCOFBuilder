@@ -59,12 +59,14 @@ def is_equilateral(p1, p2, p3, tol=0.1):
 def tetrahedron_volume(p1, p2, p3, p4):
     """Calculate the volume of the tetrahedron formed by four points."""
     # Create a matrix with the points and an additional row of ones
-    matrix = np.array([
-        [p1[0], p1[1], p1[2], 1],
-        [p2[0], p2[1], p2[2], 1],
-        [p3[0], p3[1], p3[2], 1],
-        [p4[0], p4[1], p4[2], 1]
-    ])
+    matrix = np.array(
+        [
+            [p1[0], p1[1], p1[2], 1],
+            [p2[0], p2[1], p2[2], 1],
+            [p3[0], p3[1], p3[2], 1],
+            [p4[0], p4[1], p4[2], 1],
+        ]
+    )
 
     # Calculate the determinant of the matrix
     det = np.linalg.det(matrix)
@@ -126,9 +128,11 @@ def is_square(p1, p2, p3, p4, tolerance=0.05):
     diagonal_length = max(unique_dists)
 
     # Check if the counts are correct with tolerance
-    return (dists.count(side_length) == 4 and
-            dists.count(diagonal_length) == 2 and
-            np.isclose(diagonal_length, 2 * side_length, rtol=tolerance))
+    return (
+        dists.count(side_length) == 4
+        and dists.count(diagonal_length) == 2
+        and np.isclose(diagonal_length, 2 * side_length, rtol=tolerance)
+    )
 
 
 def is_rectangle(p1, p2, p3, p4, tolerance=0.1):
@@ -152,7 +156,11 @@ def is_rectangle(p1, p2, p3, p4, tolerance=0.1):
     diagonal = sorted(list(unique_dists))[-1]
 
     # Check if the counts are correct with tolerance
-    return (dists.count(side_length[0]) == 2 and dists.count(side_length[1]) and dists.count(diagonal) == 2)
+    return (
+        dists.count(side_length[0]) == 2
+        and dists.count(side_length[1])
+        and dists.count(diagonal) == 2
+    )
 
 
 def is_rhombus(p1, p2, p3, p4, tolerance=0.1):
@@ -188,7 +196,7 @@ def is_pyramid(p1, p2, p3, p4, p5, tolerance=0.05):
         distance(p1, p5),
         distance(p2, p5),
         distance(p3, p5),
-        distance(p4, p5)
+        distance(p4, p5),
     ]
 
     # Check if all edges from the apex are the same length
@@ -203,7 +211,7 @@ def is_hexagon(p1, p2, p3, p4, p5, p6, tolerance=0.1):
     points = [p1, p2, p3, p4, p5, p6]
 
     # Check if all distances between consecutive points are equal
-    distances = [distance(points[i], points[(i+1) % 6]) for i in range(6)]
+    distances = [distance(points[i], points[(i + 1) % 6]) for i in range(6)]
 
     unique_distances = set(distances)
 
@@ -213,8 +221,18 @@ def is_hexagon(p1, p2, p3, p4, p5, p6, tolerance=0.1):
     # Check if the angle between adjacent vectors is 120 degrees (pi/3 radians)
     for i in range(6):
         # Create vectors between consecutive points
-        v1 = np.array([points[(i+1) % 6][0] - points[i][0], points[(i+1) % 6][1] - points[i][1]])
-        v2 = np.array([points[(i+2) % 6][0] - points[(i+1) % 6][0], points[(i+2) % 6][1] - points[(i+1) % 6][1]])
+        v1 = np.array(
+            [
+                points[(i + 1) % 6][0] - points[i][0],
+                points[(i + 1) % 6][1] - points[i][1],
+            ]
+        )
+        v2 = np.array(
+            [
+                points[(i + 2) % 6][0] - points[(i + 1) % 6][0],
+                points[(i + 2) % 6][1] - points[(i + 1) % 6][1],
+            ]
+        )
 
         # Calculate angle between vectors
         angle = angle_between(v1, v2)
@@ -244,7 +262,7 @@ def is_octahedron(p1, p2, p3, p4, p5, p6, tolerance=0.1):
         distance(p3, p6),
         distance(p4, p5),
         distance(p4, p6),
-        distance(p5, p6)
+        distance(p5, p6),
     ]
 
     # For an octahedron, we expect all edges to be of equal length
@@ -257,10 +275,19 @@ def is_octahedron(p1, p2, p3, p4, p5, p6, tolerance=0.1):
 def is_cube(p1, p2, p3, p4, p5, p6, p7, p8, tolerance=0.05):
     """Check if eight points form a cube."""
     edges = [
-        distance(p1, p2), distance(p1, p3), distance(p1, p4), distance(p1, p5),
-        distance(p2, p3), distance(p2, p6), distance(p3, p4), distance(p3, p7),
-        distance(p4, p5), distance(p5, p6), distance(p6, p7), distance(p7, p8),
-        distance(p8, p5)
+        distance(p1, p2),
+        distance(p1, p3),
+        distance(p1, p4),
+        distance(p1, p5),
+        distance(p2, p3),
+        distance(p2, p6),
+        distance(p3, p4),
+        distance(p3, p7),
+        distance(p4, p5),
+        distance(p5, p6),
+        distance(p6, p7),
+        distance(p7, p8),
+        distance(p8, p5),
     ]
 
     # Check if there are exactly 3 unique distances for the sides, diagonal, and face diagonal
@@ -272,14 +299,19 @@ def is_cube(p1, p2, p3, p4, p5, p6, p7, p8, tolerance=0.05):
     edge_lengths = sorted(list(unique_edges))
 
     # A cube has 12 equal edges, and face diagonals equal length
-    return (edges.count(edge_lengths[0]) == 12)
+    return edges.count(edge_lengths[0]) == 12
 
 
 def is_parallelepiped(p1, p2, p3, p4, p5, p6, p7, p8, tolerance=0.1):
     """Check if eight points form a parallelepiped."""
     # Calculate all pairwise distances between the points
     points = [p1, p2, p3, p4, p5, p6, p7, p8]
-    distances = [distance(p1, p2) for i, p1 in enumerate(points) for j, p2 in enumerate(points) if i < j]
+    distances = [
+        distance(p1, p2)
+        for i, p1 in enumerate(points)
+        for j, p2 in enumerate(points)
+        if i < j
+    ]
 
     # Get unique distances
     unique_distances = sorted(set(distances))
@@ -305,7 +337,12 @@ def is_dodecahedron(*points, tolerance=0.1):
         return False
 
     # Calculate all pairwise distances
-    distances = [distance(p1, p2) for i, p1 in enumerate(points) for j, p2 in enumerate(points) if i < j]
+    distances = [
+        distance(p1, p2)
+        for i, p1 in enumerate(points)
+        for j, p2 in enumerate(points)
+        if i < j
+    ]
 
     unique_distances = set(distances)
 

@@ -2,13 +2,16 @@ import numpy as np
 from numpy.testing import assert_allclose
 
 import sys
-sys.path.insert(1, '/home/felipe/PRs/pyCOFBuilder/src')
 
-from pycofbuilder.tools import (elements_dict,
-                                unit_vector,
-                                angle,
-                                rotation_matrix_from_vectors,
-                                rmsd)
+sys.path.insert(1, "/home/felipe/PRs/pyCOFBuilder/src")
+
+from pycofbuilder.tools import (
+    elements_dict,
+    unit_vector,
+    angle,
+    rotation_matrix_from_vectors,
+    rmsd,
+)
 
 
 def test_elements_dict() -> None:
@@ -42,13 +45,13 @@ def test_angle_same_vector():
     v = np.array([1, 2, 3])
 
     # Angle in degrees should be 0
-    assert np.isclose(angle(v, v, unit='degree'), 0.0, atol=1e-5)
+    assert np.isclose(angle(v, v, unit="degree"), 0.0, atol=1e-5)
 
     # Angle in radians should be 0
-    assert np.isclose(angle(v, v, unit='radians'), 0.0, atol=1e-5)
+    assert np.isclose(angle(v, v, unit="radians"), 0.0, atol=1e-5)
 
     # The cosine of the angle between identical vectors should be 1
-    assert np.isclose(angle(v, v, unit='cos'), 1.0, atol=1e-5)
+    assert np.isclose(angle(v, v, unit="cos"), 1.0, atol=1e-5)
 
 
 def test_angle_orthogonal_vectors():
@@ -57,10 +60,10 @@ def test_angle_orthogonal_vectors():
     v2 = np.array([0, 1, 0])
 
     # 90 degrees
-    assert np.isclose(angle(v1, v2, unit='degree'), 90.0, atol=1e-5)
+    assert np.isclose(angle(v1, v2, unit="degree"), 90.0, atol=1e-5)
 
     # π/2 radians
-    assert np.isclose(angle(v1, v2, unit='radians'), np.pi/2, atol=1e-5)
+    assert np.isclose(angle(v1, v2, unit="radians"), np.pi / 2, atol=1e-5)
 
 
 def test_rotation_matrix_identity():

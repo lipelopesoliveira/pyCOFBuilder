@@ -5,6 +5,9 @@ Change Log
 v0.0.8.9 Beta (02/08/2025)
 ========================
 
+New features
+------------
+
 - Add new custom templates for Issues:
   - Bug Report
   - Documentation Issue

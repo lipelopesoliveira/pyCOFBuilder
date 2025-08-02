@@ -1,7 +1,9 @@
-from pycofbuilder.exceptions import (BondLenghError,
-                                     BBConnectivityError,
-                                     ConnectionGroupError,
-                                     MissingXError)
+from pycofbuilder.exceptions import (
+    BondLenghError,
+    BBConnectivityError,
+    ConnectionGroupError,
+    MissingXError,
+)
 
 
 def test_bond_length_error_message():
