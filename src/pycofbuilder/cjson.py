@@ -445,7 +445,6 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
             },
             "coords": {
                 "3d": np.array(self.cartesian_positions).flatten().tolist(),
-                "3d": np.array(self.cartesian_positions).flatten().tolist(),
             },
         }
 
