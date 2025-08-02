@@ -337,7 +337,7 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
         atomic_types = []
         cartesian_positions = []
 
-        for line in xyz_data[2 : n_atoms + 3]:
+        for line in xyz_data[2:n_atoms + 3]:
             atomic_types.append(line.split()[0])
             cartesian_positions.append([float(i) for i in line.split()[1:]])
 

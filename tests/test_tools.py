@@ -1,10 +1,6 @@
 import numpy as np
 from numpy.testing import assert_allclose
 
-import sys
-
-sys.path.insert(1, "/home/felipe/PRs/pyCOFBuilder/src")
-
 from pycofbuilder.tools import (
     elements_dict,
     unit_vector,
