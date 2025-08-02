@@ -62,7 +62,12 @@ Here you will find a list of tutorials on how to use pyCOFBuilder to generate an
 Citing pyCOFBuilder
 -------------------
 
-If you use pyCOFBuilder in your research, please cite the following paper:
+If you use pyCOFBuilder in your research, please cite the following `paper`_:
+
+.. _paper: https://doi.org/10.1021/acs.jcim.3c01918
+
+OLIVEIRA, Felipe L. et ESTEVES, Pierre M. pyCOFBuilder: A python package for automated creation of Covalent Organic Framework models based on the reticular approach. Journal of Chemical Information and Modeling, 2024, vol. 64, no 8, p. 3278-3289.
+
 
 .. code-block:: bibtex
 
@@ -77,7 +82,6 @@ If you use pyCOFBuilder in your research, please cite the following paper:
       publisher={ACS Publications}
       }
 
-> OLIVEIRA, Felipe L. et ESTEVES, Pierre M. pyCOFBuilder: A python package for automated creation of Covalent Organic Framework models based on the reticular approach. Journal of Chemical Information and Modeling, 2024, vol. 64, no 8, p. 3278-3289.
 
 .. toctree::
    :caption: First steps
