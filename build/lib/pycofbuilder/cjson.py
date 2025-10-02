@@ -7,13 +7,13 @@ The CJSON package implements functions to read, create and manipulate Chemical J
 """
 
 import os
-import simplejson
-import numpy as np
-
-from pycofbuilder.tools import elements_dict
 
 import gemmi
+import numpy as np
+import simplejson
 from ase.cell import Cell
+
+from pycofbuilder.tools import elements_dict
 
 
 class ChemJSON:
@@ -49,9 +49,10 @@ class ChemJSON:
         A dictionary contaning the partial charges of the atoms on the structure.
         Example: {'DDEC': [0.1, 0.2, 0.15], 'EQeq': [0.05, 0.15, 0.19]}
     """
+
     def __init__(self):
-        self.file_name = ''
-        self.name = ''
+        self.file_name = ""
+        self.name = ""
 
         # Structure properties
         self.cell_parameters: list = [None] * 6  # Format: [a, b, c, alpha, beta, gamma]
@@ -61,7 +62,7 @@ class ChemJSON:
         self.atomic_numbers: list = []  # Format: list of atomic numbers
         self.atomic_types: list = []  # Format: list of atomic types
         self.atomic_labels: list = []  # Format: list of atomic labels
-        self.formula: str = ''
+        self.formula: str = ""
         self.partial_charges: dict = {}  # Format: dictionary of charge types and values
 
         self.bonds: list = []  # Format: list of bond indexes
@@ -76,9 +77,9 @@ class ChemJSON:
         Returns a custom representation of the class.
         """
 
-        repr_string = "ChemJSON(name='{}', formula='{}', number of atoms={}".format(self.name,
-                                                                                    self.formula,
-                                                                                    len(self.atomic_types))
+        repr_string = "ChemJSON(name='{}', formula='{}', number of atoms={}".format(
+            self.name, self.formula, len(self.atomic_types)
+        )
 
         return repr_string
 
@@ -88,9 +89,11 @@ class ChemJSON:
         Returns a custom print of the class.
         """
 
-        string_string = "ChemJSON(name='{}', formula='{}', number of atoms={})\n".format(self.name,
-                                                                                         self.formula,
-                                                                                         len(self.atomic_types))
+        string_string = (
+            "ChemJSON(name='{}', formula='{}', number of atoms={})\n".format(
+                self.name, self.formula, len(self.atomic_types)
+            )
+        )
 
         if self.cell_parameters is not None:
             string_string += f"""Cell parameters:
@@ -109,22 +112,19 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
         if self.cartesian_positions is not None:
             string_string += "Cartesian positions:\n"
             for i, position in enumerate(self.cartesian_positions):
-                string_string += "    {:3} {:>9.5f}   {:>9.5f}   {:>9.5f}\n".format(self.atomic_types[i],
-                                                                                    position[0],
-                                                                                    position[1],
-                                                                                    position[2]
-                                                                                    )
+                string_string += "    {:3} {:>9.5f}   {:>9.5f}   {:>9.5f}\n".format(
+                    self.atomic_types[i], position[0], position[1], position[2]
+                )
 
         if self.fractional_positions is not None:
             string_string += "Fractional positions:\n"
             for i, position in enumerate(self.fractional_positions):
-                string_string += "    {:3} {:>9.5f}   {:>9.5f}   {:>9.5f}\n".format(self.atomic_types[i],
-                                                                                    position[0],
-                                                                                    position[1],
-                                                                                    position[2])
+                string_string += "    {:3} {:>9.5f}   {:>9.5f}   {:>9.5f}\n".format(
+                    self.atomic_types[i], position[0], position[1], position[2]
+                )
 
         return string_string
-    
+
     def set_properties(self, properties: dict):
         """
         Sets the properties of the structure.
@@ -167,19 +167,27 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
 
         if None not in self.cell_parameters:
             aseCell = Cell.fromcellpar(self.cell_parameters)
-            self.fractional_positions = aseCell.scaled_positions(cartesian_positions).tolist()
+            self.fractional_positions = aseCell.scaled_positions(
+                cartesian_positions
+            ).tolist()
 
     def set_fractional_positions(self, fractional_positions):
         """
         Sets the fractional positions of the structure. The cartesian
         positions will be calculated and also updated.
         """
-        self.fractional_positions = np.array(fractional_positions).astype(float).tolist()
-        self.fractional_positions = np.array(fractional_positions).astype(float).tolist()
+        self.fractional_positions = (
+            np.array(fractional_positions).astype(float).tolist()
+        )
+        self.fractional_positions = (
+            np.array(fractional_positions).astype(float).tolist()
+        )
 
         if None not in self.cell_parameters:
             aseCell = Cell.fromcellpar(self.cell_parameters)
-            self.cartesian_positions = aseCell.cartesian_positions(fractional_positions).tolist()
+            self.cartesian_positions = aseCell.cartesian_positions(
+                fractional_positions
+            ).tolist()
 
     def set_atomic_types(self, atomic_types):
         """
@@ -187,12 +195,19 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
         """
         self.atomic_types = atomic_types
 
-        self.atomic_labels = [f"{atom}{i+1}" for i, atom in enumerate(self.atomic_types)]
+        self.atomic_labels = [
+            f"{atom}{i+1}" for i, atom in enumerate(self.atomic_types)
+        ]
 
-        symbol_dict = elements_dict('atomic_number')
+        symbol_dict = elements_dict("atomic_number")
         self.atomic_numbers = [symbol_dict[i] for i in atomic_types]
 
-        self.formula = ''.join([f'{atom}{self.atomic_types.count(atom)}' for atom in set(self.atomic_types)])
+        self.formula = "".join(
+            [
+                f"{atom}{self.atomic_types.count(atom)}"
+                for atom in set(self.atomic_types)
+            ]
+        )
 
     def set_atomic_numbers(self, atomic_numbers):
         """
@@ -201,14 +216,21 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
         """
         self.atomic_numbers = atomic_numbers
 
-        symbol_dict = elements_dict('atomic_number')
+        symbol_dict = elements_dict("atomic_number")
         number_dict = {j: i for i, j in zip(symbol_dict.keys(), symbol_dict.values())}
 
         self.atomic_types = [number_dict[i] for i in atomic_numbers]
 
-        self.atomic_labels = [f"{atom}{i+1}" for i, atom in enumerate(self.atomic_types)]
+        self.atomic_labels = [
+            f"{atom}{i+1}" for i, atom in enumerate(self.atomic_types)
+        ]
 
-        self.formula = ''.join([f'{atom}{self.atomic_types.count(atom)}' for atom in set(self.atomic_types)])
+        self.formula = "".join(
+            [
+                f"{atom}{self.atomic_types.count(atom)}"
+                for atom in set(self.atomic_types)
+            ]
+        )
 
     def set_bonds(self, bond_indexes: list[list], bond_orders: list = [None]):
         """
@@ -233,78 +255,89 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
         """
         Reads a ChemJSON file from a given path and file_name.
         """
-        self.file_name = os.path.join(path, file_name.split('.')[0] + '.cjson')
+        self.file_name = os.path.join(path, file_name.split(".")[0] + ".cjson")
 
-        with open(self.file_name, 'r') as file:
+        with open(self.file_name, "r") as file:
             cjson_data = simplejson.load(file)
 
         if "name" in cjson_data:
-            self.name = cjson_data['name']
+            self.name = cjson_data["name"]
 
         if "unitCell" in cjson_data:
-            if 'a' in cjson_data['unitCell']:
+            if "a" in cjson_data["unitCell"]:
                 self.set_cell_parameters(
-                    [cjson_data['unitCell'][i] for i in ['a', 'b', 'c', 'alpha', 'beta', 'gamma']]
+                    [
+                        cjson_data["unitCell"][i]
+                        for i in ["a", "b", "c", "alpha", "beta", "gamma"]
+                    ]
                 )
-            elif 'cellVectors' in cjson_data['unitCell']:
+            elif "cellVectors" in cjson_data["unitCell"]:
                 self.set_cell_matrix(
-                    np.array(cjson_data['unitCell']['cellVectors']).reshape(3, 3)
+                    np.array(cjson_data["unitCell"]["cellVectors"]).reshape(3, 3)
                 )
 
         if "atoms" in cjson_data:
-            if 'coords' in cjson_data['atoms']:
-                if '3d' in cjson_data['atoms']['coords']:
+            if "coords" in cjson_data["atoms"]:
+                if "3d" in cjson_data["atoms"]["coords"]:
                     self.set_cartesian_positions(
-                        np.array(cjson_data['atoms']['coords']['3d']).reshape(-1, 3)
+                        np.array(cjson_data["atoms"]["coords"]["3d"]).reshape(-1, 3)
                     )
-                elif '3dFractional' in cjson_data['atoms']['coords']:
+                elif "3dFractional" in cjson_data["atoms"]["coords"]:
                     self.set_fractional_positions(
-                        np.array(cjson_data['atoms']['coords']['3dFractional']).reshape(-1, 3)
+                        np.array(cjson_data["atoms"]["coords"]["3dFractional"]).reshape(
+                            -1, 3
+                        )
                     )
 
-            if "elements" in cjson_data['atoms']:
-                if 'type' in cjson_data['atoms']['elements']:
-                    self.set_atomic_types(cjson_data['atoms']['elements']['type'])
+            if "elements" in cjson_data["atoms"]:
+                if "type" in cjson_data["atoms"]["elements"]:
+                    self.set_atomic_types(cjson_data["atoms"]["elements"]["type"])
 
-                elif 'number' in cjson_data['atoms']['elements']:
-                    self.set_atomic_numbers(cjson_data['atoms']['elements']['number'])
+                elif "number" in cjson_data["atoms"]["elements"]:
+                    self.set_atomic_numbers(cjson_data["atoms"]["elements"]["number"])
 
-                if 'label' in cjson_data['atoms']['elements']:
-                    self.atomic_labels = cjson_data['atoms']['elements']['label']
+                if "label" in cjson_data["atoms"]["elements"]:
+                    self.atomic_labels = cjson_data["atoms"]["elements"]["label"]
                 else:
-                    self.atomic_labels = [f"{atom}{i+1}" for i, atom in enumerate(self.atomic_types)]
+                    self.atomic_labels = [
+                        f"{atom}{i+1}" for i, atom in enumerate(self.atomic_types)
+                    ]
 
         if "bonds" in cjson_data:
-            if 'connections' in cjson_data['bonds']:
+            if "connections" in cjson_data["bonds"]:
                 self.set_bonds(
-                    np.array(cjson_data['bonds']['connections']['index']).astype(int).reshape(-1, 2).tolist())
+                    np.array(cjson_data["bonds"]["connections"]["index"])
+                    .astype(int)
+                    .reshape(-1, 2)
+                    .tolist()
+                )
 
-            if 'order' in cjson_data['bonds']:
-                self.bond_orders = np.array(cjson_data['bonds']['order']).tolist()
+            if "order" in cjson_data["bonds"]:
+                self.bond_orders = np.array(cjson_data["bonds"]["order"]).tolist()
 
-        if 'properties' in cjson_data:
-            self.set_properties(cjson_data['properties'])
-        if 'results' in cjson_data:
-            self.set_results(cjson_data['results'])
-        if 'partialCharges' in cjson_data:
-            self.partial_charges = cjson_data['partialCharges']
+        if "properties" in cjson_data:
+            self.set_properties(cjson_data["properties"])
+        if "results" in cjson_data:
+            self.set_results(cjson_data["results"])
+        if "partialCharges" in cjson_data:
+            self.partial_charges = cjson_data["partialCharges"]
 
     def from_xyz(self, path, file_name):
         """
         Reads a XYZ file from a given path and file_name.
         """
 
-        self.file_name = os.path.join(path, file_name.split('.')[0] + '.xyz')
-        self.name = file_name.split('.')[0]
+        self.file_name = os.path.join(path, file_name.split(".")[0] + ".xyz")
+        self.name = file_name.split(".")[0]
 
-        with open(self.file_name, 'r') as file:
+        with open(self.file_name, "r") as file:
             xyz_data = file.read().splitlines()
         n_atoms = int(xyz_data[0])
 
         atomic_types = []
         cartesian_positions = []
 
-        for line in xyz_data[2: n_atoms + 3]:
+        for line in xyz_data[2:n_atoms + 3]:
             atomic_types.append(line.split()[0])
             cartesian_positions.append([float(i) for i in line.split()[1:]])
 
@@ -317,26 +350,26 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
         Reads a Gaussian input file from a given path and file_name.
         """
 
-        self.file_name = os.path.join(path, file_name.split('.')[0] + '.gjf')
-        self.name = file_name.split('.')[0]
+        self.file_name = os.path.join(path, file_name.split(".")[0] + ".gjf")
+        self.name = file_name.split(".")[0]
 
-        with open(self.file_name, 'r') as file:
+        with open(self.file_name, "r") as file:
             gjf_data = file.read().splitlines()
 
         # Remove empty lines
-        gjf_data = [line for line in gjf_data if line != '']
+        gjf_data = [line for line in gjf_data if line != ""]
 
         atomic_types = []
         cartesian_positions = []
 
         for line in gjf_data:
-            if line.split()[0] in elements_dict('atomic_number').keys():
+            if line.split()[0] in elements_dict("atomic_number").keys():
                 atomic_types.append(line.split()[0])
                 cartesian_positions.append([float(i) for i in line.split()[1:4]])
 
         cell_matrix = []
         for line in gjf_data:
-            if line.split()[0] == 'Tv':
+            if line.split()[0] == "Tv":
                 cell_matrix.append([float(i) for i in line.split()[1:4]])
 
         if cell_matrix != []:
@@ -352,26 +385,26 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
         """
 
         # Read the cif file and get the lattice parameters and atomic positions
-        cif_filename = os.path.join(path, file_name.split('.')[0] + '.cif')
+        cif_filename = os.path.join(path, file_name.split(".")[0] + ".cif")
 
         cif = gemmi.cif.read_file(cif_filename).sole_block()
 
-        a = float(cif.find_value('_cell_length_a').split('(')[0])
-        b = float(cif.find_value('_cell_length_b').split('(')[0])
-        c = float(cif.find_value('_cell_length_c').split('(')[0])
-        beta = float(cif.find_value('_cell_angle_beta').split('(')[0])
-        gamma = float(cif.find_value('_cell_angle_gamma').split('(')[0])
-        alpha = float(cif.find_value('_cell_angle_alpha').split('(')[0])
+        a = float(cif.find_value("_cell_length_a").split("(")[0])
+        b = float(cif.find_value("_cell_length_b").split("(")[0])
+        c = float(cif.find_value("_cell_length_c").split("(")[0])
+        beta = float(cif.find_value("_cell_angle_beta").split("(")[0])
+        gamma = float(cif.find_value("_cell_angle_gamma").split("(")[0])
+        alpha = float(cif.find_value("_cell_angle_alpha").split("(")[0])
 
         CellParameters = [a, b, c, alpha, beta, gamma]
 
-        AtomicTypes = list(cif.find_values('_atom_site_type_symbol'))
-        PosX = np.array(cif.find_values('_atom_site_fract_x')).astype(float)
-        PosY = np.array(cif.find_values('_atom_site_fract_y')).astype(float)
-        PosZ = np.array(cif.find_values('_atom_site_fract_z')).astype(float)
+        AtomicTypes = list(cif.find_values("_atom_site_type_symbol"))
+        PosX = np.array(cif.find_values("_atom_site_fract_x")).astype(float)
+        PosY = np.array(cif.find_values("_atom_site_fract_y")).astype(float)
+        PosZ = np.array(cif.find_values("_atom_site_fract_z")).astype(float)
         try:
-            charges = np.array(cif.find_values('_atom_site_charge')).astype(float)
-            charge_type = 'DDEC'
+            charges = np.array(cif.find_values("_atom_site_charge")).astype(float)
+            charge_type = "DDEC"
         except Exception:
             charges = None
             charge_type = None
@@ -390,47 +423,48 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
         Returns the structure as a dictionary.
         """
         structure_dict = {
-            'chemical json': 1,
-            'name': self.name,
-            'formula': self.formula,
+            "chemical json": 1,
+            "name": self.name,
+            "formula": self.formula,
         }
         if None not in self.cell_parameters:
-            structure_dict['unitCell'] = {
-                'a': self.cell_parameters[0],
-                'b': self.cell_parameters[1],
-                'c': self.cell_parameters[2],
-                'alpha': self.cell_parameters[3],
-                'beta': self.cell_parameters[4],
-                'gamma': self.cell_parameters[5],
-                'cellVectors': np.array(self.cell_matrix).flatten().tolist()
+            structure_dict["unitCell"] = {
+                "a": self.cell_parameters[0],
+                "b": self.cell_parameters[1],
+                "c": self.cell_parameters[2],
+                "alpha": self.cell_parameters[3],
+                "beta": self.cell_parameters[4],
+                "gamma": self.cell_parameters[5],
+                "cellVectors": np.array(self.cell_matrix).flatten().tolist(),
             }
 
-        structure_dict['atoms'] = {
-                'elements': {
-                    'type': self.atomic_types,
-                    'number': self.atomic_numbers,
-                },
-                'coords': {
-                    '3d': np.array(self.cartesian_positions).flatten().tolist(),
-                    '3d': np.array(self.cartesian_positions).flatten().tolist(),
-                }
-            }
+        structure_dict["atoms"] = {
+            "elements": {
+                "type": self.atomic_types,
+                "number": self.atomic_numbers,
+            },
+            "coords": {
+                "3d": np.array(self.cartesian_positions).flatten().tolist(),
+            },
+        }
 
         if len(self.bonds) > 0:
-            structure_dict['bonds'] = {
-                'connections': {'index': np.array(self.bonds).flatten().tolist()},
-                'order': self.bond_orders
+            structure_dict["bonds"] = {
+                "connections": {"index": np.array(self.bonds).flatten().tolist()},
+                "order": self.bond_orders,
             }
 
         if None not in self.cell_parameters:
-            structure_dict['atoms']['coords']['3dFractional'] = np.array(self.fractional_positions).flatten().tolist()
+            structure_dict["atoms"]["coords"]["3dFractional"] = (
+                np.array(self.fractional_positions).flatten().tolist()
+            )
 
         if len(self.partial_charges) > 0:
-            structure_dict['partialCharges'] = self.partial_charges
+            structure_dict["partialCharges"] = self.partial_charges
 
-        structure_dict['properties'] = self.properties
+        structure_dict["properties"] = self.properties
 
-        structure_dict['results'] = self.results
+        structure_dict["results"] = self.results
 
         return structure_dict
 
@@ -438,6 +472,6 @@ C   {self.cell_matrix[2][0]:>12.7f}  {self.cell_matrix[2][1]:>12.7f} {self.cell_
         """
         Writes a ChemJSON file to a given path and file_name.
         """
-        self.file_name = os.path.join(path, file_name.split('.')[0] + '.cjson')
-        with open(self.file_name, 'w') as file:
+        self.file_name = os.path.join(path, file_name.split(".")[0] + ".cjson")
+        with open(self.file_name, "w") as file:
             simplejson.dump(self.as_dict(), file, indent=4)

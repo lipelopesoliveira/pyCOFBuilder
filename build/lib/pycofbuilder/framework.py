@@ -6,55 +6,37 @@
 The Framework class implements definitions and methods for a Framework buiding
 """
 
-import os
 import copy
+import os
+
 import numpy as np
-
 from ase import Atoms
-
 # Import pymatgen
 from pymatgen.core import Lattice, Structure
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
-from pymatgen.transformations.advanced_transformations import CubicSupercellTransformation
-
+from pymatgen.transformations.advanced_transformations import \
+    CubicSupercellTransformation
 from scipy.spatial.transform import Rotation as R
-
-# Import pycofbuilder exceptions
-from pycofbuilder.exceptions import (BondLenghError,
-                                     BBConnectivityError)
 
 # Import pycofbuilder building_block
 from pycofbuilder.building_block import BuildingBlock
-
 # Import pycofbuilder topology data
 from pycofbuilder.data.topology import TOPOLOGY_DICT
-
-# Import pycofbuilder tools
-from pycofbuilder.tools import (get_bond_atom,
-                                cell_to_cellpar,
-                                cellpar_to_cell,
-                                rotation_matrix_from_vectors,
-                                unit_vector,
-                                angle,
-                                get_framework_symm_text,
-                                get_bonds)
-
+# Import pycofbuilder exceptions
+from pycofbuilder.exceptions import BBConnectivityError, BondLenghError
 # Import pycofbuilder io_tools
-from pycofbuilder.io_tools import (save_chemjson,
-                                   save_cif,
-                                   save_xyz,
-                                   save_turbomole,
-                                   save_vasp,
-                                   save_xsf,
-                                   save_pdb,
-                                   save_pqr,
-                                   save_qe,
-                                   save_gjf)
-
+from pycofbuilder.io_tools import (save_chemjson, save_cif, save_gjf, save_pdb,
+                                   save_pqr, save_qe, save_turbomole,
+                                   save_vasp, save_xsf, save_xyz)
 from pycofbuilder.logger import create_logger
+# Import pycofbuilder tools
+from pycofbuilder.tools import (angle, cell_to_cellpar, cellpar_to_cell,
+                                get_bond_atom, get_bonds,
+                                get_framework_symm_text,
+                                rotation_matrix_from_vectors, unit_vector)
 
 
-class Framework():
+class Framework:
     """
     A class used to represent a Covalent Organic Framework as a reticular entity.
 
@@ -111,19 +93,23 @@ class Framework():
 
         self.name: str | None = name
 
-        self.out_path: str = kwargs.get('out_path', os.path.join(os.getcwd(), 'out'))
-        self.save_bb: bool = kwargs.get('save_bb', False)
-        self.bb_out_path: str = kwargs.get('bb_out_path', os.path.join(self.out_path, 'building_blocks'))
+        self.out_path: str = kwargs.get("out_path", os.path.join(os.getcwd(), "out"))
+        self.save_bb: bool = kwargs.get("save_bb", False)
+        self.bb_out_path: str = kwargs.get(
+            "bb_out_path", os.path.join(self.out_path, "building_blocks")
+        )
 
-        self.logger = create_logger(level=kwargs.get('log_level', 'info'),
-                                    format=kwargs.get('log_format', 'simple'),
-                                    save_to_file=kwargs.get('save_to_file', False),
-                                    log_filename=kwargs.get('log_filename', 'pycofbuilder.log'))
+        self.logger = create_logger(
+            level=kwargs.get("log_level", "info"),
+            format=kwargs.get("log_format", "simple"),
+            save_to_file=kwargs.get("save_to_file", False),
+            log_filename=kwargs.get("log_filename", "pycofbuilder.log"),
+        )
 
-        self.symm_tol: float = kwargs.get('symm_tol', 0.1)
-        self.angle_tol: float = kwargs.get('angle_tol', 0.5)
-        self.dist_threshold: float = kwargs.get('dist_threshold', 0.8)
-        self.bond_threshold: float = kwargs.get('bond_threshold', 1.3)
+        self.symm_tol: float = kwargs.get("symm_tol", 0.1)
+        self.angle_tol: float = kwargs.get("angle_tol", 0.5)
+        self.dist_threshold: float = kwargs.get("dist_threshold", 0.8)
+        self.bond_threshold: float = kwargs.get("bond_threshold", 1.3)
 
         self.bb1_name = None
         self.bb2_name = None
@@ -151,37 +137,36 @@ class Framework():
         self.chirality = False
 
         self.available_2D_top = [
-            'HCB', 'HCB_A',
-            'SQL', 'SQL_A',
-            'KGD',
-            'HXL_A',
-            'FXT', 'FXT_A'
-            ]
+            "HCB",
+            "HCB_A",
+            "SQL",
+            "SQL_A",
+            "KGD",
+            "HXL_A",
+            "FXT",
+            "FXT_A",
+        ]
 
         # To add: ['dia', 'bor', 'srs', 'pts', 'ctn', 'rra', 'fcc', 'stp', 'acs', 'tbo', 'bcu', 'fjh', 'ceq']
-        self.available_3D_top = [
-            'DIA', 'DIA_A',
-            'BOR',
-            'LON', 'LON_A'
-            ]
+        self.available_3D_top = ["DIA", "DIA_A", "BOR", "LON", "LON_A"]
 
         self.available_topologies = self.available_2D_top + self.available_3D_top
 
         # Define available stackings for all 2D topologies
         self.available_stacking = {
-            'HCB': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
-            'HCB_A': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
-            'SQL': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
-            'SQL_A': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
-            'KGD': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
-            'HXL_A': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
-            'FXT': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
-            'FXT_A': ['A', 'AA', 'AB1', 'AB2', 'AAl', 'AAt', 'ABC1', 'ABC2'],
-            'DIA': [str(i + 1) for i in range(15)],
-            'DIA_A': [str(i + 1) for i in range(15)],
-            'BOR': [str(i + 1) for i in range(15)],
-            'LON': [str(i + 1) for i in range(15)],
-            'LON_A': [str(i + 1) for i in range(15)]
+            "HCB": ["A", "AA", "AB1", "AB2", "AAl", "AAt", "ABC1", "ABC2"],
+            "HCB_A": ["A", "AA", "AB1", "AB2", "AAl", "AAt", "ABC1", "ABC2"],
+            "SQL": ["A", "AA", "AB1", "AB2", "AAl", "AAt", "ABC1", "ABC2"],
+            "SQL_A": ["A", "AA", "AB1", "AB2", "AAl", "AAt", "ABC1", "ABC2"],
+            "KGD": ["A", "AA", "AB1", "AB2", "AAl", "AAt", "ABC1", "ABC2"],
+            "HXL_A": ["A", "AA", "AB1", "AB2", "AAl", "AAt", "ABC1", "ABC2"],
+            "FXT": ["A", "AA", "AB1", "AB2", "AAl", "AAt", "ABC1", "ABC2"],
+            "FXT_A": ["A", "AA", "AB1", "AB2", "AAl", "AAt", "ABC1", "ABC2"],
+            "DIA": [str(i + 1) for i in range(15)],
+            "DIA_A": [str(i + 1) for i in range(15)],
+            "BOR": [str(i + 1) for i in range(15)],
+            "LON": [str(i + 1) for i in range(15)],
+            "LON_A": [str(i + 1) for i in range(15)],
         }
 
         if self.name is not None:
@@ -191,41 +176,47 @@ class Framework():
         return self.as_string()
 
     def __repr__(self) -> str:
-        return f'Framework({self.bb1_name}, {self.bb2_name}, {self.topology}, {self.stacking})'
+        return f"Framework({self.bb1_name}, {self.bb2_name}, {self.topology}, {self.stacking})"
 
     def as_string(self) -> str:
         """
         Returns a string with the Framework information.
         """
 
-        fram_str = f'Name: {self.name}\n'
+        fram_str = f"Name: {self.name}\n"
 
         # Get the formula of the framework
 
         if self.composition is not None:
-            fram_str += f'Full Formula ({self.composition})\n'
-            fram_str += f'Reduced Formula: ({self.composition})\n'
+            fram_str += f"Full Formula ({self.composition})\n"
+            fram_str += f"Reduced Formula: ({self.composition})\n"
         else:
-            fram_str += 'Full Formula ()\n'
-            fram_str += 'Reduced Formula: \n'
+            fram_str += "Full Formula ()\n"
+            fram_str += "Reduced Formula: \n"
 
-        fram_str += 'abc   :  {:11.6f}  {:11.6f}  {:11.6f}\n'.format(*self.cellParameters[:3])
-        fram_str += 'angles:  {:11.6f}  {:11.6f}  {:11.6f}\n'.format(*self.cellParameters[3:])
-        fram_str += 'A: {:11.6f}  {:11.6f}   {:11.6f}\n'.format(*self.cellMatrix[0])
-        fram_str += 'B: {:11.6f}  {:11.6f}   {:11.6f}\n'.format(*self.cellMatrix[1])
-        fram_str += 'C: {:11.6f}  {:11.6f}   {:11.6f}\n'.format(*self.cellMatrix[2])
+        fram_str += "abc   :  {:11.6f}  {:11.6f}  {:11.6f}\n".format(
+            *self.cellParameters[:3]
+        )
+        fram_str += "angles:  {:11.6f}  {:11.6f}  {:11.6f}\n".format(
+            *self.cellParameters[3:]
+        )
+        fram_str += "A: {:11.6f}  {:11.6f}   {:11.6f}\n".format(*self.cellMatrix[0])
+        fram_str += "B: {:11.6f}  {:11.6f}   {:11.6f}\n".format(*self.cellMatrix[1])
+        fram_str += "C: {:11.6f}  {:11.6f}   {:11.6f}\n".format(*self.cellMatrix[2])
 
-        fram_str += f'Cartesian Sites ({self.n_atoms})\n'
-        fram_str += '  #  Type         a         b         c    label\n'
-        fram_str += '---  ----  --------  --------  --------  -------\n'
+        fram_str += f"Cartesian Sites ({self.n_atoms})\n"
+        fram_str += "  #  Type         a         b         c    label\n"
+        fram_str += "---  ----  --------  --------  --------  -------\n"
 
         for i in range(len(self.atom_types)):
-            fram_str += '{:3d}  {:4s}  {:8.5f}  {:8.5f}  {:8.5f}  {:>7}\n'.format(i,
-                                                                                  self.atom_types[i],
-                                                                                  self.atom_pos[i][0],
-                                                                                  self.atom_pos[i][1],
-                                                                                  self.atom_pos[i][2],
-                                                                                  self.atom_labels[i])
+            fram_str += "{:3d}  {:4s}  {:8.5f}  {:8.5f}  {:8.5f}  {:>7}\n".format(
+                i,
+                self.atom_types[i],
+                self.atom_pos[i][0],
+                self.atom_pos[i][1],
+                self.atom_pos[i][2],
+                self.atom_labels[i],
+            )
 
         return fram_str
 
@@ -235,7 +226,9 @@ class Framework():
         """
         return len(self.atom_types)
 
-    def get_available_topologies(self, dimensionality: str = 'all', print_result: bool = True):
+    def get_available_topologies(
+        self, dimensionality: str = "all", print_result: bool = True
+    ):
         """
         Get the available topologies implemented in the class.
 
@@ -254,22 +247,22 @@ class Framework():
             A list with the available topologies.
         """
 
-        dimensionality_error = f'Dimensionality must be one of the following: all, 2D, 3D, not {dimensionality}'
-        assert dimensionality in ['all', '2D', '3D'], dimensionality_error
+        dimensionality_error = f"Dimensionality must be one of the following: all, 2D, 3D, not {dimensionality}"
+        assert dimensionality in ["all", "2D", "3D"], dimensionality_error
 
         dimensionality_list = []
 
-        if dimensionality == 'all' or dimensionality == '2D':
+        if dimensionality == "all" or dimensionality == "2D":
             if print_result:
-                print('Available 2D Topologies:')
+                print("Available 2D Topologies:")
             for i in self.available_2D_top:
                 if print_result:
                     print(i.upper())
                 dimensionality_list.append(i)
 
-        if dimensionality == 'all' or dimensionality == '3D':
+        if dimensionality == "all" or dimensionality == "3D":
             if print_result:
-                print('Available 3D Topologies:')
+                print("Available 3D Topologies:")
             for i in self.available_3D_top:
                 if print_result:
                     print(i.upper())
@@ -295,18 +288,20 @@ class Framework():
             A tuple with the building blocks names, the net and the stacking.
         """
 
-        string_error = 'FrameworkName must be a string'
+        string_error = "FrameworkName must be a string"
         assert isinstance(FrameworkName, str), string_error
 
-        name_error = 'FrameworkName must be in the format: BB1-BB2-Net-Stacking'
-        assert len(FrameworkName.split('-')) == 4, name_error
+        name_error = "FrameworkName must be in the format: BB1-BB2-Net-Stacking"
+        assert len(FrameworkName.split("-")) == 4, name_error
 
-        bb1_name, bb2_name, Net, Stacking = FrameworkName.split('-')
+        bb1_name, bb2_name, Net, Stacking = FrameworkName.split("-")
 
-        net_error = f'{Net} not in the available list: {self.available_topologies}'
+        net_error = f"{Net} not in the available list: {self.available_topologies}"
         assert Net in self.available_topologies, net_error
 
-        stacking_error = f'{Stacking} not in the available list: {self.available_stacking[Net]}'
+        stacking_error = (
+            f"{Stacking} not in the available list: {self.available_stacking[Net]}"
+        )
         assert Stacking in self.available_stacking[Net], stacking_error
 
         return bb1_name, bb2_name, Net, Stacking
@@ -326,17 +321,18 @@ class Framework():
         """
         bb1_name, bb2_name, Net, Stacking = self.check_name_concistency(FrameworkName)
 
-        bb1 = BuildingBlock(name=bb1_name, bb_out_path=self.bb_out_path, save_bb=self.save_bb)
-        bb2 = BuildingBlock(name=bb2_name, bb_out_path=self.bb_out_path, save_bb=self.save_bb)
+        bb1 = BuildingBlock(
+            name=bb1_name, bb_out_path=self.bb_out_path, save_bb=self.save_bb
+        )
+        bb2 = BuildingBlock(
+            name=bb2_name, bb_out_path=self.bb_out_path, save_bb=self.save_bb
+        )
 
         self.from_building_blocks(bb1, bb2, Net, Stacking, **kwargs)
 
-    def from_building_blocks(self,
-                             bb1: BuildingBlock,
-                             bb2: BuildingBlock,
-                             net: str,
-                             stacking: str,
-                             **kwargs):
+    def from_building_blocks(
+        self, bb1: BuildingBlock, bb2: BuildingBlock, net: str, stacking: str, **kwargs
+    ):
         """Creates a COF from the building blocks.
 
         Parameters
@@ -355,33 +351,35 @@ class Framework():
         COF : Framework
             The COF object
         """
-        self.name = f'{bb1.name}-{bb2.name}-{net}-{stacking}'
+        self.name = f"{bb1.name}-{bb2.name}-{net}-{stacking}"
         self.bb1_name = bb1.name
         self.bb2_name = bb2.name
         self.topology = net
         self.stacking = stacking
 
         # Check if the BB1 has the smiles attribute
-        if hasattr(bb1, 'smiles') and hasattr(bb2, 'smiles'):
-            self.smiles = f'{bb1.smiles}.{bb2.smiles}'
+        if hasattr(bb1, "smiles") and hasattr(bb2, "smiles"):
+            self.smiles = f"{bb1.smiles}.{bb2.smiles}"
         else:
-            print('WARNING: The smiles attribute is not available for the building blocks')
+            print(
+                "WARNING: The smiles attribute is not available for the building blocks"
+            )
 
         net_build_dict = {
-            'HCB': self.create_hcb_structure,
-            'HCB_A': self.create_hcb_a_structure,
-            'SQL': self.create_sql_structure,
-            'SQL_A': self.create_sql_a_structure,
-            'KGD': self.create_kgd_structure,
-            'HXL_A': self.create_hxl_a_structure,
-            'FXT': self.create_fxt_structure,
-            'FXT_A': self.create_fxt_a_structure,
-            'DIA': self.create_dia_structure,
-            'DIA_A': self.create_dia_a_structure,
-            'BOR': self.create_bor_structure,
-            'LON': self.create_lon_structure,
-            'LON_A': self.create_lon_a_structure,
-            }
+            "HCB": self.create_hcb_structure,
+            "HCB_A": self.create_hcb_a_structure,
+            "SQL": self.create_sql_structure,
+            "SQL_A": self.create_sql_a_structure,
+            "KGD": self.create_kgd_structure,
+            "HXL_A": self.create_hxl_a_structure,
+            "FXT": self.create_fxt_structure,
+            "FXT_A": self.create_fxt_a_structure,
+            "DIA": self.create_dia_structure,
+            "DIA_A": self.create_dia_a_structure,
+            "BOR": self.create_bor_structure,
+            "LON": self.create_lon_structure,
+            "LON_A": self.create_lon_a_structure,
+        }
 
         result = net_build_dict[net](bb1, bb2, stacking, **kwargs)
 
@@ -390,20 +388,22 @@ class Framework():
             self.atom_types,
             self.atom_pos,
             coords_are_cartesian=True,
-            site_properties={'source': self.atom_labels}
+            site_properties={"source": self.atom_labels},
         )
 
         self.bonds = get_bonds(structure, self.bond_threshold)
 
         return result
 
-    def save(self,
-             fmt: str = 'cif',
-             supercell: tuple = (1, 1, 1),
-             save_dir=None,
-             primitive=False,
-             save_bonds=True,
-             save_labels=False) -> None:
+    def save(
+        self,
+        fmt: str = "cif",
+        supercell: tuple = (1, 1, 1),
+        save_dir=None,
+        primitive=False,
+        save_bonds=True,
+        save_labels=False,
+    ) -> None:
         """
         Save the structure in a specif file format.
 
@@ -431,19 +431,19 @@ class Framework():
         """
 
         save_dict = {
-            'cjson': save_chemjson,
-            'cif': save_cif,
-            'xyz': save_xyz,
-            'turbomole': save_turbomole,
-            'vasp': save_vasp,
-            'xsf': save_xsf,
-            'pdb': save_pdb,
-            'pqr': save_pqr,
-            'qe': save_qe,
-            'gjf': save_gjf
-         }
+            "cjson": save_chemjson,
+            "cif": save_cif,
+            "xyz": save_xyz,
+            "turbomole": save_turbomole,
+            "vasp": save_vasp,
+            "xsf": save_xsf,
+            "pdb": save_pdb,
+            "pqr": save_pqr,
+            "qe": save_qe,
+            "gjf": save_gjf,
+        }
 
-        file_format_error = f'Format must be one of the following: {save_dict.keys()}'
+        file_format_error = f"Format must be one of the following: {save_dict.keys()}"
         assert fmt in save_dict.keys(), file_format_error
 
         if primitive:
@@ -455,7 +455,7 @@ class Framework():
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
         structure.make_supercell(supercell)
@@ -467,17 +467,20 @@ class Framework():
 
         structure_dict = structure.as_dict()
 
-        cell = structure_dict['lattice']['matrix']
+        cell = structure_dict["lattice"]["matrix"]
 
-        atom_types = [site['species'][0]['element'] for site in structure_dict['sites']]
-        atom_labels = [site['properties']['source'] for site in structure_dict['sites']]
+        atom_types = [site["species"][0]["element"] for site in structure_dict["sites"]]
+        atom_labels = [site["properties"]["source"] for site in structure_dict["sites"]]
 
         if save_labels:
-            atom_labels = ['{}{}_{}'.format(atom_types[i], i, atom_labels[i]) for i in range(len(atom_types))]
+            atom_labels = [
+                "{}{}_{}".format(atom_types[i], i, atom_labels[i])
+                for i in range(len(atom_types))
+            ]
         else:
             atom_labels = [atom_types[i] + str(i) for i in range(len(atom_types))]
 
-        atom_pos = [site['xyz'] for site in structure_dict['sites']]
+        atom_pos = [site["xyz"] for site in structure_dict["sites"]]
 
         if save_dir is None:
             save_path = self.out_path
@@ -486,21 +489,25 @@ class Framework():
 
         os.makedirs(save_path, exist_ok=True)
 
-        save_dict[fmt](path=save_path,
-                       file_name=self.name,
-                       cell=cell,
-                       atomTypes=atom_types,
-                       atomLabels=atom_labels,
-                       atomPos=atom_pos,
-                       bonds=bonds)
+        save_dict[fmt](
+            path=save_path,
+            file_name=self.name,
+            cell=cell,
+            atomTypes=atom_types,
+            atomLabels=atom_labels,
+            atomPos=atom_pos,
+            bonds=bonds,
+        )
 
-    def make_cubic(self,
-                   min_length=10,
-                   force_diagonal=False,
-                   force_90_degrees=True,
-                   min_atoms=None,
-                   max_atoms=None,
-                   angle_tolerance=1e-3):
+    def make_cubic(
+        self,
+        min_length=10,
+        force_diagonal=False,
+        force_90_degrees=True,
+        min_atoms=None,
+        max_atoms=None,
+        angle_tolerance=1e-3,
+    ):
         """
         Transform the primitive structure into a supercell with alpha, beta, and
         gamma equal to 90 degrees. The algorithm will iteratively increase the size
@@ -523,22 +530,25 @@ class Framework():
             The angle tolerance for the transformation (default is 1e-3)
         """
 
-        cubic_dict = CubicSupercellTransformation(
-            min_length=min_length,
-            force_90_degrees=force_90_degrees,
-            force_diagonal=force_diagonal,
-            min_atoms=min_atoms,
-            max_atoms=max_atoms,
-            angle_tolerance=angle_tolerance
-            ).apply_transformation(self.prim_structure).as_dict()
+        cubic_dict = (
+            CubicSupercellTransformation(
+                min_length=min_length,
+                force_90_degrees=force_90_degrees,
+                force_diagonal=force_diagonal,
+                min_atoms=min_atoms,
+                max_atoms=max_atoms,
+                angle_tolerance=angle_tolerance,
+            )
+            .apply_transformation(self.prim_structure)
+            .as_dict()
+        )
 
-        self.cellMatrix = np.array(cubic_dict['lattice']['matrix']).astype(float)
+        self.cellMatrix = np.array(cubic_dict["lattice"]["matrix"]).astype(float)
         self.cellParameters = cell_to_cellpar(self.cellMatrix)
 
-        self.atom_types = [i['label'] for i in cubic_dict['sites']]
-        self.atom_pos = [i['xyz'] for i in cubic_dict['sites']]
-        self.atom_labels = [i['properties']['source'] for i in cubic_dict['sites']]
-
+        self.atom_types = [i["label"] for i in cubic_dict["sites"]]
+        self.atom_pos = [i["xyz"] for i in cubic_dict["sites"]]
+        self.atom_labels = [i["properties"]["source"] for i in cubic_dict["sites"]]
 
     def to_ase(self):
         """
@@ -549,20 +559,22 @@ class Framework():
             symbols=self.atom_types,
             positions=self.atom_pos,
             cell=self.cellMatrix,
-            pbc=True
+            pbc=True,
         )
 
         return atoms
 
-# --------------- Net creation methods -------------------------- #
+    # --------------- Net creation methods -------------------------- #
 
-    def create_hcb_structure(self,
-                             BB_T3_A,
-                             BB_T3_B,
-                             stacking: str = 'AA',
-                             slab: float = 10.0,
-                             shift_vector: tuple = (1.0, 1.0, 0),
-                             tilt_angle: float = 5.0):
+    def create_hcb_structure(
+        self,
+        BB_T3_A,
+        BB_T3_B,
+        stacking: str = "AA",
+        slab: float = 10.0,
+        shift_vector: tuple = (1.0, 1.0, 0),
+        tilt_angle: float = 5.0,
+    ):
         """Creates a COF with HCB network.
 
         The HCB net is composed of two tripodal building blocks.
@@ -594,31 +606,33 @@ class Framework():
                 6. number of operation symmetry
         """
 
-        connectivity_error = 'Building block {} must present connectivity {} not {}'
+        connectivity_error = "Building block {} must present connectivity {} not {}"
 
         if BB_T3_A.connectivity != 3:
-            self.logger.error(connectivity_error.format('A', 3, BB_T3_A.connectivity))
+            self.logger.error(connectivity_error.format("A", 3, BB_T3_A.connectivity))
             raise BBConnectivityError(3, BB_T3_A.connectivity)
         if BB_T3_B.connectivity != 3:
-            self.logger.error(connectivity_error.format('B', 3, BB_T3_B.connectivity))
+            self.logger.error(connectivity_error.format("B", 3, BB_T3_B.connectivity))
             raise BBConnectivityError(3, BB_T3_B.connectivity)
 
-        self.name = f'{BB_T3_A.name}-{BB_T3_B.name}-HCB-{stacking}'
-        self.topology = 'HCB'
+        self.name = f"{BB_T3_A.name}-{BB_T3_B.name}-HCB-{stacking}"
+        self.topology = "HCB"
         self.staking = stacking
         self.dimension = 2
 
         self.charge = BB_T3_A.charge + BB_T3_B.charge
         self.chirality = BB_T3_A.chirality or BB_T3_B.chirality
 
-        self.logger.debug(f'Starting the creation of {self.name}')
+        self.logger.debug(f"Starting the creation of {self.name}")
 
         # Detect the bond atom from the connection groups type
         bond_atom = get_bond_atom(BB_T3_A.conector, BB_T3_B.conector)
 
-        self.logger.debug('{} detected as bond atom for groups {} and {}'.format(bond_atom,
-                                                                                 BB_T3_A.conector,
-                                                                                 BB_T3_B.conector))
+        self.logger.debug(
+            "{} detected as bond atom for groups {} and {}".format(
+                bond_atom, BB_T3_A.conector, BB_T3_B.conector
+            )
+        )
 
         # Replace "X" the building block
         BB_T3_A.replace_X(bond_atom)
@@ -634,20 +648,24 @@ class Framework():
         size = BB_T3_A.size[0] + BB_T3_B.size[0]
 
         # Calculate the delta size to add to the c parameter
-        delta_a = abs(max(np.transpose(BB_T3_A.atom_pos)[2])) + abs(min(np.transpose(BB_T3_A.atom_pos)[2]))
-        delta_b = abs(max(np.transpose(BB_T3_B.atom_pos)[2])) + abs(min(np.transpose(BB_T3_B.atom_pos)[2]))
+        delta_a = abs(max(np.transpose(BB_T3_A.atom_pos)[2])) + abs(
+            min(np.transpose(BB_T3_A.atom_pos)[2])
+        )
+        delta_b = abs(max(np.transpose(BB_T3_B.atom_pos)[2])) + abs(
+            min(np.transpose(BB_T3_B.atom_pos)[2])
+        )
 
         delta_max = max([delta_a, delta_b])
 
         # Calculate the cell parameters
-        a = topology_info['a'] * size
-        b = topology_info['b'] * size
-        c = topology_info['c'] + delta_max
-        alpha = topology_info['alpha']
-        beta = topology_info['beta']
-        gamma = topology_info['gamma']
+        a = topology_info["a"] * size
+        b = topology_info["b"] * size
+        c = topology_info["c"] + delta_max
+        alpha = topology_info["alpha"]
+        beta = topology_info["beta"]
+        gamma = topology_info["gamma"]
 
-        if self.stacking == 'A':
+        if self.stacking == "A":
             c = slab
 
         # Create the lattice
@@ -660,32 +678,28 @@ class Framework():
         self.atom_pos = []
 
         # Add the A1 building blocks to the structure
-        vertice_data = topology_info['vertices'][0]
+        vertice_data = topology_info["vertices"][0]
         self.atom_types += BB_T3_A.atom_types
-        vertice_pos = np.array(vertice_data['position'])*a
+        vertice_pos = np.array(vertice_data["position"]) * a
 
-        R_Matrix = R.from_euler('z',
-                                vertice_data['angle'],
-                                degrees=True).as_matrix()
+        R_Matrix = R.from_euler("z", vertice_data["angle"], degrees=True).as_matrix()
 
         rotated_pos = np.dot(BB_T3_A.atom_pos, R_Matrix) + vertice_pos
         self.atom_pos += rotated_pos.tolist()
 
-        self.atom_labels += ['C1' if i == 'C' else i for i in BB_T3_A.atom_labels]
+        self.atom_labels += ["C1" if i == "C" else i for i in BB_T3_A.atom_labels]
 
         # Add the A2 building block to the structure
-        vertice_data = topology_info['vertices'][1]
+        vertice_data = topology_info["vertices"][1]
         self.atom_types += BB_T3_B.atom_types
-        vertice_pos = np.array(vertice_data['position'])*a
+        vertice_pos = np.array(vertice_data["position"]) * a
 
-        R_Matrix = R.from_euler('z',
-                                vertice_data['angle'],
-                                degrees=True).as_matrix()
+        R_Matrix = R.from_euler("z", vertice_data["angle"], degrees=True).as_matrix()
 
         rotated_pos = np.dot(BB_T3_B.atom_pos, R_Matrix) + vertice_pos
         self.atom_pos += rotated_pos.tolist()
 
-        self.atom_labels += ['C2' if i == 'C' else i for i in BB_T3_B.atom_labels]
+        self.atom_labels += ["C2" if i == "C" else i for i in BB_T3_B.atom_labels]
 
         # Creates a pymatgen structure
         StartingFramework = Structure(
@@ -693,33 +707,36 @@ class Framework():
             self.atom_types,
             self.atom_pos,
             coords_are_cartesian=True,
-            site_properties={'source': self.atom_labels}
+            site_properties={"source": self.atom_labels},
         ).get_sorted_structure()
 
         # Translates the structure to the center of the cell
         StartingFramework.translate_sites(
-            range(len(StartingFramework.as_dict()['sites'])),
+            range(len(StartingFramework.as_dict()["sites"])),
             [0, 0, 0.5],
             frac_coords=True,
-            to_unit_cell=True)
+            to_unit_cell=True,
+        )
 
         dict_structure = StartingFramework.as_dict()
 
-        self.cellMatrix = np.array(dict_structure['lattice']['matrix']).astype(float)
+        self.cellMatrix = np.array(dict_structure["lattice"]["matrix"]).astype(float)
         self.cellParameters = cell_to_cellpar(self.cellMatrix)
 
-        self.atom_types = [i['label'] for i in dict_structure['sites']]
-        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
+        self.atom_types = [i["label"] for i in dict_structure["sites"]]
+        self.atom_pos = [i["xyz"] for i in dict_structure["sites"]]
+        self.atom_labels = [i["properties"]["source"] for i in dict_structure["sites"]]
 
-        if stacking == 'A' or stacking == 'AA':
+        if stacking == "A" or stacking == "AA":
             stacked_structure = StartingFramework
 
-        if stacking == 'AB1':
+        if stacking == "AB1":
             self.cellMatrix *= (1, 1, 2)
             self.cellParameters *= (1, 1, 2, 1, 1, 1)
 
-            self.atom_types = np.concatenate((self.atom_types, self.atom_types)).tolist()
+            self.atom_types = np.concatenate(
+                (self.atom_types, self.atom_types)
+            ).tolist()
             self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
             self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
 
@@ -728,7 +745,7 @@ class Framework():
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -736,17 +753,16 @@ class Framework():
 
             # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                [2/3, 1/3, 0.5],
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, [2 / 3, 1 / 3, 0.5], frac_coords=True, to_unit_cell=True
+            )
 
-        if stacking == 'AB2':
+        if stacking == "AB2":
             self.cellMatrix *= (1, 1, 2)
             self.cellParameters *= (1, 1, 2, 1, 1, 1)
 
-            self.atom_types = np.concatenate((self.atom_types, self.atom_types)).tolist()
+            self.atom_types = np.concatenate(
+                (self.atom_types, self.atom_types)
+            ).tolist()
             self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
             self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels))
 
@@ -755,7 +771,7 @@ class Framework():
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -763,26 +779,29 @@ class Framework():
 
             # Translate the second sheet by the vector [1/2, 0, 0.5] to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                [1/2, 0, 0.5],
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, [1 / 2, 0, 0.5], frac_coords=True, to_unit_cell=True
+            )
 
-        if stacking == 'ABC1':
+        if stacking == "ABC1":
             self.cellMatrix *= (1, 1, 3)
             self.cellParameters *= (1, 1, 3, 1, 1, 1)
 
-            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types)).tolist()
-            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
-            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
+            self.atom_types = np.concatenate(
+                (self.atom_types, self.atom_types, self.atom_types)
+            ).tolist()
+            self.atom_pos = np.concatenate(
+                (self.atom_pos, self.atom_pos, self.atom_pos)
+            )
+            self.atom_labels = np.concatenate(
+                (self.atom_labels, self.atom_labels, self.atom_labels)
+            )
 
             stacked_structure = Structure(
                 self.cellMatrix,
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -790,34 +809,34 @@ class Framework():
 
             # Translate the second sheet by the vector (2/3, 1/3, 0) to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                (2/3, 1/3, 1/3),
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, (2 / 3, 1 / 3, 1 / 3), frac_coords=True, to_unit_cell=True
+            )
 
             # Translate the third sheet by the vector (2/3, 1/3, 0) to generate the B positions
             stacked_structure.translate_sites(
-                C_list,
-                (4/3, 2/3, 2/3),
-                frac_coords=True,
-                to_unit_cell=True
+                C_list, (4 / 3, 2 / 3, 2 / 3), frac_coords=True, to_unit_cell=True
             )
 
-        if stacking == 'ABC2':
+        if stacking == "ABC2":
             self.cellMatrix *= (1, 1, 3)
             self.cellParameters *= (1, 1, 3, 1, 1, 1)
 
-            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
-            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
-            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
+            self.atom_types = np.concatenate(
+                (self.atom_types, self.atom_types, self.atom_types)
+            )
+            self.atom_pos = np.concatenate(
+                (self.atom_pos, self.atom_pos, self.atom_pos)
+            )
+            self.atom_labels = np.concatenate(
+                (self.atom_labels, self.atom_labels, self.atom_labels)
+            )
 
             stacked_structure = Structure(
                 self.cellMatrix,
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -825,21 +844,15 @@ class Framework():
 
             # Translate the second sheet by the vector (2/3, 1/3, 0) to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                (1/3, 0, 1/3),
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, (1 / 3, 0, 1 / 3), frac_coords=True, to_unit_cell=True
+            )
 
             # Translate the third sheet by the vector (2/3, 1/3, 0) to generate the B positions
             stacked_structure.translate_sites(
-                C_list,
-                (2/3, 0, 2/3),
-                frac_coords=True,
-                to_unit_cell=True
+                C_list, (2 / 3, 0, 2 / 3), frac_coords=True, to_unit_cell=True
             )
 
-        if stacking == 'AAl':
+        if stacking == "AAl":
             self.cellMatrix *= (1, 1, 2)
             self.cellParameters *= (1, 1, 2, 1, 1, 1)
 
@@ -853,7 +866,7 @@ class Framework():
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -861,26 +874,27 @@ class Framework():
 
             # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                [0, 0, 0.5],
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, [0, 0, 0.5], frac_coords=True, to_unit_cell=True
+            )
 
         # Create AA tilted stacking.
-        if stacking == 'AAt':
-            cell = StartingFramework.as_dict()['lattice']
+        if stacking == "AAt":
+            cell = StartingFramework.as_dict()["lattice"]
 
             # Shift the cell by the tilt angle
-            a_cell = cell['a']
-            b_cell = cell['b']
-            c_cell = cell['c'] * 2
-            alpha = cell['alpha'] - tilt_angle
-            beta = cell['beta'] - tilt_angle
-            gamma = cell['gamma']
+            a_cell = cell["a"]
+            b_cell = cell["b"]
+            c_cell = cell["c"] * 2
+            alpha = cell["alpha"] - tilt_angle
+            beta = cell["beta"] - tilt_angle
+            gamma = cell["gamma"]
 
-            self.cellMatrix = cellpar_to_cell([a_cell, b_cell, c_cell, alpha, beta, gamma])
-            self.cellParameters = np.array([a_cell, b_cell, c_cell, alpha, beta, gamma]).astype(float)
+            self.cellMatrix = cellpar_to_cell(
+                [a_cell, b_cell, c_cell, alpha, beta, gamma]
+            )
+            self.cellParameters = np.array(
+                [a_cell, b_cell, c_cell, alpha, beta, gamma]
+            ).astype(float)
 
             self.atom_types = np.concatenate((self.atom_types, self.atom_types))
             self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
@@ -891,7 +905,7 @@ class Framework():
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -899,35 +913,32 @@ class Framework():
 
             # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                [0, 0, 0.5],
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, [0, 0, 0.5], frac_coords=True, to_unit_cell=True
+            )
 
         dict_structure = stacked_structure.as_dict()
 
-        self.cellMatrix = np.array(dict_structure['lattice']['matrix']).astype(float)
+        self.cellMatrix = np.array(dict_structure["lattice"]["matrix"]).astype(float)
         self.cellParameters = cell_to_cellpar(self.cellMatrix)
 
-        self.atom_types = [i['label'] for i in dict_structure['sites']]
-        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
-        self.n_atoms = len(dict_structure['sites'])
+        self.atom_types = [i["label"] for i in dict_structure["sites"]]
+        self.atom_pos = [i["xyz"] for i in dict_structure["sites"]]
+        self.atom_labels = [i["properties"]["source"] for i in dict_structure["sites"]]
+        self.n_atoms = len(dict_structure["sites"])
         self.composition = stacked_structure.formula
 
         dist_matrix = StartingFramework.distance_matrix
 
         # Check if there are any atoms closer than 0.8 A
         for i in range(len(dist_matrix)):
-            for j in range(i+1, len(dist_matrix)):
+            for j in range(i + 1, len(dist_matrix)):
                 if dist_matrix[i][j] < self.dist_threshold:
                     raise BondLenghError(i, j, dist_matrix[i][j], self.dist_threshold)
 
         # Get the simmetry information of the generated structure
-        symm = SpacegroupAnalyzer(stacked_structure,
-                                  symprec=self.symm_tol,
-                                  angle_tolerance=self.angle_tol)
+        symm = SpacegroupAnalyzer(
+            stacked_structure, symprec=self.symm_tol, angle_tolerance=self.angle_tol
+        )
 
         try:
             self.prim_structure = symm.get_refined_structure(keep_site_properties=True)
@@ -943,36 +954,42 @@ class Framework():
         except Exception as e:
             self.logger.exception(e)
 
-            self.lattice_type = 'Triclinic'
-            self.space_group = 'P1'
-            self.space_group_n = '1'
+            self.lattice_type = "Triclinic"
+            self.space_group = "P1"
+            self.space_group_n = "1"
 
             symm_op = [1]
-            self.hall = 'P 1'
+            self.hall = "P 1"
 
-        symm_text = get_framework_symm_text(self.name,
-                                            str(self.lattice_type),
-                                            str(self.hall[0:2]),
-                                            str(self.space_group),
-                                            str(self.space_group_n),
-                                            len(symm_op))
+        symm_text = get_framework_symm_text(
+            self.name,
+            str(self.lattice_type),
+            str(self.hall[0:2]),
+            str(self.space_group),
+            str(self.space_group_n),
+            len(symm_op),
+        )
 
         self.logger.info(symm_text)
 
-        return [self.name,
-                str(self.lattice_type),
-                str(self.hall[0:2]),
-                str(self.space_group),
-                str(self.space_group_n),
-                len(symm_op)]
+        return [
+            self.name,
+            str(self.lattice_type),
+            str(self.hall[0:2]),
+            str(self.space_group),
+            str(self.space_group_n),
+            len(symm_op),
+        ]
 
-    def create_hcb_a_structure(self,
-                               BB_T3: str,
-                               BB_L2: str,
-                               stacking: str = 'AA',
-                               slab: float = 10.0,
-                               shift_vector: list = (1.0, 1.0, 0),
-                               tilt_angle: float = 5.0):
+    def create_hcb_a_structure(
+        self,
+        BB_T3: str,
+        BB_L2: str,
+        stacking: str = "AA",
+        slab: float = 10.0,
+        shift_vector: list = (1.0, 1.0, 0),
+        tilt_angle: float = 5.0,
+    ):
         """Creates a COF with HCB-A network.
 
         The HCB-A net is composed of one tripodal and one linear building blocks.
@@ -1008,30 +1025,32 @@ class Framework():
                 6. number of operation symmetry
         """
 
-        connectivity_error = 'Building block {} must present connectivity {} not {}'
+        connectivity_error = "Building block {} must present connectivity {} not {}"
         if BB_T3.connectivity != 3:
-            self.logger.error(connectivity_error.format('A', 3, BB_T3.connectivity))
+            self.logger.error(connectivity_error.format("A", 3, BB_T3.connectivity))
             raise BBConnectivityError(3, BB_T3.connectivity)
         if BB_L2.connectivity != 2:
-            self.logger.error(connectivity_error.format('B', 3, BB_L2.connectivity))
+            self.logger.error(connectivity_error.format("B", 3, BB_L2.connectivity))
             raise BBConnectivityError(2, BB_L2.connectivity)
 
-        self.name = f'{BB_T3.name}-{BB_L2.name}-HCB_A-{stacking}'
-        self.topology = 'HCB_A'
+        self.name = f"{BB_T3.name}-{BB_L2.name}-HCB_A-{stacking}"
+        self.topology = "HCB_A"
         self.staking = stacking
         self.dimension = 2
 
         self.charge = BB_L2.charge + BB_T3.charge
         self.chirality = BB_L2.chirality or BB_T3.chirality
 
-        self.logger.debug(f'Starting the creation of {self.name}')
+        self.logger.debug(f"Starting the creation of {self.name}")
 
         # Detect the bond atom from the connection groups type
         bond_atom = get_bond_atom(BB_T3.conector, BB_L2.conector)
 
-        self.logger.debug('{} detected as bond atom for groups {} and {}'.format(bond_atom,
-                                                                                 BB_T3.conector,
-                                                                                 BB_L2.conector))
+        self.logger.debug(
+            "{} detected as bond atom for groups {} and {}".format(
+                bond_atom, BB_T3.conector, BB_L2.conector
+            )
+        )
 
         # Replace "X" the building block
         BB_L2.replace_X(bond_atom)
@@ -1047,20 +1066,24 @@ class Framework():
         size = BB_T3.size[0] + BB_L2.size[0]
 
         # Calculate the delta size to add to the c parameter
-        delta_a = abs(max(np.transpose(BB_T3.atom_pos)[2])) + abs(min(np.transpose(BB_T3.atom_pos)[2]))
-        delta_b = abs(max(np.transpose(BB_L2.atom_pos)[2])) + abs(min(np.transpose(BB_L2.atom_pos)[2]))
+        delta_a = abs(max(np.transpose(BB_T3.atom_pos)[2])) + abs(
+            min(np.transpose(BB_T3.atom_pos)[2])
+        )
+        delta_b = abs(max(np.transpose(BB_L2.atom_pos)[2])) + abs(
+            min(np.transpose(BB_L2.atom_pos)[2])
+        )
 
         delta_max = max([delta_a, delta_b])
 
         # Calculate the cell parameters
-        a = topology_info['a'] * size
-        b = topology_info['b'] * size
-        c = topology_info['c'] + delta_max
-        alpha = topology_info['alpha']
-        beta = topology_info['beta']
-        gamma = topology_info['gamma']
+        a = topology_info["a"] * size
+        b = topology_info["b"] * size
+        c = topology_info["c"] + delta_max
+        alpha = topology_info["alpha"]
+        beta = topology_info["beta"]
+        gamma = topology_info["gamma"]
 
-        if self.stacking == 'A':
+        if self.stacking == "A":
             c = slab
 
         # Create the lattice
@@ -1073,57 +1096,61 @@ class Framework():
         self.atom_pos = []
 
         # Add the building blocks to the structure
-        for vertice_data in topology_info['vertices']:
+        for vertice_data in topology_info["vertices"]:
             self.atom_types += BB_T3.atom_types
-            vertice_pos = np.array(vertice_data['position'])*a
+            vertice_pos = np.array(vertice_data["position"]) * a
 
-            R_Matrix = R.from_euler('z', vertice_data['angle'], degrees=True).as_matrix()
+            R_Matrix = R.from_euler(
+                "z", vertice_data["angle"], degrees=True
+            ).as_matrix()
 
             rotated_pos = np.dot(BB_T3.atom_pos, R_Matrix) + vertice_pos
             self.atom_pos += rotated_pos.tolist()
 
-            self.atom_labels += ['C1' if i == 'C' else i for i in BB_T3.atom_labels]
+            self.atom_labels += ["C1" if i == "C" else i for i in BB_T3.atom_labels]
 
         # Add the building blocks to the structure
-        for edge_data in topology_info['edges']:
+        for edge_data in topology_info["edges"]:
             self.atom_types += BB_L2.atom_types
 
-            R_Matrix = R.from_euler('z', edge_data['angle'], degrees=True).as_matrix()
+            R_Matrix = R.from_euler("z", edge_data["angle"], degrees=True).as_matrix()
 
-            rotated_pos = np.dot(BB_L2.atom_pos, R_Matrix) + np.array(edge_data['position'])*a
+            rotated_pos = (
+                np.dot(BB_L2.atom_pos, R_Matrix) + np.array(edge_data["position"]) * a
+            )
 
             self.atom_pos += rotated_pos.tolist()
 
-            self.atom_labels += ['C2' if i == 'C' else i for i in BB_L2.atom_labels]
+            self.atom_labels += ["C2" if i == "C" else i for i in BB_L2.atom_labels]
 
         StartingFramework = Structure(
             self.cellMatrix,
             self.atom_types,
             self.atom_pos,
             coords_are_cartesian=True,
-            site_properties={'source': self.atom_labels}
+            site_properties={"source": self.atom_labels},
         ).get_sorted_structure()
 
         # Translates the structure to the center of the cell
         StartingFramework.translate_sites(
-            range(len(StartingFramework.as_dict()['sites'])),
+            range(len(StartingFramework.as_dict()["sites"])),
             [0, 0, 0.5],
             frac_coords=True,
-            to_unit_cell=True
+            to_unit_cell=True,
         )
 
         dict_structure = StartingFramework.as_dict()
 
-        self.cellMatrix = np.array(dict_structure['lattice']['matrix']).astype(float)
+        self.cellMatrix = np.array(dict_structure["lattice"]["matrix"]).astype(float)
 
-        self.atom_types = [i['label'] for i in dict_structure['sites']]
-        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
+        self.atom_types = [i["label"] for i in dict_structure["sites"]]
+        self.atom_pos = [i["xyz"] for i in dict_structure["sites"]]
+        self.atom_labels = [i["properties"]["source"] for i in dict_structure["sites"]]
 
-        if stacking == 'A' or stacking == 'AA':
+        if stacking == "A" or stacking == "AA":
             stacked_structure = StartingFramework
 
-        if stacking == 'AB1':
+        if stacking == "AB1":
             self.cellMatrix *= (1, 1, 2)
             self.cellParameters *= (1, 1, 2, 1, 1, 1)
 
@@ -1136,7 +1163,7 @@ class Framework():
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -1144,13 +1171,10 @@ class Framework():
 
             # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                [2/3, 1/3, 0.5],
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, [2 / 3, 1 / 3, 0.5], frac_coords=True, to_unit_cell=True
+            )
 
-        if stacking == 'AB2':
+        if stacking == "AB2":
             self.cellMatrix *= (1, 1, 2)
             self.cellParameters *= (1, 1, 2, 1, 1, 1)
 
@@ -1163,7 +1187,7 @@ class Framework():
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -1171,26 +1195,29 @@ class Framework():
 
             # Translate the second sheet by the vector [1/2, 0, 0.5] to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                [1/2, 0, 0.5],
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, [1 / 2, 0, 0.5], frac_coords=True, to_unit_cell=True
+            )
 
-        if stacking == 'ABC1':
+        if stacking == "ABC1":
             self.cellMatrix *= (1, 1, 3)
             self.cellParameters *= (1, 1, 3, 1, 1, 1)
 
-            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
-            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
-            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
+            self.atom_types = np.concatenate(
+                (self.atom_types, self.atom_types, self.atom_types)
+            )
+            self.atom_pos = np.concatenate(
+                (self.atom_pos, self.atom_pos, self.atom_pos)
+            )
+            self.atom_labels = np.concatenate(
+                (self.atom_labels, self.atom_labels, self.atom_labels)
+            )
 
             stacked_structure = Structure(
                 self.cellMatrix,
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -1198,34 +1225,34 @@ class Framework():
 
             # Translate the second sheet by the vector (2/3, 1/3, 0) to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                (2/3, 1/3, 1/3),
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, (2 / 3, 1 / 3, 1 / 3), frac_coords=True, to_unit_cell=True
+            )
 
             # Translate the third sheet by the vector (2/3, 1/3, 0) to generate the B positions
             stacked_structure.translate_sites(
-                C_list,
-                (4/3, 2/3, 2/3),
-                frac_coords=True,
-                to_unit_cell=True
+                C_list, (4 / 3, 2 / 3, 2 / 3), frac_coords=True, to_unit_cell=True
             )
 
-        if stacking == 'ABC2':
+        if stacking == "ABC2":
             self.cellMatrix *= (1, 1, 3)
             self.cellParameters *= (1, 1, 3, 1, 1, 1)
 
-            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
-            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
-            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
+            self.atom_types = np.concatenate(
+                (self.atom_types, self.atom_types, self.atom_types)
+            )
+            self.atom_pos = np.concatenate(
+                (self.atom_pos, self.atom_pos, self.atom_pos)
+            )
+            self.atom_labels = np.concatenate(
+                (self.atom_labels, self.atom_labels, self.atom_labels)
+            )
 
             stacked_structure = Structure(
                 self.cellMatrix,
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -1233,21 +1260,15 @@ class Framework():
 
             # Translate the second sheet by the vector (2/3, 1/3, 0) to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                (1/3, 0, 1/3),
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, (1 / 3, 0, 1 / 3), frac_coords=True, to_unit_cell=True
+            )
 
             # Translate the third sheet by the vector (2/3, 1/3, 0) to generate the B positions
             stacked_structure.translate_sites(
-                C_list,
-                (2/3, 0, 2/3),
-                frac_coords=True,
-                to_unit_cell=True
+                C_list, (2 / 3, 0, 2 / 3), frac_coords=True, to_unit_cell=True
             )
 
-        if stacking == 'AAl':
+        if stacking == "AAl":
             self.cellMatrix *= (1, 1, 2)
             self.cellParameters *= (1, 1, 2, 1, 1, 1)
 
@@ -1261,7 +1282,7 @@ class Framework():
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -1269,26 +1290,27 @@ class Framework():
 
             # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                [0, 0, 0.5],
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, [0, 0, 0.5], frac_coords=True, to_unit_cell=True
+            )
 
         # Create AA tilted stacking.
-        if stacking == 'AAt':
-            cell = StartingFramework.as_dict()['lattice']
+        if stacking == "AAt":
+            cell = StartingFramework.as_dict()["lattice"]
 
             # Shift the cell by the tilt angle
-            a_cell = cell['a']
-            b_cell = cell['b']
-            c_cell = cell['c'] * 2
-            alpha = cell['alpha'] - tilt_angle
-            beta = cell['beta'] - tilt_angle
-            gamma = cell['gamma']
+            a_cell = cell["a"]
+            b_cell = cell["b"]
+            c_cell = cell["c"] * 2
+            alpha = cell["alpha"] - tilt_angle
+            beta = cell["beta"] - tilt_angle
+            gamma = cell["gamma"]
 
-            self.cellMatrix = cellpar_to_cell([a_cell, b_cell, c_cell, alpha, beta, gamma])
-            self.cellParameters = np.array([a_cell, b_cell, c_cell, alpha, beta, gamma]).astype(float)
+            self.cellMatrix = cellpar_to_cell(
+                [a_cell, b_cell, c_cell, alpha, beta, gamma]
+            )
+            self.cellParameters = np.array(
+                [a_cell, b_cell, c_cell, alpha, beta, gamma]
+            ).astype(float)
 
             self.atom_types = np.concatenate((self.atom_types, self.atom_types))
             self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
@@ -1299,7 +1321,7 @@ class Framework():
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -1307,34 +1329,31 @@ class Framework():
 
             # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                [0, 0, 0.5],
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, [0, 0, 0.5], frac_coords=True, to_unit_cell=True
+            )
 
         dict_structure = stacked_structure.as_dict()
 
-        self.cellMatrix = np.array(dict_structure['lattice']['matrix']).astype(float)
+        self.cellMatrix = np.array(dict_structure["lattice"]["matrix"]).astype(float)
 
-        self.atom_types = [i['label'] for i in dict_structure['sites']]
-        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
-        self.n_atoms = len(dict_structure['sites'])
+        self.atom_types = [i["label"] for i in dict_structure["sites"]]
+        self.atom_pos = [i["xyz"] for i in dict_structure["sites"]]
+        self.atom_labels = [i["properties"]["source"] for i in dict_structure["sites"]]
+        self.n_atoms = len(dict_structure["sites"])
         self.composition = stacked_structure.formula
 
         dist_matrix = stacked_structure.distance_matrix
 
         # Check if there are any atoms closer than 0.8 A
         for i in range(len(dist_matrix)):
-            for j in range(i+1, len(dist_matrix)):
+            for j in range(i + 1, len(dist_matrix)):
                 if dist_matrix[i][j] < self.dist_threshold:
                     raise BondLenghError(i, j, dist_matrix[i][j], self.dist_threshold)
 
         # Get the simmetry information of the generated structure
-        symm = SpacegroupAnalyzer(stacked_structure,
-                                  symprec=self.symm_tol,
-                                  angle_tolerance=self.angle_tol)
+        symm = SpacegroupAnalyzer(
+            stacked_structure, symprec=self.symm_tol, angle_tolerance=self.angle_tol
+        )
 
         try:
             self.prim_structure = symm.get_refined_structure(keep_site_properties=True)
@@ -1351,36 +1370,42 @@ class Framework():
         except Exception as e:
             self.logger.exception(e)
 
-            self.lattice_type = 'Triclinic'
-            self.space_group = 'P1'
-            self.space_group_n = '1'
+            self.lattice_type = "Triclinic"
+            self.space_group = "P1"
+            self.space_group_n = "1"
 
             symm_op = [1]
-            self.hall = 'P 1'
+            self.hall = "P 1"
 
-        symm_text = get_framework_symm_text(self.name,
-                                            str(self.lattice_type),
-                                            str(self.hall[0:2]),
-                                            str(self.space_group),
-                                            str(self.space_group_n),
-                                            len(symm_op))
+        symm_text = get_framework_symm_text(
+            self.name,
+            str(self.lattice_type),
+            str(self.hall[0:2]),
+            str(self.space_group),
+            str(self.space_group_n),
+            len(symm_op),
+        )
 
         self.logger.info(symm_text)
 
-        return [self.name,
-                str(self.lattice_type),
-                str(self.hall[0:2]),
-                str(self.space_group),
-                str(self.space_group_n),
-                len(symm_op)]
+        return [
+            self.name,
+            str(self.lattice_type),
+            str(self.hall[0:2]),
+            str(self.space_group),
+            str(self.space_group_n),
+            len(symm_op),
+        ]
 
-    def create_sql_structure(self,
-                             BB_A: str,
-                             BB_B: str,
-                             stacking: str = 'AA',
-                             slab: float = 10.0,
-                             shift_vector: list = (1.0, 1.0, 0),
-                             tilt_angle: float = 5.0):
+    def create_sql_structure(
+        self,
+        BB_A: str,
+        BB_B: str,
+        stacking: str = "AA",
+        slab: float = 10.0,
+        shift_vector: list = (1.0, 1.0, 0),
+        tilt_angle: float = 5.0,
+    ):
         """Creates a COF with SQL network.
 
         The SQL net is composed of two tetrapodal building blocks.
@@ -1414,23 +1439,23 @@ class Framework():
                 6. number of operation symmetry
         """
 
-        connectivity_error = 'Building block {} must present connectivity {} not {}'
+        connectivity_error = "Building block {} must present connectivity {} not {}"
         if BB_A.connectivity != 4:
-            self.logger.error(connectivity_error.format('A', 4, BB_A.connectivity))
+            self.logger.error(connectivity_error.format("A", 4, BB_A.connectivity))
             raise BBConnectivityError(4, BB_A.connectivity)
         if BB_B.connectivity != 4:
-            self.logger.error(connectivity_error.format('B', 4, BB_B.connectivity))
+            self.logger.error(connectivity_error.format("B", 4, BB_B.connectivity))
             raise BBConnectivityError(4, BB_B.connectivity)
 
-        self.name = f'{BB_A.name}-{BB_B.name}-SQL-{stacking}'
-        self.topology = 'SQL'
+        self.name = f"{BB_A.name}-{BB_B.name}-SQL-{stacking}"
+        self.topology = "SQL"
         self.staking = stacking
         self.dimension = 2
 
         self.charge = BB_A.charge + BB_B.charge
         self.chirality = BB_A.chirality or BB_B.chirality
 
-        self.logger.debug(f'Starting the creation of {self.name}')
+        self.logger.debug(f"Starting the creation of {self.name}")
 
         # Get the positions of the "X" atoms
         _, X_A = BB_A.get_X_points()
@@ -1443,9 +1468,11 @@ class Framework():
         # Detect the bond atom from the connection groups type
         bond_atom = get_bond_atom(BB_A.conector, BB_B.conector)
 
-        self.logger.debug('{} detected as bond atom for groups {} and {}'.format(bond_atom,
-                                                                                 BB_A.conector,
-                                                                                 BB_B.conector))
+        self.logger.debug(
+            "{} detected as bond atom for groups {} and {}".format(
+                bond_atom, BB_A.conector, BB_B.conector
+            )
+        )
 
         # Replace "X" the building block
         BB_A.replace_X(bond_atom)
@@ -1458,24 +1485,34 @@ class Framework():
         topology_info = TOPOLOGY_DICT[self.topology]
 
         # Measure the base size of the building blocks
-        size_A = (np.abs(BB_A.size[0] * np.sin(alpha_A)) + np.abs(BB_B.size[0] * np.cos(alpha_B))) * 2
-        size_B = (np.abs(BB_A.size[0] * np.cos(alpha_A)) + np.abs(BB_B.size[0] * np.cos(alpha_B))) * 2
+        size_A = (
+            np.abs(BB_A.size[0] * np.sin(alpha_A))
+            + np.abs(BB_B.size[0] * np.cos(alpha_B))
+        ) * 2
+        size_B = (
+            np.abs(BB_A.size[0] * np.cos(alpha_A))
+            + np.abs(BB_B.size[0] * np.cos(alpha_B))
+        ) * 2
 
         # Calculate the delta size to add to the c parameter
-        delta_a = abs(max(np.transpose(BB_A.atom_pos)[2])) + abs(min(np.transpose(BB_B.atom_pos)[2]))
-        delta_b = abs(max(np.transpose(BB_A.atom_pos)[2])) + abs(min(np.transpose(BB_B.atom_pos)[2]))
+        delta_a = abs(max(np.transpose(BB_A.atom_pos)[2])) + abs(
+            min(np.transpose(BB_B.atom_pos)[2])
+        )
+        delta_b = abs(max(np.transpose(BB_A.atom_pos)[2])) + abs(
+            min(np.transpose(BB_B.atom_pos)[2])
+        )
 
         delta_max = max([delta_a, delta_b])
 
         # Calculate the cell parameters
-        a = topology_info['a'] * size_A
-        b = topology_info['b'] * size_B
-        c = topology_info['c'] + delta_max
-        alpha = topology_info['alpha']
-        beta = topology_info['beta']
-        gamma = topology_info['gamma']
+        a = topology_info["a"] * size_A
+        b = topology_info["b"] * size_B
+        c = topology_info["c"] + delta_max
+        alpha = topology_info["alpha"]
+        beta = topology_info["beta"]
+        gamma = topology_info["gamma"]
 
-        if self.stacking == 'A':
+        if self.stacking == "A":
             c = slab
 
         # Create the lattice
@@ -1491,52 +1528,52 @@ class Framework():
         self.atom_types += BB_A.atom_types
         vertice_pos = np.array([0, 0, 0])
 
-        R_Matrix = R.from_euler('z', -alpha_A, degrees=False).as_matrix()
+        R_Matrix = R.from_euler("z", -alpha_A, degrees=False).as_matrix()
 
         rotated_pos = np.dot(BB_A.atom_pos, R_Matrix)
         self.atom_pos += rotated_pos.tolist()
 
-        self.atom_labels += ['C1' if i == 'C' else i for i in BB_A.atom_labels]
+        self.atom_labels += ["C1" if i == "C" else i for i in BB_A.atom_labels]
 
         # Add the second building block to the structure
         self.atom_types += BB_B.atom_types
-        vertice_pos = np.array([a/2, b/2, 0])
+        vertice_pos = np.array([a / 2, b / 2, 0])
 
-        R_Matrix = R.from_euler('z', -alpha_B, degrees=False).as_matrix()
+        R_Matrix = R.from_euler("z", -alpha_B, degrees=False).as_matrix()
 
         rotated_pos = np.dot(BB_B.atom_pos, R_Matrix) + vertice_pos
         self.atom_pos += rotated_pos.tolist()
 
-        self.atom_labels += ['C2' if i == 'C' else i for i in BB_B.atom_labels]
+        self.atom_labels += ["C2" if i == "C" else i for i in BB_B.atom_labels]
 
         StartingFramework = Structure(
             self.cellMatrix,
             self.atom_types,
             self.atom_pos,
             coords_are_cartesian=True,
-            site_properties={'source': self.atom_labels}
+            site_properties={"source": self.atom_labels},
         ).get_sorted_structure()
 
         # Translates the structure to the center of the cell
         StartingFramework.translate_sites(
-            range(len(StartingFramework.as_dict()['sites'])),
+            range(len(StartingFramework.as_dict()["sites"])),
             [0, 0, 0.5],
             frac_coords=True,
-            to_unit_cell=True
+            to_unit_cell=True,
         )
 
         dict_structure = StartingFramework.as_dict()
 
-        self.cellMatrix = np.array(dict_structure['lattice']['matrix']).astype(float)
+        self.cellMatrix = np.array(dict_structure["lattice"]["matrix"]).astype(float)
 
-        self.atom_types = [i['label'] for i in dict_structure['sites']]
-        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
+        self.atom_types = [i["label"] for i in dict_structure["sites"]]
+        self.atom_pos = [i["xyz"] for i in dict_structure["sites"]]
+        self.atom_labels = [i["properties"]["source"] for i in dict_structure["sites"]]
 
-        if stacking == 'A' or stacking == 'AA':
+        if stacking == "A" or stacking == "AA":
             stacked_structure = StartingFramework
 
-        if stacking == 'AB1':
+        if stacking == "AB1":
 
             self.cellMatrix *= (1, 1, 2)
             self.cellParameters *= (1, 1, 2, 1, 1, 1)
@@ -1550,7 +1587,7 @@ class Framework():
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -1558,13 +1595,10 @@ class Framework():
 
             # Translate the second sheet by the vector [1/4, 1/4, 0.5] to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                [1/4, 1/4, 0.5],
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, [1 / 4, 1 / 4, 0.5], frac_coords=True, to_unit_cell=True
+            )
 
-        if stacking == 'AB2':
+        if stacking == "AB2":
             self.cellMatrix *= (1, 1, 2)
             self.cellParameters *= (1, 1, 2, 1, 1, 1)
 
@@ -1577,7 +1611,7 @@ class Framework():
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -1585,27 +1619,30 @@ class Framework():
 
             # Translate the second sheet by the vector [1/2, 0, 0.5] to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                [1/2, 0, 0.5],
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, [1 / 2, 0, 0.5], frac_coords=True, to_unit_cell=True
+            )
 
-        if stacking == 'ABC1':
+        if stacking == "ABC1":
 
             self.cellMatrix *= (1, 1, 3)
             self.cellParameters *= (1, 1, 3, 1, 1, 1)
 
-            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
-            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
-            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
+            self.atom_types = np.concatenate(
+                (self.atom_types, self.atom_types, self.atom_types)
+            )
+            self.atom_pos = np.concatenate(
+                (self.atom_pos, self.atom_pos, self.atom_pos)
+            )
+            self.atom_labels = np.concatenate(
+                (self.atom_labels, self.atom_labels, self.atom_labels)
+            )
 
             stacked_structure = Structure(
                 self.cellMatrix,
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -1613,34 +1650,34 @@ class Framework():
 
             # Translate the second sheet by the vector (1/3, 1/3, 0) to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                (1/3, 1/3, 1/3),
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, (1 / 3, 1 / 3, 1 / 3), frac_coords=True, to_unit_cell=True
+            )
 
             # Translate the third sheet by the vector (2/3, 2/3, 0) to generate the B positions
             stacked_structure.translate_sites(
-                C_list,
-                (2/3, 2/3, 2/3),
-                frac_coords=True,
-                to_unit_cell=True
+                C_list, (2 / 3, 2 / 3, 2 / 3), frac_coords=True, to_unit_cell=True
             )
 
-        if stacking == 'ABC2':
+        if stacking == "ABC2":
             self.cellMatrix *= (1, 1, 3)
             self.cellParameters *= (1, 1, 3, 1, 1, 1)
 
-            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
-            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
-            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
+            self.atom_types = np.concatenate(
+                (self.atom_types, self.atom_types, self.atom_types)
+            )
+            self.atom_pos = np.concatenate(
+                (self.atom_pos, self.atom_pos, self.atom_pos)
+            )
+            self.atom_labels = np.concatenate(
+                (self.atom_labels, self.atom_labels, self.atom_labels)
+            )
 
             stacked_structure = Structure(
                 self.cellMatrix,
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -1648,23 +1685,17 @@ class Framework():
 
             # Translate the second sheet by the vector (1/3, 1/3, 0) to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                (1/3, 0, 1/3),
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, (1 / 3, 0, 1 / 3), frac_coords=True, to_unit_cell=True
+            )
 
             # Translate the third sheet by the vector (2/3, 2/3, 0) to generate the B positions
             stacked_structure.translate_sites(
-                C_list,
-                (2/3, 0, 2/3),
-                frac_coords=True,
-                to_unit_cell=True
+                C_list, (2 / 3, 0, 2 / 3), frac_coords=True, to_unit_cell=True
             )
 
         # Create AAl stacking. Tetragonal cell with two sheets
         # per cell shifited by the shift_vector in angstroms.
-        if stacking == 'AAl':
+        if stacking == "AAl":
             self.cellMatrix *= (1, 1, 2)
             self.cellParameters *= (1, 1, 2, 1, 1, 1)
 
@@ -1678,7 +1709,7 @@ class Framework():
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -1686,27 +1717,28 @@ class Framework():
 
             # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                [0, 0, 0.5],
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, [0, 0, 0.5], frac_coords=True, to_unit_cell=True
+            )
 
         # Create AA tilted stacking.
         # Tilted tetragonal cell with two sheets per cell tilted by tilt_angle.
-        if stacking == 'AAt':
-            cell = StartingFramework.as_dict()['lattice']
+        if stacking == "AAt":
+            cell = StartingFramework.as_dict()["lattice"]
 
             # Shift the cell by the tilt angle
-            a_cell = cell['a']
-            b_cell = cell['b']
-            c_cell = cell['c'] * 2
-            alpha = cell['alpha'] - tilt_angle
-            beta = cell['beta'] - tilt_angle
-            gamma = cell['gamma']
+            a_cell = cell["a"]
+            b_cell = cell["b"]
+            c_cell = cell["c"] * 2
+            alpha = cell["alpha"] - tilt_angle
+            beta = cell["beta"] - tilt_angle
+            gamma = cell["gamma"]
 
-            self.cellMatrix = cellpar_to_cell([a_cell, b_cell, c_cell, alpha, beta, gamma])
-            self.cellParameters = np.array([a_cell, b_cell, c_cell, alpha, beta, gamma]).astype(float)
+            self.cellMatrix = cellpar_to_cell(
+                [a_cell, b_cell, c_cell, alpha, beta, gamma]
+            )
+            self.cellParameters = np.array(
+                [a_cell, b_cell, c_cell, alpha, beta, gamma]
+            ).astype(float)
 
             self.atom_types = np.concatenate((self.atom_types, self.atom_types))
             self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
@@ -1717,7 +1749,7 @@ class Framework():
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -1725,34 +1757,31 @@ class Framework():
 
             # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                [0, 0, 0.5],
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, [0, 0, 0.5], frac_coords=True, to_unit_cell=True
+            )
 
         dict_structure = stacked_structure.as_dict()
 
-        self.cellMatrix = np.array(dict_structure['lattice']['matrix']).astype(float)
+        self.cellMatrix = np.array(dict_structure["lattice"]["matrix"]).astype(float)
 
-        self.atom_types = [i['label'] for i in dict_structure['sites']]
-        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
-        self.n_atoms = len(dict_structure['sites'])
+        self.atom_types = [i["label"] for i in dict_structure["sites"]]
+        self.atom_pos = [i["xyz"] for i in dict_structure["sites"]]
+        self.atom_labels = [i["properties"]["source"] for i in dict_structure["sites"]]
+        self.n_atoms = len(dict_structure["sites"])
         self.composition = stacked_structure.formula
 
         dist_matrix = stacked_structure.distance_matrix
 
         # Check if there are any atoms closer than 0.8 A
         for i in range(len(dist_matrix)):
-            for j in range(i+1, len(dist_matrix)):
+            for j in range(i + 1, len(dist_matrix)):
                 if dist_matrix[i][j] < self.dist_threshold:
                     raise BondLenghError(i, j, dist_matrix[i][j], self.dist_threshold)
 
         # Get the simmetry information of the generated structure
-        symm = SpacegroupAnalyzer(stacked_structure,
-                                  symprec=self.symm_tol,
-                                  angle_tolerance=self.angle_tol)
+        symm = SpacegroupAnalyzer(
+            stacked_structure, symprec=self.symm_tol, angle_tolerance=self.angle_tol
+        )
 
         try:
             self.prim_structure = symm.get_refined_structure(keep_site_properties=True)
@@ -1769,37 +1798,43 @@ class Framework():
         except Exception as e:
             self.logger.exception(e)
 
-            self.lattice_type = 'Triclinic'
-            self.space_group = 'P1'
-            self.space_group_n = '1'
+            self.lattice_type = "Triclinic"
+            self.space_group = "P1"
+            self.space_group_n = "1"
 
             symm_op = [1]
-            self.hall = 'P 1'
+            self.hall = "P 1"
 
-        symm_text = get_framework_symm_text(self.name,
-                                            str(self.lattice_type),
-                                            str(self.hall[0:2]),
-                                            str(self.space_group),
-                                            str(self.space_group_n),
-                                            len(symm_op))
+        symm_text = get_framework_symm_text(
+            self.name,
+            str(self.lattice_type),
+            str(self.hall[0:2]),
+            str(self.space_group),
+            str(self.space_group_n),
+            len(symm_op),
+        )
 
         self.logger.info(symm_text)
 
-        return [self.name,
-                str(self.lattice_type),
-                str(self.hall[0:2]),
-                str(self.space_group),
-                str(self.space_group_n),
-                len(symm_op)]
+        return [
+            self.name,
+            str(self.lattice_type),
+            str(self.hall[0:2]),
+            str(self.space_group),
+            str(self.space_group_n),
+            len(symm_op),
+        ]
 
-    def create_sql_a_structure(self,
-                               BB_S4: str,
-                               BB_L2: str,
-                               stacking: str = 'AA',
-                               c_parameter_base: float = 3.6,
-                               slab: float = 10.0,
-                               shift_vector: list = (1.0, 1.0, 0),
-                               tilt_angle: float = 5.0):
+    def create_sql_a_structure(
+        self,
+        BB_S4: str,
+        BB_L2: str,
+        stacking: str = "AA",
+        c_parameter_base: float = 3.6,
+        slab: float = 10.0,
+        shift_vector: list = (1.0, 1.0, 0),
+        tilt_angle: float = 5.0,
+    ):
         """Creates a COF with SQL-A network.
 
         The SQL-A net is composed of one tetrapodal and one linear building blocks.
@@ -1831,23 +1866,23 @@ class Framework():
                 6. number of operation symmetry
         """
 
-        connectivity_error = 'Building block {} must present connectivity {} not {}'
+        connectivity_error = "Building block {} must present connectivity {} not {}"
         if BB_S4.connectivity != 4:
-            self.logger.error(connectivity_error.format('A', 4, BB_S4.connectivity))
+            self.logger.error(connectivity_error.format("A", 4, BB_S4.connectivity))
             raise BBConnectivityError(4, BB_S4.connectivity)
         if BB_L2.connectivity != 2:
-            self.logger.error(connectivity_error.format('B', 3, BB_L2.connectivity))
+            self.logger.error(connectivity_error.format("B", 3, BB_L2.connectivity))
             raise BBConnectivityError(2, BB_L2.connectivity)
 
-        self.name = f'{BB_S4.name}-{BB_L2.name}-SQL_A-{stacking}'
-        self.topology = 'SQL_A'
+        self.name = f"{BB_S4.name}-{BB_L2.name}-SQL_A-{stacking}"
+        self.topology = "SQL_A"
         self.staking = stacking
         self.dimension = 2
 
         self.charge = BB_S4.charge + BB_L2.charge
         self.chirality = BB_S4.chirality or BB_L2.chirality
 
-        self.logger.debug(f'Starting the creation of {self.name}')
+        self.logger.debug(f"Starting the creation of {self.name}")
 
         # Get the position of the "X" atoms
         _, X_S4 = BB_S4.get_X_points()
@@ -1858,9 +1893,11 @@ class Framework():
         # Detect the bond atom from the connection groups type
         bond_atom = get_bond_atom(BB_S4.conector, BB_L2.conector)
 
-        self.logger.debug('{} detected as bond atom for groups {} and {}'.format(bond_atom,
-                                                                                 BB_S4.conector,
-                                                                                 BB_L2.conector))
+        self.logger.debug(
+            "{} detected as bond atom for groups {} and {}".format(
+                bond_atom, BB_S4.conector, BB_L2.conector
+            )
+        )
 
         # Replace "X" the building block
         BB_L2.replace_X(bond_atom)
@@ -1877,20 +1914,24 @@ class Framework():
         size_B = ((BB_S4.size[0] + BB_L2.size[0]) * np.abs(np.cos(alpha_S4))) * 4
 
         # Calculate the delta size to add to the c parameter
-        delta_a = abs(max(np.transpose(BB_S4.atom_pos)[2])) + abs(min(np.transpose(BB_S4.atom_pos)[2]))
-        delta_b = abs(max(np.transpose(BB_L2.atom_pos)[2])) + abs(min(np.transpose(BB_L2.atom_pos)[2]))
+        delta_a = abs(max(np.transpose(BB_S4.atom_pos)[2])) + abs(
+            min(np.transpose(BB_S4.atom_pos)[2])
+        )
+        delta_b = abs(max(np.transpose(BB_L2.atom_pos)[2])) + abs(
+            min(np.transpose(BB_L2.atom_pos)[2])
+        )
 
         delta_max = max([delta_a, delta_b])
 
         # Calculate the cell parameters
-        a = topology_info['a'] * size_A
-        b = topology_info['b'] * size_B
-        c = topology_info['c'] + delta_max
-        alpha = topology_info['alpha']
-        beta = topology_info['beta']
-        gamma = topology_info['gamma']
+        a = topology_info["a"] * size_A
+        b = topology_info["b"] * size_B
+        c = topology_info["c"] + delta_max
+        alpha = topology_info["alpha"]
+        beta = topology_info["beta"]
+        gamma = topology_info["gamma"]
 
-        if self.stacking == 'A':
+        if self.stacking == "A":
             c = slab
 
         # Create the lattice
@@ -1903,59 +1944,59 @@ class Framework():
         self.atom_pos = []
 
         # Add the S4 building blocks to the structure
-        for vertice_data in topology_info['vertices']:
+        for vertice_data in topology_info["vertices"]:
             self.atom_types += BB_S4.atom_types
-            vertice_pos = np.array(vertice_data['position']) * np.array([a, b, c])
+            vertice_pos = np.array(vertice_data["position"]) * np.array([a, b, c])
 
-            R_Matrix = R.from_euler('z', -alpha_S4, degrees=False).as_matrix()
+            R_Matrix = R.from_euler("z", -alpha_S4, degrees=False).as_matrix()
 
             rotated_pos = np.dot(BB_S4.atom_pos, R_Matrix) + vertice_pos
             self.atom_pos += rotated_pos.tolist()
 
-            self.atom_labels += ['C1' if i == 'C' else i for i in BB_S4.atom_labels]
+            self.atom_labels += ["C1" if i == "C" else i for i in BB_S4.atom_labels]
 
         L2_angle_list = [-alpha_S4, alpha_S4, -alpha_S4, alpha_S4]
 
         # Add the L2 building blocks to the structure
-        for i, edge_data in enumerate(topology_info['edges']):
+        for i, edge_data in enumerate(topology_info["edges"]):
             self.atom_types += BB_L2.atom_types
-            edge_pos = np.array(edge_data['position']) * np.array([a, b, c])
+            edge_pos = np.array(edge_data["position"]) * np.array([a, b, c])
 
-            R_Matrix = R.from_euler('z', L2_angle_list[i], degrees=False).as_matrix()
+            R_Matrix = R.from_euler("z", L2_angle_list[i], degrees=False).as_matrix()
 
             rotated_pos = np.dot(BB_L2.atom_pos, R_Matrix) + edge_pos
             self.atom_pos += rotated_pos.tolist()
 
-            self.atom_labels += ['C2' if i == 'C' else i for i in BB_L2.atom_labels]
+            self.atom_labels += ["C2" if i == "C" else i for i in BB_L2.atom_labels]
 
         StartingFramework = Structure(
             self.cellMatrix,
             self.atom_types,
             self.atom_pos,
             coords_are_cartesian=True,
-            site_properties={'source': self.atom_labels}
+            site_properties={"source": self.atom_labels},
         ).get_sorted_structure()
 
         # Translates the structure to the center of the cell
         StartingFramework.translate_sites(
-            range(len(StartingFramework.as_dict()['sites'])),
+            range(len(StartingFramework.as_dict()["sites"])),
             [0, 0, 0.5],
             frac_coords=True,
-            to_unit_cell=True
+            to_unit_cell=True,
         )
 
         dict_structure = StartingFramework.as_dict()
 
-        self.cellMatrix = np.array(dict_structure['lattice']['matrix']).astype(float)
+        self.cellMatrix = np.array(dict_structure["lattice"]["matrix"]).astype(float)
 
-        self.atom_types = [i['label'] for i in dict_structure['sites']]
-        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
+        self.atom_types = [i["label"] for i in dict_structure["sites"]]
+        self.atom_pos = [i["xyz"] for i in dict_structure["sites"]]
+        self.atom_labels = [i["properties"]["source"] for i in dict_structure["sites"]]
 
-        if stacking == 'A' or stacking == 'AA':
+        if stacking == "A" or stacking == "AA":
             stacked_structure = StartingFramework
 
-        if stacking == 'AB1':
+        if stacking == "AB1":
 
             self.cellMatrix *= (1, 1, 2)
             self.cellParameters *= (1, 1, 2, 1, 1, 1)
@@ -1969,7 +2010,7 @@ class Framework():
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -1977,13 +2018,10 @@ class Framework():
 
             # Translate the second sheet by the vector [1/4, 1/4, 0.5] to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                [1/4, 1/4, 0.5],
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, [1 / 4, 1 / 4, 0.5], frac_coords=True, to_unit_cell=True
+            )
 
-        if stacking == 'AB2':
+        if stacking == "AB2":
             self.cellMatrix *= (1, 1, 2)
             self.cellParameters *= (1, 1, 2, 1, 1, 1)
 
@@ -1996,7 +2034,7 @@ class Framework():
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -2004,27 +2042,30 @@ class Framework():
 
             # Translate the second sheet by the vector [1/2, 0, 0.5] to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                [1/2, 0, 0.5],
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, [1 / 2, 0, 0.5], frac_coords=True, to_unit_cell=True
+            )
 
-        if stacking == 'ABC1':
+        if stacking == "ABC1":
 
             self.cellMatrix *= (1, 1, 3)
             self.cellParameters *= (1, 1, 3, 1, 1, 1)
 
-            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
-            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
-            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
+            self.atom_types = np.concatenate(
+                (self.atom_types, self.atom_types, self.atom_types)
+            )
+            self.atom_pos = np.concatenate(
+                (self.atom_pos, self.atom_pos, self.atom_pos)
+            )
+            self.atom_labels = np.concatenate(
+                (self.atom_labels, self.atom_labels, self.atom_labels)
+            )
 
             stacked_structure = Structure(
                 self.cellMatrix,
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -2032,34 +2073,34 @@ class Framework():
 
             # Translate the second sheet by the vector (1/3, 1/3, 0) to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                (1/3, 1/3, 1/3),
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, (1 / 3, 1 / 3, 1 / 3), frac_coords=True, to_unit_cell=True
+            )
 
             # Translate the third sheet by the vector (2/3, 2/3, 0) to generate the B positions
             stacked_structure.translate_sites(
-                C_list,
-                (2/3, 2/3, 2/3),
-                frac_coords=True,
-                to_unit_cell=True
+                C_list, (2 / 3, 2 / 3, 2 / 3), frac_coords=True, to_unit_cell=True
             )
 
-        if stacking == 'ABC2':
+        if stacking == "ABC2":
             self.cellMatrix *= (1, 1, 3)
             self.cellParameters *= (1, 1, 3, 1, 1, 1)
 
-            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
-            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
-            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
+            self.atom_types = np.concatenate(
+                (self.atom_types, self.atom_types, self.atom_types)
+            )
+            self.atom_pos = np.concatenate(
+                (self.atom_pos, self.atom_pos, self.atom_pos)
+            )
+            self.atom_labels = np.concatenate(
+                (self.atom_labels, self.atom_labels, self.atom_labels)
+            )
 
             stacked_structure = Structure(
                 self.cellMatrix,
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -2067,23 +2108,17 @@ class Framework():
 
             # Translate the second sheet by the vector (1/3, 1/3, 0) to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                (1/3, 0, 1/3),
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, (1 / 3, 0, 1 / 3), frac_coords=True, to_unit_cell=True
+            )
 
             # Translate the third sheet by the vector (2/3, 2/3, 0) to generate the B positions
             stacked_structure.translate_sites(
-                C_list,
-                (2/3, 0, 2/3),
-                frac_coords=True,
-                to_unit_cell=True
+                C_list, (2 / 3, 0, 2 / 3), frac_coords=True, to_unit_cell=True
             )
 
         # Create AAl stacking. Tetragonal cell with two sheets
         # per cell shifited by the shift_vector in angstroms.
-        if stacking == 'AAl':
+        if stacking == "AAl":
             self.cellMatrix *= (1, 1, 2)
             self.cellParameters *= (1, 1, 2, 1, 1, 1)
 
@@ -2097,7 +2132,7 @@ class Framework():
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -2105,27 +2140,28 @@ class Framework():
 
             # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                [0, 0, 0.5],
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, [0, 0, 0.5], frac_coords=True, to_unit_cell=True
+            )
 
         # Create AA tilted stacking.
         # Tilted tetragonal cell with two sheets per cell tilted by tilt_angle.
-        if stacking == 'AAt':
-            cell = StartingFramework.as_dict()['lattice']
+        if stacking == "AAt":
+            cell = StartingFramework.as_dict()["lattice"]
 
             # Shift the cell by the tilt angle
-            a_cell = cell['a']
-            b_cell = cell['b']
-            c_cell = cell['c'] * 2
-            alpha = cell['alpha'] - tilt_angle
-            beta = cell['beta'] - tilt_angle
-            gamma = cell['gamma']
+            a_cell = cell["a"]
+            b_cell = cell["b"]
+            c_cell = cell["c"] * 2
+            alpha = cell["alpha"] - tilt_angle
+            beta = cell["beta"] - tilt_angle
+            gamma = cell["gamma"]
 
-            self.cellMatrix = cellpar_to_cell([a_cell, b_cell, c_cell, alpha, beta, gamma])
-            self.cellParameters = np.array([a_cell, b_cell, c_cell, alpha, beta, gamma]).astype(float)
+            self.cellMatrix = cellpar_to_cell(
+                [a_cell, b_cell, c_cell, alpha, beta, gamma]
+            )
+            self.cellParameters = np.array(
+                [a_cell, b_cell, c_cell, alpha, beta, gamma]
+            ).astype(float)
 
             self.atom_types = np.concatenate((self.atom_types, self.atom_types))
             self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
@@ -2136,7 +2172,7 @@ class Framework():
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -2144,34 +2180,31 @@ class Framework():
 
             # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                [0, 0, 0.5],
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, [0, 0, 0.5], frac_coords=True, to_unit_cell=True
+            )
 
         dict_structure = stacked_structure.as_dict()
 
-        self.cellMatrix = np.array(dict_structure['lattice']['matrix']).astype(float)
+        self.cellMatrix = np.array(dict_structure["lattice"]["matrix"]).astype(float)
 
-        self.atom_types = [i['label'] for i in dict_structure['sites']]
-        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
-        self.n_atoms = len(dict_structure['sites'])
+        self.atom_types = [i["label"] for i in dict_structure["sites"]]
+        self.atom_pos = [i["xyz"] for i in dict_structure["sites"]]
+        self.atom_labels = [i["properties"]["source"] for i in dict_structure["sites"]]
+        self.n_atoms = len(dict_structure["sites"])
         self.composition = stacked_structure.formula
 
         dist_matrix = stacked_structure.distance_matrix
 
         # Check if there are any atoms closer than 0.8 A
         for i in range(len(dist_matrix)):
-            for j in range(i+1, len(dist_matrix)):
+            for j in range(i + 1, len(dist_matrix)):
                 if dist_matrix[i][j] < self.dist_threshold:
                     raise BondLenghError(i, j, dist_matrix[i][j], self.dist_threshold)
 
         # Get the simmetry information of the generated structure
-        symm = SpacegroupAnalyzer(stacked_structure,
-                                  symprec=self.symm_tol,
-                                  angle_tolerance=self.angle_tol)
+        symm = SpacegroupAnalyzer(
+            stacked_structure, symprec=self.symm_tol, angle_tolerance=self.angle_tol
+        )
 
         try:
             self.prim_structure = symm.get_refined_structure(keep_site_properties=True)
@@ -2188,37 +2221,43 @@ class Framework():
         except Exception as e:
             self.logger.exception(e)
 
-            self.lattice_type = 'Triclinic'
-            self.space_group = 'P1'
-            self.space_group_n = '1'
+            self.lattice_type = "Triclinic"
+            self.space_group = "P1"
+            self.space_group_n = "1"
 
             symm_op = [1]
-            self.hall = 'P 1'
+            self.hall = "P 1"
 
-        symm_text = get_framework_symm_text(self.name,
-                                            str(self.lattice_type),
-                                            str(self.hall[0:2]),
-                                            str(self.space_group),
-                                            str(self.space_group_n),
-                                            len(symm_op))
+        symm_text = get_framework_symm_text(
+            self.name,
+            str(self.lattice_type),
+            str(self.hall[0:2]),
+            str(self.space_group),
+            str(self.space_group_n),
+            len(symm_op),
+        )
 
         self.logger.info(symm_text)
 
-        return [self.name,
-                str(self.lattice_type),
-                str(self.hall[0:2]),
-                str(self.space_group),
-                str(self.space_group_n),
-                len(symm_op)]
+        return [
+            self.name,
+            str(self.lattice_type),
+            str(self.hall[0:2]),
+            str(self.space_group),
+            str(self.space_group_n),
+            len(symm_op),
+        ]
 
-    def create_kgd_structure(self,
-                             BB_H6: str,
-                             BB_T3: str,
-                             stacking: str = 'AA',
-                             print_result: bool = True,
-                             slab: float = 10.0,
-                             shift_vector: list = (1.0, 1.0, 0),
-                             tilt_angle: float = 5.0):
+    def create_kgd_structure(
+        self,
+        BB_H6: str,
+        BB_T3: str,
+        stacking: str = "AA",
+        print_result: bool = True,
+        slab: float = 10.0,
+        shift_vector: list = (1.0, 1.0, 0),
+        tilt_angle: float = 5.0,
+    ):
         """Creates a COF with KGD network.
 
         The KGD net is composed of one hexapodal and one tripodal building blocks.
@@ -2253,30 +2292,32 @@ class Framework():
                 5. number of the space group,
                 6. number of operation symmetry
         """
-        connectivity_error = 'Building block {} must present connectivity {} not {}'
+        connectivity_error = "Building block {} must present connectivity {} not {}"
         if BB_H6.connectivity != 6:
-            self.logger.error(connectivity_error.format('A', 6, BB_H6.connectivity))
+            self.logger.error(connectivity_error.format("A", 6, BB_H6.connectivity))
             raise BBConnectivityError(6, BB_H6.connectivity)
         if BB_T3.connectivity != 3:
-            self.logger.error(connectivity_error.format('B', 3, BB_T3.connectivity))
+            self.logger.error(connectivity_error.format("B", 3, BB_T3.connectivity))
             raise BBConnectivityError(3, BB_T3.connectivity)
 
-        self.name = f'{BB_H6.name}-{BB_T3.name}-KGD-{stacking}'
-        self.topology = 'KGD'
+        self.name = f"{BB_H6.name}-{BB_T3.name}-KGD-{stacking}"
+        self.topology = "KGD"
         self.staking = stacking
         self.dimension = 2
 
         self.charge = BB_H6.charge + BB_T3.charge
         self.chirality = BB_H6.chirality or BB_T3.chirality
 
-        self.logger.debug(f'Starting the creation of {self.name}')
+        self.logger.debug(f"Starting the creation of {self.name}")
 
         # Detect the bond atom from the connection groups type
         bond_atom = get_bond_atom(BB_H6.conector, BB_T3.conector)
 
-        self.logger.debug('{} detected as bond atom for groups {} and {}'.format(bond_atom,
-                                                                                 BB_H6.conector,
-                                                                                 BB_T3.conector))
+        self.logger.debug(
+            "{} detected as bond atom for groups {} and {}".format(
+                bond_atom, BB_H6.conector, BB_T3.conector
+            )
+        )
 
         # Replace "X" the building block
         BB_H6.replace_X(bond_atom)
@@ -2292,20 +2333,24 @@ class Framework():
         size = BB_H6.size[0] + BB_T3.size[0]
 
         # Calculate the delta size to add to the c parameter
-        delta_a = abs(max(np.transpose(BB_H6.atom_pos)[2])) + abs(min(np.transpose(BB_H6.atom_pos)[2]))
-        delta_b = abs(max(np.transpose(BB_T3.atom_pos)[2])) + abs(min(np.transpose(BB_T3.atom_pos)[2]))
+        delta_a = abs(max(np.transpose(BB_H6.atom_pos)[2])) + abs(
+            min(np.transpose(BB_H6.atom_pos)[2])
+        )
+        delta_b = abs(max(np.transpose(BB_T3.atom_pos)[2])) + abs(
+            min(np.transpose(BB_T3.atom_pos)[2])
+        )
 
         delta_max = max([delta_a, delta_b])
 
         # Calculate the cell parameters
-        a = topology_info['a'] * size
-        b = topology_info['b'] * size
-        c = topology_info['c'] + delta_max
-        alpha = topology_info['alpha']
-        beta = topology_info['beta']
-        gamma = topology_info['gamma']
+        a = topology_info["a"] * size
+        b = topology_info["b"] * size
+        c = topology_info["c"] + delta_max
+        alpha = topology_info["alpha"]
+        beta = topology_info["beta"]
+        gamma = topology_info["gamma"]
 
-        if self.stacking == 'A':
+        if self.stacking == "A":
             c = slab
 
         # Create the lattice
@@ -2318,61 +2363,59 @@ class Framework():
         self.atom_pos = []
 
         # Add the building blocks to the structure
-        for vertice_data in topology_info['vertices']:
+        for vertice_data in topology_info["vertices"]:
             self.atom_types += BB_H6.atom_types
-            vertice_pos = np.array(vertice_data['position'])*a
+            vertice_pos = np.array(vertice_data["position"]) * a
 
-            R_Matrix = R.from_euler('z',
-                                    vertice_data['angle'],
-                                    degrees=True).as_matrix()
+            R_Matrix = R.from_euler(
+                "z", vertice_data["angle"], degrees=True
+            ).as_matrix()
 
             rotated_pos = np.dot(BB_H6.atom_pos, R_Matrix) + vertice_pos
             self.atom_pos += rotated_pos.tolist()
 
-            self.atom_labels += ['C1' if i == 'C' else i for i in BB_H6.atom_labels]
+            self.atom_labels += ["C1" if i == "C" else i for i in BB_H6.atom_labels]
 
         # Add the building blocks to the structure
-        for edge_data in topology_info['edges']:
+        for edge_data in topology_info["edges"]:
             self.atom_types += BB_T3.atom_types
-            edge_pos = np.array(edge_data['position'])*a
+            edge_pos = np.array(edge_data["position"]) * a
 
-            R_Matrix = R.from_euler('z',
-                                    edge_data['angle'],
-                                    degrees=True).as_matrix()
+            R_Matrix = R.from_euler("z", edge_data["angle"], degrees=True).as_matrix()
 
             rotated_pos = np.dot(BB_T3.atom_pos, R_Matrix) + edge_pos
             self.atom_pos += rotated_pos.tolist()
 
-            self.atom_labels += ['C2' if i == 'C' else i for i in BB_T3.atom_labels]
+            self.atom_labels += ["C2" if i == "C" else i for i in BB_T3.atom_labels]
 
         StartingFramework = Structure(
             self.cellMatrix,
             self.atom_types,
             self.atom_pos,
             coords_are_cartesian=True,
-            site_properties={'source': self.atom_labels}
+            site_properties={"source": self.atom_labels},
         ).get_sorted_structure()
 
         # Translates the structure to the center of the cell
         StartingFramework.translate_sites(
-            range(len(StartingFramework.as_dict()['sites'])),
+            range(len(StartingFramework.as_dict()["sites"])),
             [0, 0, 0.5],
             frac_coords=True,
-            to_unit_cell=True
+            to_unit_cell=True,
         )
 
         dict_structure = StartingFramework.as_dict()
 
-        self.cellMatrix = np.array(dict_structure['lattice']['matrix']).astype(float)
+        self.cellMatrix = np.array(dict_structure["lattice"]["matrix"]).astype(float)
 
-        self.atom_types = [i['label'] for i in dict_structure['sites']]
-        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
+        self.atom_types = [i["label"] for i in dict_structure["sites"]]
+        self.atom_pos = [i["xyz"] for i in dict_structure["sites"]]
+        self.atom_labels = [i["properties"]["source"] for i in dict_structure["sites"]]
 
-        if stacking == 'A' or stacking == 'AA':
+        if stacking == "A" or stacking == "AA":
             stacked_structure = StartingFramework
 
-        if stacking == 'AB1':
+        if stacking == "AB1":
             self.cellMatrix *= (1, 1, 2)
             self.cellParameters *= (1, 1, 2, 1, 1, 1)
 
@@ -2385,7 +2428,7 @@ class Framework():
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -2393,13 +2436,10 @@ class Framework():
 
             # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                [2/3, 1/3, 0.5],
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, [2 / 3, 1 / 3, 0.5], frac_coords=True, to_unit_cell=True
+            )
 
-        if stacking == 'AB2':
+        if stacking == "AB2":
             self.cellMatrix *= (1, 1, 2)
             self.cellParameters *= (1, 1, 2, 1, 1, 1)
 
@@ -2412,7 +2452,7 @@ class Framework():
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -2420,26 +2460,29 @@ class Framework():
 
             # Translate the second sheet by the vector [1/2, 0, 0.5] to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                [1/2, 0, 0.5],
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, [1 / 2, 0, 0.5], frac_coords=True, to_unit_cell=True
+            )
 
-        if stacking == 'ABC1':
+        if stacking == "ABC1":
             self.cellMatrix *= (1, 1, 3)
             self.cellParameters *= (1, 1, 3, 1, 1, 1)
 
-            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
-            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
-            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
+            self.atom_types = np.concatenate(
+                (self.atom_types, self.atom_types, self.atom_types)
+            )
+            self.atom_pos = np.concatenate(
+                (self.atom_pos, self.atom_pos, self.atom_pos)
+            )
+            self.atom_labels = np.concatenate(
+                (self.atom_labels, self.atom_labels, self.atom_labels)
+            )
 
             stacked_structure = Structure(
                 self.cellMatrix,
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -2447,34 +2490,34 @@ class Framework():
 
             # Translate the second sheet by the vector (2/3, 1/3, 0) to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                (2/3, 1/3, 1/3),
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, (2 / 3, 1 / 3, 1 / 3), frac_coords=True, to_unit_cell=True
+            )
 
             # Translate the third sheet by the vector (2/3, 1/3, 0) to generate the B positions
             stacked_structure.translate_sites(
-                C_list,
-                (4/3, 2/3, 2/3),
-                frac_coords=True,
-                to_unit_cell=True
+                C_list, (4 / 3, 2 / 3, 2 / 3), frac_coords=True, to_unit_cell=True
             )
 
-        if stacking == 'ABC2':
+        if stacking == "ABC2":
             self.cellMatrix *= (1, 1, 3)
             self.cellParameters *= (1, 1, 3, 1, 1, 1)
 
-            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
-            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
-            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
+            self.atom_types = np.concatenate(
+                (self.atom_types, self.atom_types, self.atom_types)
+            )
+            self.atom_pos = np.concatenate(
+                (self.atom_pos, self.atom_pos, self.atom_pos)
+            )
+            self.atom_labels = np.concatenate(
+                (self.atom_labels, self.atom_labels, self.atom_labels)
+            )
 
             stacked_structure = Structure(
                 self.cellMatrix,
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -2482,21 +2525,15 @@ class Framework():
 
             # Translate the second sheet by the vector (2/3, 1/3, 0) to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                (1/3, 0, 1/3),
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, (1 / 3, 0, 1 / 3), frac_coords=True, to_unit_cell=True
+            )
 
             # Translate the third sheet by the vector (2/3, 1/3, 0) to generate the B positions
             stacked_structure.translate_sites(
-                C_list,
-                (2/3, 0, 2/3),
-                frac_coords=True,
-                to_unit_cell=True
+                C_list, (2 / 3, 0, 2 / 3), frac_coords=True, to_unit_cell=True
             )
 
-        if stacking == 'AAl':
+        if stacking == "AAl":
             self.cellMatrix *= (1, 1, 2)
             self.cellParameters *= (1, 1, 2, 1, 1, 1)
 
@@ -2510,7 +2547,7 @@ class Framework():
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -2518,26 +2555,27 @@ class Framework():
 
             # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                [0, 0, 0.5],
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, [0, 0, 0.5], frac_coords=True, to_unit_cell=True
+            )
 
         # Create AA tilted stacking.
-        if stacking == 'AAt':
-            cell = StartingFramework.as_dict()['lattice']
+        if stacking == "AAt":
+            cell = StartingFramework.as_dict()["lattice"]
 
             # Shift the cell by the tilt angle
-            a_cell = cell['a']
-            b_cell = cell['b']
-            c_cell = cell['c'] * 2
-            alpha = cell['alpha'] - tilt_angle
-            beta = cell['beta'] - tilt_angle
-            gamma = cell['gamma']
+            a_cell = cell["a"]
+            b_cell = cell["b"]
+            c_cell = cell["c"] * 2
+            alpha = cell["alpha"] - tilt_angle
+            beta = cell["beta"] - tilt_angle
+            gamma = cell["gamma"]
 
-            self.cellMatrix = cellpar_to_cell([a_cell, b_cell, c_cell, alpha, beta, gamma])
-            self.cellParameters = np.array([a_cell, b_cell, c_cell, alpha, beta, gamma]).astype(float)
+            self.cellMatrix = cellpar_to_cell(
+                [a_cell, b_cell, c_cell, alpha, beta, gamma]
+            )
+            self.cellParameters = np.array(
+                [a_cell, b_cell, c_cell, alpha, beta, gamma]
+            ).astype(float)
 
             self.atom_types = np.concatenate((self.atom_types, self.atom_types))
             self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
@@ -2548,7 +2586,7 @@ class Framework():
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -2556,34 +2594,31 @@ class Framework():
 
             # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                [0, 0, 0.5],
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, [0, 0, 0.5], frac_coords=True, to_unit_cell=True
+            )
 
         dict_structure = stacked_structure.as_dict()
 
-        self.cellMatrix = np.array(dict_structure['lattice']['matrix']).astype(float)
+        self.cellMatrix = np.array(dict_structure["lattice"]["matrix"]).astype(float)
 
-        self.atom_types = [i['label'] for i in dict_structure['sites']]
-        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
-        self.n_atoms = len(dict_structure['sites'])
+        self.atom_types = [i["label"] for i in dict_structure["sites"]]
+        self.atom_pos = [i["xyz"] for i in dict_structure["sites"]]
+        self.atom_labels = [i["properties"]["source"] for i in dict_structure["sites"]]
+        self.n_atoms = len(dict_structure["sites"])
         self.composition = stacked_structure.formula
 
         dist_matrix = stacked_structure.distance_matrix
 
         # Check if there are any atoms closer than 0.8 A
         for i in range(len(dist_matrix)):
-            for j in range(i+1, len(dist_matrix)):
+            for j in range(i + 1, len(dist_matrix)):
                 if dist_matrix[i][j] < self.dist_threshold:
                     raise BondLenghError(i, j, dist_matrix[i][j], self.dist_threshold)
 
         # Get the simmetry information of the generated structure
-        symm = SpacegroupAnalyzer(stacked_structure,
-                                  symprec=self.symm_tol,
-                                  angle_tolerance=self.angle_tol)
+        symm = SpacegroupAnalyzer(
+            stacked_structure, symprec=self.symm_tol, angle_tolerance=self.angle_tol
+        )
 
         try:
             self.prim_structure = symm.get_refined_structure(keep_site_properties=True)
@@ -2599,37 +2634,43 @@ class Framework():
         except Exception as e:
             self.logger.exception(e)
 
-            self.lattice_type = 'Triclinic'
-            self.space_group = 'P1'
-            self.space_group_n = '1'
+            self.lattice_type = "Triclinic"
+            self.space_group = "P1"
+            self.space_group_n = "1"
 
             symm_op = [1]
-            self.hall = 'P 1'
+            self.hall = "P 1"
 
-        symm_text = get_framework_symm_text(self.name,
-                                            str(self.lattice_type),
-                                            str(self.hall[0:2]),
-                                            str(self.space_group),
-                                            str(self.space_group_n),
-                                            len(symm_op))
+        symm_text = get_framework_symm_text(
+            self.name,
+            str(self.lattice_type),
+            str(self.hall[0:2]),
+            str(self.space_group),
+            str(self.space_group_n),
+            len(symm_op),
+        )
 
         self.logger.info(symm_text)
 
-        return [self.name,
-                str(self.lattice_type),
-                str(self.hall[0:2]),
-                str(self.space_group),
-                str(self.space_group_n),
-                len(symm_op)]
+        return [
+            self.name,
+            str(self.lattice_type),
+            str(self.hall[0:2]),
+            str(self.space_group),
+            str(self.space_group_n),
+            len(symm_op),
+        ]
 
-    def create_hxl_a_structure(self,
-                               BB_H6: str,
-                               BB_L2: str,
-                               stacking: str = 'AA',
-                               print_result: bool = True,
-                               slab: float = 10.0,
-                               shift_vector: list = (1.0, 1.0, 0),
-                               tilt_angle: float = 5.0):
+    def create_hxl_a_structure(
+        self,
+        BB_H6: str,
+        BB_L2: str,
+        stacking: str = "AA",
+        print_result: bool = True,
+        slab: float = 10.0,
+        shift_vector: list = (1.0, 1.0, 0),
+        tilt_angle: float = 5.0,
+    ):
         """Creates a COF with HXL-A network.
 
         The HXL-A net is composed of one hexapodal and one linear building blocks.
@@ -2663,30 +2704,32 @@ class Framework():
                 6. number of operation symmetry
         """
 
-        connectivity_error = 'Building block {} must present connectivity {} not {}'
+        connectivity_error = "Building block {} must present connectivity {} not {}"
         if BB_H6.connectivity != 6:
-            self.logger.error(connectivity_error.format('A', 6, BB_H6.connectivity))
+            self.logger.error(connectivity_error.format("A", 6, BB_H6.connectivity))
             raise BBConnectivityError(6, BB_H6.connectivity)
         if BB_L2.connectivity != 2:
-            self.logger.error(connectivity_error.format('B', 3, BB_L2.connectivity))
+            self.logger.error(connectivity_error.format("B", 3, BB_L2.connectivity))
             raise BBConnectivityError(2, BB_L2.connectivity)
 
-        self.name = f'{BB_H6.name}-{BB_L2.name}-HXL_A-{stacking}'
-        self.topology = 'HXL_A'
+        self.name = f"{BB_H6.name}-{BB_L2.name}-HXL_A-{stacking}"
+        self.topology = "HXL_A"
         self.staking = stacking
         self.dimension = 2
 
         self.charge = BB_H6.charge + BB_L2.charge
         self.chirality = BB_H6.chirality or BB_L2.chirality
 
-        self.logger.debug(f'Starting the creation of {self.name}')
+        self.logger.debug(f"Starting the creation of {self.name}")
 
         # Detect the bond atom from the connection groups type
         bond_atom = get_bond_atom(BB_H6.conector, BB_L2.conector)
 
-        self.logger.debug('{} detected as bond atom for groups {} and {}'.format(bond_atom,
-                                                                                 BB_H6.conector,
-                                                                                 BB_L2.conector))
+        self.logger.debug(
+            "{} detected as bond atom for groups {} and {}".format(
+                bond_atom, BB_H6.conector, BB_L2.conector
+            )
+        )
 
         # Replace "X" the building block
         BB_L2.replace_X(bond_atom)
@@ -2702,20 +2745,24 @@ class Framework():
         size = BB_H6.size[0] + BB_L2.size[0]
 
         # Calculate the delta size to add to the c parameter
-        delta_a = abs(max(np.transpose(BB_H6.atom_pos)[2])) + abs(min(np.transpose(BB_H6.atom_pos)[2]))
-        delta_b = abs(max(np.transpose(BB_L2.atom_pos)[2])) + abs(min(np.transpose(BB_L2.atom_pos)[2]))
+        delta_a = abs(max(np.transpose(BB_H6.atom_pos)[2])) + abs(
+            min(np.transpose(BB_H6.atom_pos)[2])
+        )
+        delta_b = abs(max(np.transpose(BB_L2.atom_pos)[2])) + abs(
+            min(np.transpose(BB_L2.atom_pos)[2])
+        )
 
         delta_max = max([delta_a, delta_b])
 
         # Calculate the cell parameters
-        a = topology_info['a'] * size
-        b = topology_info['b'] * size
-        c = topology_info['c'] + delta_max
-        alpha = topology_info['alpha']
-        beta = topology_info['beta']
-        gamma = topology_info['gamma']
+        a = topology_info["a"] * size
+        b = topology_info["b"] * size
+        c = topology_info["c"] + delta_max
+        alpha = topology_info["alpha"]
+        beta = topology_info["beta"]
+        gamma = topology_info["gamma"]
 
-        if self.stacking == 'A':
+        if self.stacking == "A":
             c = slab
 
         # Create the lattice
@@ -2728,61 +2775,59 @@ class Framework():
         self.atom_pos = []
 
         # Add the building blocks to the structure
-        for vertice_data in topology_info['vertices']:
+        for vertice_data in topology_info["vertices"]:
             self.atom_types += BB_H6.atom_types
-            vertice_pos = np.array(vertice_data['position'])*a
+            vertice_pos = np.array(vertice_data["position"]) * a
 
-            R_Matrix = R.from_euler('z',
-                                    vertice_data['angle'],
-                                    degrees=True).as_matrix()
+            R_Matrix = R.from_euler(
+                "z", vertice_data["angle"], degrees=True
+            ).as_matrix()
 
             rotated_pos = np.dot(BB_H6.atom_pos, R_Matrix) + vertice_pos
             self.atom_pos += rotated_pos.tolist()
 
-            self.atom_labels += ['C1' if i == 'C' else i for i in BB_H6.atom_labels]
+            self.atom_labels += ["C1" if i == "C" else i for i in BB_H6.atom_labels]
 
         # Add the building blocks to the structure
-        for edge_data in topology_info['edges']:
+        for edge_data in topology_info["edges"]:
             self.atom_types += BB_L2.atom_types
-            edge_pos = np.array(edge_data['position'])*a
+            edge_pos = np.array(edge_data["position"]) * a
 
-            R_Matrix = R.from_euler('z',
-                                    edge_data['angle'],
-                                    degrees=True).as_matrix()
+            R_Matrix = R.from_euler("z", edge_data["angle"], degrees=True).as_matrix()
 
             rotated_pos = np.dot(BB_L2.atom_pos, R_Matrix) + edge_pos
             self.atom_pos += rotated_pos.tolist()
 
-            self.atom_labels += ['C2' if i == 'C' else i for i in BB_L2.atom_labels]
+            self.atom_labels += ["C2" if i == "C" else i for i in BB_L2.atom_labels]
 
         StartingFramework = Structure(
             self.cellMatrix,
             self.atom_types,
             self.atom_pos,
             coords_are_cartesian=True,
-            site_properties={'source': self.atom_labels}
+            site_properties={"source": self.atom_labels},
         ).get_sorted_structure()
 
         # Translates the structure to the center of the cell
         StartingFramework.translate_sites(
-            range(len(StartingFramework.as_dict()['sites'])),
+            range(len(StartingFramework.as_dict()["sites"])),
             [0, 0, 0.5],
             frac_coords=True,
-            to_unit_cell=True
+            to_unit_cell=True,
         )
 
         dict_structure = StartingFramework.as_dict()
 
-        self.cellMatrix = np.array(dict_structure['lattice']['matrix']).astype(float)
+        self.cellMatrix = np.array(dict_structure["lattice"]["matrix"]).astype(float)
 
-        self.atom_types = [i['label'] for i in dict_structure['sites']]
-        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
+        self.atom_types = [i["label"] for i in dict_structure["sites"]]
+        self.atom_pos = [i["xyz"] for i in dict_structure["sites"]]
+        self.atom_labels = [i["properties"]["source"] for i in dict_structure["sites"]]
 
-        if stacking == 'A' or stacking == 'AA':
+        if stacking == "A" or stacking == "AA":
             stacked_structure = StartingFramework
 
-        if stacking == 'AB1':
+        if stacking == "AB1":
             self.cellMatrix *= (1, 1, 2)
             self.cellParameters *= (1, 1, 2, 1, 1, 1)
 
@@ -2795,7 +2840,7 @@ class Framework():
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -2803,13 +2848,10 @@ class Framework():
 
             # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                [2/3, 1/3, 0.5],
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, [2 / 3, 1 / 3, 0.5], frac_coords=True, to_unit_cell=True
+            )
 
-        if stacking == 'AB2':
+        if stacking == "AB2":
             self.cellMatrix *= (1, 1, 2)
             self.cellParameters *= (1, 1, 2, 1, 1, 1)
 
@@ -2822,7 +2864,7 @@ class Framework():
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -2830,26 +2872,29 @@ class Framework():
 
             # Translate the second sheet by the vector [1/2, 0, 0.5] to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                [1/2, 0, 0.5],
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, [1 / 2, 0, 0.5], frac_coords=True, to_unit_cell=True
+            )
 
-        if stacking == 'ABC1':
+        if stacking == "ABC1":
             self.cellMatrix *= (1, 1, 3)
             self.cellParameters *= (1, 1, 3, 1, 1, 1)
 
-            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
-            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
-            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
+            self.atom_types = np.concatenate(
+                (self.atom_types, self.atom_types, self.atom_types)
+            )
+            self.atom_pos = np.concatenate(
+                (self.atom_pos, self.atom_pos, self.atom_pos)
+            )
+            self.atom_labels = np.concatenate(
+                (self.atom_labels, self.atom_labels, self.atom_labels)
+            )
 
             stacked_structure = Structure(
                 self.cellMatrix,
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -2857,34 +2902,34 @@ class Framework():
 
             # Translate the second sheet by the vector (2/3, 1/3, 0) to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                (2/3, 1/3, 1/3),
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, (2 / 3, 1 / 3, 1 / 3), frac_coords=True, to_unit_cell=True
+            )
 
             # Translate the third sheet by the vector (2/3, 1/3, 0) to generate the B positions
             stacked_structure.translate_sites(
-                C_list,
-                (4/3, 2/3, 2/3),
-                frac_coords=True,
-                to_unit_cell=True
+                C_list, (4 / 3, 2 / 3, 2 / 3), frac_coords=True, to_unit_cell=True
             )
 
-        if stacking == 'ABC2':
+        if stacking == "ABC2":
             self.cellMatrix *= (1, 1, 3)
             self.cellParameters *= (1, 1, 3, 1, 1, 1)
 
-            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
-            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
-            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
+            self.atom_types = np.concatenate(
+                (self.atom_types, self.atom_types, self.atom_types)
+            )
+            self.atom_pos = np.concatenate(
+                (self.atom_pos, self.atom_pos, self.atom_pos)
+            )
+            self.atom_labels = np.concatenate(
+                (self.atom_labels, self.atom_labels, self.atom_labels)
+            )
 
             stacked_structure = Structure(
                 self.cellMatrix,
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -2892,21 +2937,15 @@ class Framework():
 
             # Translate the second sheet by the vector (2/3, 1/3, 0) to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                (1/3, 0, 1/3),
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, (1 / 3, 0, 1 / 3), frac_coords=True, to_unit_cell=True
+            )
 
             # Translate the third sheet by the vector (2/3, 1/3, 0) to generate the B positions
             stacked_structure.translate_sites(
-                C_list,
-                (2/3, 0, 2/3),
-                frac_coords=True,
-                to_unit_cell=True
+                C_list, (2 / 3, 0, 2 / 3), frac_coords=True, to_unit_cell=True
             )
 
-        if stacking == 'AAl':
+        if stacking == "AAl":
             self.cellMatrix *= (1, 1, 2)
             self.cellParameters *= (1, 1, 2, 1, 1, 1)
 
@@ -2920,7 +2959,7 @@ class Framework():
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -2928,26 +2967,27 @@ class Framework():
 
             # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                [0, 0, 0.5],
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, [0, 0, 0.5], frac_coords=True, to_unit_cell=True
+            )
 
         # Create AA tilted stacking.
-        if stacking == 'AAt':
-            cell = StartingFramework.as_dict()['lattice']
+        if stacking == "AAt":
+            cell = StartingFramework.as_dict()["lattice"]
 
             # Shift the cell by the tilt angle
-            a_cell = cell['a']
-            b_cell = cell['b']
-            c_cell = cell['c'] * 2
-            alpha = cell['alpha'] - tilt_angle
-            beta = cell['beta'] - tilt_angle
-            gamma = cell['gamma']
+            a_cell = cell["a"]
+            b_cell = cell["b"]
+            c_cell = cell["c"] * 2
+            alpha = cell["alpha"] - tilt_angle
+            beta = cell["beta"] - tilt_angle
+            gamma = cell["gamma"]
 
-            self.cellMatrix = cellpar_to_cell([a_cell, b_cell, c_cell, alpha, beta, gamma])
-            self.cellParameters = np.array([a_cell, b_cell, c_cell, alpha, beta, gamma]).astype(float)
+            self.cellMatrix = cellpar_to_cell(
+                [a_cell, b_cell, c_cell, alpha, beta, gamma]
+            )
+            self.cellParameters = np.array(
+                [a_cell, b_cell, c_cell, alpha, beta, gamma]
+            ).astype(float)
 
             self.atom_types = np.concatenate((self.atom_types, self.atom_types))
             self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
@@ -2958,7 +2998,7 @@ class Framework():
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -2966,34 +3006,31 @@ class Framework():
 
             # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                [0, 0, 0.5],
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, [0, 0, 0.5], frac_coords=True, to_unit_cell=True
+            )
 
         dict_structure = stacked_structure.as_dict()
 
-        self.cellMatrix = np.array(dict_structure['lattice']['matrix']).astype(float)
+        self.cellMatrix = np.array(dict_structure["lattice"]["matrix"]).astype(float)
 
-        self.atom_types = [i['label'] for i in dict_structure['sites']]
-        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
-        self.n_atoms = len(dict_structure['sites'])
+        self.atom_types = [i["label"] for i in dict_structure["sites"]]
+        self.atom_pos = [i["xyz"] for i in dict_structure["sites"]]
+        self.atom_labels = [i["properties"]["source"] for i in dict_structure["sites"]]
+        self.n_atoms = len(dict_structure["sites"])
         self.composition = stacked_structure.formula
 
         dist_matrix = stacked_structure.distance_matrix
 
         # Check if there are any atoms closer than 0.8 A
         for i in range(len(dist_matrix)):
-            for j in range(i+1, len(dist_matrix)):
+            for j in range(i + 1, len(dist_matrix)):
                 if dist_matrix[i][j] < self.dist_threshold:
                     raise BondLenghError(i, j, dist_matrix[i][j], self.dist_threshold)
 
         # Get the simmetry information of the generated structure
-        symm = SpacegroupAnalyzer(stacked_structure,
-                                  symprec=self.symm_tol,
-                                  angle_tolerance=self.angle_tol)
+        symm = SpacegroupAnalyzer(
+            stacked_structure, symprec=self.symm_tol, angle_tolerance=self.angle_tol
+        )
 
         try:
             self.prim_structure = symm.get_refined_structure(keep_site_properties=True)
@@ -3009,37 +3046,43 @@ class Framework():
         except Exception as e:
             self.logger.exception(e)
 
-            self.lattice_type = 'Triclinic'
-            self.space_group = 'P1'
-            self.space_group_n = '1'
+            self.lattice_type = "Triclinic"
+            self.space_group = "P1"
+            self.space_group_n = "1"
 
             symm_op = [1]
-            self.hall = 'P 1'
+            self.hall = "P 1"
 
-        symm_text = get_framework_symm_text(self.name,
-                                            str(self.lattice_type),
-                                            str(self.hall[0:2]),
-                                            str(self.space_group),
-                                            str(self.space_group_n),
-                                            len(symm_op))
+        symm_text = get_framework_symm_text(
+            self.name,
+            str(self.lattice_type),
+            str(self.hall[0:2]),
+            str(self.space_group),
+            str(self.space_group_n),
+            len(symm_op),
+        )
 
         self.logger.info(symm_text)
 
-        return [self.name,
-                str(self.lattice_type),
-                str(self.hall[0:2]),
-                str(self.space_group),
-                str(self.space_group_n),
-                len(symm_op)]
+        return [
+            self.name,
+            str(self.lattice_type),
+            str(self.hall[0:2]),
+            str(self.space_group),
+            str(self.space_group_n),
+            len(symm_op),
+        ]
 
-    def create_fxt_structure(self,
-                             BB_R4_A: BuildingBlock,
-                             BB_R4_B: BuildingBlock,
-                             stacking: str = 'AA',
-                             print_result: bool = True,
-                             slab: float = 10.0,
-                             shift_vector: list = (1.0, 1.0, 0.0),
-                             tilt_angle: float = 5.0):
+    def create_fxt_structure(
+        self,
+        BB_R4_A: BuildingBlock,
+        BB_R4_B: BuildingBlock,
+        stacking: str = "AA",
+        print_result: bool = True,
+        slab: float = 10.0,
+        shift_vector: list = (1.0, 1.0, 0.0),
+        tilt_angle: float = 5.0,
+    ):
         """Creates a COF with FXT network.
 
         The FXT net is composed of two tetrapodal building blocks.
@@ -3073,38 +3116,40 @@ class Framework():
                 6. number of operation symmetry
         """
 
-        connectivity_error = 'Building block {} must present connectivity {} not {}'
+        connectivity_error = "Building block {} must present connectivity {} not {}"
         if BB_R4_A.connectivity != 4:
-            self.logger.error(connectivity_error.format('A', 4, BB_R4_A.connectivity))
+            self.logger.error(connectivity_error.format("A", 4, BB_R4_A.connectivity))
             raise BBConnectivityError(4, BB_R4_A.connectivity)
         if BB_R4_B.connectivity != 4:
-            self.logger.error(connectivity_error.format('B', 4, BB_R4_B.connectivity))
+            self.logger.error(connectivity_error.format("B", 4, BB_R4_B.connectivity))
             raise BBConnectivityError(4, BB_R4_B.connectivity)
 
-        self.name = f'{BB_R4_A.name}-{BB_R4_B.name}-FXT-{stacking}'
-        self.topology = 'FXT'
+        self.name = f"{BB_R4_A.name}-{BB_R4_B.name}-FXT-{stacking}"
+        self.topology = "FXT"
         self.staking = stacking
         self.dimension = 2
 
         self.charge = BB_R4_A.charge + BB_R4_B.charge
         self.chirality = BB_R4_A.chirality or BB_R4_B.chirality
 
-        self.logger.debug(f'Starting the creation of {self.name}')
+        self.logger.debug(f"Starting the creation of {self.name}")
 
         # Detect the bond atom from the connection groups type
         bond_atom = get_bond_atom(BB_R4_A.conector, BB_R4_B.conector)
 
-        self.logger.debug('{} detected as bond atom for groups {} and {}'.format(bond_atom,
-                                                                                 BB_R4_A.conector,
-                                                                                 BB_R4_B.conector))
+        self.logger.debug(
+            "{} detected as bond atom for groups {} and {}".format(
+                bond_atom, BB_R4_A.conector, BB_R4_B.conector
+            )
+        )
 
         # Find the d' vector to realign the S4/R4 building blocks
         for bb in [BB_R4_A, BB_R4_B]:
             x_vec = bb.get_X_points()[1]
 
-            R_Matrix = R.from_euler('z',
-                                    angle([0, 1, 0], (x_vec[0] + x_vec[1]) / 2),
-                                    degrees=True).as_matrix()
+            R_Matrix = R.from_euler(
+                "z", angle([0, 1, 0], (x_vec[0] + x_vec[1]) / 2), degrees=True
+            ).as_matrix()
 
             rotated_pos = np.dot(bb.atom_pos, R_Matrix)
 
@@ -3124,20 +3169,24 @@ class Framework():
         size = 2 * (BB_R4_A.size[0] + BB_R4_B.size[0])
 
         # Calculate the delta size to add to the c parameter
-        delta_a = abs(max(np.transpose(BB_R4_A.atom_pos)[2])) + abs(min(np.transpose(BB_R4_B.atom_pos)[2]))
-        delta_b = abs(max(np.transpose(BB_R4_A.atom_pos)[2])) + abs(min(np.transpose(BB_R4_B.atom_pos)[2]))
+        delta_a = abs(max(np.transpose(BB_R4_A.atom_pos)[2])) + abs(
+            min(np.transpose(BB_R4_B.atom_pos)[2])
+        )
+        delta_b = abs(max(np.transpose(BB_R4_A.atom_pos)[2])) + abs(
+            min(np.transpose(BB_R4_B.atom_pos)[2])
+        )
 
         delta_max = max([delta_a, delta_b])
 
         # Calculate the cell parameters
-        a = topology_info['a'] * size
-        b = topology_info['b'] * size
-        c = topology_info['c'] + delta_max
-        alpha = topology_info['alpha']
-        beta = topology_info['beta']
-        gamma = topology_info['gamma']
+        a = topology_info["a"] * size
+        b = topology_info["b"] * size
+        c = topology_info["c"] + delta_max
+        alpha = topology_info["alpha"]
+        beta = topology_info["beta"]
+        gamma = topology_info["gamma"]
 
-        if self.stacking == 'A':
+        if self.stacking == "A":
             c = slab
 
         # Create the lattice
@@ -3150,57 +3199,59 @@ class Framework():
         self.atom_pos = []
 
         # Add the first building block to the structure
-        vertice_data = topology_info['vertices'][0]
+        vertice_data = topology_info["vertices"][0]
         self.atom_types += BB_R4_A.atom_types
-        vertice_pos = np.array(vertice_data['position'])*a
+        vertice_pos = np.array(vertice_data["position"]) * a
 
-        R_Matrix = R.from_euler('z', vertice_data['angle'], degrees=True).as_matrix()
+        R_Matrix = R.from_euler("z", vertice_data["angle"], degrees=True).as_matrix()
 
         rotated_pos = np.dot(BB_R4_A.atom_pos, R_Matrix) + vertice_pos
         self.atom_pos += rotated_pos.tolist()
 
-        self.atom_labels += ['C1' if i == 'C' else i for i in BB_R4_A.atom_labels]
+        self.atom_labels += ["C1" if i == "C" else i for i in BB_R4_A.atom_labels]
 
         # Add the second building block to the structure
-        for vertice_data in topology_info['vertices'][1:]:
+        for vertice_data in topology_info["vertices"][1:]:
             self.atom_types += BB_R4_B.atom_types
-            vertice_pos = np.array(vertice_data['position'])*a
+            vertice_pos = np.array(vertice_data["position"]) * a
 
-            R_Matrix = R.from_euler('z', vertice_data['angle'], degrees=True).as_matrix()
+            R_Matrix = R.from_euler(
+                "z", vertice_data["angle"], degrees=True
+            ).as_matrix()
 
             rotated_pos = np.dot(BB_R4_B.atom_pos, R_Matrix) + vertice_pos
             self.atom_pos += rotated_pos.tolist()
 
-            self.atom_labels += ['C2' if i == 'C' else i for i in BB_R4_B.atom_labels]
+            self.atom_labels += ["C2" if i == "C" else i for i in BB_R4_B.atom_labels]
 
         StartingFramework = Structure(
             self.cellMatrix,
             self.atom_types,
             self.atom_pos,
             coords_are_cartesian=True,
-            site_properties={'source': self.atom_labels}
+            site_properties={"source": self.atom_labels},
         ).get_sorted_structure()
 
         # Translates the structure to the center of the cell
         StartingFramework.translate_sites(
-            range(len(StartingFramework.as_dict()['sites'])),
+            range(len(StartingFramework.as_dict()["sites"])),
             [0, 0, 0.5],
             frac_coords=True,
-            to_unit_cell=True
+            to_unit_cell=True,
         )
 
         dict_structure = StartingFramework.as_dict()
 
-        self.cellMatrix = np.array(dict_structure['lattice']['matrix']).astype(float)
+        self.cellMatrix = np.array(dict_structure["lattice"]["matrix"]).astype(float)
 
-        self.atom_types = [i['label'] for i in dict_structure['sites']]
-        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
+        self.atom_types = [i["label"] for i in dict_structure["sites"]]
+        self.atom_pos = [i["xyz"] for i in dict_structure["sites"]]
+        self.atom_labels = [i["properties"]["source"] for i in dict_structure["sites"]]
 
-        if stacking == 'A' or stacking == 'AA':
+        if stacking == "A" or stacking == "AA":
             stacked_structure = StartingFramework
 
-        if stacking == 'AB1':
+        if stacking == "AB1":
 
             self.cellMatrix *= (1, 1, 2)
             self.cellParameters *= (1, 1, 2, 1, 1, 1)
@@ -3214,7 +3265,7 @@ class Framework():
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -3222,13 +3273,10 @@ class Framework():
 
             # Translate the second sheet by the vector [1/4, 1/4, 0.5] to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                [1/4, 1/4, 0.5],
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, [1 / 4, 1 / 4, 0.5], frac_coords=True, to_unit_cell=True
+            )
 
-        if stacking == 'AB2':
+        if stacking == "AB2":
             self.cellMatrix *= (1, 1, 2)
             self.cellParameters *= (1, 1, 2, 1, 1, 1)
 
@@ -3241,7 +3289,7 @@ class Framework():
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -3249,27 +3297,30 @@ class Framework():
 
             # Translate the second sheet by the vector [1/2, 0, 0.5] to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                [1/2, 0, 0.5],
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, [1 / 2, 0, 0.5], frac_coords=True, to_unit_cell=True
+            )
 
-        if stacking == 'ABC1':
+        if stacking == "ABC1":
 
             self.cellMatrix *= (1, 1, 3)
             self.cellParameters *= (1, 1, 3, 1, 1, 1)
 
-            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
-            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
-            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
+            self.atom_types = np.concatenate(
+                (self.atom_types, self.atom_types, self.atom_types)
+            )
+            self.atom_pos = np.concatenate(
+                (self.atom_pos, self.atom_pos, self.atom_pos)
+            )
+            self.atom_labels = np.concatenate(
+                (self.atom_labels, self.atom_labels, self.atom_labels)
+            )
 
             stacked_structure = Structure(
                 self.cellMatrix,
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -3277,34 +3328,34 @@ class Framework():
 
             # Translate the second sheet by the vector (1/3, 1/3, 0) to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                (1/3, 1/3, 1/3),
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, (1 / 3, 1 / 3, 1 / 3), frac_coords=True, to_unit_cell=True
+            )
 
             # Translate the third sheet by the vector (2/3, 2/3, 0) to generate the B positions
             stacked_structure.translate_sites(
-                C_list,
-                (2/3, 2/3, 2/3),
-                frac_coords=True,
-                to_unit_cell=True
+                C_list, (2 / 3, 2 / 3, 2 / 3), frac_coords=True, to_unit_cell=True
             )
 
-        if stacking == 'ABC2':
+        if stacking == "ABC2":
             self.cellMatrix *= (1, 1, 3)
             self.cellParameters *= (1, 1, 3, 1, 1, 1)
 
-            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
-            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
-            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
+            self.atom_types = np.concatenate(
+                (self.atom_types, self.atom_types, self.atom_types)
+            )
+            self.atom_pos = np.concatenate(
+                (self.atom_pos, self.atom_pos, self.atom_pos)
+            )
+            self.atom_labels = np.concatenate(
+                (self.atom_labels, self.atom_labels, self.atom_labels)
+            )
 
             stacked_structure = Structure(
                 self.cellMatrix,
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -3312,23 +3363,17 @@ class Framework():
 
             # Translate the second sheet by the vector (1/3, 1/3, 0) to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                (1/3, 0, 1/3),
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, (1 / 3, 0, 1 / 3), frac_coords=True, to_unit_cell=True
+            )
 
             # Translate the third sheet by the vector (2/3, 2/3, 0) to generate the B positions
             stacked_structure.translate_sites(
-                C_list,
-                (2/3, 0, 2/3),
-                frac_coords=True,
-                to_unit_cell=True
+                C_list, (2 / 3, 0, 2 / 3), frac_coords=True, to_unit_cell=True
             )
 
         # Create AAl stacking. Tetragonal cell with two sheets
         # per cell shifited by the shift_vector in angstroms.
-        if stacking == 'AAl':
+        if stacking == "AAl":
             self.cellMatrix *= (1, 1, 2)
             self.cellParameters *= (1, 1, 2, 1, 1, 1)
 
@@ -3342,7 +3387,7 @@ class Framework():
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -3350,27 +3395,28 @@ class Framework():
 
             # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                [0, 0, 0.5],
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, [0, 0, 0.5], frac_coords=True, to_unit_cell=True
+            )
 
         # Create AA tilted stacking.
         # Tilted tetragonal cell with two sheets per cell tilted by tilt_angle.
-        if stacking == 'AAt':
-            cell = StartingFramework.as_dict()['lattice']
+        if stacking == "AAt":
+            cell = StartingFramework.as_dict()["lattice"]
 
             # Shift the cell by the tilt angle
-            a_cell = cell['a']
-            b_cell = cell['b']
-            c_cell = cell['c'] * 2
-            alpha = cell['alpha'] - tilt_angle
-            beta = cell['beta'] - tilt_angle
-            gamma = cell['gamma']
+            a_cell = cell["a"]
+            b_cell = cell["b"]
+            c_cell = cell["c"] * 2
+            alpha = cell["alpha"] - tilt_angle
+            beta = cell["beta"] - tilt_angle
+            gamma = cell["gamma"]
 
-            self.cellMatrix = cellpar_to_cell([a_cell, b_cell, c_cell, alpha, beta, gamma])
-            self.cellParameters = np.array([a_cell, b_cell, c_cell, alpha, beta, gamma]).astype(float)
+            self.cellMatrix = cellpar_to_cell(
+                [a_cell, b_cell, c_cell, alpha, beta, gamma]
+            )
+            self.cellParameters = np.array(
+                [a_cell, b_cell, c_cell, alpha, beta, gamma]
+            ).astype(float)
 
             self.atom_types = np.concatenate((self.atom_types, self.atom_types))
             self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
@@ -3381,7 +3427,7 @@ class Framework():
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -3389,34 +3435,31 @@ class Framework():
 
             # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                [0, 0, 0.5],
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, [0, 0, 0.5], frac_coords=True, to_unit_cell=True
+            )
 
         dict_structure = stacked_structure.as_dict()
 
-        self.cellMatrix = np.array(dict_structure['lattice']['matrix']).astype(float)
+        self.cellMatrix = np.array(dict_structure["lattice"]["matrix"]).astype(float)
 
-        self.atom_types = [i['label'] for i in dict_structure['sites']]
-        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
-        self.n_atoms = len(dict_structure['sites'])
+        self.atom_types = [i["label"] for i in dict_structure["sites"]]
+        self.atom_pos = [i["xyz"] for i in dict_structure["sites"]]
+        self.atom_labels = [i["properties"]["source"] for i in dict_structure["sites"]]
+        self.n_atoms = len(dict_structure["sites"])
         self.composition = stacked_structure.formula
 
         dist_matrix = stacked_structure.distance_matrix
 
         # Check if there are any atoms closer than 0.8 A
         for i in range(len(dist_matrix)):
-            for j in range(i+1, len(dist_matrix)):
+            for j in range(i + 1, len(dist_matrix)):
                 if dist_matrix[i][j] < self.dist_threshold:
                     raise BondLenghError(i, j, dist_matrix[i][j], self.dist_threshold)
 
         # Get the simmetry information of the generated structure
-        symm = SpacegroupAnalyzer(stacked_structure,
-                                  symprec=self.symm_tol,
-                                  angle_tolerance=self.angle_tol)
+        symm = SpacegroupAnalyzer(
+            stacked_structure, symprec=self.symm_tol, angle_tolerance=self.angle_tol
+        )
 
         try:
             self.prim_structure = symm.get_refined_structure(keep_site_properties=True)
@@ -3433,38 +3476,44 @@ class Framework():
         except Exception as e:
             self.logger.exception(e)
 
-            self.lattice_type = 'Triclinic'
-            self.space_group = 'P1'
-            self.space_group_n = '1'
+            self.lattice_type = "Triclinic"
+            self.space_group = "P1"
+            self.space_group_n = "1"
 
             symm_op = [1]
-            self.hall = 'P 1'
+            self.hall = "P 1"
 
-        symm_text = get_framework_symm_text(self.name,
-                                            str(self.lattice_type),
-                                            str(self.hall[0:2]),
-                                            str(self.space_group),
-                                            str(self.space_group_n),
-                                            len(symm_op))
+        symm_text = get_framework_symm_text(
+            self.name,
+            str(self.lattice_type),
+            str(self.hall[0:2]),
+            str(self.space_group),
+            str(self.space_group_n),
+            len(symm_op),
+        )
 
         self.logger.info(symm_text)
 
-        return [self.name,
-                str(self.lattice_type),
-                str(self.hall[0:2]),
-                str(self.space_group),
-                str(self.space_group_n),
-                len(symm_op)]
+        return [
+            self.name,
+            str(self.lattice_type),
+            str(self.hall[0:2]),
+            str(self.space_group),
+            str(self.space_group_n),
+            len(symm_op),
+        ]
 
-    def create_fxt_a_structure(self,
-                               BB_S4: str,
-                               BB_L2: str,
-                               stacking: str = 'AA',
-                               c_parameter_base: float = 3.6,
-                               print_result: bool = True,
-                               slab: float = 10.0,
-                               shift_vector: list = (1.0, 1.0, 0),
-                               tilt_angle: float = 5.0):
+    def create_fxt_a_structure(
+        self,
+        BB_S4: str,
+        BB_L2: str,
+        stacking: str = "AA",
+        c_parameter_base: float = 3.6,
+        print_result: bool = True,
+        slab: float = 10.0,
+        shift_vector: list = (1.0, 1.0, 0),
+        tilt_angle: float = 5.0,
+    ):
         """Creates a COF with FXT-A network.
 
         The FXT-A net is composed of one tetrapodal and one linear building blocks.
@@ -3498,36 +3547,38 @@ class Framework():
                 6. number of operation symmetry
         """
 
-        connectivity_error = 'Building block {} must present connectivity {} not {}'
+        connectivity_error = "Building block {} must present connectivity {} not {}"
         if BB_S4.connectivity != 4:
-            self.logger.error(connectivity_error.format('A', 4, BB_S4.connectivity))
+            self.logger.error(connectivity_error.format("A", 4, BB_S4.connectivity))
             raise BBConnectivityError(4, BB_S4.connectivity)
         if BB_L2.connectivity != 2:
-            self.logger.error(connectivity_error.format('B', 3, BB_L2.connectivity))
+            self.logger.error(connectivity_error.format("B", 3, BB_L2.connectivity))
             raise BBConnectivityError(2, BB_L2.connectivity)
 
-        self.name = f'{BB_S4.name}-{BB_L2.name}-FXT_A-{stacking}'
-        self.topology = 'FXT_A'
+        self.name = f"{BB_S4.name}-{BB_L2.name}-FXT_A-{stacking}"
+        self.topology = "FXT_A"
         self.staking = stacking
         self.dimension = 2
 
         self.charge = BB_S4.charge + BB_L2.charge
         self.chirality = BB_S4.chirality or BB_L2.chirality
 
-        self.logger.debug(f'Starting the creation of {self.name}')
+        self.logger.debug(f"Starting the creation of {self.name}")
 
         # Detect the bond atom from the connection groups type
         bond_atom = get_bond_atom(BB_S4.conector, BB_L2.conector)
 
-        self.logger.debug('{} detected as bond atom for groups {} and {}'.format(bond_atom,
-                                                                                 BB_S4.conector,
-                                                                                 BB_L2.conector))
+        self.logger.debug(
+            "{} detected as bond atom for groups {} and {}".format(
+                bond_atom, BB_S4.conector, BB_L2.conector
+            )
+        )
 
         x_vec = BB_S4.get_X_points()[1]
 
-        R_Matrix = R.from_euler('z',
-                                angle([0, 1, 0], (x_vec[0] + x_vec[1]) / 2),
-                                degrees=True).as_matrix()
+        R_Matrix = R.from_euler(
+            "z", angle([0, 1, 0], (x_vec[0] + x_vec[1]) / 2), degrees=True
+        ).as_matrix()
 
         rotated_pos = np.dot(BB_S4.atom_pos, R_Matrix)
 
@@ -3547,20 +3598,24 @@ class Framework():
         size = 2 * (BB_S4.size[0] + BB_L2.size[0])
 
         # Calculate the delta size to add to the c parameter
-        delta_a = abs(max(np.transpose(BB_S4.atom_pos)[2])) + abs(min(np.transpose(BB_S4.atom_pos)[2]))
-        delta_b = abs(max(np.transpose(BB_L2.atom_pos)[2])) + abs(min(np.transpose(BB_L2.atom_pos)[2]))
+        delta_a = abs(max(np.transpose(BB_S4.atom_pos)[2])) + abs(
+            min(np.transpose(BB_S4.atom_pos)[2])
+        )
+        delta_b = abs(max(np.transpose(BB_L2.atom_pos)[2])) + abs(
+            min(np.transpose(BB_L2.atom_pos)[2])
+        )
 
         delta_max = max([delta_a, delta_b])
 
         # Calculate the cell parameters
-        a = topology_info['a'] * size
-        b = topology_info['b'] * size
-        c = topology_info['c'] + delta_max
-        alpha = topology_info['alpha']
-        beta = topology_info['beta']
-        gamma = topology_info['gamma']
+        a = topology_info["a"] * size
+        b = topology_info["b"] * size
+        c = topology_info["c"] + delta_max
+        alpha = topology_info["alpha"]
+        beta = topology_info["beta"]
+        gamma = topology_info["gamma"]
 
-        if self.stacking == 'A':
+        if self.stacking == "A":
             c = slab
 
         # Create the lattice
@@ -3573,57 +3628,59 @@ class Framework():
         self.atom_pos = []
 
         # Add the building blocks to the structure
-        for vertice_data in topology_info['vertices']:
+        for vertice_data in topology_info["vertices"]:
             self.atom_types += BB_S4.atom_types
-            vertice_pos = np.array(vertice_data['position'])*a
+            vertice_pos = np.array(vertice_data["position"]) * a
 
-            R_Matrix = R.from_euler('z', vertice_data['angle'], degrees=True).as_matrix()
+            R_Matrix = R.from_euler(
+                "z", vertice_data["angle"], degrees=True
+            ).as_matrix()
 
             rotated_pos = np.dot(BB_S4.atom_pos, R_Matrix) + vertice_pos
             self.atom_pos += rotated_pos.tolist()
 
-            self.atom_labels += ['C1' if i == 'C' else i for i in BB_S4.atom_labels]
+            self.atom_labels += ["C1" if i == "C" else i for i in BB_S4.atom_labels]
 
         # Add the building blocks to the structure
-        for edge_data in topology_info['edges']:
+        for edge_data in topology_info["edges"]:
             self.atom_types += BB_L2.atom_types
-            edge_pos = np.array(edge_data['position'])*a
+            edge_pos = np.array(edge_data["position"]) * a
 
-            R_Matrix = R.from_euler('z', edge_data['angle'], degrees=True).as_matrix()
+            R_Matrix = R.from_euler("z", edge_data["angle"], degrees=True).as_matrix()
 
             rotated_pos = np.dot(BB_L2.atom_pos, R_Matrix) + edge_pos
             self.atom_pos += rotated_pos.tolist()
 
-            self.atom_labels += ['C2' if i == 'C' else i for i in BB_L2.atom_labels]
+            self.atom_labels += ["C2" if i == "C" else i for i in BB_L2.atom_labels]
 
         StartingFramework = Structure(
             self.cellMatrix,
             self.atom_types,
             self.atom_pos,
             coords_are_cartesian=True,
-            site_properties={'source': self.atom_labels}
+            site_properties={"source": self.atom_labels},
         ).get_sorted_structure()
 
         # Translates the structure to the center of the cell
         StartingFramework.translate_sites(
-            range(len(StartingFramework.as_dict()['sites'])),
+            range(len(StartingFramework.as_dict()["sites"])),
             [0, 0, 0.5],
             frac_coords=True,
-            to_unit_cell=True
+            to_unit_cell=True,
         )
 
         dict_structure = StartingFramework.as_dict()
 
-        self.cellMatrix = np.array(dict_structure['lattice']['matrix']).astype(float)
+        self.cellMatrix = np.array(dict_structure["lattice"]["matrix"]).astype(float)
 
-        self.atom_types = [i['label'] for i in dict_structure['sites']]
-        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
+        self.atom_types = [i["label"] for i in dict_structure["sites"]]
+        self.atom_pos = [i["xyz"] for i in dict_structure["sites"]]
+        self.atom_labels = [i["properties"]["source"] for i in dict_structure["sites"]]
 
-        if stacking == 'A' or stacking == 'AA':
+        if stacking == "A" or stacking == "AA":
             stacked_structure = StartingFramework
 
-        if stacking == 'AB1':
+        if stacking == "AB1":
             self.cellMatrix *= (1, 1, 2)
             self.cellParameters *= (1, 1, 2, 1, 1, 1)
 
@@ -3636,7 +3693,7 @@ class Framework():
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -3644,13 +3701,10 @@ class Framework():
 
             # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                [2/3, 1/3, 0.5],
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, [2 / 3, 1 / 3, 0.5], frac_coords=True, to_unit_cell=True
+            )
 
-        if stacking == 'AB2':
+        if stacking == "AB2":
             self.cellMatrix *= (1, 1, 2)
             self.cellParameters *= (1, 1, 2, 1, 1, 1)
 
@@ -3663,7 +3717,7 @@ class Framework():
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -3671,26 +3725,29 @@ class Framework():
 
             # Translate the second sheet by the vector [1/2, 0, 0.5] to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                [1/2, 0, 0.5],
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, [1 / 2, 0, 0.5], frac_coords=True, to_unit_cell=True
+            )
 
-        if stacking == 'ABC1':
+        if stacking == "ABC1":
             self.cellMatrix *= (1, 1, 3)
             self.cellParameters *= (1, 1, 3, 1, 1, 1)
 
-            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
-            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
-            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
+            self.atom_types = np.concatenate(
+                (self.atom_types, self.atom_types, self.atom_types)
+            )
+            self.atom_pos = np.concatenate(
+                (self.atom_pos, self.atom_pos, self.atom_pos)
+            )
+            self.atom_labels = np.concatenate(
+                (self.atom_labels, self.atom_labels, self.atom_labels)
+            )
 
             stacked_structure = Structure(
                 self.cellMatrix,
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -3698,34 +3755,34 @@ class Framework():
 
             # Translate the second sheet by the vector (2/3, 1/3, 0) to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                (2/3, 1/3, 1/3),
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, (2 / 3, 1 / 3, 1 / 3), frac_coords=True, to_unit_cell=True
+            )
 
             # Translate the third sheet by the vector (2/3, 1/3, 0) to generate the B positions
             stacked_structure.translate_sites(
-                C_list,
-                (4/3, 2/3, 2/3),
-                frac_coords=True,
-                to_unit_cell=True
+                C_list, (4 / 3, 2 / 3, 2 / 3), frac_coords=True, to_unit_cell=True
             )
 
-        if stacking == 'ABC2':
+        if stacking == "ABC2":
             self.cellMatrix *= (1, 1, 3)
             self.cellParameters *= (1, 1, 3, 1, 1, 1)
 
-            self.atom_types = np.concatenate((self.atom_types, self.atom_types, self.atom_types))
-            self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos, self.atom_pos))
-            self.atom_labels = np.concatenate((self.atom_labels, self.atom_labels, self.atom_labels))
+            self.atom_types = np.concatenate(
+                (self.atom_types, self.atom_types, self.atom_types)
+            )
+            self.atom_pos = np.concatenate(
+                (self.atom_pos, self.atom_pos, self.atom_pos)
+            )
+            self.atom_labels = np.concatenate(
+                (self.atom_labels, self.atom_labels, self.atom_labels)
+            )
 
             stacked_structure = Structure(
                 self.cellMatrix,
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -3733,21 +3790,15 @@ class Framework():
 
             # Translate the second sheet by the vector (2/3, 1/3, 0) to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                (1/3, 0, 1/3),
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, (1 / 3, 0, 1 / 3), frac_coords=True, to_unit_cell=True
+            )
 
             # Translate the third sheet by the vector (2/3, 1/3, 0) to generate the B positions
             stacked_structure.translate_sites(
-                C_list,
-                (2/3, 0, 2/3),
-                frac_coords=True,
-                to_unit_cell=True
+                C_list, (2 / 3, 0, 2 / 3), frac_coords=True, to_unit_cell=True
             )
 
-        if stacking == 'AAl':
+        if stacking == "AAl":
             self.cellMatrix *= (1, 1, 2)
             self.cellParameters *= (1, 1, 2, 1, 1, 1)
 
@@ -3761,7 +3812,7 @@ class Framework():
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -3769,26 +3820,27 @@ class Framework():
 
             # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                [0, 0, 0.5],
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, [0, 0, 0.5], frac_coords=True, to_unit_cell=True
+            )
 
         # Create AA tilted stacking.
-        if stacking == 'AAt':
-            cell = StartingFramework.as_dict()['lattice']
+        if stacking == "AAt":
+            cell = StartingFramework.as_dict()["lattice"]
 
             # Shift the cell by the tilt angle
-            a_cell = cell['a']
-            b_cell = cell['b']
-            c_cell = cell['c'] * 2
-            alpha = cell['alpha'] - tilt_angle
-            beta = cell['beta'] - tilt_angle
-            gamma = cell['gamma']
+            a_cell = cell["a"]
+            b_cell = cell["b"]
+            c_cell = cell["c"] * 2
+            alpha = cell["alpha"] - tilt_angle
+            beta = cell["beta"] - tilt_angle
+            gamma = cell["gamma"]
 
-            self.cellMatrix = cellpar_to_cell([a_cell, b_cell, c_cell, alpha, beta, gamma])
-            self.cellParameters = np.array([a_cell, b_cell, c_cell, alpha, beta, gamma]).astype(float)
+            self.cellMatrix = cellpar_to_cell(
+                [a_cell, b_cell, c_cell, alpha, beta, gamma]
+            )
+            self.cellParameters = np.array(
+                [a_cell, b_cell, c_cell, alpha, beta, gamma]
+            ).astype(float)
 
             self.atom_types = np.concatenate((self.atom_types, self.atom_types))
             self.atom_pos = np.concatenate((self.atom_pos, self.atom_pos))
@@ -3799,7 +3851,7 @@ class Framework():
                 self.atom_types,
                 self.atom_pos,
                 coords_are_cartesian=True,
-                site_properties={'source': self.atom_labels}
+                site_properties={"source": self.atom_labels},
             )
 
             # Get the index of the atoms in the second sheet
@@ -3807,34 +3859,31 @@ class Framework():
 
             # Translate the second sheet by the vector [2/3, 1/3, 0.5] to generate the B positions
             stacked_structure.translate_sites(
-                B_list,
-                [0, 0, 0.5],
-                frac_coords=True,
-                to_unit_cell=True
-                )
+                B_list, [0, 0, 0.5], frac_coords=True, to_unit_cell=True
+            )
 
         dict_structure = stacked_structure.as_dict()
 
-        self.cellMatrix = np.array(dict_structure['lattice']['matrix']).astype(float)
+        self.cellMatrix = np.array(dict_structure["lattice"]["matrix"]).astype(float)
 
-        self.atom_types = [i['label'] for i in dict_structure['sites']]
-        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
-        self.n_atoms = len(dict_structure['sites'])
+        self.atom_types = [i["label"] for i in dict_structure["sites"]]
+        self.atom_pos = [i["xyz"] for i in dict_structure["sites"]]
+        self.atom_labels = [i["properties"]["source"] for i in dict_structure["sites"]]
+        self.n_atoms = len(dict_structure["sites"])
         self.composition = stacked_structure.formula
 
         dist_matrix = stacked_structure.distance_matrix
 
         # Check if there are any atoms closer than 0.8 A
         for i in range(len(dist_matrix)):
-            for j in range(i+1, len(dist_matrix)):
+            for j in range(i + 1, len(dist_matrix)):
                 if dist_matrix[i][j] < self.dist_threshold:
                     raise BondLenghError(i, j, dist_matrix[i][j], self.dist_threshold)
 
         # Get the simmetry information of the generated structure
-        symm = SpacegroupAnalyzer(stacked_structure,
-                                  symprec=self.symm_tol,
-                                  angle_tolerance=self.angle_tol)
+        symm = SpacegroupAnalyzer(
+            stacked_structure, symprec=self.symm_tol, angle_tolerance=self.angle_tol
+        )
 
         try:
             self.prim_structure = symm.get_refined_structure(keep_site_properties=True)
@@ -3851,36 +3900,42 @@ class Framework():
         except Exception as e:
             self.logger.exception(e)
 
-            self.lattice_type = 'Triclinic'
-            self.space_group = 'P1'
-            self.space_group_n = '1'
+            self.lattice_type = "Triclinic"
+            self.space_group = "P1"
+            self.space_group_n = "1"
 
             symm_op = [1]
-            self.hall = 'P 1'
+            self.hall = "P 1"
 
-        symm_text = get_framework_symm_text(self.name,
-                                            str(self.lattice_type),
-                                            str(self.hall[0:2]),
-                                            str(self.space_group),
-                                            str(self.space_group_n),
-                                            len(symm_op))
+        symm_text = get_framework_symm_text(
+            self.name,
+            str(self.lattice_type),
+            str(self.hall[0:2]),
+            str(self.space_group),
+            str(self.space_group_n),
+            len(symm_op),
+        )
 
         self.logger.info(symm_text)
 
-        return [self.name,
-                str(self.lattice_type),
-                str(self.hall[0:2]),
-                str(self.space_group),
-                str(self.space_group_n),
-                len(symm_op)]
+        return [
+            self.name,
+            str(self.lattice_type),
+            str(self.hall[0:2]),
+            str(self.space_group),
+            str(self.space_group_n),
+            len(symm_op),
+        ]
 
-    def create_dia_structure(self,
-                             BB_D41: str,
-                             BB_D42: str,
-                             interp_dg: str = '1',
-                             d_param_base: float = 7.2,
-                             print_result: bool = True,
-                             **kwargs):
+    def create_dia_structure(
+        self,
+        BB_D41: str,
+        BB_D42: str,
+        interp_dg: str = "1",
+        d_param_base: float = 7.2,
+        print_result: bool = True,
+        **kwargs,
+    ):
         """Creates a COF with DIA network.
 
         The DIA net is composed of two tetrapodal tetrahedical building blocks.
@@ -3909,30 +3964,32 @@ class Framework():
                 5. number of the space group,
                 6. number of operation symmetry
         """
-        connectivity_error = 'Building block {} must present connectivity {} not {}'
+        connectivity_error = "Building block {} must present connectivity {} not {}"
         if BB_D41.connectivity != 4:
-            self.logger.error(connectivity_error.format('A', 4, BB_D41.connectivity))
+            self.logger.error(connectivity_error.format("A", 4, BB_D41.connectivity))
             raise BBConnectivityError(4, BB_D41.connectivity)
         if BB_D42.connectivity != 4:
-            self.logger.error(connectivity_error.format('B', 4, BB_D42.connectivity))
+            self.logger.error(connectivity_error.format("B", 4, BB_D42.connectivity))
             raise BBConnectivityError(4, BB_D42.connectivity)
 
-        self.name = f'{BB_D41.name}-{BB_D42.name}-DIA-{interp_dg}'
-        self.topology = 'DIA'
+        self.name = f"{BB_D41.name}-{BB_D42.name}-DIA-{interp_dg}"
+        self.topology = "DIA"
         self.staking = interp_dg
         self.dimension = 3
 
         self.charge = BB_D41.charge + BB_D42.charge
         self.chirality = BB_D41.chirality or BB_D42.chirality
 
-        self.logger.debug(f'Starting the creation of {self.name}')
+        self.logger.debug(f"Starting the creation of {self.name}")
 
         # Detect the bond atom from the connection groups type
         bond_atom = get_bond_atom(BB_D41.conector, BB_D42.conector)
 
-        self.logger.debug('{} detected as bond atom for groups {} and {}'.format(bond_atom,
-                                                                                 BB_D41.conector,
-                                                                                 BB_D42.conector))
+        self.logger.debug(
+            "{} detected as bond atom for groups {} and {}".format(
+                bond_atom, BB_D41.conector, BB_D42.conector
+            )
+        )
 
         # Get the topology information
         topology_info = TOPOLOGY_DICT[self.topology]
@@ -3941,12 +3998,14 @@ class Framework():
         size = np.average(BB_D41.size) + np.average(BB_D42.size)
 
         # Calculate the primitive cell vector assuming tetrahedical building blocks
-        a_prim = np.sqrt(2)*size*np.sqrt((1 - np.cos(1.9106316646041868)))
-        a_conv = np.sqrt(2)*a_prim
+        a_prim = np.sqrt(2) * size * np.sqrt((1 - np.cos(1.9106316646041868)))
+        a_conv = np.sqrt(2) * a_prim
 
         # Create the primitive lattice
-        self.cellMatrix = Lattice(a_conv/2*np.array(topology_info['lattice']))
-        self.cellParameters = np.array([a_prim, a_prim, a_prim, 60, 60, 60]).astype(float)
+        self.cellMatrix = Lattice(a_conv / 2 * np.array(topology_info["lattice"]))
+        self.cellParameters = np.array([a_prim, a_prim, a_prim, 60, 60, 60]).astype(
+            float
+        )
 
         # Create the structure
         self.atom_types = []
@@ -3954,62 +4013,66 @@ class Framework():
         self.atom_pos = []
 
         # Align and rotate the building block 1 to their respective positions
-        BB_D41.align_to(topology_info['vertices'][0]['align_v'])
+        BB_D41.align_to(topology_info["vertices"][0]["align_v"])
 
         # Determine the angle that alings the X[1] to one of the vertices of the tetrahedron
         vertice_pos = unit_vector(np.array([1, 0, 1]))
         Q_vertice_pos = BB_D41.get_X_points()[1][1]
 
         rotated_list = [
-             R.from_rotvec(
-                 a * unit_vector(topology_info['vertices'][0]['align_v']), degrees=False
-                 ).apply(Q_vertice_pos)
-             for a in np.linspace(0, 2*np.pi, 360)
-             ]
+            R.from_rotvec(
+                a * unit_vector(topology_info["vertices"][0]["align_v"]), degrees=False
+            ).apply(Q_vertice_pos)
+            for a in np.linspace(0, 2 * np.pi, 360)
+        ]
 
         # Calculate the angle between the vertice_pos and the elements of rotated_list
         angle_list = [angle(vertice_pos, i) for i in rotated_list]
 
         rot_angle = np.linspace(0, 360, 360)[np.argmax(angle_list)]
 
-        BB_D41.rotate_around(rotation_axis=np.array(topology_info['vertices'][0]['align_v']),
-                             angle=rot_angle,
-                             degree=True)
+        BB_D41.rotate_around(
+            rotation_axis=np.array(topology_info["vertices"][0]["align_v"]),
+            angle=rot_angle,
+            degree=True,
+        )
 
-        BB_D41.shift(np.array(topology_info['vertices'][0]['position'])*a_conv)
+        BB_D41.shift(np.array(topology_info["vertices"][0]["position"]) * a_conv)
         BB_D41.remove_X()
 
         # Add the building block 1 to the structure
         self.atom_types += BB_D41.atom_types
         self.atom_pos += BB_D41.atom_pos.tolist()
-        self.atom_labels += ['C1' if i == 'C' else i for i in BB_D41.atom_labels]
+        self.atom_labels += ["C1" if i == "C" else i for i in BB_D41.atom_labels]
 
         # Align and rotate the building block 1 to their respective positions
-        BB_D42.align_to(topology_info['vertices'][0]['align_v'])
+        BB_D42.align_to(topology_info["vertices"][0]["align_v"])
 
         # Determine the angle that alings the X[1] to one of the vertices of the tetrahedron
         vertice_pos = unit_vector(np.array([1, 0, 1]))
         Q_vertice_pos = BB_D42.get_X_points()[1][1]
 
         rotated_list = [
-             R.from_rotvec(
-                 a * unit_vector(topology_info['vertices'][0]['align_v']), degrees=False
-                 ).apply(Q_vertice_pos)
-             for a in np.linspace(0, 2*np.pi, 360)
-             ]
+            R.from_rotvec(
+                a * unit_vector(topology_info["vertices"][0]["align_v"]), degrees=False
+            ).apply(Q_vertice_pos)
+            for a in np.linspace(0, 2 * np.pi, 360)
+        ]
 
         # Calculate the angle between the vertice_pos and the elements of rotated_list
         angle_list = [angle(vertice_pos, i) for i in rotated_list]
 
         rot_angle = np.linspace(0, 360, 360)[np.argmax(angle_list)]
 
-        BB_D42.rotate_around(rotation_axis=np.array(topology_info['vertices'][0]['align_v']),
-                             angle=rot_angle,
-                             degree=True)
+        BB_D42.rotate_around(
+            rotation_axis=np.array(topology_info["vertices"][0]["align_v"]),
+            angle=rot_angle,
+            degree=True,
+        )
 
         BB_D42.atom_pos = -BB_D42.atom_pos
 
-        BB_D42.shift(np.array(topology_info['vertices'][1]['position'])*a_conv)
+        BB_D42.shift(np.array(topology_info["vertices"][1]["position"]) * a_conv)
 
         BB_D42.replace_X(bond_atom)
         BB_D42.remove_X()
@@ -4017,7 +4080,7 @@ class Framework():
         # Add the building block 2 to the structure
         self.atom_types += BB_D42.atom_types
         self.atom_pos += BB_D42.atom_pos.tolist()
-        self.atom_labels += ['C2' if i == 'C' else i for i in BB_D42.atom_labels]
+        self.atom_labels += ["C2" if i == "C" else i for i in BB_D42.atom_labels]
 
         atom_types, atom_labels, atom_pos = [], [], []
         for n_int in range(int(self.stacking)):
@@ -4036,49 +4099,61 @@ class Framework():
             self.atom_types,
             self.atom_pos,
             coords_are_cartesian=True,
-            site_properties={'source': self.atom_labels}
+            site_properties={"source": self.atom_labels},
         ).get_sorted_structure()
 
         dict_structure = StartingFramework.as_dict()
 
-        self.cellMatrix = np.array(dict_structure['lattice']['matrix']).astype(float)
+        self.cellMatrix = np.array(dict_structure["lattice"]["matrix"]).astype(float)
 
-        self.atom_types = [i['label'] for i in dict_structure['sites']]
-        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
-        self.n_atoms = len(dict_structure['sites'])
+        self.atom_types = [i["label"] for i in dict_structure["sites"]]
+        self.atom_pos = [i["xyz"] for i in dict_structure["sites"]]
+        self.atom_labels = [i["properties"]["source"] for i in dict_structure["sites"]]
+        self.n_atoms = len(dict_structure["sites"])
         self.composition = StartingFramework.formula
 
         dist_matrix = StartingFramework.distance_matrix
 
         # Check if there are any atoms closer than 0.8 A
         for i in range(len(dist_matrix)):
-            for j in range(i+1, len(dist_matrix)):
+            for j in range(i + 1, len(dist_matrix)):
                 if dist_matrix[i][j] < self.dist_threshold:
                     raise BondLenghError(i, j, dist_matrix[i][j], self.dist_threshold)
 
         # Get the simmetry information of the generated structure
-        symm = SpacegroupAnalyzer(StartingFramework,
-                                  symprec=self.symm_tol,
-                                  angle_tolerance=self.angle_tol)
+        symm = SpacegroupAnalyzer(
+            StartingFramework, symprec=self.symm_tol, angle_tolerance=self.angle_tol
+        )
 
         try:
-            self.prim_structure = symm.get_primitive_standard_structure(keep_site_properties=True)
+            self.prim_structure = symm.get_primitive_standard_structure(
+                keep_site_properties=True
+            )
 
-            dict_structure = symm.get_refined_structure(keep_site_properties=True).as_dict()
+            dict_structure = symm.get_refined_structure(
+                keep_site_properties=True
+            ).as_dict()
 
-            self.cellMatrix = np.array(dict_structure['lattice']['matrix']).astype(float)
-            self.cellParameters = np.array([dict_structure['lattice']['a'],
-                                            dict_structure['lattice']['b'],
-                                            dict_structure['lattice']['c'],
-                                            dict_structure['lattice']['alpha'],
-                                            dict_structure['lattice']['beta'],
-                                            dict_structure['lattice']['gamma']]).astype(float)
+            self.cellMatrix = np.array(dict_structure["lattice"]["matrix"]).astype(
+                float
+            )
+            self.cellParameters = np.array(
+                [
+                    dict_structure["lattice"]["a"],
+                    dict_structure["lattice"]["b"],
+                    dict_structure["lattice"]["c"],
+                    dict_structure["lattice"]["alpha"],
+                    dict_structure["lattice"]["beta"],
+                    dict_structure["lattice"]["gamma"],
+                ]
+            ).astype(float)
 
-            self.atom_types = [i['label'] for i in dict_structure['sites']]
-            self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-            self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
-            self.n_atoms = len(dict_structure['sites'])
+            self.atom_types = [i["label"] for i in dict_structure["sites"]]
+            self.atom_pos = [i["xyz"] for i in dict_structure["sites"]]
+            self.atom_labels = [
+                i["properties"]["source"] for i in dict_structure["sites"]
+            ]
+            self.n_atoms = len(dict_structure["sites"])
             self.composition = self.prim_structure.formula
 
             self.logger.debug(self.prim_structure)
@@ -4093,36 +4168,42 @@ class Framework():
         except Exception as e:
             self.logger.exception(e)
 
-            self.lattice_type = 'Triclinic'
-            self.space_group = 'P1'
-            self.space_group_n = '1'
+            self.lattice_type = "Triclinic"
+            self.space_group = "P1"
+            self.space_group_n = "1"
 
             symm_op = [1]
-            self.hall = 'P 1'
+            self.hall = "P 1"
 
-        symm_text = get_framework_symm_text(self.name,
-                                            str(self.lattice_type),
-                                            str(self.hall[0:2]),
-                                            str(self.space_group),
-                                            str(self.space_group_n),
-                                            len(symm_op))
+        symm_text = get_framework_symm_text(
+            self.name,
+            str(self.lattice_type),
+            str(self.hall[0:2]),
+            str(self.space_group),
+            str(self.space_group_n),
+            len(symm_op),
+        )
 
         self.logger.info(symm_text)
 
-        return [self.name,
-                str(self.lattice_type),
-                str(self.hall[0:2]),
-                str(self.space_group),
-                str(self.space_group_n),
-                len(symm_op)]
+        return [
+            self.name,
+            str(self.lattice_type),
+            str(self.hall[0:2]),
+            str(self.space_group),
+            str(self.space_group_n),
+            len(symm_op),
+        ]
 
-    def create_dia_a_structure(self,
-                               BB_D4: str,
-                               BB_L2: str,
-                               interp_dg: str = '1',
-                               d_param_base: float = 7.2,
-                               print_result: bool = True,
-                               **kwargs):
+    def create_dia_a_structure(
+        self,
+        BB_D4: str,
+        BB_L2: str,
+        interp_dg: str = "1",
+        d_param_base: float = 7.2,
+        print_result: bool = True,
+        **kwargs,
+    ):
         """Creates a COF with DIA-A network.
 
         The DIA net is composed of two tetrapodal tetrahedical building blocks.
@@ -4151,30 +4232,32 @@ class Framework():
                 5. number of the space group,
                 6. number of operation symmetry
         """
-        connectivity_error = 'Building block {} must present connectivity {} not {}'
+        connectivity_error = "Building block {} must present connectivity {} not {}"
         if BB_D4.connectivity != 4:
-            self.logger.error(connectivity_error.format('A', 4, BB_D4.connectivity))
+            self.logger.error(connectivity_error.format("A", 4, BB_D4.connectivity))
             raise BBConnectivityError(4, BB_D4.connectivity)
         if BB_L2.connectivity != 2:
-            self.logger.error(connectivity_error.format('B', 2, BB_L2.connectivity))
+            self.logger.error(connectivity_error.format("B", 2, BB_L2.connectivity))
             raise BBConnectivityError(2, BB_L2.connectivity)
 
-        self.name = f'{BB_D4.name}-{BB_L2.name}-DIA_A-{interp_dg}'
-        self.topology = 'DIA_A'
+        self.name = f"{BB_D4.name}-{BB_L2.name}-DIA_A-{interp_dg}"
+        self.topology = "DIA_A"
         self.staking = interp_dg
         self.dimension = 3
 
         self.charge = BB_D4.charge + BB_L2.charge
         self.chirality = BB_D4.chirality or BB_L2.chirality
 
-        self.logger.debug(f'Starting the creation of {self.name}')
+        self.logger.debug(f"Starting the creation of {self.name}")
 
         # Detect the bond atom from the connection groups type
         bond_atom = get_bond_atom(BB_D4.conector, BB_L2.conector)
 
-        self.logger.debug('{} detected as bond atom for groups {} and {}'.format(bond_atom,
-                                                                                 BB_D4.conector,
-                                                                                 BB_L2.conector))
+        self.logger.debug(
+            "{} detected as bond atom for groups {} and {}".format(
+                bond_atom, BB_D4.conector, BB_L2.conector
+            )
+        )
 
         # Get the topology information
         topology_info = TOPOLOGY_DICT[self.topology]
@@ -4183,12 +4266,14 @@ class Framework():
         size = 2 * (np.average(BB_D4.size) + np.average(BB_L2.size))
 
         # Calculate the primitive cell vector assuming tetrahedical building blocks
-        a_prim = np.sqrt(2)*size*np.sqrt((1 - np.cos(1.9106316646041868)))
-        a_conv = np.sqrt(2)*a_prim
+        a_prim = np.sqrt(2) * size * np.sqrt((1 - np.cos(1.9106316646041868)))
+        a_conv = np.sqrt(2) * a_prim
 
         # Create the primitive lattice
-        self.cellMatrix = Lattice(a_conv/2*np.array(topology_info['lattice']))
-        self.cellParameters = np.array([a_prim, a_prim, a_prim, 60, 60, 60]).astype(float)
+        self.cellMatrix = Lattice(a_conv / 2 * np.array(topology_info["lattice"]))
+        self.cellParameters = np.array([a_prim, a_prim, a_prim, 60, 60, 60]).astype(
+            float
+        )
 
         # Create the structure
         self.atom_types = []
@@ -4196,51 +4281,57 @@ class Framework():
         self.atom_pos = []
 
         # Align and rotate the building block 1 to their respective positions
-        BB_D4.align_to(topology_info['vertices'][0]['align_v'])
+        BB_D4.align_to(topology_info["vertices"][0]["align_v"])
 
         # Determine the angle that alings the X[1] to one of the vertices of the tetrahedron
         vertice_pos = unit_vector(np.array([1, 0, 1]))
         Q_vertice_pos = BB_D4.get_X_points()[1][1]
 
         rotated_list = [
-             R.from_rotvec(
-                 a * unit_vector(topology_info['vertices'][0]['align_v']), degrees=False
-                 ).apply(Q_vertice_pos)
-             for a in np.linspace(0, 2*np.pi, 360)
-             ]
+            R.from_rotvec(
+                a * unit_vector(topology_info["vertices"][0]["align_v"]), degrees=False
+            ).apply(Q_vertice_pos)
+            for a in np.linspace(0, 2 * np.pi, 360)
+        ]
 
         # Calculate the angle between the vertice_pos and the elements of rotated_list
         angle_list = [angle(vertice_pos, i) for i in rotated_list]
 
         rot_angle = np.linspace(0, 360, 360)[np.argmax(angle_list)]
 
-        BB_D4.rotate_around(rotation_axis=np.array(topology_info['vertices'][0]['align_v']),
-                            angle=rot_angle,
-                            degree=True)
+        BB_D4.rotate_around(
+            rotation_axis=np.array(topology_info["vertices"][0]["align_v"]),
+            angle=rot_angle,
+            degree=True,
+        )
 
-        BB_D4.shift(np.array(topology_info['vertices'][0]['position'])*a_conv)
+        BB_D4.shift(np.array(topology_info["vertices"][0]["position"]) * a_conv)
         BB_D4.remove_X()
 
         # Add the building block 1 to the structure
         self.atom_types += BB_D4.atom_types
         self.atom_pos += BB_D4.atom_pos.tolist()
-        self.atom_labels += ['C1' if i == 'C' else i for i in BB_D4.atom_labels]
+        self.atom_labels += ["C1" if i == "C" else i for i in BB_D4.atom_labels]
 
         # Add the building block 1 to the structure
         self.atom_types += BB_D4.atom_types
-        self.atom_pos += list(-np.array(BB_D4.atom_pos) + np.array(topology_info['vertices'][1]['position'])*a_conv)
-        self.atom_labels += ['C1' if i == 'C' else i for i in BB_D4.atom_labels]
+        self.atom_pos += list(
+            -np.array(BB_D4.atom_pos)
+            + np.array(topology_info["vertices"][1]["position"]) * a_conv
+        )
+        self.atom_labels += ["C1" if i == "C" else i for i in BB_D4.atom_labels]
 
         # Add the building blocks to the structure
-        for edge_data in topology_info['edges']:
+        for edge_data in topology_info["edges"]:
             # Copy the building block 2 object
             BB = copy.deepcopy(BB_L2)
 
             # Align, rotate and shift the building block 2 to their respective positions
-            BB.align_to(edge_data['align_v'])
-            BB.rotate_around(rotation_axis=edge_data['align_v'],
-                             angle=edge_data['angle'])
-            BB.shift(np.array(edge_data['position']) * a_conv)
+            BB.align_to(edge_data["align_v"])
+            BB.rotate_around(
+                rotation_axis=edge_data["align_v"], angle=edge_data["angle"]
+            )
+            BB.shift(np.array(edge_data["position"]) * a_conv)
 
             # Replace "X" the building block with the correct atom dicated by the connection group
             BB.replace_X(bond_atom)
@@ -4249,7 +4340,7 @@ class Framework():
             # Update the structure
             self.atom_types += BB.atom_types
             self.atom_pos += BB.atom_pos.tolist()
-            self.atom_labels += ['C2' if i == 'C' else i for i in BB.atom_labels]
+            self.atom_labels += ["C2" if i == "C" else i for i in BB.atom_labels]
 
         atom_types, atom_labels, atom_pos = [], [], []
         for n_int in range(int(self.stacking)):
@@ -4268,62 +4359,78 @@ class Framework():
             self.atom_types,
             self.atom_pos,
             coords_are_cartesian=True,
-            site_properties={'source': self.atom_labels}
+            site_properties={"source": self.atom_labels},
         ).get_sorted_structure()
 
         StartingFramework.translate_sites(
             np.ones(len(self.atom_types)).astype(int).tolist(),
             [0, 0, 0],
             frac_coords=True,
-            to_unit_cell=True
-            )
+            to_unit_cell=True,
+        )
 
         dict_structure = StartingFramework.as_dict()
 
-        self.cellMatrix = np.array(dict_structure['lattice']['matrix']).astype(float)
-        self.cellParameters = np.array([dict_structure['lattice']['a'],
-                                        dict_structure['lattice']['b'],
-                                        dict_structure['lattice']['c'],
-                                        dict_structure['lattice']['alpha'],
-                                        dict_structure['lattice']['beta'],
-                                        dict_structure['lattice']['gamma']]).astype(float)
+        self.cellMatrix = np.array(dict_structure["lattice"]["matrix"]).astype(float)
+        self.cellParameters = np.array(
+            [
+                dict_structure["lattice"]["a"],
+                dict_structure["lattice"]["b"],
+                dict_structure["lattice"]["c"],
+                dict_structure["lattice"]["alpha"],
+                dict_structure["lattice"]["beta"],
+                dict_structure["lattice"]["gamma"],
+            ]
+        ).astype(float)
 
-        self.atom_types = [i['label'] for i in dict_structure['sites']]
-        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
-        self.n_atoms = len(dict_structure['sites'])
+        self.atom_types = [i["label"] for i in dict_structure["sites"]]
+        self.atom_pos = [i["xyz"] for i in dict_structure["sites"]]
+        self.atom_labels = [i["properties"]["source"] for i in dict_structure["sites"]]
+        self.n_atoms = len(dict_structure["sites"])
         self.composition = StartingFramework.formula
 
         dist_matrix = StartingFramework.distance_matrix
 
         # Check if there are any atoms closer than 0.8 A
         for i in range(len(dist_matrix)):
-            for j in range(i+1, len(dist_matrix)):
+            for j in range(i + 1, len(dist_matrix)):
                 if dist_matrix[i][j] < self.dist_threshold:
                     raise BondLenghError(i, j, dist_matrix[i][j], self.dist_threshold)
 
         # Get the simmetry information of the generated structure
-        symm = SpacegroupAnalyzer(StartingFramework,
-                                  symprec=self.symm_tol,
-                                  angle_tolerance=self.angle_tol)
+        symm = SpacegroupAnalyzer(
+            StartingFramework, symprec=self.symm_tol, angle_tolerance=self.angle_tol
+        )
 
         try:
-            self.prim_structure = symm.get_primitive_standard_structure(keep_site_properties=True)
+            self.prim_structure = symm.get_primitive_standard_structure(
+                keep_site_properties=True
+            )
 
-            dict_structure = symm.get_refined_structure(keep_site_properties=True).as_dict()
+            dict_structure = symm.get_refined_structure(
+                keep_site_properties=True
+            ).as_dict()
 
-            self.cellMatrix = np.array(dict_structure['lattice']['matrix']).astype(float)
-            self.cellParameters = np.array([dict_structure['lattice']['a'],
-                                            dict_structure['lattice']['b'],
-                                            dict_structure['lattice']['c'],
-                                            dict_structure['lattice']['alpha'],
-                                            dict_structure['lattice']['beta'],
-                                            dict_structure['lattice']['gamma']]).astype(float)
+            self.cellMatrix = np.array(dict_structure["lattice"]["matrix"]).astype(
+                float
+            )
+            self.cellParameters = np.array(
+                [
+                    dict_structure["lattice"]["a"],
+                    dict_structure["lattice"]["b"],
+                    dict_structure["lattice"]["c"],
+                    dict_structure["lattice"]["alpha"],
+                    dict_structure["lattice"]["beta"],
+                    dict_structure["lattice"]["gamma"],
+                ]
+            ).astype(float)
 
-            self.atom_types = [i['label'] for i in dict_structure['sites']]
-            self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-            self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
-            self.n_atoms = len(dict_structure['sites'])
+            self.atom_types = [i["label"] for i in dict_structure["sites"]]
+            self.atom_pos = [i["xyz"] for i in dict_structure["sites"]]
+            self.atom_labels = [
+                i["properties"]["source"] for i in dict_structure["sites"]
+            ]
+            self.n_atoms = len(dict_structure["sites"])
             self.composition = self.prim_structure.formula
 
             self.logger.debug(self.prim_structure)
@@ -4338,36 +4445,42 @@ class Framework():
         except Exception as e:
             self.logger.exception(e)
 
-            self.lattice_type = 'Triclinic'
-            self.space_group = 'P1'
-            self.space_group_n = '1'
+            self.lattice_type = "Triclinic"
+            self.space_group = "P1"
+            self.space_group_n = "1"
 
             symm_op = [1]
-            self.hall = 'P 1'
+            self.hall = "P 1"
 
-        symm_text = get_framework_symm_text(self.name,
-                                            str(self.lattice_type),
-                                            str(self.hall[0:2]),
-                                            str(self.space_group),
-                                            str(self.space_group_n),
-                                            len(symm_op))
+        symm_text = get_framework_symm_text(
+            self.name,
+            str(self.lattice_type),
+            str(self.hall[0:2]),
+            str(self.space_group),
+            str(self.space_group_n),
+            len(symm_op),
+        )
 
         self.logger.info(symm_text)
 
-        return [self.name,
-                str(self.lattice_type),
-                str(self.hall[0:2]),
-                str(self.space_group),
-                str(self.space_group_n),
-                len(symm_op)]
+        return [
+            self.name,
+            str(self.lattice_type),
+            str(self.hall[0:2]),
+            str(self.space_group),
+            str(self.space_group_n),
+            len(symm_op),
+        ]
 
-    def create_bor_structure(self,
-                             BB_D4: str,
-                             BB_T3: str,
-                             interp_dg: str = '1',
-                             d_param_base: float = 7.2,
-                             print_result: bool = True,
-                             **kwargs):
+    def create_bor_structure(
+        self,
+        BB_D4: str,
+        BB_T3: str,
+        interp_dg: str = "1",
+        d_param_base: float = 7.2,
+        print_result: bool = True,
+        **kwargs,
+    ):
         """Creates a COF with BOR network.
 
         The BOR net is composed of one tetrapodal tetrahedical building block and
@@ -4398,65 +4511,65 @@ class Framework():
                 6. number of operation symmetry
         """
 
-        raise NotImplementedError('The BOR network is not implemented yet')
+        raise NotImplementedError("The BOR network is not implemented yet")
 
-        connectivity_error = 'Building block {} must present connectivity {} not {}'
+        connectivity_error = "Building block {} must present connectivity {} not {}"
         if BB_D4.connectivity != 4:
-            self.logger.error(connectivity_error.format('A', 4, BB_D4.connectivity))
+            self.logger.error(connectivity_error.format("A", 4, BB_D4.connectivity))
             raise BBConnectivityError(4, BB_D4.connectivity)
         if BB_T3.connectivity != 3:
-            self.logger.error(connectivity_error.format('B', 3, BB_T3.connectivity))
+            self.logger.error(connectivity_error.format("B", 3, BB_T3.connectivity))
             raise BBConnectivityError(3, BB_T3.connectivity)
 
         # Get the topology information
         topology_info = TOPOLOGY_DICT[self.topology]
 
-        self.name = f'{BB_D4.name}-{BB_T3.name}-BOR-{interp_dg}'
-        self.topology = 'BOR'
+        self.name = f"{BB_D4.name}-{BB_T3.name}-BOR-{interp_dg}"
+        self.topology = "BOR"
         self.staking = interp_dg
         self.dimension = 3
 
         self.charge = BB_D4.charge + BB_T3.charge
         self.chirality = BB_D4.chirality or BB_T3.chirality
 
-        self.logger.debug(f'Starting the creation of {self.name}')
+        self.logger.debug(f"Starting the creation of {self.name}")
 
         # Detect the bond atom from the connection groups type
         bond_atom = get_bond_atom(BB_D4.conector, BB_T3.conector)
 
-        self.logger.debug('{} detected as bond atom for groups {} and {}'.format(bond_atom,
-                                                                                 BB_D4.conector,
-                                                                                 BB_T3.conector))
+        self.logger.debug(
+            "{} detected as bond atom for groups {} and {}".format(
+                bond_atom, BB_D4.conector, BB_T3.conector
+            )
+        )
 
         # Get the topology information
         topology_info = TOPOLOGY_DICT[self.topology]
 
         # Measure the base size of the building blocks
-        d_size = (np.array(BB_D4.size).mean() + np.array(BB_T3.size).mean())
+        d_size = np.array(BB_D4.size).mean() + np.array(BB_T3.size).mean()
 
         # Calculate the primitive cell vector assuming tetrahedical building blocks
         a_conv = np.sqrt(6) * d_size
 
         # Create the primitive lattice
-        self.cellMatrix = Lattice(a_conv * np.array(topology_info['lattice']))
-        self.cellParameters = np.array([a_conv, a_conv, a_conv, 90, 90, 90]).astype(float)
+        self.cellMatrix = Lattice(a_conv * np.array(topology_info["lattice"]))
+        self.cellParameters = np.array([a_conv, a_conv, a_conv, 90, 90, 90]).astype(
+            float
+        )
 
         # Create the structure
         atom_types = []
         atom_labels = []
         atom_pos = []
 
-        for D_site in topology_info['vertices']:
+        for D_site in topology_info["vertices"]:
             D4 = BB_D4.copy()
-            D4.align_to(
-                np.array(D_site['align_v'])
-                )
+            D4.align_to(np.array(D_site["align_v"]))
 
-            D4.rotate_around(
-                rotation_axis=D_site['align_v'],
-                angle=D_site['angle'])
+            D4.rotate_around(rotation_axis=D_site["align_v"], angle=D_site["angle"])
 
-            D4.shift(np.array(D_site['position'])*a_conv)
+            D4.shift(np.array(D_site["position"]) * a_conv)
 
             atom_types += D4.atom_types
             atom_pos += D4.atom_pos.tolist()
@@ -4468,22 +4581,24 @@ class Framework():
                 if coord < 0:
                     atom_pos[i][j] += a_conv
 
-        X_pos = [atom_pos[i] for i in np.where(np.array(atom_types) == 'X')[0]]
+        X_pos = [atom_pos[i] for i in np.where(np.array(atom_types) == "X")[0]]
 
-        T_site = topology_info['edges'][0]
+        T_site = topology_info["edges"][0]
 
         _, X = BB_T3.get_X_points()
-        BB_T3.rotate_around([0, 0, 1], T_site['angle'], True)
+        BB_T3.rotate_around([0, 0, 1], T_site["angle"], True)
 
-        R_matrix = rotation_matrix_from_vectors([0, 0, 1],
-                                                T_site['align_v'])
+        R_matrix = rotation_matrix_from_vectors([0, 0, 1], T_site["align_v"])
 
         BB_T3.atom_pos = np.dot(BB_T3.atom_pos, R_matrix.T)
 
-        BB_T3.replace_X('O')
+        BB_T3.replace_X("O")
 
         # Get the 3 atoms that are closer to T_site['position'])*a_conv
-        X_pos_temp = sorted(X_pos, key=lambda x: np.linalg.norm(x - np.array(T_site['position'])*a_conv))
+        X_pos_temp = sorted(
+            X_pos,
+            key=lambda x: np.linalg.norm(x - np.array(T_site["position"]) * a_conv),
+        )
 
         X_center = np.array(X_pos_temp[:3]).mean(axis=0)
 
@@ -4524,11 +4639,15 @@ class Framework():
                     atom_pos[i][j] += a_conv
 
         # Remove the X atoms from the list
-        X_index = np.where(np.array(atom_types) == 'X')[0]
+        X_index = np.where(np.array(atom_types) == "X")[0]
 
-        self.atom_types = [atom_types[i] for i in range(len(atom_types)) if i not in X_index]
+        self.atom_types = [
+            atom_types[i] for i in range(len(atom_types)) if i not in X_index
+        ]
         self.atom_pos = [atom_pos[i] for i in range(len(atom_pos)) if i not in X_index]
-        self.atom_labels = [atom_labels[i] for i in range(len(atom_labels)) if i not in X_index]
+        self.atom_labels = [
+            atom_labels[i] for i in range(len(atom_labels)) if i not in X_index
+        ]
 
         atom_types, atom_labels, atom_pos = [], [], []
         for n_int in range(int(self.stacking)):
@@ -4547,64 +4666,80 @@ class Framework():
             self.atom_types,
             self.atom_pos,
             coords_are_cartesian=True,
-            site_properties={'source': self.atom_labels}
+            site_properties={"source": self.atom_labels},
         ).get_sorted_structure()
 
         StartingFramework.translate_sites(
             np.ones(len(self.atom_types)).astype(int).tolist(),
             [0, 0, 0],
             frac_coords=True,
-            to_unit_cell=True
-            )
+            to_unit_cell=True,
+        )
 
         dict_structure = StartingFramework.as_dict()
 
-        self.cellMatrix = np.array(dict_structure['lattice']['matrix']).astype(float)
-        self.cellParameters = np.array([dict_structure['lattice']['a'],
-                                        dict_structure['lattice']['b'],
-                                        dict_structure['lattice']['c'],
-                                        dict_structure['lattice']['alpha'],
-                                        dict_structure['lattice']['beta'],
-                                        dict_structure['lattice']['gamma']]).astype(float)
+        self.cellMatrix = np.array(dict_structure["lattice"]["matrix"]).astype(float)
+        self.cellParameters = np.array(
+            [
+                dict_structure["lattice"]["a"],
+                dict_structure["lattice"]["b"],
+                dict_structure["lattice"]["c"],
+                dict_structure["lattice"]["alpha"],
+                dict_structure["lattice"]["beta"],
+                dict_structure["lattice"]["gamma"],
+            ]
+        ).astype(float)
 
-        self.atom_types = [i['label'] for i in dict_structure['sites']]
-        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
-        self.n_atoms = len(dict_structure['sites'])
+        self.atom_types = [i["label"] for i in dict_structure["sites"]]
+        self.atom_pos = [i["xyz"] for i in dict_structure["sites"]]
+        self.atom_labels = [i["properties"]["source"] for i in dict_structure["sites"]]
+        self.n_atoms = len(dict_structure["sites"])
         self.composition = StartingFramework.formula
 
-        StartingFramework.to('TESTE_BOR.cif', fmt='cif')
+        StartingFramework.to("TESTE_BOR.cif", fmt="cif")
 
         dist_matrix = StartingFramework.distance_matrix
 
         # Check if there are any atoms closer than 0.8 A
         for i in range(len(dist_matrix)):
-            for j in range(i+1, len(dist_matrix)):
+            for j in range(i + 1, len(dist_matrix)):
                 if dist_matrix[i][j] < self.dist_threshold:
                     raise BondLenghError(i, j, dist_matrix[i][j], self.dist_threshold)
 
         # Get the simmetry information of the generated structure
-        symm = SpacegroupAnalyzer(StartingFramework,
-                                  symprec=self.symm_tol,
-                                  angle_tolerance=self.angle_tol)
+        symm = SpacegroupAnalyzer(
+            StartingFramework, symprec=self.symm_tol, angle_tolerance=self.angle_tol
+        )
 
         try:
-            self.prim_structure = symm.get_primitive_standard_structure(keep_site_properties=True)
+            self.prim_structure = symm.get_primitive_standard_structure(
+                keep_site_properties=True
+            )
 
-            dict_structure = symm.get_refined_structure(keep_site_properties=True).as_dict()
+            dict_structure = symm.get_refined_structure(
+                keep_site_properties=True
+            ).as_dict()
 
-            self.cellMatrix = np.array(dict_structure['lattice']['matrix']).astype(float)
-            self.cellParameters = np.array([dict_structure['lattice']['a'],
-                                            dict_structure['lattice']['b'],
-                                            dict_structure['lattice']['c'],
-                                            dict_structure['lattice']['alpha'],
-                                            dict_structure['lattice']['beta'],
-                                            dict_structure['lattice']['gamma']]).astype(float)
+            self.cellMatrix = np.array(dict_structure["lattice"]["matrix"]).astype(
+                float
+            )
+            self.cellParameters = np.array(
+                [
+                    dict_structure["lattice"]["a"],
+                    dict_structure["lattice"]["b"],
+                    dict_structure["lattice"]["c"],
+                    dict_structure["lattice"]["alpha"],
+                    dict_structure["lattice"]["beta"],
+                    dict_structure["lattice"]["gamma"],
+                ]
+            ).astype(float)
 
-            self.atom_types = [i['label'] for i in dict_structure['sites']]
-            self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-            self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
-            self.n_atoms = len(dict_structure['sites'])
+            self.atom_types = [i["label"] for i in dict_structure["sites"]]
+            self.atom_pos = [i["xyz"] for i in dict_structure["sites"]]
+            self.atom_labels = [
+                i["properties"]["source"] for i in dict_structure["sites"]
+            ]
+            self.n_atoms = len(dict_structure["sites"])
             self.composition = self.prim_structure.formula
 
             self.logger.debug(self.prim_structure)
@@ -4619,36 +4754,42 @@ class Framework():
         except Exception as e:
             self.logger.exception(e)
 
-            self.lattice_type = 'Triclinic'
-            self.space_group = 'P1'
-            self.space_group_n = '1'
+            self.lattice_type = "Triclinic"
+            self.space_group = "P1"
+            self.space_group_n = "1"
 
             symm_op = [1]
-            self.hall = 'P 1'
+            self.hall = "P 1"
 
-        symm_text = get_framework_symm_text(self.name,
-                                            str(self.lattice_type),
-                                            str(self.hall[0:2]),
-                                            str(self.space_group),
-                                            str(self.space_group_n),
-                                            len(symm_op))
+        symm_text = get_framework_symm_text(
+            self.name,
+            str(self.lattice_type),
+            str(self.hall[0:2]),
+            str(self.space_group),
+            str(self.space_group_n),
+            len(symm_op),
+        )
 
         self.logger.info(symm_text)
 
-        return [self.name,
-                str(self.lattice_type),
-                str(self.hall[0:2]),
-                str(self.space_group),
-                str(self.space_group_n),
-                len(symm_op)]
+        return [
+            self.name,
+            str(self.lattice_type),
+            str(self.hall[0:2]),
+            str(self.space_group),
+            str(self.space_group_n),
+            len(symm_op),
+        ]
 
-    def create_lon_structure(self,
-                             BB_D4_A: str,
-                             BB_D4_B: str,
-                             interp_dg: str = '1',
-                             d_param_base: float = 7.2,
-                             print_result: bool = True,
-                             **kwargs):
+    def create_lon_structure(
+        self,
+        BB_D4_A: str,
+        BB_D4_B: str,
+        interp_dg: str = "1",
+        d_param_base: float = 7.2,
+        print_result: bool = True,
+        **kwargs,
+    ):
         """Creates a COF with LON network.
 
         The LON net is composed of two tetrapodal tetrahedical building blocks.
@@ -4677,30 +4818,32 @@ class Framework():
                 5. number of the space group,
                 6. number of operation symmetry
         """
-        connectivity_error = 'Building block {} must present connectivity {} not {}'
+        connectivity_error = "Building block {} must present connectivity {} not {}"
         if BB_D4_A.connectivity != 4:
-            self.logger.error(connectivity_error.format('A', 4, BB_D4_A.connectivity))
+            self.logger.error(connectivity_error.format("A", 4, BB_D4_A.connectivity))
             raise BBConnectivityError(4, BB_D4_A.connectivity)
         if BB_D4_B.connectivity != 4:
-            self.logger.error(connectivity_error.format('B', 4, BB_D4_B.connectivity))
+            self.logger.error(connectivity_error.format("B", 4, BB_D4_B.connectivity))
             raise BBConnectivityError(4, BB_D4_B.connectivity)
 
-        self.name = f'{BB_D4_A.name}-{BB_D4_B.name}-LON-{interp_dg}'
-        self.topology = 'LON'
+        self.name = f"{BB_D4_A.name}-{BB_D4_B.name}-LON-{interp_dg}"
+        self.topology = "LON"
         self.staking = interp_dg
         self.dimension = 3
 
         self.charge = BB_D4_A.charge + BB_D4_B.charge
         self.chirality = BB_D4_A.chirality or BB_D4_B.chirality
 
-        self.logger.debug(f'Starting the creation of {self.name}')
+        self.logger.debug(f"Starting the creation of {self.name}")
 
         # Detect the bond atom from the connection groups type
         bond_atom = get_bond_atom(BB_D4_A.conector, BB_D4_B.conector)
 
-        self.logger.debug('{} detected as bond atom for groups {} and {}'.format(bond_atom,
-                                                                                 BB_D4_A.conector,
-                                                                                 BB_D4_B.conector))
+        self.logger.debug(
+            "{} detected as bond atom for groups {} and {}".format(
+                bond_atom, BB_D4_A.conector, BB_D4_B.conector
+            )
+        )
 
         # Get the topology information
         topology_info = TOPOLOGY_DICT[self.topology]
@@ -4708,18 +4851,20 @@ class Framework():
         # Measure the base size of the building blocks
         size = np.average(BB_D4_A.size) + np.average(BB_D4_B.size)
 
-        alat = 3/2 * size * np.cos(np.radians(19.4712)) / np.cos(np.radians(30))
+        alat = 3 / 2 * size * np.cos(np.radians(19.4712)) / np.cos(np.radians(30))
 
         # Calculate the primitive cell vector assuming perfect tetrahedical building blocks
-        self.cellMatrix = Lattice(alat*np.array(topology_info['lattice']))
-        self.cellParameters = np.array([
-            alat * topology_info['a'],
-            alat * topology_info['b'],
-            alat * topology_info['c'],
-            topology_info['alpha'],
-            topology_info['beta'],
-            topology_info['gamma']
-            ]).astype(float)
+        self.cellMatrix = Lattice(alat * np.array(topology_info["lattice"]))
+        self.cellParameters = np.array(
+            [
+                alat * topology_info["a"],
+                alat * topology_info["b"],
+                alat * topology_info["c"],
+                topology_info["alpha"],
+                topology_info["beta"],
+                topology_info["gamma"],
+            ]
+        ).astype(float)
 
         # Create the structure
         self.atom_types = []
@@ -4727,17 +4872,19 @@ class Framework():
         self.atom_pos = []
 
         # Align and rotate the building block 1 to their respective positions
-        BB_D4_A.align_to(topology_info['vertices'][0]['align_v'])
-        BB_D4_B.align_to(topology_info['vertices'][2]['align_v'])
+        BB_D4_A.align_to(topology_info["vertices"][0]["align_v"])
+        BB_D4_B.align_to(topology_info["vertices"][2]["align_v"])
 
         for site in [0, 1]:
             BB = copy.deepcopy(BB_D4_A)
 
-            BB.align_to(topology_info['vertices'][site]['align_v'])
-            BB.rotate_around(rotation_axis=topology_info['vertices'][site]['align_v'],
-                             angle=topology_info['vertices'][site]['angle'])
+            BB.align_to(topology_info["vertices"][site]["align_v"])
+            BB.rotate_around(
+                rotation_axis=topology_info["vertices"][site]["align_v"],
+                angle=topology_info["vertices"][site]["angle"],
+            )
 
-            BB.shift(np.array(topology_info['vertices'][site]['position'])*alat)
+            BB.shift(np.array(topology_info["vertices"][site]["position"]) * alat)
 
             BB.replace_X(bond_atom)
             BB.remove_X()
@@ -4745,21 +4892,23 @@ class Framework():
             # Update the structure
             self.atom_types += BB.atom_types
             self.atom_pos += BB.atom_pos.tolist()
-            self.atom_labels += ['C1' if i == 'C' else i for i in BB.atom_labels]
+            self.atom_labels += ["C1" if i == "C" else i for i in BB.atom_labels]
 
         for site in [2, 3]:
             BB = copy.deepcopy(BB_D4_B)
 
-            BB.align_to(topology_info['vertices'][site]['align_v'])
-            BB.rotate_around(rotation_axis=topology_info['vertices'][site]['align_v'],
-                             angle=topology_info['vertices'][site]['angle'])
+            BB.align_to(topology_info["vertices"][site]["align_v"])
+            BB.rotate_around(
+                rotation_axis=topology_info["vertices"][site]["align_v"],
+                angle=topology_info["vertices"][site]["angle"],
+            )
 
-            BB.shift(np.array(topology_info['vertices'][site]['position'])*alat)
+            BB.shift(np.array(topology_info["vertices"][site]["position"]) * alat)
 
             BB.remove_X()
             self.atom_types += BB.atom_types
             self.atom_pos += BB.atom_pos.tolist()
-            self.atom_labels += ['C2' if i == 'C' else i for i in BB.atom_labels]
+            self.atom_labels += ["C2" if i == "C" else i for i in BB.atom_labels]
 
         atom_types, atom_labels, atom_pos = [], [], []
         for n_int in range(int(self.stacking)):
@@ -4778,62 +4927,78 @@ class Framework():
             self.atom_types,
             self.atom_pos,
             coords_are_cartesian=True,
-            site_properties={'source': self.atom_labels}
+            site_properties={"source": self.atom_labels},
         ).get_sorted_structure()
 
         StartingFramework.translate_sites(
             np.ones(len(self.atom_types)).astype(int).tolist(),
             [0, 0, 0],
             frac_coords=True,
-            to_unit_cell=True
-            )
+            to_unit_cell=True,
+        )
 
         dict_structure = StartingFramework.as_dict()
 
-        self.cellMatrix = np.array(dict_structure['lattice']['matrix']).astype(float)
-        self.cellParameters = np.array([dict_structure['lattice']['a'],
-                                        dict_structure['lattice']['b'],
-                                        dict_structure['lattice']['c'],
-                                        dict_structure['lattice']['alpha'],
-                                        dict_structure['lattice']['beta'],
-                                        dict_structure['lattice']['gamma']]).astype(float)
+        self.cellMatrix = np.array(dict_structure["lattice"]["matrix"]).astype(float)
+        self.cellParameters = np.array(
+            [
+                dict_structure["lattice"]["a"],
+                dict_structure["lattice"]["b"],
+                dict_structure["lattice"]["c"],
+                dict_structure["lattice"]["alpha"],
+                dict_structure["lattice"]["beta"],
+                dict_structure["lattice"]["gamma"],
+            ]
+        ).astype(float)
 
-        self.atom_types = [i['label'] for i in dict_structure['sites']]
-        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
-        self.n_atoms = len(dict_structure['sites'])
+        self.atom_types = [i["label"] for i in dict_structure["sites"]]
+        self.atom_pos = [i["xyz"] for i in dict_structure["sites"]]
+        self.atom_labels = [i["properties"]["source"] for i in dict_structure["sites"]]
+        self.n_atoms = len(dict_structure["sites"])
         self.composition = StartingFramework.formula
 
         dist_matrix = StartingFramework.distance_matrix
 
         # Check if there are any atoms closer than 0.8 A
         for i in range(len(dist_matrix)):
-            for j in range(i+1, len(dist_matrix)):
+            for j in range(i + 1, len(dist_matrix)):
                 if dist_matrix[i][j] < self.dist_threshold:
                     raise BondLenghError(i, j, dist_matrix[i][j], self.dist_threshold)
 
         # Get the simmetry information of the generated structure
-        symm = SpacegroupAnalyzer(StartingFramework,
-                                  symprec=self.symm_tol,
-                                  angle_tolerance=self.angle_tol)
+        symm = SpacegroupAnalyzer(
+            StartingFramework, symprec=self.symm_tol, angle_tolerance=self.angle_tol
+        )
 
         try:
-            self.prim_structure = symm.get_primitive_standard_structure(keep_site_properties=True)
+            self.prim_structure = symm.get_primitive_standard_structure(
+                keep_site_properties=True
+            )
 
-            dict_structure = symm.get_refined_structure(keep_site_properties=True).as_dict()
+            dict_structure = symm.get_refined_structure(
+                keep_site_properties=True
+            ).as_dict()
 
-            self.cellMatrix = np.array(dict_structure['lattice']['matrix']).astype(float)
-            self.cellParameters = np.array([dict_structure['lattice']['a'],
-                                            dict_structure['lattice']['b'],
-                                            dict_structure['lattice']['c'],
-                                            dict_structure['lattice']['alpha'],
-                                            dict_structure['lattice']['beta'],
-                                            dict_structure['lattice']['gamma']]).astype(float)
+            self.cellMatrix = np.array(dict_structure["lattice"]["matrix"]).astype(
+                float
+            )
+            self.cellParameters = np.array(
+                [
+                    dict_structure["lattice"]["a"],
+                    dict_structure["lattice"]["b"],
+                    dict_structure["lattice"]["c"],
+                    dict_structure["lattice"]["alpha"],
+                    dict_structure["lattice"]["beta"],
+                    dict_structure["lattice"]["gamma"],
+                ]
+            ).astype(float)
 
-            self.atom_types = [i['label'] for i in dict_structure['sites']]
-            self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-            self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
-            self.n_atoms = len(dict_structure['sites'])
+            self.atom_types = [i["label"] for i in dict_structure["sites"]]
+            self.atom_pos = [i["xyz"] for i in dict_structure["sites"]]
+            self.atom_labels = [
+                i["properties"]["source"] for i in dict_structure["sites"]
+            ]
+            self.n_atoms = len(dict_structure["sites"])
             self.composition = self.prim_structure.formula
 
             self.logger.debug(self.prim_structure)
@@ -4848,37 +5013,42 @@ class Framework():
         except Exception as e:
             self.logger.exception(e)
 
-            self.lattice_type = 'Triclinic'
-            self.space_group = 'P1'
-            self.space_group_n = '1'
+            self.lattice_type = "Triclinic"
+            self.space_group = "P1"
+            self.space_group_n = "1"
 
             symm_op = [1]
-            self.hall = 'P 1'
+            self.hall = "P 1"
 
-        symm_text = get_framework_symm_text(self.name,
-                                            str(self.lattice_type),
-                                            str(self.hall[0:2]),
-                                            str(self.space_group),
-                                            str(self.space_group_n),
-                                            len(symm_op))
+        symm_text = get_framework_symm_text(
+            self.name,
+            str(self.lattice_type),
+            str(self.hall[0:2]),
+            str(self.space_group),
+            str(self.space_group_n),
+            len(symm_op),
+        )
 
         self.logger.info(symm_text)
 
-        return [self.name,
-                str(self.lattice_type),
-                str(self.hall[0:2]),
-                str(self.space_group),
-                str(self.space_group_n),
-                len(symm_op)]
+        return [
+            self.name,
+            str(self.lattice_type),
+            str(self.hall[0:2]),
+            str(self.space_group),
+            str(self.space_group_n),
+            len(symm_op),
+        ]
 
-    def create_lon_a_structure(self,
-                               BB_D4: BuildingBlock,
-                               BB_L2: BuildingBlock,
-                               interp_dg: str | int = 0,
-                               d_param_base: float = 10,
-                               print_result: bool = True,
-                               **kwargs):
-
+    def create_lon_a_structure(
+        self,
+        BB_D4: BuildingBlock,
+        BB_L2: BuildingBlock,
+        interp_dg: str | int = 0,
+        d_param_base: float = 10,
+        print_result: bool = True,
+        **kwargs,
+    ):
         """Creates a COF with LON network.
 
         The LON_A net is composed of one tetrapodal tetrahedical and one linear building blocks.
@@ -4910,50 +5080,67 @@ class Framework():
         # Get the topology information
         topology_info = TOPOLOGY_DICT[self.topology]
 
-        connectivity_error = 'Building block {} must present connectivity {} not {}'
-        if BB_D4.connectivity != topology_info['vertice_connectivity']:
-            self.logger.error(connectivity_error.format('A', topology_info['vertice_connectivity'], BB_D4.connectivity))
-            raise BBConnectivityError(topology_info['vertice_connectivity'], BB_D4.connectivity)
-        if BB_L2.connectivity != topology_info['edge_connectivity']:
-            self.logger.error(connectivity_error.format('B', topology_info['edge_connectivity'], BB_L2.connectivity))
-            raise BBConnectivityError(topology_info['edge_connectivity'], BB_L2.connectivity)
+        connectivity_error = "Building block {} must present connectivity {} not {}"
+        if BB_D4.connectivity != topology_info["vertice_connectivity"]:
+            self.logger.error(
+                connectivity_error.format(
+                    "A", topology_info["vertice_connectivity"], BB_D4.connectivity
+                )
+            )
+            raise BBConnectivityError(
+                topology_info["vertice_connectivity"], BB_D4.connectivity
+            )
+        if BB_L2.connectivity != topology_info["edge_connectivity"]:
+            self.logger.error(
+                connectivity_error.format(
+                    "B", topology_info["edge_connectivity"], BB_L2.connectivity
+                )
+            )
+            raise BBConnectivityError(
+                topology_info["edge_connectivity"], BB_L2.connectivity
+            )
 
         # Check if stacking is present in kwargs
-        if 'stacking' in kwargs:
+        if "stacking" in kwargs:
             self.logger.warning(
-                'The stacking parameter should not be used in 3D nets. The interp_dg parameter should be used instead')
+                "The stacking parameter should not be used in 3D nets. The interp_dg parameter should be used instead"
+            )
 
-        self.name = f'{BB_D4.name}-{BB_L2.name}-LON_A-{interp_dg}'
-        self.topology = 'LON_A'
+        self.name = f"{BB_D4.name}-{BB_L2.name}-LON_A-{interp_dg}"
+        self.topology = "LON_A"
         self.staking = interp_dg
         self.dimension = 3
 
         self.charge = BB_D4.charge + BB_L2.charge
         self.chirality = BB_D4.chirality or BB_L2.chirality
 
-        self.logger.debug(f'Starting the creation of {self.name}')
+        self.logger.debug(f"Starting the creation of {self.name}")
 
         # Detect the bond atom from the connection groups type
         bond_atom = get_bond_atom(BB_D4.conector, BB_L2.conector)
 
-        self.logger.debug('{} detected as bond atom for groups {} and {}'.format(bond_atom,
-                                                                                 BB_D4.conector,
-                                                                                 BB_L2.conector))
+        self.logger.debug(
+            "{} detected as bond atom for groups {} and {}".format(
+                bond_atom, BB_D4.conector, BB_L2.conector
+            )
+        )
         # Measure the base size of the building blocks
         size = np.average(BB_D4.size) + np.average(BB_L2.size)
 
         alat = 4 * size * np.cos(np.radians(35.26439))
 
         # Calculate the primitive cell vector assuming perfect tetrahedical building blocks
-        self.cellMatrix = Lattice(alat*np.array(topology_info['lattice']))
-        self.cellParameters = np.array([
-            alat * topology_info['a'],
-            alat * topology_info['b'],
-            alat * topology_info['c'],
-            topology_info['alpha'],
-            topology_info['beta'],
-            topology_info['gamma']
-            ]).astype(float)
+        self.cellMatrix = Lattice(alat * np.array(topology_info["lattice"]))
+        self.cellParameters = np.array(
+            [
+                alat * topology_info["a"],
+                alat * topology_info["b"],
+                alat * topology_info["c"],
+                topology_info["alpha"],
+                topology_info["beta"],
+                topology_info["gamma"],
+            ]
+        ).astype(float)
 
         # Create the structure
         self.atom_types = []
@@ -4961,16 +5148,18 @@ class Framework():
         self.atom_pos = []
 
         # Align and rotate the building block 1 to their respective positions
-        BB_D4.align_to(topology_info['vertices'][0]['align_v'])
+        BB_D4.align_to(topology_info["vertices"][0]["align_v"])
 
         for site in range(4):
             BB = copy.deepcopy(BB_D4)
 
-            BB.align_to(topology_info['vertices'][site]['align_v'])
-            BB.rotate_around(rotation_axis=topology_info['vertices'][site]['align_v'],
-                             angle=topology_info['vertices'][site]['angle'])
+            BB.align_to(topology_info["vertices"][site]["align_v"])
+            BB.rotate_around(
+                rotation_axis=topology_info["vertices"][site]["align_v"],
+                angle=topology_info["vertices"][site]["angle"],
+            )
 
-            BB.shift(np.array(topology_info['vertices'][site]['position'])*alat)
+            BB.shift(np.array(topology_info["vertices"][site]["position"]) * alat)
 
             BB.replace_X(bond_atom)
             BB.remove_X()
@@ -4978,26 +5167,27 @@ class Framework():
             # Update the structure
             self.atom_types += BB.atom_types
             self.atom_pos += BB.atom_pos.tolist()
-            self.atom_labels += ['C1' if i == 'C' else i for i in BB.atom_labels]
+            self.atom_labels += ["C1" if i == "C" else i for i in BB.atom_labels]
 
         # Add the building blocks to the structure
-        for edge_data in topology_info['edges']:
+        for edge_data in topology_info["edges"]:
 
             # Copy the building block 2 object
             BB = copy.deepcopy(BB_L2)
 
             # Align, rotate and shift the building block 2 to their respective positions
-            BB.align_to(edge_data['align_v'])
-            BB.rotate_around(rotation_axis=edge_data['align_v'],
-                             angle=edge_data['angle'])
-            BB.shift(np.array(edge_data['position']) * alat)
+            BB.align_to(edge_data["align_v"])
+            BB.rotate_around(
+                rotation_axis=edge_data["align_v"], angle=edge_data["angle"]
+            )
+            BB.shift(np.array(edge_data["position"]) * alat)
 
             BB.remove_X()
 
             # Update the structure
             self.atom_types += BB.atom_types
             self.atom_pos += BB.atom_pos.tolist()
-            self.atom_labels += ['C2' if i == 'C' else i for i in BB.atom_labels]
+            self.atom_labels += ["C2" if i == "C" else i for i in BB.atom_labels]
 
         atom_types, atom_labels, atom_pos = [], [], []
         for n_int in range(int(self.stacking)):
@@ -5016,62 +5206,78 @@ class Framework():
             self.atom_types,
             self.atom_pos,
             coords_are_cartesian=True,
-            site_properties={'source': self.atom_labels}
+            site_properties={"source": self.atom_labels},
         ).get_sorted_structure()
 
         StartingFramework.translate_sites(
             np.ones(len(self.atom_types)).astype(int).tolist(),
             [0, 0, 0],
             frac_coords=True,
-            to_unit_cell=True
-            )
+            to_unit_cell=True,
+        )
 
         dict_structure = StartingFramework.as_dict()
 
-        self.cellMatrix = np.array(dict_structure['lattice']['matrix']).astype(float)
-        self.cellParameters = np.array([dict_structure['lattice']['a'],
-                                        dict_structure['lattice']['b'],
-                                        dict_structure['lattice']['c'],
-                                        dict_structure['lattice']['alpha'],
-                                        dict_structure['lattice']['beta'],
-                                        dict_structure['lattice']['gamma']]).astype(float)
+        self.cellMatrix = np.array(dict_structure["lattice"]["matrix"]).astype(float)
+        self.cellParameters = np.array(
+            [
+                dict_structure["lattice"]["a"],
+                dict_structure["lattice"]["b"],
+                dict_structure["lattice"]["c"],
+                dict_structure["lattice"]["alpha"],
+                dict_structure["lattice"]["beta"],
+                dict_structure["lattice"]["gamma"],
+            ]
+        ).astype(float)
 
-        self.atom_types = [i['label'] for i in dict_structure['sites']]
-        self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-        self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
-        self.n_atoms = len(dict_structure['sites'])
+        self.atom_types = [i["label"] for i in dict_structure["sites"]]
+        self.atom_pos = [i["xyz"] for i in dict_structure["sites"]]
+        self.atom_labels = [i["properties"]["source"] for i in dict_structure["sites"]]
+        self.n_atoms = len(dict_structure["sites"])
         self.composition = StartingFramework.formula
 
         dist_matrix = StartingFramework.distance_matrix
 
         # Check if there are any atoms closer than 0.8 A
         for i in range(len(dist_matrix)):
-            for j in range(i+1, len(dist_matrix)):
+            for j in range(i + 1, len(dist_matrix)):
                 if dist_matrix[i][j] < self.dist_threshold:
                     raise BondLenghError(i, j, dist_matrix[i][j], self.dist_threshold)
 
         # Get the simmetry information of the generated structure
-        symm = SpacegroupAnalyzer(StartingFramework,
-                                  symprec=self.symm_tol,
-                                  angle_tolerance=self.angle_tol)
+        symm = SpacegroupAnalyzer(
+            StartingFramework, symprec=self.symm_tol, angle_tolerance=self.angle_tol
+        )
 
         try:
-            self.prim_structure = symm.get_primitive_standard_structure(keep_site_properties=True)
+            self.prim_structure = symm.get_primitive_standard_structure(
+                keep_site_properties=True
+            )
 
-            dict_structure = symm.get_refined_structure(keep_site_properties=True).as_dict()
+            dict_structure = symm.get_refined_structure(
+                keep_site_properties=True
+            ).as_dict()
 
-            self.cellMatrix = np.array(dict_structure['lattice']['matrix']).astype(float)
-            self.cellParameters = np.array([dict_structure['lattice']['a'],
-                                            dict_structure['lattice']['b'],
-                                            dict_structure['lattice']['c'],
-                                            dict_structure['lattice']['alpha'],
-                                            dict_structure['lattice']['beta'],
-                                            dict_structure['lattice']['gamma']]).astype(float)
+            self.cellMatrix = np.array(dict_structure["lattice"]["matrix"]).astype(
+                float
+            )
+            self.cellParameters = np.array(
+                [
+                    dict_structure["lattice"]["a"],
+                    dict_structure["lattice"]["b"],
+                    dict_structure["lattice"]["c"],
+                    dict_structure["lattice"]["alpha"],
+                    dict_structure["lattice"]["beta"],
+                    dict_structure["lattice"]["gamma"],
+                ]
+            ).astype(float)
 
-            self.atom_types = [i['label'] for i in dict_structure['sites']]
-            self.atom_pos = [i['xyz'] for i in dict_structure['sites']]
-            self.atom_labels = [i['properties']['source'] for i in dict_structure['sites']]
-            self.n_atoms = len(dict_structure['sites'])
+            self.atom_types = [i["label"] for i in dict_structure["sites"]]
+            self.atom_pos = [i["xyz"] for i in dict_structure["sites"]]
+            self.atom_labels = [
+                i["properties"]["source"] for i in dict_structure["sites"]
+            ]
+            self.n_atoms = len(dict_structure["sites"])
             self.composition = self.prim_structure.formula
 
             self.logger.debug(self.prim_structure)
@@ -5086,25 +5292,29 @@ class Framework():
         except Exception as e:
             self.logger.exception(e)
 
-            self.lattice_type = 'Triclinic'
-            self.space_group = 'P1'
-            self.space_group_n = '1'
+            self.lattice_type = "Triclinic"
+            self.space_group = "P1"
+            self.space_group_n = "1"
 
             symm_op = [1]
-            self.hall = 'P 1'
+            self.hall = "P 1"
 
-        symm_text = get_framework_symm_text(self.name,
-                                            str(self.lattice_type),
-                                            str(self.hall[0:2]),
-                                            str(self.space_group),
-                                            str(self.space_group_n),
-                                            len(symm_op))
+        symm_text = get_framework_symm_text(
+            self.name,
+            str(self.lattice_type),
+            str(self.hall[0:2]),
+            str(self.space_group),
+            str(self.space_group_n),
+            len(symm_op),
+        )
 
         self.logger.info(symm_text)
 
-        return [self.name,
-                str(self.lattice_type),
-                str(self.hall[0:2]),
-                str(self.space_group),
-                str(self.space_group_n),
-                len(symm_op)]
+        return [
+            self.name,
+            str(self.lattice_type),
+            str(self.hall[0:2]),
+            str(self.space_group),
+            str(self.space_group_n),
+            len(symm_op),
+        ]
