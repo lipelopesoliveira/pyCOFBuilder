@@ -6,15 +6,22 @@ class BuildingBlock(Molecule):
     def __init__(
             self,
             database_path: Path,
+            coreGroupsFolder: str = 'coreGroups',
+            connGroupsFolder: str = 'connGroups',
+            funcGroupsFolder: str = 'funcGroups'
             ) -> None:
 
         super().__init__()
 
         self.database_path: Path = database_path
 
-        self.allowed_shapes: list[str] = [c.stem for c in (self.database_path / 'core').glob('*') if c.is_dir()]
-        self.allowed_connectors: list[str] = [c.stem for c in (self.database_path / 'connGroups').glob('*')]
-        self.allowed_funcGroups: list[str] = [c.stem for c in (self.database_path / 'funcGroups').glob('*')]
+        self.coreGroupsFolder: str = coreGroupsFolder
+        self.connGroupsFolder: str = connGroupsFolder
+        self.funcGroupsFolder: str = funcGroupsFolder
+
+        self.allowed_shapes: list[str] = [s.stem for s in (database_path / coreGroupsFolder).glob('*') if s.is_dir()]
+        self.allowed_connectors: list[str] = [c.stem for c in (database_path / connGroupsFolder).glob('*')]
+        self.allowed_funcGroups: list[str] = [f.stem for f in (database_path / funcGroupsFolder).glob('*')]
 
     def __repr__(self) -> str:
         return (
@@ -69,7 +76,7 @@ class BuildingBlock(Molecule):
         """
 
         connector: Molecule = Molecule()
-        connector.from_mol(self.database_path / 'connGroups' / f"{self.connector}.mol")
+        connector.from_mol(self.database_path / self.connGroupsFolder / f"{self.connector}.mol")
 
         while "Q" in self.atom_types:
             self.replace_by_atom_group(
@@ -84,9 +91,8 @@ class BuildingBlock(Molecule):
         """
         for i, funcGroup_name in enumerate(self.funcGroups):
             funcGroup: Molecule = Molecule()
-            funcGroup.from_mol(self.database_path / 'funcGroups' / f"{funcGroup_name}.mol")
+            funcGroup.from_mol(self.database_path / self.funcGroupsFolder / f"{funcGroup_name}.mol")
 
-            print(f"Adding functional group {funcGroup_name} as R{i+1}...")
             while f"R{i+1}" in self.atom_types:
                 self.replace_by_atom_group(
                     atom_index=self.atom_types.index(f"R{i+1}"),
@@ -99,7 +105,7 @@ class BuildingBlock(Molecule):
         for group in remaining_groups:
             while group in self.atom_types:
                 funcGroup: Molecule = Molecule()
-                funcGroup.from_mol(self.database_path / 'funcGroups' / "H.mol")
+                funcGroup.from_mol(self.database_path / self.funcGroupsFolder / "H.mol")
                 self.replace_by_atom_group(
                     atom_index=self.atom_types.index(group),
                     group=funcGroup,
@@ -115,7 +121,7 @@ class BuildingBlock(Molecule):
         self.core: str = name.split('_')[1]
         self._check_core()
 
-        self.from_mol(self.database_path / 'core' / self.shape / f"{self.core}.mol")
+        self.from_mol(self.database_path / self.coreGroupsFolder / self.shape / f"{self.core}.mol")
 
         self.connector: str = name.split('_')[2]
         self._check_connector()
@@ -132,6 +138,8 @@ class BuildingBlock(Molecule):
             connector=self.connector,
             funcGroups='_'.join(self.funcGroups)
         )
+
+        self.properties['name'] = self.name
 
     def from_file(self, file_path: Path) -> None:
         """
