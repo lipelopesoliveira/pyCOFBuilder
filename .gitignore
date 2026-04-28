@@ -6,3 +6,8 @@ tests/__pycache__/test_exceptions.cpython-311-pytest-7.4.4.pyc
 tests/__pycache__/test_iotools.cpython-311-pytest-7.4.4.pyc
 tests/__pycache__/test_tools.cpython-311-pytest-7.4.4.pyc
 .pypirc
+tests/__pycache__/__init__.cpython-312.pyc
+tests/__pycache__/test_dependencies.cpython-312-pytest-8.4.2.pyc
+tests/__pycache__/test_exceptions.cpython-312-pytest-8.4.2.pyc
+tests/__pycache__/test_iotools.cpython-312-pytest-8.4.2.pyc
+tests/__pycache__/test_tools.cpython-312-pytest-8.4.2.pyc
