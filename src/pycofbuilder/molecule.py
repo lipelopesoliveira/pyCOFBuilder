@@ -1,10 +1,13 @@
 from __future__ import annotations
 
-import json
 import os
 from abc import abstractmethod
 from pathlib import Path
 from typing import Iterator, Sequence
+
+from collections import Counter
+import math
+from functools import reduce
 
 import numpy as np
 from numpy.typing import NDArray
@@ -111,25 +114,27 @@ class Molecule:
 
     def __str__(self) -> str:
         outs = [
+            f"Name: {self.properties.get('name', self.composition)}",
             f"Full Formula ({self.composition})",
-            f"Reduced Formula: {self.composition}",
+            f"Reduced Formula: {self.reduced_formula}",
             f"Charge = {self._charge}, Spin Mult = {self.spin_multiplicity}",
             f"Sites ({len(self)}), Bonds ({len(self.bonds)})",
         ]
         for site in self:
             outs.append(
-                f"{site.index:4} {site.atom_type:3} {' '.join([f'{site.coordinates[coord]:0.6f}'.rjust(12) for coord in range(3)])}"
+                "{:4} {:3} {}".format(
+                    site.index,
+                    site.atom_type,
+                    ' '.join([f'{site.coordinates[coord]:0.6f}'.rjust(12) for coord in range(3)]))
             )
 
         outs += ["Bonds:"]
 
         for bond in self.bonds:
             outs.append(
-                "{}_{} - {}_{}, {} ({}), {:0.4f} Å".format(
-                    bond.atom_1.atom_type,
-                    bond.atom_1.index,
-                    bond.atom_2.atom_type,
-                    bond.atom_2.index,
+                "{:6} - {:6}, {:<10} ({}), {:0.4f} Å".format(
+                    f"{bond.atom_1.atom_type}_{bond.atom_1.index}",
+                    f"{bond.atom_2.atom_type}_{bond.atom_2.index}",
                     bond.bond_type_name,
                     bond.bond_type,
                     bond.bond_distance,
@@ -147,7 +152,10 @@ class Molecule:
         # Check if the difference on charge and sum of partial charges is significant
         if abs(sum(self.partial_charges) - self.charge) > 1e-3:
             raise Warning(
-                f"Total partial charge ({sum(self.partial_charges)}) does not match molecular charge ({self.charge})."
+                "Total partial charge {:.5f} does not match molecular charge {:.5f}.".format(
+                    sum(self.partial_charges),
+                    self.charge
+                )
             )
 
     def remove_bonds(self, atom: AtomicSite) -> None:
@@ -249,12 +257,27 @@ class Molecule:
     @property
     def composition(self):
         """Composition of the molecule."""
-        from collections import Counter
-
         comp_dict = Counter([site.atom_type for site in self])
+
+        nums = comp_dict.values()
+        gcd = reduce(math.gcd, nums)
         # Convert to string
-        comp = "".join([f"{el}{comp_dict[el]}" for el in sorted(comp_dict.keys())])
+        comp = "".join(
+            [f"{el}{comp_dict[el]}" for el in sorted(comp_dict.keys())])
         return comp
+    
+    @property
+    def reduced_formula(self) -> str:
+        """Reduced formula of the molecule."""
+        comp_dict = Counter([site.atom_type for site in self])
+
+        nums = comp_dict.values()
+        gcd = reduce(math.gcd, nums)
+
+        # Convert to string
+        reduced = "".join(
+            [f"{el}{int(comp_dict[el] / gcd)}" for el in sorted(comp_dict.keys())])
+        return reduced
 
     @property
     def partial_charges(self) -> list[float]:
@@ -282,7 +305,7 @@ class Molecule:
     def n_bonds(self) -> int:
         """Number of bonds in the molecule."""
         return len(self.bonds)
-    
+
     @property
     def center_of_mass(self) -> NDArray[np.float64]:
         """Calculate the center of mass of the molecule."""
@@ -308,7 +331,8 @@ class Molecule:
         atom1 = self.sites[i]
         atom2 = self.sites[j]
         return float(
-            np.linalg.norm(np.array(atom1.coordinates) - np.array(atom2.coordinates))
+            np.linalg.norm(np.array(atom1.coordinates) -
+                           np.array(atom2.coordinates))
         )
 
     @abstractmethod
@@ -413,12 +437,16 @@ class Molecule:
         for site in self:
             if property_name not in site.properties:
                 raise KeyError(
-                    f"Property {property_name} not found in site properties. Available properties: {list(site.properties.keys())}"
+                    f"Property {property_name} not found in site properties."
+                    f" Available properties: {list(site.properties.keys())}"
                 )
             values.append(site.properties[property_name])
         return values
 
-    def centralize(self, by_atom_type: str | None = None, by_indexes: Sequence[int] | None = None) -> None:
+    def centralize(self,
+                   by_atom_type: str | None = None,
+                   by_indexes: Sequence[int] | None = None
+                   ) -> None:
         """
         Centralize the molecule by subtracting the mean coordinates.
         If by_atom_type is not None, centralize by the mean position of the atoms of this atom type.
@@ -541,7 +569,8 @@ class Molecule:
             - group.sites[r_atom_index].coordinates
         )
 
-        Rot_m = rotation_matrix_from_vectors(align_vector_group, alignment_vector)
+        Rot_m = rotation_matrix_from_vectors(
+            align_vector_group, alignment_vector)
 
         # Rotate and translade the conector group to Q position in the strucutre
         group.positions = (
@@ -580,14 +609,15 @@ class Molecule:
 
         # Replace 'R' atoms with 'X' for visualization
         for i, symbol in enumerate(symbols):
-            if symbol in ["R", "Xe", "Q"]:
+            if symbol in ["R", "Xe", "Q"] + ["R" + str(i) for i in range(1, 10)]:
                 symbols[i] = "X"
 
         ase_molecule = Atoms(symbols=symbols, positions=positions)
 
         # Set initial charges if charge property exists
         if "partial_charge" in self.sites[0].properties:
-            charges = [site.properties["partial_charge"] for site in self.sites]
+            charges = [site.properties["partial_charge"]
+                       for site in self.sites]
             ase_molecule.set_initial_charges(charges)
 
         view(ase_molecule)
@@ -647,7 +677,12 @@ class Molecule:
         if filename.endswith(".xyz"):
             filename = filename[:-4]
 
-        bond_dict = {1: "S", 2: "D", 3: "T", 4: "A"}
+        bond_dict = {
+            1: "S",
+            2: "D",
+            3: "T",
+            4: "A"
+            }
 
         X_index = [atom.index for atom in self.sites if atom.atom_type == "X"]
 
@@ -656,7 +691,9 @@ class Molecule:
         for atom in self.sites:
             xyz_txt += [
                 "{:3s}    {:12.7f}  {:12.7f}  {:12.7f}  {:12.7f}".format(
-                    atom.atom_type, *atom.coordinates, atom.properties.get("partial_charge", 0.0)
+                    atom.atom_type, *
+                    atom.coordinates, atom.properties.get(
+                        "partial_charge", 0.0)
                 )
             ]
 
@@ -675,7 +712,8 @@ class Molecule:
         Load a molecule from a .mol file.
         """
 
-        atomTypes, cartPos, partialCharges, bonds, bondTypes = read_mol_file(file_name)
+        atomTypes, cartPos, partialCharges, bonds, bondTypes = read_mol_file(
+            file_name)
 
         for i in range(len(atomTypes)):
             self.sites.append(

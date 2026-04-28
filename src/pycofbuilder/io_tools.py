@@ -297,7 +297,11 @@ def read_mol_file(
     file_path,
 ) -> tuple[list, list[list[float]], list[float], list[tuple[int, int]], list[int]]:
     """
-    Reads a .mol file and extracts atom types, Cartesian positions, partial charges, bonds, and bond types.
+    Reads a .mol file and extracts 
+    atom types, Cartesian positions, partial charges, bonds, and bond types.
+
+    This function assumes that the .mol file was created by GaussView, files created
+    by any other software might not be read correctly.
 
     Parameters
     ----------
@@ -331,7 +335,6 @@ def read_mol_file(
         cartPos.append(np.array(atom_line[:3], dtype=float))
         partialCharges.append(float(atom_line[4]))
 
-    # Replace "F" by "R" on atomTypes
     bonds_non_processed = mol_data[4 + n_atoms : 4 + n_atoms + n_bonds]
 
     bonds: list[tuple[int, int]] = [
