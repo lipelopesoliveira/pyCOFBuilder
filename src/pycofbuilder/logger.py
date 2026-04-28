@@ -10,10 +10,12 @@ import logging.config
 import logging.handlers
 
 
-def create_logger(level: str = "DEBUG",
-                  format: str = "detailed",
-                  save_to_file: bool = False,
-                  log_filename: str = 'pycofbuilder.log'):
+def create_logger(
+    level: str = "DEBUG",
+    format: str = "detailed",
+    save_to_file: bool = False,
+    log_filename: str = "pycofbuilder.log",
+):
     """
     Build a logger with the given level and format.
 
@@ -38,45 +40,45 @@ def create_logger(level: str = "DEBUG",
 
     # Check if the parameters are valid
     allowed_levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
-    assert level.upper() in allowed_levels, "Invalid level, must be one of {}".format(allowed_levels)
+    assert level.upper() in allowed_levels, "Invalid level, must be one of {}".format(
+        allowed_levels
+    )
 
     allowed_formats = ["simple", "detailed"]
-    assert format.lower() in allowed_formats, "Invalid format, must be one of {}".format(allowed_formats)
+    assert (
+        format.lower() in allowed_formats
+    ), "Invalid format, must be one of {}".format(allowed_formats)
 
     # Set up logging
     config_log = {
-      "version": 1,
-      "disable_existing_loggers": False,
-      "formatters": {
-        "simple": {
-          "format": "%(message)s"
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "simple": {"format": "%(message)s"},
+            "detailed": {
+                "format": "[%(levelname)s|%(module)s|L%(lineno)d] %(asctime)s: %(message)s",
+                "datefmt": "%Y-%m-%dT%H:%M:%S%z",
+            },
         },
-        "detailed": {
-          "format": "[%(levelname)s|%(module)s|L%(lineno)d] %(asctime)s: %(message)s",
-          "datefmt": "%Y-%m-%dT%H:%M:%S%z"
-        }
-      },
-      "handlers": {
-        "stderr": {
-          "class": "logging.StreamHandler",
-          "level": level.upper(),
-          "formatter": format.lower(),
-          "stream": "ext://sys.stderr"
+        "handlers": {
+            "stderr": {
+                "class": "logging.StreamHandler",
+                "level": level.upper(),
+                "formatter": format.lower(),
+                "stream": "ext://sys.stderr",
+            },
         },
-      },
-      "loggers": {
-          "root": {"level": level.upper(), "handlers": ["stderr"]}
-          }
+        "loggers": {"root": {"level": level.upper(), "handlers": ["stderr"]}},
     }
 
     if save_to_file:
         config_log["handlers"]["file"] = {
-          "class": "logging.FileHandler",
-          "level": level.upper(),
-          "formatter": format.lower(),
-          "filename": log_filename,
-          "mode": "a",
-          "encoding": "utf-8"
+            "class": "logging.FileHandler",
+            "level": level.upper(),
+            "formatter": format.lower(),
+            "filename": log_filename,
+            "mode": "a",
+            "encoding": "utf-8",
         }
         config_log["loggers"]["root"]["handlers"].append("file")
 

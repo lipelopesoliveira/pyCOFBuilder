@@ -1,24 +1,20 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pycofbuilder.tools &mdash; pyCOFBuilder 0.0.8.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
-      <link rel="stylesheet" type="text/css" href="../../_static/tabs.css?v=a5c4661c" />
+  <title>pycofbuilder.tools &mdash; pyCOFBuilder 0.0.8.5 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=a6cd5f1d"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script src="../../_static/tabs.js?v=3030b3cb"></script>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5abc45ba"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -104,16 +100,20 @@
 <span class="sd">This module contains the tools used by pyCOFBuilder.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">simplejson</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">scipy.spatial</span> <span class="kn">import</span> <span class="n">distance</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">combinations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">simplejson</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.spatial</span><span class="w"> </span><span class="kn">import</span> <span class="n">distance</span>
 
 
 <div class="viewcode-block" id="elements_dict">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.tools.elements_dict">[docs]</a>
-<span class="k">def</span> <span class="nf">elements_dict</span><span class="p">(</span><span class="nb">property</span><span class="o">=</span><span class="s1">&#39;atomic_mass&#39;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Returns a dictionary containing the elements symbol and its selected property.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">elements_dict</span><span class="p">(</span><span class="nb">property</span><span class="o">=</span><span class="s2">&quot;atomic_mass&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns a dictionary containing the elements symbol and its selected property.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -138,18 +138,20 @@
 <span class="sd">    -------</span>
 <span class="sd">    prop_dic : dictionary</span>
 <span class="sd">        A dictionary containing the elements symbol and its respective property.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;periodic_table.json&#39;</span><span class="p">)</span>
+    <span class="n">file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;periodic_table.json&quot;</span><span class="p">)</span>
 
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">periodic_table</span> <span class="o">=</span> <span class="n">simplejson</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 
-    <span class="n">prop_list</span> <span class="o">=</span> <span class="n">periodic_table</span><span class="p">[</span><span class="s1">&#39;H&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+    <span class="n">prop_list</span> <span class="o">=</span> <span class="n">periodic_table</span><span class="p">[</span><span class="s2">&quot;H&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
 
     <span class="c1"># Check if the property is valid</span>
     <span class="k">if</span> <span class="nb">property</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">prop_list</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid property. Valid properties are: &#39;</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">prop_list</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Invalid property. Valid properties are: &quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">prop_list</span><span class="p">)</span>
+        <span class="p">)</span>
 
     <span class="n">prop_dic</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">periodic_table</span><span class="p">:</span>
@@ -161,17 +163,17 @@
 
 <div class="viewcode-block" id="unit_vector">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.tools.unit_vector">[docs]</a>
-<span class="k">def</span> <span class="nf">unit_vector</span><span class="p">(</span><span class="n">vector</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">unit_vector</span><span class="p">(</span><span class="n">vector</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a unit vector in the same direction as x.&quot;&quot;&quot;</span>
-    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vector</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float&#39;</span><span class="p">)</span>
-    <span class="n">norm</span> <span class="o">=</span> <span class="n">y</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">norm</span></div>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vector</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">y</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">y</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="angle">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.tools.angle">[docs]</a>
-<span class="k">def</span> <span class="nf">angle</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;degree&#39;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">angle</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;degree&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates the angle between two vectors v1 and v2.</span>
 
@@ -194,11 +196,11 @@
 
     <span class="n">dot_product</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">unit_vector1</span><span class="p">,</span> <span class="n">unit_vector2</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">unit</span> <span class="o">==</span> <span class="s1">&#39;degree&#39;</span><span class="p">:</span>
-        <span class="n">angle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">dot_product</span><span class="p">)</span> <span class="o">*</span> <span class="mf">180.</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
-    <span class="k">if</span> <span class="n">unit</span> <span class="o">==</span> <span class="s1">&#39;radians&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">unit</span> <span class="o">==</span> <span class="s2">&quot;degree&quot;</span><span class="p">:</span>
+        <span class="n">angle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">dot_product</span><span class="p">)</span> <span class="o">*</span> <span class="mf">180.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+    <span class="k">if</span> <span class="n">unit</span> <span class="o">==</span> <span class="s2">&quot;radians&quot;</span><span class="p">:</span>
         <span class="n">angle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">dot_product</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">unit</span> <span class="o">==</span> <span class="s1">&#39;cos&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">unit</span> <span class="o">==</span> <span class="s2">&quot;cos&quot;</span><span class="p">:</span>
         <span class="n">angle</span> <span class="o">=</span> <span class="n">dot_product</span>
     <span class="k">return</span> <span class="n">angle</span></div>
 
@@ -206,8 +208,8 @@
 
 <div class="viewcode-block" id="rotation_matrix_from_vectors">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.tools.rotation_matrix_from_vectors">[docs]</a>
-<span class="k">def</span> <span class="nf">rotation_matrix_from_vectors</span><span class="p">(</span><span class="n">vec1</span><span class="p">,</span> <span class="n">vec2</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rotation_matrix_from_vectors</span><span class="p">(</span><span class="n">vec1</span><span class="p">,</span> <span class="n">vec2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Find the rotation matrix that aligns vec1 to vec2</span>
 
 <span class="sd">    Parameters</span>
@@ -220,17 +222,17 @@
 <span class="sd">    -------</span>
 <span class="sd">    rotation_matrix : array</span>
 <span class="sd">        A transform matrix (3x3) which when applied to vec1, aligns it with vec2.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="n">vec1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">vec1</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="n">vec2</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">vec2</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="n">vec1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">vec1</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="p">(</span>
+        <span class="n">vec2</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">vec2</span><span class="p">)</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
     <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
     <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
     <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">s</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">kmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">v</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
-                         <span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
-                         <span class="p">[</span><span class="o">-</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">]])</span>
+        <span class="n">kmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">v</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="p">[</span><span class="o">-</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">]])</span>
 
-        <span class="n">rotation_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="n">kmat</span> <span class="o">+</span> <span class="n">kmat</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">kmat</span><span class="p">)</span> <span class="o">*</span> <span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">c</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">s</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="n">rotation_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="n">kmat</span> <span class="o">+</span> <span class="n">kmat</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">kmat</span><span class="p">)</span> <span class="o">*</span> <span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">c</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">s</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">rotation_matrix</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span></div>
@@ -239,7 +241,7 @@
 
 <div class="viewcode-block" id="rmsd">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.tools.rmsd">[docs]</a>
-<span class="k">def</span> <span class="nf">rmsd</span><span class="p">(</span><span class="n">V</span><span class="p">,</span> <span class="n">W</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rmsd</span><span class="p">(</span><span class="n">V</span><span class="p">,</span> <span class="n">W</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate Root-mean-square deviation from two sets of vectors V and W.</span>
 <span class="sd">    Parameters</span>
@@ -259,9 +261,55 @@
 
 
 
+<div class="viewcode-block" id="calculate_sides">
+<a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.tools.calculate_sides">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate_sides</span><span class="p">(</span><span class="n">points</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the lengths of the sides of a geometric shape defined by a set of points in 3D space.</span>
+
+<span class="sd">    This function takes an array of 3D points and computes the unique side lengths of the shape</span>
+<span class="sd">    formed by these points. The sides are calculated as the Euclidean distances</span>
+<span class="sd">    between pairs of points.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    -----------</span>
+<span class="sd">    points : numpy.ndarray</span>
+<span class="sd">        A 2D array of shape (n, 3), where n is the number of points. Each row represents the</span>
+<span class="sd">        coordinates of a point (x, y, z).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    --------</span>
+<span class="sd">    numpy.ndarray</span>
+<span class="sd">        A sorted array of unique side lengths of the geometric shape.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">    -------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the input is not a 2D numpy array with shape (n, 3).</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; points = np.array([[0, 0, 0], [0, 2, 0], [2, 0, 0], [2, 2, 0]])</span>
+<span class="sd">    &gt;&gt;&gt; calculate_sides(points)</span>
+<span class="sd">    array([2., 2.82842712])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">or</span> <span class="n">points</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">points</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input must be a 2D numpy array of shape (n, 3).&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Calculate all pairwise distances</span>
+    <span class="n">distances</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">points</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">combinations</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">)),</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="c1"># Return sorted unique distances</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">distances</span><span class="p">))</span></div>
+
+
+
 <div class="viewcode-block" id="cell_to_cellpar">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.tools.cell_to_cellpar">[docs]</a>
-<span class="k">def</span> <span class="nf">cell_to_cellpar</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">radians</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">cell_to_cellpar</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">radians</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the cell parameters [a, b, c, alpha, beta, gamma]</span>
 <span class="sd">    given a 3x3 cell matrix.</span>
 
@@ -302,7 +350,7 @@
 
 <div class="viewcode-block" id="cellpar_to_cell">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.tools.cellpar_to_cell">[docs]</a>
-<span class="k">def</span> <span class="nf">cellpar_to_cell</span><span class="p">(</span><span class="n">cellpar</span><span class="p">,</span> <span class="n">ab_normal</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">a_direction</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">cellpar_to_cell</span><span class="p">(</span><span class="n">cellpar</span><span class="p">,</span> <span class="n">ab_normal</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">a_direction</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a 3x3 cell matrix from cell parameters (a,b,c,alpha,beta, and gamma).</span>
 
 <span class="sd">    Angles must be in degrees.</span>
@@ -345,7 +393,7 @@
     <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
 
     <span class="c1"># Express va, vb and vc in the X,Y,Z-system</span>
-    <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span> <span class="o">=</span> <span class="mf">90.</span><span class="p">,</span> <span class="mf">90.</span><span class="p">,</span> <span class="mf">90.</span>
+    <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span> <span class="o">=</span> <span class="mf">90.0</span><span class="p">,</span> <span class="mf">90.0</span><span class="p">,</span> <span class="mf">90.0</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cellpar</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
         <span class="n">a</span> <span class="o">=</span> <span class="n">b</span> <span class="o">=</span> <span class="n">c</span> <span class="o">=</span> <span class="n">cellpar</span>
     <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">cellpar</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -383,7 +431,7 @@
     <span class="n">vb</span> <span class="o">=</span> <span class="n">b</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">cos_gamma</span><span class="p">,</span> <span class="n">sin_gamma</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
     <span class="n">cx</span> <span class="o">=</span> <span class="n">cos_beta</span>
     <span class="n">cy</span> <span class="o">=</span> <span class="p">(</span><span class="n">cos_alpha</span> <span class="o">-</span> <span class="n">cos_beta</span> <span class="o">*</span> <span class="n">cos_gamma</span><span class="p">)</span> <span class="o">/</span> <span class="n">sin_gamma</span>
-    <span class="n">cz_sqr</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">-</span> <span class="n">cx</span> <span class="o">*</span> <span class="n">cx</span> <span class="o">-</span> <span class="n">cy</span> <span class="o">*</span> <span class="n">cy</span>
+    <span class="n">cz_sqr</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">cx</span> <span class="o">*</span> <span class="n">cx</span> <span class="o">-</span> <span class="n">cy</span> <span class="o">*</span> <span class="n">cy</span>
     <span class="k">assert</span> <span class="n">cz_sqr</span> <span class="o">&gt;=</span> <span class="mi">0</span>
     <span class="n">cz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">cz_sqr</span><span class="p">)</span>
     <span class="n">vc</span> <span class="o">=</span> <span class="n">c</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="n">cz</span><span class="p">])</span>
@@ -399,13 +447,15 @@
 
 <div class="viewcode-block" id="get_fractional_to_cartesian_matrix">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.tools.get_fractional_to_cartesian_matrix">[docs]</a>
-<span class="k">def</span> <span class="nf">get_fractional_to_cartesian_matrix</span><span class="p">(</span><span class="n">cell_a</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-                                       <span class="n">cell_b</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-                                       <span class="n">cell_c</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-                                       <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-                                       <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-                                       <span class="n">gamma</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-                                       <span class="n">angle_in_degrees</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">float</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_fractional_to_cartesian_matrix</span><span class="p">(</span>
+    <span class="n">cell_a</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">cell_b</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">cell_c</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">gamma</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">angle_in_degrees</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return the transformation matrix that converts fractional coordinates to</span>
 <span class="sd">    cartesian coordinates.</span>
@@ -450,13 +500,15 @@
 
 <div class="viewcode-block" id="get_cartesian_to_fractional_matrix">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.tools.get_cartesian_to_fractional_matrix">[docs]</a>
-<span class="k">def</span> <span class="nf">get_cartesian_to_fractional_matrix</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-                                       <span class="n">b</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-                                       <span class="n">c</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-                                       <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-                                       <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-                                       <span class="n">gamma</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-                                       <span class="n">angle_in_degrees</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">float</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_cartesian_to_fractional_matrix</span><span class="p">(</span>
+    <span class="n">a</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">b</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">c</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">gamma</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">angle_in_degrees</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return the transformation matrix that converts cartesian coordinates to</span>
 <span class="sd">    fractional coordinates.</span>
@@ -502,7 +554,7 @@
 
 <div class="viewcode-block" id="get_reciprocal_vectors">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.tools.get_reciprocal_vectors">[docs]</a>
-<span class="k">def</span> <span class="nf">get_reciprocal_vectors</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_reciprocal_vectors</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the reciprocal vectors of a cell given in cell parameters of cell vectors.</span>
 
@@ -538,7 +590,7 @@
 
 <div class="viewcode-block" id="get_kgrid">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.tools.get_kgrid">[docs]</a>
-<span class="k">def</span> <span class="nf">get_kgrid</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">distance</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_kgrid</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">distance</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the k-points grid in the reciprocal space with a given distance for a</span>
 <span class="sd">    cell given in cell parameters of cell vectors.</span>
@@ -563,9 +615,9 @@
 
     <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">b1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">b2</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">b3</span><span class="p">)])</span>
 
-    <span class="n">kx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">distance</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-    <span class="n">ky</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="n">distance</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-    <span class="n">kz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">/</span><span class="n">distance</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">kx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">distance</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">ky</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">distance</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">kz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="n">distance</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">kx</span><span class="p">,</span> <span class="n">ky</span><span class="p">,</span> <span class="n">kz</span></div>
 
@@ -573,7 +625,7 @@
 
 <div class="viewcode-block" id="create_CellBox">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.tools.create_CellBox">[docs]</a>
-<span class="k">def</span> <span class="nf">create_CellBox</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_CellBox</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates the CellBox using the same expression as RASPA.&quot;&quot;&quot;</span>
 
     <span class="n">tempd</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">beta</span><span class="p">))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span>
@@ -586,11 +638,9 @@
     <span class="n">bz</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">cx</span> <span class="o">=</span> <span class="n">C</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
     <span class="n">cy</span> <span class="o">=</span> <span class="n">C</span> <span class="o">*</span> <span class="n">tempd</span>
-    <span class="n">cz</span> <span class="o">=</span> <span class="n">C</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">tempd</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">cz</span> <span class="o">=</span> <span class="n">C</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">tempd</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
 
-    <span class="n">CellBox</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">ax</span><span class="p">,</span> <span class="n">ay</span><span class="p">,</span> <span class="n">az</span><span class="p">],</span>
-                        <span class="p">[</span><span class="n">bx</span><span class="p">,</span> <span class="n">by</span><span class="p">,</span> <span class="n">bz</span><span class="p">],</span>
-                        <span class="p">[</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="n">cz</span><span class="p">]])</span>
+    <span class="n">CellBox</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">ax</span><span class="p">,</span> <span class="n">ay</span><span class="p">,</span> <span class="n">az</span><span class="p">],</span> <span class="p">[</span><span class="n">bx</span><span class="p">,</span> <span class="n">by</span><span class="p">,</span> <span class="n">bz</span><span class="p">],</span> <span class="p">[</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="n">cz</span><span class="p">]])</span>
 
     <span class="k">return</span> <span class="n">CellBox</span></div>
 
@@ -598,8 +648,8 @@
 
 <div class="viewcode-block" id="calculate_UnitCells">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.tools.calculate_UnitCells">[docs]</a>
-<span class="k">def</span> <span class="nf">calculate_UnitCells</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate_UnitCells</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the number of unit cell repetitions so that all supercell lengths are larger than</span>
 <span class="sd">    twice the interaction potential cut-off radius.</span>
 
@@ -617,7 +667,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    superCell</span>
 <span class="sd">        (3,1) list containg the number of repiting units in `x`, `y`, `z` directions.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># Make sure that the cell is in the format of cell matrix</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
@@ -647,13 +697,15 @@
 
 <div class="viewcode-block" id="cellpar_to_lammpsbox">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.tools.cellpar_to_lammpsbox">[docs]</a>
-<span class="k">def</span> <span class="nf">cellpar_to_lammpsbox</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-                         <span class="n">b</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-                         <span class="n">c</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-                         <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-                         <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-                         <span class="n">gamma</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-                         <span class="n">angle_in_degrees</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">cellpar_to_lammpsbox</span><span class="p">(</span>
+    <span class="n">a</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">b</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">c</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">gamma</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">angle_in_degrees</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return the box parameters lx, ly, lz, xy, xz, yz for LAMMPS data input.</span>
 <span class="sd">    Parameters</span>
@@ -670,16 +722,16 @@
 <span class="sd">        The 1x6 array with the box parameters &#39;lx&#39;, &#39;ly&#39;, &#39;lz&#39;, &#39;xy&#39;, &#39;xz&#39;, &#39;yz&#39;.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">angle_in_degrees</span><span class="p">:</span>
-        <span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">)</span>
-        <span class="n">beta</span> <span class="o">=</span> <span class="n">beta</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">)</span>
-        <span class="n">gamma</span> <span class="o">=</span> <span class="n">gamma</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">)</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">)</span>
+        <span class="n">beta</span> <span class="o">=</span> <span class="n">beta</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">)</span>
+        <span class="n">gamma</span> <span class="o">=</span> <span class="n">gamma</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">)</span>
 
     <span class="n">lx</span> <span class="o">=</span> <span class="n">a</span>
     <span class="n">xy</span> <span class="o">=</span> <span class="n">b</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span>
     <span class="n">xz</span> <span class="o">=</span> <span class="n">c</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
-    <span class="n">ly</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">b</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">xy</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">ly</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">b</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">xy</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
     <span class="n">yz</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span> <span class="o">*</span> <span class="n">c</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span> <span class="o">-</span> <span class="n">xy</span> <span class="o">*</span> <span class="n">xz</span><span class="p">)</span> <span class="o">/</span> <span class="n">ly</span>
-    <span class="n">lz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">c</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">xz</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">yz</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">lz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">c</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">xz</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">yz</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">lx</span><span class="p">,</span> <span class="n">ly</span><span class="p">,</span> <span class="n">lz</span><span class="p">,</span> <span class="n">xy</span><span class="p">,</span> <span class="n">xz</span><span class="p">,</span> <span class="n">yz</span><span class="p">])</span></div>
 
@@ -687,7 +739,7 @@
 
 <div class="viewcode-block" id="find_index">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.tools.find_index">[docs]</a>
-<span class="k">def</span> <span class="nf">find_index</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">e_list</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">find_index</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">e_list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Finds the index of a given element in a list</span>
 
@@ -703,19 +755,20 @@
 <span class="sd">        The index of element in the e_list</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">index</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">e_list</span><span class="p">)):</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">e_list</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">element</span><span class="p">):</span>
             <span class="n">index</span> <span class="o">=</span> <span class="n">i</span>
             <span class="k">break</span>
+
     <span class="k">return</span> <span class="n">index</span></div>
 
 
 
 <div class="viewcode-block" id="change_X_atoms">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.tools.change_X_atoms">[docs]</a>
-<span class="k">def</span> <span class="nf">change_X_atoms</span><span class="p">(</span><span class="n">atom_labels</span><span class="p">,</span> <span class="n">atom_pos</span><span class="p">,</span> <span class="n">bond_atom</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">change_X_atoms</span><span class="p">(</span><span class="n">atom_labels</span><span class="p">,</span> <span class="n">atom_pos</span><span class="p">,</span> <span class="n">bond_atom</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Changes the X atom for the desired bond_atom or remove it if bond_atom == &#39;R&#39;.</span>
 
 <span class="sd">    Parameters</span>
@@ -730,14 +783,14 @@
 <span class="sd">        List containing the processed atom labels</span>
 <span class="sd">    pos : list</span>
 <span class="sd">        List containing the processed atom position</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">label</span><span class="p">,</span> <span class="n">pos</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
 
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">atom_labels</span><span class="p">)):</span>
-        <span class="k">if</span> <span class="n">atom_labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;X&#39;</span> <span class="ow">and</span> <span class="n">bond_atom</span> <span class="o">!=</span> <span class="s1">&#39;R&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">atom_labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;X&quot;</span> <span class="ow">and</span> <span class="n">bond_atom</span> <span class="o">!=</span> <span class="s2">&quot;R&quot;</span><span class="p">:</span>
             <span class="n">label</span> <span class="o">+=</span> <span class="p">[</span><span class="n">bond_atom</span><span class="p">]</span>
             <span class="n">pos</span> <span class="o">+=</span> <span class="p">[</span><span class="n">atom_pos</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
-        <span class="k">if</span> <span class="n">atom_labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;X&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">atom_labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;X&quot;</span><span class="p">:</span>
             <span class="n">label</span> <span class="o">+=</span> <span class="p">[</span><span class="n">atom_labels</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
             <span class="n">pos</span> <span class="o">+=</span> <span class="p">[</span><span class="n">atom_pos</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
 
@@ -745,64 +798,78 @@
 
 
 
-<div class="viewcode-block" id="closest_atom">
-<a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.tools.closest_atom">[docs]</a>
-<span class="k">def</span> <span class="nf">closest_atom</span><span class="p">(</span><span class="n">label_1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pos_1</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Find the closest atom to a given atom</span>
+<div class="viewcode-block" id="find_closest_atom">
+<a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.tools.find_closest_atom">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">find_closest_atom</span><span class="p">(</span>
+    <span class="n">target_label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">target_position</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">,</span>
+    <span class="n">atom_labels</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+    <span class="n">atom_positions</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="n">NDArray</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find the closest atom to a given atom in a structure.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    label_1 : string</span>
-<span class="sd">        String containing the label of the atom</span>
-<span class="sd">    pos_1 : list</span>
-<span class="sd">        Array containing the position of the atom</span>
-<span class="sd">    labels : list</span>
-<span class="sd">        List containing the all the atom labels on the structure</span>
-<span class="sd">    pos : list</span>
-<span class="sd">        List containing the all the atom positions on the structure</span>
+<span class="sd">    target_label : str</span>
+<span class="sd">        Label of the target atom.</span>
+<span class="sd">    target_position : list | NDArray</span>
+<span class="sd">        Position of the target atom as a list or numpy array.</span>
+<span class="sd">    atom_labels : list</span>
+<span class="sd">        List of all atom labels in the structure.</span>
+<span class="sd">    atom_positions : list | NDArray</span>
+<span class="sd">        List or numpy array of all atom positions in the structure.</span>
 
 <span class="sd">    Returns</span>
-<span class="sd">    ----------</span>
-<span class="sd">    closest_label : string</span>
-<span class="sd">        String containing the label of the closest atom</span>
-<span class="sd">    closest_position : array</span>
-<span class="sd">        Array containing the position of the closest atom</span>
-<span class="sd">    euclidian_distance : float</span>
-<span class="sd">        Euclidian distance between the two atoms</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    -------</span>
+<span class="sd">    closest_label : str</span>
+<span class="sd">        Label of the closest atom.</span>
+<span class="sd">    closest_position : NDArray</span>
+<span class="sd">        Position of the closest atom as a numpy array.</span>
+<span class="sd">    euclidean_distance : float</span>
+<span class="sd">        Euclidean distance between the target atom and the closest atom.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">list_labels</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">list_pos</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># Convert positions to numpy arrays for easier manipulation</span>
+    <span class="n">target_position</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">target_position</span><span class="p">)</span>
+    <span class="n">atom_positions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">atom_positions</span><span class="p">)</span>
 
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)):</span>
-        <span class="k">if</span> <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">label_1</span><span class="p">:</span>
-            <span class="n">list_labels</span> <span class="o">+=</span> <span class="p">[</span><span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
-            <span class="n">list_pos</span> <span class="o">+=</span> <span class="p">[</span><span class="n">pos</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+    <span class="c1"># Filter out the target atom from the list of atoms</span>
+    <span class="n">filtered_labels</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">filtered_positions</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">list_pos</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">atom_labels</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">atom_labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">target_label</span><span class="p">:</span>
+            <span class="n">filtered_labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom_labels</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">filtered_positions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom_positions</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
 
-    <span class="n">closest_index</span> <span class="o">=</span> <span class="n">distance</span><span class="o">.</span><span class="n">cdist</span><span class="p">([</span><span class="n">pos_1</span><span class="p">],</span> <span class="n">list_pos</span><span class="p">)</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span>
+    <span class="c1"># If no other atoms are present, return default values</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">filtered_positions</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]),</span> <span class="kc">None</span>
 
-    <span class="n">closest_label</span> <span class="o">=</span> <span class="n">list_labels</span><span class="p">[</span><span class="n">closest_index</span><span class="p">]</span>
-    <span class="n">closest_position</span> <span class="o">=</span> <span class="n">list_pos</span><span class="p">[</span><span class="n">closest_index</span><span class="p">]</span>
-    <span class="n">euclidian_distance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">pos_1</span> <span class="o">-</span> <span class="n">list_pos</span><span class="p">[</span><span class="n">closest_index</span><span class="p">])</span>
+    <span class="c1"># Find the closest atom using pairwise distances</span>
+    <span class="n">closest_index</span> <span class="o">=</span> <span class="n">distance</span><span class="o">.</span><span class="n">cdist</span><span class="p">([</span><span class="n">target_position</span><span class="p">],</span> <span class="n">filtered_positions</span><span class="p">)</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span>
 
-    <span class="k">return</span> <span class="n">closest_label</span><span class="p">,</span> <span class="n">closest_position</span><span class="p">,</span> <span class="n">euclidian_distance</span></div>
+    <span class="n">closest_label</span> <span class="o">=</span> <span class="n">filtered_labels</span><span class="p">[</span><span class="n">closest_index</span><span class="p">]</span>
+    <span class="n">closest_position</span> <span class="o">=</span> <span class="n">filtered_positions</span><span class="p">[</span><span class="n">closest_index</span><span class="p">]</span>
+    <span class="n">euclidean_distance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">target_position</span> <span class="o">-</span> <span class="n">closest_position</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">closest_label</span><span class="p">,</span> <span class="n">closest_position</span><span class="p">,</span> <span class="n">euclidean_distance</span></div>
 
 
 
 <div class="viewcode-block" id="closest_atom_struc">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.tools.closest_atom_struc">[docs]</a>
-<span class="k">def</span> <span class="nf">closest_atom_struc</span><span class="p">(</span><span class="n">label_1</span><span class="p">,</span> <span class="n">pos_1</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">pos</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Finds the closest atom on the structure to a given atom&#39;&#39;&#39;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">closest_atom_struc</span><span class="p">(</span><span class="n">label_1</span><span class="p">,</span> <span class="n">pos_1</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">pos</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Finds the closest atom on the structure to a given atom</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">list_labels</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">list_pos</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)):</span>
         <span class="k">if</span> <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">label_1</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s1">&#39;C&#39;</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="s2">&quot;C&quot;</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
                 <span class="n">list_labels</span> <span class="o">+=</span> <span class="p">[</span><span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
                 <span class="n">list_pos</span> <span class="o">+=</span> <span class="p">[</span><span class="n">pos</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
 
@@ -818,27 +885,28 @@
 
 <div class="viewcode-block" id="get_bond_atom">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.tools.get_bond_atom">[docs]</a>
-<span class="k">def</span> <span class="nf">get_bond_atom</span><span class="p">(</span><span class="n">connector_1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">connector_2</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_bond_atom</span><span class="p">(</span><span class="n">connector_1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">connector_2</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the atom that will be used to bond two building blocks.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">bond_dict</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;NH2&#39;</span><span class="p">:</span> <span class="s1">&#39;N&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;NHOH&#39;</span><span class="p">:</span> <span class="s1">&#39;N&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;COCHCHOH&#39;</span><span class="p">:</span> <span class="s1">&#39;N&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;CONHNH2&#39;</span><span class="p">:</span> <span class="s1">&#39;N&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;CHNNH2&#39;</span><span class="p">:</span> <span class="s1">&#39;N&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;COOH&#39;</span><span class="p">:</span> <span class="s1">&#39;N&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;BOH2&#39;</span><span class="p">:</span> <span class="s1">&#39;B&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;OH2&#39;</span><span class="p">:</span> <span class="s1">&#39;B&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Cl&#39;</span><span class="p">:</span> <span class="s1">&#39;X&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Br&#39;</span><span class="p">:</span> <span class="s1">&#39;X&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;CH2CN&#39;</span><span class="p">:</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;CH3&#39;</span><span class="p">:</span> <span class="s1">&#39;C&#39;</span>
+        <span class="s2">&quot;NH2&quot;</span><span class="p">:</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;NHOH&quot;</span><span class="p">:</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;COCHCHOH&quot;</span><span class="p">:</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;CONHNH2&quot;</span><span class="p">:</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;CHNNH2&quot;</span><span class="p">:</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;COOH&quot;</span><span class="p">:</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;CCH3O&quot;</span><span class="p">:</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;BOH2&quot;</span><span class="p">:</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;OH2&quot;</span><span class="p">:</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Cl&quot;</span><span class="p">:</span> <span class="s2">&quot;X&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Br&quot;</span><span class="p">:</span> <span class="s2">&quot;X&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;CH2CN&quot;</span><span class="p">:</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;CH3&quot;</span><span class="p">:</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span>
     <span class="p">}</span>
 
-    <span class="n">bond_atom</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">bond_atom</span> <span class="o">=</span> <span class="s2">&quot;N&quot;</span>
     <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">bond_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
         <span class="k">if</span> <span class="n">group</span> <span class="ow">in</span> <span class="p">[</span><span class="n">connector_1</span><span class="p">,</span> <span class="n">connector_2</span><span class="p">]:</span>
             <span class="n">bond_atom</span> <span class="o">=</span> <span class="n">bond_dict</span><span class="p">[</span><span class="n">group</span><span class="p">]</span>
@@ -849,34 +917,34 @@
 
 <div class="viewcode-block" id="get_framework_symm_text">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.tools.get_framework_symm_text">[docs]</a>
-<span class="k">def</span> <span class="nf">get_framework_symm_text</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">lattice</span><span class="p">,</span> <span class="n">hall</span><span class="p">,</span> <span class="n">space_group</span><span class="p">,</span> <span class="n">space_number</span><span class="p">,</span> <span class="n">symm_op</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Get the text for the framework symmop&#39;&#39;&#39;</span>
-    <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{:&lt;60s}</span><span class="s1"> </span><span class="si">{:^12s}</span><span class="s1"> </span><span class="si">{:&lt;4s}</span><span class="s1"> </span><span class="si">{:^4s}</span><span class="s1"> #</span><span class="si">{:^5s}</span><span class="s1">   </span><span class="si">{:^2}</span><span class="s1"> sym. op.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span>
-                                                                           <span class="n">lattice</span><span class="p">,</span>
-                                                                           <span class="n">hall</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">),</span>
-                                                                           <span class="n">space_group</span><span class="p">,</span>
-                                                                           <span class="n">space_number</span><span class="p">,</span>
-                                                                           <span class="n">symm_op</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_framework_symm_text</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">lattice</span><span class="p">,</span> <span class="n">hall</span><span class="p">,</span> <span class="n">space_group</span><span class="p">,</span> <span class="n">space_number</span><span class="p">,</span> <span class="n">symm_op</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the text for the framework symmop</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{:&lt;60s}</span><span class="s2"> </span><span class="si">{:^12s}</span><span class="s2"> </span><span class="si">{:&lt;4s}</span><span class="s2"> </span><span class="si">{:^4s}</span><span class="s2"> #</span><span class="si">{:^5s}</span><span class="s2">   </span><span class="si">{:^2}</span><span class="s2"> sym. op.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">name</span><span class="p">,</span> <span class="n">lattice</span><span class="p">,</span> <span class="n">hall</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">),</span> <span class="n">space_group</span><span class="p">,</span> <span class="n">space_number</span><span class="p">,</span> <span class="n">symm_op</span>
+    <span class="p">)</span>
     <span class="k">return</span> <span class="n">text</span></div>
 
 
 
 <div class="viewcode-block" id="print_framework_name">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.tools.print_framework_name">[docs]</a>
-<span class="k">def</span> <span class="nf">print_framework_name</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">lattice</span><span class="p">,</span> <span class="n">hall</span><span class="p">,</span> <span class="n">space_group</span><span class="p">,</span> <span class="n">space_number</span><span class="p">,</span> <span class="n">symm_op</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;Print the results of the created structure&#39;&#39;&#39;</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:&lt;60s}</span><span class="s1"> </span><span class="si">{:^12s}</span><span class="s1"> </span><span class="si">{:&lt;4s}</span><span class="s1"> </span><span class="si">{:^4s}</span><span class="s1"> #</span><span class="si">{:^5s}</span><span class="s1">   </span><span class="si">{:^2}</span><span class="s1"> sym. op.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span>
-                                                                          <span class="n">lattice</span><span class="p">,</span>
-                                                                          <span class="n">hall</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">),</span>
-                                                                          <span class="n">space_group</span><span class="p">,</span>
-                                                                          <span class="n">space_number</span><span class="p">,</span>
-                                                                          <span class="n">symm_op</span><span class="p">))</span></div>
+<span class="k">def</span><span class="w"> </span><span class="nf">print_framework_name</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">lattice</span><span class="p">,</span> <span class="n">hall</span><span class="p">,</span> <span class="n">space_group</span><span class="p">,</span> <span class="n">space_number</span><span class="p">,</span> <span class="n">symm_op</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Print the results of the created structure</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;</span><span class="si">{:&lt;60s}</span><span class="s2"> </span><span class="si">{:^12s}</span><span class="s2"> </span><span class="si">{:&lt;4s}</span><span class="s2"> </span><span class="si">{:^4s}</span><span class="s2"> #</span><span class="si">{:^5s}</span><span class="s2">   </span><span class="si">{:^2}</span><span class="s2"> sym. op.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">name</span><span class="p">,</span> <span class="n">lattice</span><span class="p">,</span> <span class="n">hall</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">),</span> <span class="n">space_group</span><span class="p">,</span> <span class="n">space_number</span><span class="p">,</span> <span class="n">symm_op</span>
+        <span class="p">)</span>
+    <span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="print_command">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.tools.print_command">[docs]</a>
-<span class="k">def</span> <span class="nf">print_command</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">verbose</span><span class="p">,</span> <span class="n">match</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">print_command</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">verbose</span><span class="p">,</span> <span class="n">match</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">verbose</span> <span class="ow">in</span> <span class="n">match</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span></div>
 
@@ -884,7 +952,7 @@
 
 <div class="viewcode-block" id="formula_from_atom_list">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.tools.formula_from_atom_list">[docs]</a>
-<span class="k">def</span> <span class="nf">formula_from_atom_list</span><span class="p">(</span><span class="n">AtomLabels</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">formula_from_atom_list</span><span class="p">(</span><span class="n">AtomLabels</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Create a string with the formula of the structure from the list of atoms.</span>
 
@@ -899,7 +967,7 @@
 <span class="sd">        String with the formula of the structure.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">formula</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">AtomLabels</span><span class="p">):</span>
         <span class="n">formula</span> <span class="o">+=</span> <span class="n">i</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">AtomLabels</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
 
@@ -909,8 +977,8 @@
 
 <div class="viewcode-block" id="smiles_to_xsmiles">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.tools.smiles_to_xsmiles">[docs]</a>
-<span class="k">def</span> <span class="nf">smiles_to_xsmiles</span><span class="p">(</span><span class="n">smiles_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">smiles_to_xsmiles</span><span class="p">(</span><span class="n">smiles_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Converts a SMILES string to an extended SMILES string with labels</span>
 
 <span class="sd">    Parameters</span>
@@ -926,40 +994,40 @@
 <span class="sd">        xsmiles labels for images with the special labels</span>
 <span class="sd">    composition : str</span>
 <span class="sd">        String containing the composition</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="n">SPECIAL_ATOMS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Q&#39;</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">,</span> <span class="s1">&#39;X&#39;</span><span class="p">]</span>
-    <span class="n">REGULAR_ATOMS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">,</span> <span class="s1">&#39;H&#39;</span><span class="p">,</span> <span class="s1">&#39;O&#39;</span><span class="p">,</span> <span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="s1">&#39;F&#39;</span><span class="p">]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">SPECIAL_ATOMS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Q&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;X&quot;</span><span class="p">]</span>
+    <span class="n">REGULAR_ATOMS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;O&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;F&quot;</span><span class="p">,</span> <span class="s2">&quot;Cl&quot;</span><span class="p">,</span> <span class="s2">&quot;Br&quot;</span><span class="p">,</span> <span class="s2">&quot;I&quot;</span><span class="p">,</span> <span class="s2">&quot;P&quot;</span><span class="p">,</span> <span class="s2">&quot;Be&quot;</span><span class="p">]</span>
 
-    <span class="n">xsmiles</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">xsmiles</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="n">labels</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">atom_list</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">letter</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">smiles_string</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="n">letter</span> <span class="ow">in</span> <span class="n">SPECIAL_ATOMS</span><span class="p">:</span>
-            <span class="n">xsmiles</span> <span class="o">+=</span> <span class="s1">&#39;*&#39;</span>
+            <span class="n">xsmiles</span> <span class="o">+=</span> <span class="s2">&quot;*&quot;</span>
             <span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">letter</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">letter</span> <span class="o">==</span> <span class="s1">&#39;R&#39;</span><span class="p">:</span>
-                <span class="n">atom_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">smiles_string</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">letter</span> <span class="o">==</span> <span class="s2">&quot;R&quot;</span><span class="p">:</span>
+                <span class="n">atom_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">smiles_string</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">atom_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">letter</span><span class="p">)</span>
 
         <span class="k">elif</span> <span class="n">letter</span><span class="o">.</span><span class="n">isnumeric</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">smiles_string</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;R&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">smiles_string</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;R&quot;</span><span class="p">:</span>
                 <span class="n">labels</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">letter</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">xsmiles</span> <span class="o">+=</span> <span class="n">letter</span>
 
         <span class="k">elif</span> <span class="n">letter</span> <span class="ow">in</span> <span class="n">REGULAR_ATOMS</span><span class="p">:</span>
             <span class="n">xsmiles</span> <span class="o">+=</span> <span class="n">letter</span>
-            <span class="n">labels</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">]</span>
+            <span class="n">labels</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span>
             <span class="n">atom_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">letter</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="n">xsmiles</span> <span class="o">+=</span> <span class="n">letter</span>
 
     <span class="c1"># Generate the xsmiles label</span>
-    <span class="n">xsmiles_label</span> <span class="o">=</span> <span class="s1">&#39;|$&#39;</span> <span class="o">+</span> <span class="s1">&#39;;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;$|&#39;</span>
+    <span class="n">xsmiles_label</span> <span class="o">=</span> <span class="s2">&quot;|$&quot;</span> <span class="o">+</span> <span class="s2">&quot;;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;$|&quot;</span>
 
     <span class="c1"># Generate the composition</span>
     <span class="n">composition</span> <span class="o">=</span> <span class="n">formula_from_atom_list</span><span class="p">(</span><span class="n">atom_list</span><span class="p">)</span>
@@ -970,7 +1038,7 @@
 
 <div class="viewcode-block" id="ibrav_to_cell">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.tools.ibrav_to_cell">[docs]</a>
-<span class="k">def</span> <span class="nf">ibrav_to_cell</span><span class="p">(</span><span class="n">ibrav</span><span class="p">,</span> <span class="n">celldm1</span><span class="p">,</span> <span class="n">celldm2</span><span class="p">,</span> <span class="n">celldm3</span><span class="p">,</span> <span class="n">celldm4</span><span class="p">,</span> <span class="n">celldm5</span><span class="p">,</span> <span class="n">celldm6</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">ibrav_to_cell</span><span class="p">(</span><span class="n">ibrav</span><span class="p">,</span> <span class="n">celldm1</span><span class="p">,</span> <span class="n">celldm2</span><span class="p">,</span> <span class="n">celldm3</span><span class="p">,</span> <span class="n">celldm4</span><span class="p">,</span> <span class="n">celldm5</span><span class="p">,</span> <span class="n">celldm6</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert a value of ibrav to a cell.</span>
 
@@ -990,91 +1058,148 @@
     <span class="k">if</span> <span class="n">ibrav</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">cell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">alat</span>
     <span class="k">elif</span> <span class="n">ibrav</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="n">cell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
-                         <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
-                         <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]])</span> <span class="o">*</span> <span class="p">(</span><span class="n">alat</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">cell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]])</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="n">alat</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="p">)</span>
     <span class="k">elif</span> <span class="n">ibrav</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-        <span class="n">cell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
-                         <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
-                         <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]])</span> <span class="o">*</span> <span class="p">(</span><span class="n">alat</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">cell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]])</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="n">alat</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="p">)</span>
     <span class="k">elif</span> <span class="n">ibrav</span> <span class="o">==</span> <span class="o">-</span><span class="mi">3</span><span class="p">:</span>
-        <span class="n">cell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
-                         <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
-                         <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">]])</span> <span class="o">*</span> <span class="p">(</span><span class="n">alat</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">cell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">]])</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="n">alat</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="p">)</span>
     <span class="k">elif</span> <span class="n">ibrav</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
-        <span class="n">cell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
-                         <span class="p">[</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="mi">3</span><span class="o">**</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
-                         <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">celldm3</span><span class="p">]])</span> <span class="o">*</span> <span class="n">alat</span>
+        <span class="n">cell</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="mi">3</span><span class="o">**</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">celldm3</span><span class="p">]])</span>
+            <span class="o">*</span> <span class="n">alat</span>
+        <span class="p">)</span>
     <span class="k">elif</span> <span class="n">ibrav</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
-        <span class="n">tx</span> <span class="o">=</span> <span class="p">((</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">celldm4</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
-        <span class="n">ty</span> <span class="o">=</span> <span class="p">((</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">celldm4</span><span class="p">)</span> <span class="o">/</span> <span class="mf">6.0</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
-        <span class="n">tz</span> <span class="o">=</span> <span class="p">((</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">celldm4</span><span class="p">)</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
-        <span class="n">cell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">tx</span><span class="p">,</span> <span class="o">-</span><span class="n">ty</span><span class="p">,</span> <span class="n">tz</span><span class="p">],</span>
-                         <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">ty</span><span class="p">,</span> <span class="n">tz</span><span class="p">],</span>
-                         <span class="p">[</span><span class="o">-</span><span class="n">tx</span><span class="p">,</span> <span class="o">-</span><span class="n">ty</span><span class="p">,</span> <span class="n">tz</span><span class="p">]])</span> <span class="o">*</span> <span class="n">alat</span>
+        <span class="n">tx</span> <span class="o">=</span> <span class="p">((</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">celldm4</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+        <span class="n">ty</span> <span class="o">=</span> <span class="p">((</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">celldm4</span><span class="p">)</span> <span class="o">/</span> <span class="mf">6.0</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+        <span class="n">tz</span> <span class="o">=</span> <span class="p">((</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">celldm4</span><span class="p">)</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+        <span class="n">cell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">tx</span><span class="p">,</span> <span class="o">-</span><span class="n">ty</span><span class="p">,</span> <span class="n">tz</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">ty</span><span class="p">,</span> <span class="n">tz</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="n">tx</span><span class="p">,</span> <span class="o">-</span><span class="n">ty</span><span class="p">,</span> <span class="n">tz</span><span class="p">]])</span> <span class="o">*</span> <span class="n">alat</span>
     <span class="k">elif</span> <span class="n">ibrav</span> <span class="o">==</span> <span class="o">-</span><span class="mi">5</span><span class="p">:</span>
-        <span class="n">ty</span> <span class="o">=</span> <span class="p">((</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">celldm4</span><span class="p">)</span> <span class="o">/</span> <span class="mf">6.0</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
-        <span class="n">tz</span> <span class="o">=</span> <span class="p">((</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">celldm4</span><span class="p">)</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
+        <span class="n">ty</span> <span class="o">=</span> <span class="p">((</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">celldm4</span><span class="p">)</span> <span class="o">/</span> <span class="mf">6.0</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+        <span class="n">tz</span> <span class="o">=</span> <span class="p">((</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">celldm4</span><span class="p">)</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
         <span class="n">a_prime</span> <span class="o">=</span> <span class="n">alat</span> <span class="o">/</span> <span class="mi">3</span><span class="o">**</span><span class="mf">0.5</span>
         <span class="n">u</span> <span class="o">=</span> <span class="n">tz</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">ty</span>
         <span class="n">v</span> <span class="o">=</span> <span class="n">tz</span> <span class="o">+</span> <span class="mi">2</span><span class="o">**</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">ty</span>
-        <span class="n">cell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">v</span><span class="p">],</span>
-                         <span class="p">[</span><span class="n">v</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">],</span>
-                         <span class="p">[</span><span class="n">v</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">u</span><span class="p">]])</span> <span class="o">*</span> <span class="n">a_prime</span>
+        <span class="n">cell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">v</span><span class="p">],</span> <span class="p">[</span><span class="n">v</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">],</span> <span class="p">[</span><span class="n">v</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">u</span><span class="p">]])</span> <span class="o">*</span> <span class="n">a_prime</span>
     <span class="k">elif</span> <span class="n">ibrav</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
-        <span class="n">cell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
-                         <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
-                         <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">celldm3</span><span class="p">]])</span> <span class="o">*</span> <span class="n">alat</span>
+        <span class="n">cell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">celldm3</span><span class="p">]])</span> <span class="o">*</span> <span class="n">alat</span>
     <span class="k">elif</span> <span class="n">ibrav</span> <span class="o">==</span> <span class="mi">7</span><span class="p">:</span>
-        <span class="n">cell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">celldm3</span><span class="p">],</span>
-                         <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">celldm3</span><span class="p">],</span>
-                         <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">celldm3</span><span class="p">]])</span> <span class="o">*</span> <span class="p">(</span><span class="n">alat</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">cell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[[</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">celldm3</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">celldm3</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">celldm3</span><span class="p">]]</span>
+        <span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">alat</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">ibrav</span> <span class="o">==</span> <span class="mi">8</span><span class="p">:</span>
-        <span class="n">cell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
-                         <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">celldm2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
-                         <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">celldm3</span><span class="p">]])</span> <span class="o">*</span> <span class="n">alat</span>
+        <span class="n">cell</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">celldm2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">celldm3</span><span class="p">]])</span> <span class="o">*</span> <span class="n">alat</span>
+        <span class="p">)</span>
     <span class="k">elif</span> <span class="n">ibrav</span> <span class="o">==</span> <span class="mi">9</span><span class="p">:</span>
-        <span class="n">cell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">celldm2</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
-                         <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">celldm2</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
-                         <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">celldm3</span><span class="p">]])</span> <span class="o">*</span> <span class="n">alat</span>
+        <span class="n">cell</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="p">[</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">celldm2</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+                    <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">celldm2</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+                    <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">celldm3</span><span class="p">],</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+            <span class="o">*</span> <span class="n">alat</span>
+        <span class="p">)</span>
     <span class="k">elif</span> <span class="n">ibrav</span> <span class="o">==</span> <span class="o">-</span><span class="mi">9</span><span class="p">:</span>
-        <span class="n">cell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="o">-</span><span class="n">celldm2</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
-                         <span class="p">[</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">celldm2</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
-                         <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">celldm3</span><span class="p">]])</span> <span class="o">*</span> <span class="n">alat</span>
+        <span class="n">cell</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="p">[</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="o">-</span><span class="n">celldm2</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+                    <span class="p">[</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">celldm2</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+                    <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">celldm3</span><span class="p">],</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+            <span class="o">*</span> <span class="n">alat</span>
+        <span class="p">)</span>
     <span class="k">elif</span> <span class="n">ibrav</span> <span class="o">==</span> <span class="mi">10</span><span class="p">:</span>
-        <span class="n">cell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">celldm3</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">],</span>
-                         <span class="p">[</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">celldm2</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
-                         <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">celldm2</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">celldm3</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">]])</span> <span class="o">*</span> <span class="n">alat</span>
+        <span class="n">cell</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="p">[</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">celldm3</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">],</span>
+                    <span class="p">[</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">celldm2</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+                    <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">celldm2</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">celldm3</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">],</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+            <span class="o">*</span> <span class="n">alat</span>
+        <span class="p">)</span>
     <span class="k">elif</span> <span class="n">ibrav</span> <span class="o">==</span> <span class="mi">11</span><span class="p">:</span>
-        <span class="n">cell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">celldm2</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">celldm3</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">],</span>
-                         <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">celldm2</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">celldm3</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">],</span>
-                         <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="o">-</span><span class="n">celldm2</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">celldm3</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">]])</span> <span class="o">*</span> <span class="n">alat</span>
+        <span class="n">cell</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="p">[</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">celldm2</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">celldm3</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">],</span>
+                    <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">celldm2</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">celldm3</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">],</span>
+                    <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="o">-</span><span class="n">celldm2</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">celldm3</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">],</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+            <span class="o">*</span> <span class="n">alat</span>
+        <span class="p">)</span>
     <span class="k">elif</span> <span class="n">ibrav</span> <span class="o">==</span> <span class="mi">12</span><span class="p">:</span>
-        <span class="n">sinab</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">celldm4</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
-        <span class="n">cell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
-                         <span class="p">[</span><span class="n">celldm2</span> <span class="o">*</span> <span class="n">celldm4</span><span class="p">,</span> <span class="n">celldm2</span> <span class="o">*</span> <span class="n">sinab</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
-                         <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">celldm3</span><span class="p">]])</span> <span class="o">*</span> <span class="n">alat</span>
+        <span class="n">sinab</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">celldm4</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+        <span class="n">cell</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+                    <span class="p">[</span><span class="n">celldm2</span> <span class="o">*</span> <span class="n">celldm4</span><span class="p">,</span> <span class="n">celldm2</span> <span class="o">*</span> <span class="n">sinab</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+                    <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">celldm3</span><span class="p">],</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+            <span class="o">*</span> <span class="n">alat</span>
+        <span class="p">)</span>
     <span class="k">elif</span> <span class="n">ibrav</span> <span class="o">==</span> <span class="o">-</span><span class="mi">12</span><span class="p">:</span>
-        <span class="n">sinac</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">celldm5</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
-        <span class="n">cell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
-                         <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">celldm2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
-                         <span class="p">[</span><span class="n">celldm3</span> <span class="o">*</span> <span class="n">celldm5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">celldm3</span> <span class="o">*</span> <span class="n">sinac</span><span class="p">]])</span> <span class="o">*</span> <span class="n">alat</span>
+        <span class="n">sinac</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">celldm5</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+        <span class="n">cell</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+                    <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">celldm2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+                    <span class="p">[</span><span class="n">celldm3</span> <span class="o">*</span> <span class="n">celldm5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">celldm3</span> <span class="o">*</span> <span class="n">sinac</span><span class="p">],</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+            <span class="o">*</span> <span class="n">alat</span>
+        <span class="p">)</span>
     <span class="k">elif</span> <span class="n">ibrav</span> <span class="o">==</span> <span class="mi">13</span><span class="p">:</span>
-        <span class="n">sinab</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">celldm4</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
-        <span class="n">cell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="n">celldm3</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">],</span>
-                         <span class="p">[</span><span class="n">celldm2</span> <span class="o">*</span> <span class="n">celldm4</span><span class="p">,</span> <span class="n">celldm2</span> <span class="o">*</span> <span class="n">sinab</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
-                         <span class="p">[</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">celldm3</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">]])</span> <span class="o">*</span> <span class="n">alat</span>
+        <span class="n">sinab</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">celldm4</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+        <span class="n">cell</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="p">[</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="n">celldm3</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">],</span>
+                    <span class="p">[</span><span class="n">celldm2</span> <span class="o">*</span> <span class="n">celldm4</span><span class="p">,</span> <span class="n">celldm2</span> <span class="o">*</span> <span class="n">sinab</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+                    <span class="p">[</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">celldm3</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">],</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+            <span class="o">*</span> <span class="n">alat</span>
+        <span class="p">)</span>
     <span class="k">elif</span> <span class="n">ibrav</span> <span class="o">==</span> <span class="mi">14</span><span class="p">:</span>
-        <span class="n">sinab</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">celldm4</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
-        <span class="n">v3</span> <span class="o">=</span> <span class="p">[</span><span class="n">celldm3</span> <span class="o">*</span> <span class="n">celldm5</span><span class="p">,</span>
-              <span class="n">celldm3</span> <span class="o">*</span> <span class="p">(</span><span class="n">celldm6</span> <span class="o">-</span> <span class="n">celldm5</span> <span class="o">*</span> <span class="n">celldm4</span><span class="p">)</span> <span class="o">/</span> <span class="n">sinab</span><span class="p">,</span>
-              <span class="n">celldm3</span> <span class="o">*</span> <span class="p">((</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">celldm6</span> <span class="o">*</span> <span class="n">celldm5</span> <span class="o">*</span> <span class="n">celldm4</span>
-                          <span class="o">-</span> <span class="n">celldm6</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">celldm5</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">celldm4</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span><span class="p">)</span> <span class="o">/</span> <span class="n">sinab</span><span class="p">]</span>
-        <span class="n">cell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
-                         <span class="p">[</span><span class="n">celldm2</span> <span class="o">*</span> <span class="n">celldm4</span><span class="p">,</span> <span class="n">celldm2</span> <span class="o">*</span> <span class="n">sinab</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
-                         <span class="n">v3</span><span class="p">])</span> <span class="o">*</span> <span class="n">alat</span>
+        <span class="n">sinab</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">celldm4</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+        <span class="n">v3</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">celldm3</span> <span class="o">*</span> <span class="n">celldm5</span><span class="p">,</span>
+            <span class="n">celldm3</span> <span class="o">*</span> <span class="p">(</span><span class="n">celldm6</span> <span class="o">-</span> <span class="n">celldm5</span> <span class="o">*</span> <span class="n">celldm4</span><span class="p">)</span> <span class="o">/</span> <span class="n">sinab</span><span class="p">,</span>
+            <span class="n">celldm3</span>
+            <span class="o">*</span> <span class="p">(</span>
+                <span class="p">(</span>
+                    <span class="mi">1</span>
+                    <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">celldm6</span> <span class="o">*</span> <span class="n">celldm5</span> <span class="o">*</span> <span class="n">celldm4</span>
+                    <span class="o">-</span> <span class="n">celldm6</span><span class="o">**</span><span class="mi">2</span>
+                    <span class="o">-</span> <span class="n">celldm5</span><span class="o">**</span><span class="mi">2</span>
+                    <span class="o">-</span> <span class="n">celldm4</span><span class="o">**</span><span class="mi">2</span>
+                <span class="p">)</span>
+                <span class="o">**</span> <span class="mf">0.5</span>
+            <span class="p">)</span>
+            <span class="o">/</span> <span class="n">sinab</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">cell</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="n">celldm2</span> <span class="o">*</span> <span class="n">celldm4</span><span class="p">,</span> <span class="n">celldm2</span> <span class="o">*</span> <span class="n">sinab</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="n">v3</span><span class="p">])</span>
+            <span class="o">*</span> <span class="n">alat</span>
+        <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;ibrav = </span><span class="si">{0}</span><span class="s1"> is not implemented&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ibrav</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;ibrav = </span><span class="si">{0}</span><span class="s2"> is not implemented&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ibrav</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">cell</span></div>
 
@@ -1082,18 +1207,18 @@
 
 <div class="viewcode-block" id="equal_value">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.tools.equal_value">[docs]</a>
-<span class="k">def</span> <span class="nf">equal_value</span><span class="p">(</span><span class="n">val1</span><span class="p">,</span> <span class="n">val2</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">equal_value</span><span class="p">(</span><span class="n">val1</span><span class="p">,</span> <span class="n">val2</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Determine if two values are equal based on a given threshold.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">val1</span> <span class="o">-</span> <span class="n">val2</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">threshold</span></div>
 
 
 
 <div class="viewcode-block" id="classify_unit_cell">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.tools.classify_unit_cell">[docs]</a>
-<span class="k">def</span> <span class="nf">classify_unit_cell</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">thr</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">classify_unit_cell</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">thr</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Determine the bravais lattice based on the cell lattice.</span>
 <span class="sd">    The cell lattice can be the cell parameters as (6,1) array or</span>
 <span class="sd">    the cell vectors as (3x3) array.</span>
@@ -1112,25 +1237,41 @@
 <span class="sd">    -------</span>
 <span class="sd">    cell_type : string</span>
 <span class="sd">        Bravais lattice.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
         <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span> <span class="o">=</span> <span class="n">cell_to_cellpar</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span>
 
-    <span class="n">cell_type</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">cell_type</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
-    <span class="k">if</span> <span class="n">equal_value</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="n">thr</span><span class="p">)</span> <span class="ow">and</span> <span class="n">equal_value</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="n">thr</span><span class="p">)</span> <span class="ow">and</span> <span class="n">equal_value</span><span class="p">(</span><span class="n">gamma</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="n">thr</span><span class="p">):</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">equal_value</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="n">thr</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="n">equal_value</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="n">thr</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="n">equal_value</span><span class="p">(</span><span class="n">gamma</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="n">thr</span><span class="p">)</span>
+    <span class="p">):</span>
         <span class="k">if</span> <span class="n">equal_value</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">thr</span><span class="p">)</span> <span class="ow">and</span> <span class="n">equal_value</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">thr</span><span class="p">):</span>
             <span class="n">cell_type</span> <span class="o">=</span> <span class="s2">&quot;cubic&quot;</span>
         <span class="k">if</span> <span class="n">equal_value</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">thr</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">equal_value</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">thr</span><span class="p">):</span>
             <span class="n">cell_type</span> <span class="o">=</span> <span class="s2">&quot;tetragonal&quot;</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">cell_type</span> <span class="o">=</span> <span class="s2">&quot;orthorhombic&quot;</span>
-    <span class="k">elif</span> <span class="n">equal_value</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="n">thr</span><span class="p">)</span> <span class="ow">and</span> <span class="n">equal_value</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="n">thr</span><span class="p">)</span> <span class="ow">and</span> <span class="n">equal_value</span><span class="p">(</span><span class="n">gamma</span><span class="p">,</span> <span class="mi">120</span><span class="p">,</span> <span class="n">thr</span><span class="p">):</span>
+    <span class="k">elif</span> <span class="p">(</span>
+        <span class="n">equal_value</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="n">thr</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="n">equal_value</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="n">thr</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="n">equal_value</span><span class="p">(</span><span class="n">gamma</span><span class="p">,</span> <span class="mi">120</span><span class="p">,</span> <span class="n">thr</span><span class="p">)</span>
+    <span class="p">):</span>
         <span class="k">if</span> <span class="n">equal_value</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">thr</span><span class="p">):</span>
             <span class="n">cell_type</span> <span class="o">=</span> <span class="s2">&quot;hexagonal&quot;</span>
-    <span class="k">elif</span> <span class="n">equal_value</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="n">thr</span><span class="p">)</span> <span class="ow">or</span> <span class="n">equal_value</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="n">thr</span><span class="p">)</span> <span class="ow">or</span> <span class="n">equal_value</span><span class="p">(</span><span class="n">gamma</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="n">thr</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">equal_value</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">thr</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">equal_value</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">thr</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">equal_value</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">thr</span><span class="p">):</span>
+    <span class="k">elif</span> <span class="p">(</span>
+        <span class="n">equal_value</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="n">thr</span><span class="p">)</span>
+        <span class="ow">or</span> <span class="n">equal_value</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="n">thr</span><span class="p">)</span>
+        <span class="ow">or</span> <span class="n">equal_value</span><span class="p">(</span><span class="n">gamma</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="n">thr</span><span class="p">)</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="ow">not</span> <span class="n">equal_value</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">thr</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="n">equal_value</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">thr</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="n">equal_value</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">thr</span><span class="p">)</span>
+        <span class="p">):</span>
             <span class="n">cell_type</span> <span class="o">=</span> <span class="s2">&quot;monoclinic&quot;</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">cell_type</span> <span class="o">=</span> <span class="s2">&quot;triclinic&quot;</span>
@@ -1141,10 +1282,10 @@
 
 <div class="viewcode-block" id="cell_to_ibrav">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.tools.cell_to_ibrav">[docs]</a>
-<span class="k">def</span> <span class="nf">cell_to_ibrav</span><span class="p">(</span><span class="n">cell</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">cell_to_ibrav</span><span class="p">(</span><span class="n">cell</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return the ibrav number for a given cell.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
         <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span> <span class="o">=</span> <span class="n">cell_to_cellpar</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span>
@@ -1153,36 +1294,37 @@
 
     <span class="n">cell_type</span> <span class="o">=</span> <span class="n">classify_unit_cell</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">cell_type</span> <span class="o">==</span> <span class="s1">&#39;cubic&#39;</span><span class="p">:</span>
-        <span class="n">celldm</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ibrav&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-                  <span class="s1">&#39;celldm(1)&#39;</span><span class="p">:</span> <span class="n">a</span> <span class="o">/</span> <span class="mf">0.5291772105638411</span><span class="p">}</span>
-    <span class="k">elif</span> <span class="n">cell_type</span> <span class="o">==</span> <span class="s1">&#39;hexagonal&#39;</span><span class="p">:</span>
-        <span class="n">celldm</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ibrav&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
-                  <span class="s1">&#39;celldm(1)&#39;</span><span class="p">:</span> <span class="n">a</span> <span class="o">/</span> <span class="mf">0.5291772105638411</span><span class="p">,</span>
-                  <span class="s1">&#39;celldm(3)&#39;</span><span class="p">:</span> <span class="n">c</span> <span class="o">/</span> <span class="n">a</span><span class="p">}</span>
-    <span class="k">elif</span> <span class="n">cell_type</span> <span class="o">==</span> <span class="s1">&#39;tetragonal&#39;</span><span class="p">:</span>
-        <span class="n">celldm</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ibrav&#39;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
-                  <span class="s1">&#39;celldm(1)&#39;</span><span class="p">:</span> <span class="n">a</span> <span class="o">/</span> <span class="mf">0.5291772105638411</span><span class="p">,</span>
-                  <span class="s1">&#39;celldm(3)&#39;</span><span class="p">:</span> <span class="n">c</span> <span class="o">/</span> <span class="n">a</span><span class="p">}</span>
-    <span class="k">elif</span> <span class="n">cell_type</span> <span class="o">==</span> <span class="s1">&#39;orthorhombic&#39;</span><span class="p">:</span>
-        <span class="n">celldm</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ibrav&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
-                  <span class="s1">&#39;celldm(1)&#39;</span><span class="p">:</span> <span class="n">a</span> <span class="o">/</span> <span class="mf">0.5291772105638411</span><span class="p">,</span>
-                  <span class="s1">&#39;celldm(2)&#39;</span><span class="p">:</span> <span class="n">b</span> <span class="o">/</span> <span class="n">a</span><span class="p">,</span>
-                  <span class="s1">&#39;celldm(3)&#39;</span><span class="p">:</span> <span class="n">c</span> <span class="o">/</span> <span class="n">a</span><span class="p">}</span>
-    <span class="k">elif</span> <span class="n">cell_type</span> <span class="o">==</span> <span class="s1">&#39;monoclinic&#39;</span><span class="p">:</span>
-        <span class="n">celldm</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ibrav&#39;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>
-                  <span class="s1">&#39;celldm(1)&#39;</span><span class="p">:</span> <span class="n">a</span> <span class="o">/</span> <span class="mf">0.5291772105638411</span><span class="p">,</span>
-                  <span class="s1">&#39;celldm(2)&#39;</span><span class="p">:</span> <span class="n">b</span> <span class="o">/</span> <span class="n">a</span><span class="p">,</span>
-                  <span class="s1">&#39;celldm(3)&#39;</span><span class="p">:</span> <span class="n">c</span> <span class="o">/</span> <span class="n">a</span><span class="p">,</span>
-                  <span class="s1">&#39;celldm(4)&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">beta</span><span class="p">))}</span>
+    <span class="k">if</span> <span class="n">cell_type</span> <span class="o">==</span> <span class="s2">&quot;cubic&quot;</span><span class="p">:</span>
+        <span class="n">celldm</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ibrav&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;celldm(1)&quot;</span><span class="p">:</span> <span class="n">a</span> <span class="o">/</span> <span class="mf">0.5291772105638411</span><span class="p">}</span>
+    <span class="k">elif</span> <span class="n">cell_type</span> <span class="o">==</span> <span class="s2">&quot;hexagonal&quot;</span><span class="p">:</span>
+        <span class="n">celldm</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ibrav&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;celldm(1)&quot;</span><span class="p">:</span> <span class="n">a</span> <span class="o">/</span> <span class="mf">0.5291772105638411</span><span class="p">,</span> <span class="s2">&quot;celldm(3)&quot;</span><span class="p">:</span> <span class="n">c</span> <span class="o">/</span> <span class="n">a</span><span class="p">}</span>
+    <span class="k">elif</span> <span class="n">cell_type</span> <span class="o">==</span> <span class="s2">&quot;tetragonal&quot;</span><span class="p">:</span>
+        <span class="n">celldm</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ibrav&quot;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="s2">&quot;celldm(1)&quot;</span><span class="p">:</span> <span class="n">a</span> <span class="o">/</span> <span class="mf">0.5291772105638411</span><span class="p">,</span> <span class="s2">&quot;celldm(3)&quot;</span><span class="p">:</span> <span class="n">c</span> <span class="o">/</span> <span class="n">a</span><span class="p">}</span>
+    <span class="k">elif</span> <span class="n">cell_type</span> <span class="o">==</span> <span class="s2">&quot;orthorhombic&quot;</span><span class="p">:</span>
+        <span class="n">celldm</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;ibrav&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+            <span class="s2">&quot;celldm(1)&quot;</span><span class="p">:</span> <span class="n">a</span> <span class="o">/</span> <span class="mf">0.5291772105638411</span><span class="p">,</span>
+            <span class="s2">&quot;celldm(2)&quot;</span><span class="p">:</span> <span class="n">b</span> <span class="o">/</span> <span class="n">a</span><span class="p">,</span>
+            <span class="s2">&quot;celldm(3)&quot;</span><span class="p">:</span> <span class="n">c</span> <span class="o">/</span> <span class="n">a</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="k">elif</span> <span class="n">cell_type</span> <span class="o">==</span> <span class="s2">&quot;monoclinic&quot;</span><span class="p">:</span>
+        <span class="n">celldm</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;ibrav&quot;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>
+            <span class="s2">&quot;celldm(1)&quot;</span><span class="p">:</span> <span class="n">a</span> <span class="o">/</span> <span class="mf">0.5291772105638411</span><span class="p">,</span>
+            <span class="s2">&quot;celldm(2)&quot;</span><span class="p">:</span> <span class="n">b</span> <span class="o">/</span> <span class="n">a</span><span class="p">,</span>
+            <span class="s2">&quot;celldm(3)&quot;</span><span class="p">:</span> <span class="n">c</span> <span class="o">/</span> <span class="n">a</span><span class="p">,</span>
+            <span class="s2">&quot;celldm(4)&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">beta</span><span class="p">)),</span>
+        <span class="p">}</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">celldm</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ibrav&#39;</span><span class="p">:</span> <span class="mi">14</span><span class="p">,</span>
-                  <span class="s1">&#39;celldm(1)&#39;</span><span class="p">:</span> <span class="n">a</span> <span class="o">/</span> <span class="mf">0.5291772105638411</span><span class="p">,</span>
-                  <span class="s1">&#39;celldm(2)&#39;</span><span class="p">:</span> <span class="n">b</span> <span class="o">/</span> <span class="n">a</span><span class="p">,</span>
-                  <span class="s1">&#39;celldm(3)&#39;</span><span class="p">:</span> <span class="n">c</span> <span class="o">/</span> <span class="n">a</span><span class="p">,</span>
-                  <span class="s1">&#39;celldm(4)&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">alpha</span><span class="p">)),</span>
-                  <span class="s1">&#39;celldm(5)&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">beta</span><span class="p">)),</span>
-                  <span class="s1">&#39;celldm(6)&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">gamma</span><span class="p">))}</span>
+        <span class="n">celldm</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;ibrav&quot;</span><span class="p">:</span> <span class="mi">14</span><span class="p">,</span>
+            <span class="s2">&quot;celldm(1)&quot;</span><span class="p">:</span> <span class="n">a</span> <span class="o">/</span> <span class="mf">0.5291772105638411</span><span class="p">,</span>
+            <span class="s2">&quot;celldm(2)&quot;</span><span class="p">:</span> <span class="n">b</span> <span class="o">/</span> <span class="n">a</span><span class="p">,</span>
+            <span class="s2">&quot;celldm(3)&quot;</span><span class="p">:</span> <span class="n">c</span> <span class="o">/</span> <span class="n">a</span><span class="p">,</span>
+            <span class="s2">&quot;celldm(4)&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">alpha</span><span class="p">)),</span>
+            <span class="s2">&quot;celldm(5)&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">beta</span><span class="p">)),</span>
+            <span class="s2">&quot;celldm(6)&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">gamma</span><span class="p">)),</span>
+        <span class="p">}</span>
 
     <span class="k">return</span> <span class="n">celldm</span></div>
 
@@ -1190,7 +1332,7 @@
 
 <div class="viewcode-block" id="is_bonded">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.tools.is_bonded">[docs]</a>
-<span class="k">def</span> <span class="nf">is_bonded</span><span class="p">(</span><span class="n">atom1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">atom2</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dist</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.3</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_bonded</span><span class="p">(</span><span class="n">atom1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">atom2</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dist</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.3</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Determine if two atoms are bonded based on the distance between them.</span>
 <span class="sd">    Two atoms are considered bonded if the distance between them is less than</span>
@@ -1208,7 +1350,7 @@
 <span class="sd">        Cutoff factor for the covalent radii. Default: 1.3</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">periodic_table</span> <span class="o">=</span> <span class="n">elements_dict</span><span class="p">(</span><span class="nb">property</span><span class="o">=</span><span class="s1">&#39;covalent_radius&#39;</span><span class="p">)</span>
+    <span class="n">periodic_table</span> <span class="o">=</span> <span class="n">elements_dict</span><span class="p">(</span><span class="nb">property</span><span class="o">=</span><span class="s2">&quot;covalent_radius&quot;</span><span class="p">)</span>
 
     <span class="c1"># Get the covalent radii of the two atoms</span>
     <span class="n">cr_1</span> <span class="o">=</span> <span class="n">periodic_table</span><span class="p">[</span><span class="n">atom1</span><span class="p">]</span>
@@ -1218,7 +1360,9 @@
     <span class="n">max_bond_distance</span> <span class="o">=</span> <span class="p">(</span><span class="n">cr_1</span> <span class="o">+</span> <span class="n">cr_2</span><span class="p">)</span> <span class="o">*</span> <span class="n">cutoff</span>
 
     <span class="k">if</span> <span class="n">dist</span> <span class="o">&lt;</span> <span class="mf">0.6</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Distance between atoms is less than 0.6 Å. Check if the structure is correct.&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s2">&quot;Distance between atoms is less than 0.6 Å. Check if the structure is correct.&quot;</span>
+        <span class="p">)</span>
 
     <span class="c1"># Check if the distance is less than the cutoff</span>
     <span class="k">if</span> <span class="mf">0.6</span> <span class="o">&lt;</span> <span class="n">dist</span> <span class="o">&lt;=</span> <span class="n">max_bond_distance</span><span class="p">:</span>
@@ -1230,7 +1374,7 @@
 
 <div class="viewcode-block" id="get_bonds">
 <a class="viewcode-back" href="../../pycofbuilder.html#pycofbuilder.tools.get_bonds">[docs]</a>
-<span class="k">def</span> <span class="nf">get_bonds</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mf">1.3</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_bonds</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mf">1.3</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the bonded atoms in a structure based on the distance between them.</span>
 
@@ -1242,13 +1386,17 @@
 <span class="sd">        Cutoff factor for the covalent radii. Default: 1.3 Å</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">atom_types</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()[</span><span class="s1">&#39;species&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;element&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">structure</span><span class="o">.</span><span class="n">sites</span><span class="p">]</span>
+    <span class="n">atom_types</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()[</span><span class="s2">&quot;species&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;element&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">structure</span><span class="o">.</span><span class="n">sites</span><span class="p">]</span>
 
     <span class="c1"># Get bonded atoms</span>
     <span class="n">center_indices</span><span class="p">,</span> <span class="n">points_indies</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">bond_distances</span> <span class="o">=</span> <span class="n">structure</span><span class="o">.</span><span class="n">get_neighbor_list</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
     <span class="n">bonded_atoms</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">center_indices</span><span class="p">,</span> <span class="n">points_indies</span><span class="p">,</span> <span class="n">bond_distances</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
 
-    <span class="n">bonded_atoms</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">bonded_atoms</span> <span class="k">if</span> <span class="n">is_bonded</span><span class="p">(</span><span class="n">atom_types</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">])],</span> <span class="n">atom_types</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">])],</span> <span class="n">i</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">cutoff</span><span class="p">)]</span>
+    <span class="n">bonded_atoms</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">i</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">bonded_atoms</span>
+        <span class="k">if</span> <span class="n">is_bonded</span><span class="p">(</span><span class="n">atom_types</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">])],</span> <span class="n">atom_types</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">])],</span> <span class="n">i</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">cutoff</span><span class="p">)</span>
+    <span class="p">]</span>
 
     <span class="n">bonded_atoms</span> <span class="o">=</span> <span class="p">[[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">i</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">bonded_atoms</span><span class="p">]</span>
 

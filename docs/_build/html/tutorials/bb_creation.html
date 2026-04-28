@@ -1,25 +1,23 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Creation of new building blocks &mdash; pyCOFBuilder 0.0.8.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+  <title>Creation of new building blocks &mdash; pyCOFBuilder 0.0.8.5 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/tabs.css?v=a5c4661c" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=a6cd5f1d"></script>
-        <script src="../_static/doctools.js?v=888ff710"></script>
-        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script src="../_static/tabs.js?v=3030b3cb"></script>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5abc45ba"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/tabs.js?v=3030b3cb"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -120,7 +118,8 @@
 <div class="admonition important">
 <p class="admonition-title">Important</p>
 <p>Don’t forget to add the special points (Q, X, or <span class="raw-html">R<sub>y</sub></span>.) in the structure of the molecule you want to add to pyCOFBuilder, as in the image below</p>
-<a class="reference internal image-reference" href="../_images/new_buiding_block.png"><img alt="Special points in the structure of the molecule" class="align-center" src="../_images/new_buiding_block.png" style="width: 800px;" /></a>
+<a class="reference internal image-reference" href="../_images/new_buiding_block.png"><img alt="Special points in the structure of the molecule" class="align-center" src="../_images/new_buiding_block.png" style="width: 800px;" />
+</a>
 </div>
 <section id="creating-a-new-building-block-structure-file">
 <h2>Creating a new building block structure file<a class="headerlink" href="#creating-a-new-building-block-structure-file" title="Link to this heading"></a></h2>
@@ -130,7 +129,8 @@
 <p>You don’t actually need to add any point for functionalization if you don’t want to functionalize the organic core. However, in case you want to add functionalization points to the organic core you
 it is necessary to add pseudoatoms <code class="docutils literal notranslate"><span class="pre">Ry</span></code>, where <code class="docutils literal notranslate"><span class="pre">y</span></code> is a number between 1 and 9, to the structure of the organic core. The distance between the <code class="docutils literal notranslate"><span class="pre">Ry</span></code> and the carbon (or any other atom it is attached)
 atom should be set to 0.5 Å.</p>
-<a class="reference internal image-reference" href="../_images/new_organic_core.png"><img alt="Special points in the structure of the molecule for a organic core" class="align-center" src="../_images/new_organic_core.png" style="width: 800px;" /></a>
+<a class="reference internal image-reference" href="../_images/new_organic_core.png"><img alt="Special points in the structure of the molecule for a organic core" class="align-center" src="../_images/new_organic_core.png" style="width: 800px;" />
+</a>
 </section>
 <hr class="docutils" />
 <section id="connection-groups">
@@ -139,7 +139,8 @@ atom should be set to 0.5 Å.</p>
 the building block and the linkers.</p>
 <p>For example, if you want to create a connection group with a distance of 1.5 Å between the connection points, you should set the distance between the <code class="docutils literal notranslate"><span class="pre">Q</span></code> and the carbon atom to 1.0 Å
 once the distance between the <code class="docutils literal notranslate"><span class="pre">C</span></code> and the <code class="docutils literal notranslate"><span class="pre">Q</span></code> points in the organic core is 0.5 Å. The same applies to the <code class="docutils literal notranslate"><span class="pre">X</span></code> point.</p>
-<a class="reference internal image-reference" href="../_images/new_connection_group.png"><img alt="Special points in the structure of the molecule for a connection group" class="align-center" src="../_images/new_connection_group.png" style="width: 800px;" /></a>
+<a class="reference internal image-reference" href="../_images/new_connection_group.png"><img alt="Special points in the structure of the molecule for a connection group" class="align-center" src="../_images/new_connection_group.png" style="width: 800px;" />
+</a>
 </section>
 <hr class="docutils" />
 <section id="functional-groups">
@@ -147,14 +148,15 @@ once the distance between the <code class="docutils literal notranslate"><span c
 <p>For the functional groups the distance from the pseudoatom <code class="docutils literal notranslate"><span class="pre">R</span></code> and the atom connected directly to it should be set in a way to get the final espected distance between the atoms after the functionalization.
 For example, if you want to add a <code class="docutils literal notranslate"><span class="pre">Cl</span></code> atom as functional group, you should set the distance between the <code class="docutils literal notranslate"><span class="pre">R</span></code> and the <code class="docutils literal notranslate"><span class="pre">Cl</span></code> atom to 1.27 Å to obtain a final distance of 1.77 Å between the
 <code class="docutils literal notranslate"><span class="pre">C</span></code> atom of the organic core and the <code class="docutils literal notranslate"><span class="pre">Cl</span></code> atoms.</p>
-<a class="reference internal image-reference" href="../_images/new_functional_group.png"><img alt="Special points in the structure of the molecule for a functional group" class="align-center" src="../_images/new_functional_group.png" style="width: 800px;" /></a>
+<a class="reference internal image-reference" href="../_images/new_functional_group.png"><img alt="Special points in the structure of the molecule for a functional group" class="align-center" src="../_images/new_functional_group.png" style="width: 800px;" />
+</a>
 </section>
 </section>
 <hr class="docutils" />
 <section id="creating-a-new-building-block-file-compatible-with-pycofbuilder">
 <h2>Creating a new building block file compatible with pyCOFBuilder<a class="headerlink" href="#creating-a-new-building-block-file-compatible-with-pycofbuilder" title="Link to this heading"></a></h2>
 <p>Once you created the file with the structure for the new building block, it is only necessary to convert it to a <code class="docutils literal notranslate"><span class="pre">.cjson</span></code> file. Below there is an example of how to create a new building block using the <code class="docutils literal notranslate"><span class="pre">ChemicalJSON</span></code> module.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">from</span> <span class="nn">pycofbuilder.cjson</span> <span class="kn">import</span> <span class="n">ChemJSON</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">from</span><span class="w"> </span><span class="nn">pycofbuilder.cjson</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChemJSON</span>
 <span class="linenos"> 2</span>
 <span class="linenos"> 3</span><span class="c1"># Create an empty ChemJSON object</span>
 <span class="linenos"> 4</span><span class="n">new_BB</span> <span class="o">=</span> <span class="n">ChemJSON</span><span class="p">()</span>

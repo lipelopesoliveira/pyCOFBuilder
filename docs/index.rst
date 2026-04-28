@@ -59,6 +59,30 @@ Here you will find a list of tutorials on how to use pyCOFBuilder to generate an
 * :doc:`tutorials/creating_mofs`
 
 
+Citing pyCOFBuilder
+-------------------
+
+If you use pyCOFBuilder in your research, please cite the following `paper`_:
+
+.. _paper: https://doi.org/10.1021/acs.jcim.3c01918
+
+OLIVEIRA, Felipe L. et ESTEVES, Pierre M. pyCOFBuilder: A python package for automated creation of Covalent Organic Framework models based on the reticular approach. Journal of Chemical Information and Modeling, 2024, vol. 64, no 8, p. 3278-3289.
+
+
+.. code-block:: bibtex
+
+   @article{oliveira2024pycofbuilder,
+      title={pyCOFBuilder: A python package for automated creation of Covalent Organic Framework models based on the reticular approach},
+      author={Oliveira, Felipe L and Esteves, Pierre M},
+      journal={Journal of Chemical Information and Modeling},
+      volume={64},
+      number={8},
+      pages={3278--3289},
+      year={2024},
+      publisher={ACS Publications}
+      }
+
+
 .. toctree::
    :caption: First steps
    :hidden:

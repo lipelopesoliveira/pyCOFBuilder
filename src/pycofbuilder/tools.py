@@ -7,14 +7,15 @@ This module contains the tools used by pyCOFBuilder.
 """
 
 import os
-import simplejson
 from itertools import combinations
+
 import numpy as np
+import simplejson
 from numpy.typing import NDArray
 from scipy.spatial import distance
 
 
-def elements_dict(property='atomic_mass') -> dict:
+def elements_dict(property="atomic_mass") -> dict:
     """
     Returns a dictionary containing the elements symbol and its selected property.
 
@@ -43,16 +44,18 @@ def elements_dict(property='atomic_mass') -> dict:
         A dictionary containing the elements symbol and its respective property.
     """
 
-    file_name = os.path.join(os.path.dirname(__file__), 'data', 'periodic_table.json')
+    file_name = os.path.join(os.path.dirname(__file__), "data", "periodic_table.json")
 
-    with open(file_name, 'r') as f:
+    with open(file_name, "r") as f:
         periodic_table = simplejson.load(f)
 
-    prop_list = periodic_table['H'].keys()
+    prop_list = periodic_table["H"].keys()
 
     # Check if the property is valid
     if property not in prop_list:
-        raise ValueError('Invalid property. Valid properties are: ' + ', '.join(prop_list))
+        raise ValueError(
+            "Invalid property. Valid properties are: " + ", ".join(prop_list)
+        )
 
     prop_dic = {}
     for element in periodic_table:
@@ -63,12 +66,12 @@ def elements_dict(property='atomic_mass') -> dict:
 
 def unit_vector(vector: list[float] | NDArray) -> NDArray:
     """Return a unit vector in the same direction as x."""
-    y = np.array(vector, dtype='float')
+    y = np.array(vector, dtype="float")
 
     return y / np.linalg.norm(y)
 
 
-def angle(v1, v2, unit='degree') -> float:
+def angle(v1, v2, unit="degree") -> float:
     """
     Calculates the angle between two vectors v1 and v2.
 
@@ -91,11 +94,11 @@ def angle(v1, v2, unit='degree') -> float:
 
     dot_product = np.dot(unit_vector1, unit_vector2)
 
-    if unit == 'degree':
-        angle = np.arccos(dot_product) * 180. / np.pi
-    if unit == 'radians':
+    if unit == "degree":
+        angle = np.arccos(dot_product) * 180.0 / np.pi
+    if unit == "radians":
         angle = np.arccos(dot_product)
-    if unit == 'cos':
+    if unit == "cos":
         angle = dot_product
     return angle
 
@@ -115,16 +118,16 @@ def rotation_matrix_from_vectors(vec1, vec2) -> np.ndarray:
     rotation_matrix : array
         A transform matrix (3x3) which when applied to vec1, aligns it with vec2.
     """
-    a, b = (vec1 / np.linalg.norm(vec1)).reshape(3), (vec2 / np.linalg.norm(vec2)).reshape(3)
+    a, b = (vec1 / np.linalg.norm(vec1)).reshape(3), (
+        vec2 / np.linalg.norm(vec2)
+    ).reshape(3)
     v = np.cross(a, b)
     c = np.dot(a, b)
     s = np.linalg.norm(v)
     if s != 0:
-        kmat = np.array([[0, -v[2], v[1]],
-                         [v[2], 0, -v[0]],
-                         [-v[1], v[0], 0]])
+        kmat = np.array([[0, -v[2], v[1]], [v[2], 0, -v[0]], [-v[1], v[0], 0]])
 
-        rotation_matrix = np.eye(3) + kmat + kmat.dot(kmat) * ((1 - c) / (s ** 2))
+        rotation_matrix = np.eye(3) + kmat + kmat.dot(kmat) * ((1 - c) / (s**2))
         return rotation_matrix
     else:
         return np.identity(3)
@@ -273,7 +276,7 @@ def cellpar_to_cell(cellpar, ab_normal=(0, 0, 1), a_direction=None) -> np.ndarra
     Y = np.cross(Z, X)
 
     # Express va, vb and vc in the X,Y,Z-system
-    alpha, beta, gamma = 90., 90., 90.
+    alpha, beta, gamma = 90.0, 90.0, 90.0
     if isinstance(cellpar, (int, float)):
         a = b = c = cellpar
     elif len(cellpar) == 1:
@@ -311,7 +314,7 @@ def cellpar_to_cell(cellpar, ab_normal=(0, 0, 1), a_direction=None) -> np.ndarra
     vb = b * np.array([cos_gamma, sin_gamma, 0])
     cx = cos_beta
     cy = (cos_alpha - cos_beta * cos_gamma) / sin_gamma
-    cz_sqr = 1. - cx * cx - cy * cy
+    cz_sqr = 1.0 - cx * cx - cy * cy
     assert cz_sqr >= 0
     cz = np.sqrt(cz_sqr)
     vc = c * np.array([cx, cy, cz])
@@ -324,13 +327,15 @@ def cellpar_to_cell(cellpar, ab_normal=(0, 0, 1), a_direction=None) -> np.ndarra
     return cell
 
 
-def get_fractional_to_cartesian_matrix(cell_a: float,
-                                       cell_b: float,
-                                       cell_c: float,
-                                       alpha: float,
-                                       beta: float,
-                                       gamma: float,
-                                       angle_in_degrees: bool = True) -> np.ndarray:
+def get_fractional_to_cartesian_matrix(
+    cell_a: float,
+    cell_b: float,
+    cell_c: float,
+    alpha: float,
+    beta: float,
+    gamma: float,
+    angle_in_degrees: bool = True,
+) -> np.ndarray:
     """
     Return the transformation matrix that converts fractional coordinates to
     cartesian coordinates.
@@ -372,13 +377,15 @@ def get_fractional_to_cartesian_matrix(cell_a: float,
     return T_matrix
 
 
-def get_cartesian_to_fractional_matrix(a: float,
-                                       b: float,
-                                       c: float,
-                                       alpha: float,
-                                       beta: float,
-                                       gamma: float,
-                                       angle_in_degrees: bool = True) -> np.ndarray:
+def get_cartesian_to_fractional_matrix(
+    a: float,
+    b: float,
+    c: float,
+    alpha: float,
+    beta: float,
+    gamma: float,
+    angle_in_degrees: bool = True,
+) -> np.ndarray:
     """
     Return the transformation matrix that converts cartesian coordinates to
     fractional coordinates.
@@ -479,9 +486,9 @@ def get_kgrid(cell, distance=0.3) -> tuple[int, int, int]:
 
     b = np.array([np.linalg.norm(b1), np.linalg.norm(b2), np.linalg.norm(b3)])
 
-    kx = np.ceil(b[0]/distance).astype(int)
-    ky = np.ceil(b[1]/distance).astype(int)
-    kz = np.ceil(b[2]/distance).astype(int)
+    kx = np.ceil(b[0] / distance).astype(int)
+    ky = np.ceil(b[1] / distance).astype(int)
+    kz = np.ceil(b[2] / distance).astype(int)
 
     return kx, ky, kz
 
@@ -499,11 +506,9 @@ def create_CellBox(A, B, C, alpha, beta, gamma) -> np.ndarray:
     bz = 0
     cx = C * np.cos(beta)
     cy = C * tempd
-    cz = C * np.sqrt(1 - np.cos(beta) ** 2 - tempd ** 2)
+    cz = C * np.sqrt(1 - np.cos(beta) ** 2 - tempd**2)
 
-    CellBox = np.array([[ax, ay, az],
-                        [bx, by, bz],
-                        [cx, cy, cz]])
+    CellBox = np.array([[ax, ay, az], [bx, by, bz], [cx, cy, cz]])
 
     return CellBox
 
@@ -554,13 +559,15 @@ def calculate_UnitCells(cell, cutoff) -> tuple[int, int, int]:
     return supercell
 
 
-def cellpar_to_lammpsbox(a: float,
-                         b: float,
-                         c: float,
-                         alpha: float,
-                         beta: float,
-                         gamma: float,
-                         angle_in_degrees: bool = True) -> np.ndarray:
+def cellpar_to_lammpsbox(
+    a: float,
+    b: float,
+    c: float,
+    alpha: float,
+    beta: float,
+    gamma: float,
+    angle_in_degrees: bool = True,
+) -> np.ndarray:
     """
     Return the box parameters lx, ly, lz, xy, xz, yz for LAMMPS data input.
     Parameters
@@ -577,16 +584,16 @@ def cellpar_to_lammpsbox(a: float,
         The 1x6 array with the box parameters 'lx', 'ly', 'lz', 'xy', 'xz', 'yz'.
     """
     if angle_in_degrees:
-        alpha = alpha*(np.pi/180)
-        beta = beta*(np.pi/180)
-        gamma = gamma*(np.pi/180)
+        alpha = alpha * (np.pi / 180)
+        beta = beta * (np.pi / 180)
+        gamma = gamma * (np.pi / 180)
 
     lx = a
     xy = b * np.cos(gamma)
     xz = c * np.cos(beta)
-    ly = np.sqrt(b ** 2 - xy ** 2)
+    ly = np.sqrt(b**2 - xy**2)
     yz = (b * c * np.cos(alpha) - xy * xz) / ly
-    lz = np.sqrt(c ** 2 - xz ** 2 - yz ** 2)
+    lz = np.sqrt(c**2 - xz**2 - yz**2)
 
     return np.array([lx, ly, lz, xy, xz, yz])
 
@@ -636,20 +643,22 @@ def change_X_atoms(atom_labels, atom_pos, bond_atom) -> tuple:
     label, pos = [], []
 
     for i in range(len(atom_labels)):
-        if atom_labels[i] == 'X' and bond_atom != 'R':
+        if atom_labels[i] == "X" and bond_atom != "R":
             label += [bond_atom]
             pos += [atom_pos[i]]
-        if atom_labels[i] != 'X':
+        if atom_labels[i] != "X":
             label += [atom_labels[i]]
             pos += [atom_pos[i]]
 
     return label, pos
 
 
-def find_closest_atom(target_label: str,
-                      target_position: list | NDArray,
-                      atom_labels: list,
-                      atom_positions: list | NDArray):
+def find_closest_atom(
+    target_label: str,
+    target_position: list | NDArray,
+    atom_labels: list,
+    atom_positions: list | NDArray,
+):
     """
     Find the closest atom to a given atom in a structure.
 
@@ -710,7 +719,7 @@ def closest_atom_struc(label_1, pos_1, labels, pos):
     list_pos = []
     for i in range(len(labels)):
         if labels[i] != label_1:
-            if 'C' in labels[i]:
+            if "C" in labels[i]:
                 list_labels += [labels[i]]
                 list_pos += [pos[i]]
 
@@ -729,22 +738,22 @@ def get_bond_atom(connector_1: str, connector_2: str) -> str:
     """
 
     bond_dict = {
-        'NH2': 'N',
-        'NHOH': 'N',
-        'COCHCHOH': 'N',
-        'CONHNH2': 'N',
-        'CHNNH2': 'N',
-        'COOH': 'N',
-        'CCH3O': 'N',
-        'BOH2': 'B',
-        'OH2': 'B',
-        'Cl': 'X',
-        'Br': 'X',
-        'CH2CN': 'C',
-        'CH3': 'C'
+        "NH2": "N",
+        "NHOH": "N",
+        "COCHCHOH": "N",
+        "CONHNH2": "N",
+        "CHNNH2": "N",
+        "COOH": "N",
+        "CCH3O": "N",
+        "BOH2": "B",
+        "OH2": "B",
+        "Cl": "X",
+        "Br": "X",
+        "CH2CN": "C",
+        "CH3": "C",
     }
 
-    bond_atom = 'N'
+    bond_atom = "N"
     for group in list(bond_dict.keys()):
         if group in [connector_1, connector_2]:
             bond_atom = bond_dict[group]
@@ -756,12 +765,9 @@ def get_framework_symm_text(name, lattice, hall, space_group, space_number, symm
     """
     Get the text for the framework symmop
     """
-    text = '{:<60s} {:^12s} {:<4s} {:^4s} #{:^5s}   {:^2} sym. op.'.format(name,
-                                                                           lattice,
-                                                                           hall.lstrip('-'),
-                                                                           space_group,
-                                                                           space_number,
-                                                                           symm_op)
+    text = "{:<60s} {:^12s} {:<4s} {:^4s} #{:^5s}   {:^2} sym. op.".format(
+        name, lattice, hall.lstrip("-"), space_group, space_number, symm_op
+    )
     return text
 
 
@@ -769,12 +775,11 @@ def print_framework_name(name, lattice, hall, space_group, space_number, symm_op
     """
     Print the results of the created structure
     """
-    print('{:<60s} {:^12s} {:<4s} {:^4s} #{:^5s}   {:^2} sym. op.'.format(name,
-                                                                          lattice,
-                                                                          hall.lstrip('-'),
-                                                                          space_group,
-                                                                          space_number,
-                                                                          symm_op))
+    print(
+        "{:<60s} {:^12s} {:<4s} {:^4s} #{:^5s}   {:^2} sym. op.".format(
+            name, lattice, hall.lstrip("-"), space_group, space_number, symm_op
+        )
+    )
 
 
 def print_command(text, verbose, match):
@@ -797,7 +802,7 @@ def formula_from_atom_list(AtomLabels: list) -> str:
         String with the formula of the structure.
     """
 
-    formula = ''
+    formula = ""
     for i in set(AtomLabels):
         formula += i + str(AtomLabels.count(i))
 
@@ -822,39 +827,39 @@ def smiles_to_xsmiles(smiles_string: str) -> tuple[str, str, str]:
     composition : str
         String containing the composition
     """
-    SPECIAL_ATOMS = ['Q', 'R', 'X']
-    REGULAR_ATOMS = ['C', 'N', 'H', 'O', 'S', 'B', 'F', 'Cl', 'Br', 'I', 'P', 'Be']
+    SPECIAL_ATOMS = ["Q", "R", "X"]
+    REGULAR_ATOMS = ["C", "N", "H", "O", "S", "B", "F", "Cl", "Br", "I", "P", "Be"]
 
-    xsmiles = ''
+    xsmiles = ""
     labels = []
     atom_list = []
 
     for i, letter in enumerate(smiles_string):
 
         if letter in SPECIAL_ATOMS:
-            xsmiles += '*'
+            xsmiles += "*"
             labels.append(letter)
-            if letter == 'R':
-                atom_list.append(smiles_string[i:i+2])
+            if letter == "R":
+                atom_list.append(smiles_string[i:i + 2])
             else:
                 atom_list.append(letter)
 
         elif letter.isnumeric():
-            if smiles_string[i-1] == 'R':
+            if smiles_string[i - 1] == "R":
                 labels[-1] = labels[-1] + letter
             else:
                 xsmiles += letter
 
         elif letter in REGULAR_ATOMS:
             xsmiles += letter
-            labels += ['']
+            labels += [""]
             atom_list.append(letter)
 
         else:
             xsmiles += letter
 
     # Generate the xsmiles label
-    xsmiles_label = '|$' + ';'.join(labels) + '$|'
+    xsmiles_label = "|$" + ";".join(labels) + "$|"
 
     # Generate the composition
     composition = formula_from_atom_list(atom_list)
@@ -882,91 +887,148 @@ def ibrav_to_cell(ibrav, celldm1, celldm2, celldm3, celldm4, celldm5, celldm6):
     if ibrav == 1:
         cell = np.identity(3) * alat
     elif ibrav == 2:
-        cell = np.array([[-1.0, 0.0, 1.0],
-                         [0.0, 1.0, 1.0],
-                         [-1.0, 1.0, 0.0]]) * (alat / 2)
+        cell = np.array([[-1.0, 0.0, 1.0], [0.0, 1.0, 1.0], [-1.0, 1.0, 0.0]]) * (
+            alat / 2
+        )
     elif ibrav == 3:
-        cell = np.array([[1.0, 1.0, 1.0],
-                         [-1.0, 1.0, 1.0],
-                         [-1.0, -1.0, 1.0]]) * (alat / 2)
+        cell = np.array([[1.0, 1.0, 1.0], [-1.0, 1.0, 1.0], [-1.0, -1.0, 1.0]]) * (
+            alat / 2
+        )
     elif ibrav == -3:
-        cell = np.array([[-1.0, 1.0, 1.0],
-                         [1.0, -1.0, 1.0],
-                         [1.0, 1.0, -1.0]]) * (alat / 2)
+        cell = np.array([[-1.0, 1.0, 1.0], [1.0, -1.0, 1.0], [1.0, 1.0, -1.0]]) * (
+            alat / 2
+        )
     elif ibrav == 4:
-        cell = np.array([[1.0, 0.0, 0.0],
-                         [-0.5, 0.5 * 3**0.5, 0.0],
-                         [0.0, 0.0, celldm3]]) * alat
+        cell = (
+            np.array([[1.0, 0.0, 0.0], [-0.5, 0.5 * 3**0.5, 0.0], [0.0, 0.0, celldm3]])
+            * alat
+        )
     elif ibrav == 5:
-        tx = ((1.0 - celldm4) / 2.0)**0.5
-        ty = ((1.0 - celldm4) / 6.0)**0.5
-        tz = ((1 + 2 * celldm4) / 3.0)**0.5
-        cell = np.array([[tx, -ty, tz],
-                         [0, 2 * ty, tz],
-                         [-tx, -ty, tz]]) * alat
+        tx = ((1.0 - celldm4) / 2.0) ** 0.5
+        ty = ((1.0 - celldm4) / 6.0) ** 0.5
+        tz = ((1 + 2 * celldm4) / 3.0) ** 0.5
+        cell = np.array([[tx, -ty, tz], [0, 2 * ty, tz], [-tx, -ty, tz]]) * alat
     elif ibrav == -5:
-        ty = ((1.0 - celldm4) / 6.0)**0.5
-        tz = ((1 + 2 * celldm4) / 3.0)**0.5
+        ty = ((1.0 - celldm4) / 6.0) ** 0.5
+        tz = ((1 + 2 * celldm4) / 3.0) ** 0.5
         a_prime = alat / 3**0.5
         u = tz - 2 * 2**0.5 * ty
         v = tz + 2**0.5 * ty
-        cell = np.array([[u, v, v],
-                         [v, u, v],
-                         [v, v, u]]) * a_prime
+        cell = np.array([[u, v, v], [v, u, v], [v, v, u]]) * a_prime
     elif ibrav == 6:
-        cell = np.array([[1.0, 0.0, 0.0],
-                         [0.0, 1.0, 0.0],
-                         [0.0, 0.0, celldm3]]) * alat
+        cell = np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, celldm3]]) * alat
     elif ibrav == 7:
-        cell = np.array([[1.0, -1.0, celldm3],
-                         [1.0, 1.0, celldm3],
-                         [-1.0, -1.0, celldm3]]) * (alat / 2)
+        cell = np.array(
+            [[1.0, -1.0, celldm3], [1.0, 1.0, celldm3], [-1.0, -1.0, celldm3]]
+        ) * (alat / 2)
     elif ibrav == 8:
-        cell = np.array([[1.0, 0.0, 0.0],
-                         [0.0, celldm2, 0.0],
-                         [0.0, 0.0, celldm3]]) * alat
+        cell = (
+            np.array([[1.0, 0.0, 0.0], [0.0, celldm2, 0.0], [0.0, 0.0, celldm3]]) * alat
+        )
     elif ibrav == 9:
-        cell = np.array([[1.0 / 2.0, celldm2 / 2.0, 0.0],
-                         [-1.0 / 2.0, celldm2 / 2.0, 0.0],
-                         [0.0, 0.0, celldm3]]) * alat
+        cell = (
+            np.array(
+                [
+                    [1.0 / 2.0, celldm2 / 2.0, 0.0],
+                    [-1.0 / 2.0, celldm2 / 2.0, 0.0],
+                    [0.0, 0.0, celldm3],
+                ]
+            )
+            * alat
+        )
     elif ibrav == -9:
-        cell = np.array([[1.0 / 2.0, -celldm2 / 2.0, 0.0],
-                         [1.0 / 2.0, celldm2 / 2.0, 0.0],
-                         [0.0, 0.0, celldm3]]) * alat
+        cell = (
+            np.array(
+                [
+                    [1.0 / 2.0, -celldm2 / 2.0, 0.0],
+                    [1.0 / 2.0, celldm2 / 2.0, 0.0],
+                    [0.0, 0.0, celldm3],
+                ]
+            )
+            * alat
+        )
     elif ibrav == 10:
-        cell = np.array([[1.0 / 2.0, 0.0, celldm3 / 2.0],
-                         [1.0 / 2.0, celldm2 / 2.0, 0.0],
-                         [0.0, celldm2 / 2.0, celldm3 / 2.0]]) * alat
+        cell = (
+            np.array(
+                [
+                    [1.0 / 2.0, 0.0, celldm3 / 2.0],
+                    [1.0 / 2.0, celldm2 / 2.0, 0.0],
+                    [0.0, celldm2 / 2.0, celldm3 / 2.0],
+                ]
+            )
+            * alat
+        )
     elif ibrav == 11:
-        cell = np.array([[1.0 / 2.0, celldm2 / 2.0, celldm3 / 2.0],
-                         [-1.0 / 2.0, celldm2 / 2.0, celldm3 / 2.0],
-                         [-1.0 / 2.0, -celldm2 / 2.0, celldm3 / 2.0]]) * alat
+        cell = (
+            np.array(
+                [
+                    [1.0 / 2.0, celldm2 / 2.0, celldm3 / 2.0],
+                    [-1.0 / 2.0, celldm2 / 2.0, celldm3 / 2.0],
+                    [-1.0 / 2.0, -celldm2 / 2.0, celldm3 / 2.0],
+                ]
+            )
+            * alat
+        )
     elif ibrav == 12:
-        sinab = (1.0 - celldm4**2)**0.5
-        cell = np.array([[1.0, 0.0, 0.0],
-                         [celldm2 * celldm4, celldm2 * sinab, 0.0],
-                         [0.0, 0.0, celldm3]]) * alat
+        sinab = (1.0 - celldm4**2) ** 0.5
+        cell = (
+            np.array(
+                [
+                    [1.0, 0.0, 0.0],
+                    [celldm2 * celldm4, celldm2 * sinab, 0.0],
+                    [0.0, 0.0, celldm3],
+                ]
+            )
+            * alat
+        )
     elif ibrav == -12:
-        sinac = (1.0 - celldm5**2)**0.5
-        cell = np.array([[1.0, 0.0, 0.0],
-                         [0.0, celldm2, 0.0],
-                         [celldm3 * celldm5, 0.0, celldm3 * sinac]]) * alat
+        sinac = (1.0 - celldm5**2) ** 0.5
+        cell = (
+            np.array(
+                [
+                    [1.0, 0.0, 0.0],
+                    [0.0, celldm2, 0.0],
+                    [celldm3 * celldm5, 0.0, celldm3 * sinac],
+                ]
+            )
+            * alat
+        )
     elif ibrav == 13:
-        sinab = (1.0 - celldm4**2)**0.5
-        cell = np.array([[1.0 / 2.0, 0.0, -celldm3 / 2.0],
-                         [celldm2 * celldm4, celldm2 * sinab, 0.0],
-                         [1.0 / 2.0, 0.0, celldm3 / 2.0]]) * alat
+        sinab = (1.0 - celldm4**2) ** 0.5
+        cell = (
+            np.array(
+                [
+                    [1.0 / 2.0, 0.0, -celldm3 / 2.0],
+                    [celldm2 * celldm4, celldm2 * sinab, 0.0],
+                    [1.0 / 2.0, 0.0, celldm3 / 2.0],
+                ]
+            )
+            * alat
+        )
     elif ibrav == 14:
-        sinab = (1.0 - celldm4**2)**0.5
-        v3 = [celldm3 * celldm5,
-              celldm3 * (celldm6 - celldm5 * celldm4) / sinab,
-              celldm3 * ((1 + 2 * celldm6 * celldm5 * celldm4
-                          - celldm6**2 - celldm5**2 - celldm4**2)**0.5) / sinab]
-        cell = np.array([[1.0, 0.0, 0.0],
-                         [celldm2 * celldm4, celldm2 * sinab, 0.0],
-                         v3]) * alat
+        sinab = (1.0 - celldm4**2) ** 0.5
+        v3 = [
+            celldm3 * celldm5,
+            celldm3 * (celldm6 - celldm5 * celldm4) / sinab,
+            celldm3
+            * (
+                (
+                    1
+                    + 2 * celldm6 * celldm5 * celldm4
+                    - celldm6**2
+                    - celldm5**2
+                    - celldm4**2
+                )
+                ** 0.5
+            )
+            / sinab,
+        ]
+        cell = (
+            np.array([[1.0, 0.0, 0.0], [celldm2 * celldm4, celldm2 * sinab, 0.0], v3])
+            * alat
+        )
     else:
-        raise NotImplementedError('ibrav = {0} is not implemented'.format(ibrav))
+        raise NotImplementedError("ibrav = {0} is not implemented".format(ibrav))
 
     return cell
 
@@ -1003,20 +1065,36 @@ def classify_unit_cell(cell, thr=1e-3) -> str:
     if len(cell) == 3:
         a, b, c, alpha, beta, gamma = cell_to_cellpar(cell)
 
-    cell_type = ''
+    cell_type = ""
 
-    if equal_value(alpha, 90, thr) and equal_value(beta, 90, thr) and equal_value(gamma, 90, thr):
+    if (
+        equal_value(alpha, 90, thr)
+        and equal_value(beta, 90, thr)
+        and equal_value(gamma, 90, thr)
+    ):
         if equal_value(a, b, thr) and equal_value(b, c, thr):
             cell_type = "cubic"
         if equal_value(a, b, thr) and not equal_value(a, c, thr):
             cell_type = "tetragonal"
         else:
             cell_type = "orthorhombic"
-    elif equal_value(alpha, 90, thr) and equal_value(beta, 90, thr) and equal_value(gamma, 120, thr):
+    elif (
+        equal_value(alpha, 90, thr)
+        and equal_value(beta, 90, thr)
+        and equal_value(gamma, 120, thr)
+    ):
         if equal_value(a, b, thr):
             cell_type = "hexagonal"
-    elif equal_value(alpha, 90, thr) or equal_value(beta, 90, thr) or equal_value(gamma, 90, thr):
-        if not equal_value(a, b, thr) and not equal_value(b, c, thr) and not equal_value(a, c, thr):
+    elif (
+        equal_value(alpha, 90, thr)
+        or equal_value(beta, 90, thr)
+        or equal_value(gamma, 90, thr)
+    ):
+        if (
+            not equal_value(a, b, thr)
+            and not equal_value(b, c, thr)
+            and not equal_value(a, c, thr)
+        ):
             cell_type = "monoclinic"
     else:
         cell_type = "triclinic"
@@ -1036,36 +1114,37 @@ def cell_to_ibrav(cell):
 
     cell_type = classify_unit_cell(cell)
 
-    if cell_type == 'cubic':
-        celldm = {'ibrav': 1,
-                  'celldm(1)': a / 0.5291772105638411}
-    elif cell_type == 'hexagonal':
-        celldm = {'ibrav': 4,
-                  'celldm(1)': a / 0.5291772105638411,
-                  'celldm(3)': c / a}
-    elif cell_type == 'tetragonal':
-        celldm = {'ibrav': 6,
-                  'celldm(1)': a / 0.5291772105638411,
-                  'celldm(3)': c / a}
-    elif cell_type == 'orthorhombic':
-        celldm = {'ibrav': 8,
-                  'celldm(1)': a / 0.5291772105638411,
-                  'celldm(2)': b / a,
-                  'celldm(3)': c / a}
-    elif cell_type == 'monoclinic':
-        celldm = {'ibrav': 12,
-                  'celldm(1)': a / 0.5291772105638411,
-                  'celldm(2)': b / a,
-                  'celldm(3)': c / a,
-                  'celldm(4)': np.cos(np.deg2rad(beta))}
+    if cell_type == "cubic":
+        celldm = {"ibrav": 1, "celldm(1)": a / 0.5291772105638411}
+    elif cell_type == "hexagonal":
+        celldm = {"ibrav": 4, "celldm(1)": a / 0.5291772105638411, "celldm(3)": c / a}
+    elif cell_type == "tetragonal":
+        celldm = {"ibrav": 6, "celldm(1)": a / 0.5291772105638411, "celldm(3)": c / a}
+    elif cell_type == "orthorhombic":
+        celldm = {
+            "ibrav": 8,
+            "celldm(1)": a / 0.5291772105638411,
+            "celldm(2)": b / a,
+            "celldm(3)": c / a,
+        }
+    elif cell_type == "monoclinic":
+        celldm = {
+            "ibrav": 12,
+            "celldm(1)": a / 0.5291772105638411,
+            "celldm(2)": b / a,
+            "celldm(3)": c / a,
+            "celldm(4)": np.cos(np.deg2rad(beta)),
+        }
     else:
-        celldm = {'ibrav': 14,
-                  'celldm(1)': a / 0.5291772105638411,
-                  'celldm(2)': b / a,
-                  'celldm(3)': c / a,
-                  'celldm(4)': np.cos(np.deg2rad(alpha)),
-                  'celldm(5)': np.cos(np.deg2rad(beta)),
-                  'celldm(6)': np.cos(np.deg2rad(gamma))}
+        celldm = {
+            "ibrav": 14,
+            "celldm(1)": a / 0.5291772105638411,
+            "celldm(2)": b / a,
+            "celldm(3)": c / a,
+            "celldm(4)": np.cos(np.deg2rad(alpha)),
+            "celldm(5)": np.cos(np.deg2rad(beta)),
+            "celldm(6)": np.cos(np.deg2rad(gamma)),
+        }
 
     return celldm
 
@@ -1088,7 +1167,7 @@ def is_bonded(atom1: str, atom2: str, dist: float, cutoff: float = 1.3):
         Cutoff factor for the covalent radii. Default: 1.3
     """
 
-    periodic_table = elements_dict(property='covalent_radius')
+    periodic_table = elements_dict(property="covalent_radius")
 
     # Get the covalent radii of the two atoms
     cr_1 = periodic_table[atom1]
@@ -1098,7 +1177,9 @@ def is_bonded(atom1: str, atom2: str, dist: float, cutoff: float = 1.3):
     max_bond_distance = (cr_1 + cr_2) * cutoff
 
     if dist < 0.6:
-        print('Distance between atoms is less than 0.6 Å. Check if the structure is correct.')
+        print(
+            "Distance between atoms is less than 0.6 Å. Check if the structure is correct."
+        )
 
     # Check if the distance is less than the cutoff
     if 0.6 < dist <= max_bond_distance:
@@ -1119,13 +1200,17 @@ def get_bonds(structure, cutoff=1.3):
         Cutoff factor for the covalent radii. Default: 1.3 Å
     """
 
-    atom_types = [i.as_dict()['species'][0]['element'] for i in structure.sites]
+    atom_types = [i.as_dict()["species"][0]["element"] for i in structure.sites]
 
     # Get bonded atoms
     center_indices, points_indies, _, bond_distances = structure.get_neighbor_list(5)
     bonded_atoms = np.array([center_indices, points_indies, bond_distances]).T
 
-    bonded_atoms = [i for i in bonded_atoms if is_bonded(atom_types[int(i[0])], atom_types[int(i[1])], i[2], cutoff)]
+    bonded_atoms = [
+        i
+        for i in bonded_atoms
+        if is_bonded(atom_types[int(i[0])], atom_types[int(i[1])], i[2], cutoff)
+    ]
 
     bonded_atoms = [[int(i[0]), int(i[1]), i[2]] for i in bonded_atoms]
 
