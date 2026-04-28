@@ -103,35 +103,49 @@ def angle(v1, v2, unit="degree") -> float:
     return angle
 
 
-def rotation_matrix_from_vectors(vec1, vec2) -> np.ndarray:
+def rotation_matrix_from_vectors(vec1: NDArray, vec2: NDArray) -> NDArray:
     """
-    Find the rotation matrix that aligns vec1 to vec2
+    Calculates the rotation matrix that aligns vec1 to vec2 using the Rodrigues' rotation formula.
 
     Parameters
     ----------
-    vec1 : array
-        (3,3) array
-    vec2 : array
-        (3,3) array
+    vec1 : NDArray
+        Source vector (shape: 3,).
+    vec2 : NDArray
+        Destination vector (shape: 3,).
+
     Returns
     -------
-    rotation_matrix : array
-        A transform matrix (3x3) which when applied to vec1, aligns it with vec2.
+    NDArray
+        A 3x3 rotation matrix.
     """
-    a, b = (vec1 / np.linalg.norm(vec1)).reshape(3), (
-        vec2 / np.linalg.norm(vec2)
-    ).reshape(3)
+    # Normalize vectors
+    norm_v1 = np.linalg.norm(vec1)
+    norm_v2 = np.linalg.norm(vec2)
+
+    if np.isclose(norm_v1, 0) or np.isclose(norm_v2, 0):
+        raise ValueError("Input vectors must have non-zero magnitude.")
+
+    a = (vec1 / norm_v1).reshape(3)
+    b = (vec2 / norm_v2).reshape(3)
+
+    if np.allclose(a, b):
+        return np.eye(3)
+    if np.allclose(a, -b):
+        # 180-degree rotation case. Returns -I (inversion) as a simplification.
+        return -np.eye(3)
+
     v = np.cross(a, b)
     c = np.dot(a, b)
     s = np.linalg.norm(v)
-    if s != 0:
-        kmat = np.array([[0, -v[2], v[1]], [v[2], 0, -v[0]], [-v[1], v[0], 0]])
 
-        rotation_matrix = np.eye(3) + kmat + kmat.dot(kmat) * ((1 - c) / (s**2))
-        return rotation_matrix
-    else:
-        return np.identity(3)
+    # Skew-symmetric cross-product matrix
+    kmat = np.array([[0, -v[2], v[1]], [v[2], 0, -v[0]], [-v[1], v[0], 0]])
 
+    # Rodriguez rotation formula
+    rotation_matrix = np.eye(3) + kmat + kmat.dot(kmat) * ((1 - c) / (s**2))
+
+    return rotation_matrix
 
 def rmsd(V, W) -> float:
     """

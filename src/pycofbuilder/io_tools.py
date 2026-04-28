@@ -293,6 +293,55 @@ def read_cif(path, file_name, useASE=False, usePymatgen=False):
     return atomTypes, cartPos, cellMatrix, partialCharges
 
 
+def read_mol_file(
+    file_path,
+) -> tuple[list, list[list[float]], list[float], list[tuple[int, int]], list[int]]:
+    """
+    Reads a .mol file and extracts atom types, Cartesian positions, partial charges, bonds, and bond types.
+
+    Parameters
+    ----------
+    file_path : str
+        Path to the .mol file.
+    Returns
+    -------
+    atomTypes : list
+        List of atom types.
+    cartPos : list of list of float
+        List of Cartesian positions for each atom.
+    partialCharges : list of float
+        List of partial charges for each atom.
+    bonds : list of tuple of int
+        List of bonds represented as tuples of atom indices.
+    bondTypes : list of int
+        List of bond types.
+    """
+
+    with open(file_path, "r") as f:
+        mol_data = f.read().splitlines()
+
+    n_atoms, n_bonds = map(int, mol_data[3].split()[:2])
+    atoms_non_processed = mol_data[4 : 4 + n_atoms]
+
+    atomTypes, cartPos, partialCharges = [], [], []
+
+    for atom_line in atoms_non_processed:
+        atom_line = atom_line.split()
+        atomTypes.append(atom_line[3])
+        cartPos.append(np.array(atom_line[:3], dtype=float))
+        partialCharges.append(float(atom_line[4]))
+
+    # Replace "F" by "R" on atomTypes
+    bonds_non_processed = mol_data[4 + n_atoms : 4 + n_atoms + n_bonds]
+
+    bonds: list[tuple[int, int]] = [
+        (int(bond_line.split()[0]), int(bond_line.split()[1]))
+        for bond_line in bonds_non_processed
+    ]
+    bondTypes = [int(bond_line.split()[2]) for bond_line in bonds_non_processed]
+
+    return atomTypes, np.array(cartPos).tolist(), partialCharges, bonds, bondTypes
+
 def save_csv(
     path: str, file_name: str, data: list, delimiter: str = ",", head: list = []
 ) -> None:

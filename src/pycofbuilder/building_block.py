@@ -326,13 +326,13 @@ class BuildingBlock:
 
             normal = np.cross(X_pos[0], X_pos[-1])
             if normal[0] != 0 and normal[1] != 0:
-                R_matrix = rotation_matrix_from_vectors(normal, [0, 0, 1])
+                R_matrix = rotation_matrix_from_vectors(normal, np.array([0, 0, 1]))
                 self.atom_pos = np.dot(self.atom_pos, np.transpose(R_matrix))
 
         if len(X_pos) == 2:
             normal = np.cross(X_pos[0], self.atom_pos[1])
             if normal[0] != 0 and normal[1] != 0:
-                R_matrix = rotation_matrix_from_vectors(normal, [0, 0, 1])
+                R_matrix = rotation_matrix_from_vectors(normal, np.array([0, 0, 1]))
                 self.atom_pos = np.dot(self.atom_pos, np.transpose(R_matrix))
 
     def shift(self, shift_vector: list):

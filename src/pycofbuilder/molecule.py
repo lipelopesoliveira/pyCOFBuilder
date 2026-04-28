@@ -11,7 +11,8 @@ from numpy.typing import NDArray
 
 from pycofbuilder.atom import AtomicSite
 from pycofbuilder.bond import Bond
-from pycofbuilder.utils import read_mol_file, rotation_matrix_from_vectors
+from pycofbuilder.io_tools import read_mol_file
+from pycofbuilder.tools import rotation_matrix_from_vectors
 
 
 class Molecule:
@@ -417,20 +418,27 @@ class Molecule:
             values.append(site.properties[property_name])
         return values
 
-    def centralize(self, by_atom: str | None = None) -> None:
+    def centralize(self, by_atom_type: str | None = None, by_indexes: Sequence[int] | None = None) -> None:
         """
         Centralize the molecule by subtracting the mean coordinates.
-        If by_x is True, centralize by the mean position of the X atoms.
+        If by_atom_type is not None, centralize by the mean position of the atoms of this atom type.
 
         Parameters
         ----------
-        by_atom : str | None
+        by_atom_type : str | None
             If provided, centralize by the mean position of the atoms of this type.
+        by_indexes : Sequence[int] | None
+            If provided, centralize by the mean position of the atoms at these indexes.
         """
 
-        if by_atom:
+        if by_atom_type:
             x_coords = [
-                site.coordinates for site in self.sites if site.atom_type == by_atom
+                site.coordinates for site in self.sites if site.atom_type == by_atom_type
+            ]
+            mean_coords = np.mean(x_coords, axis=0)
+        elif by_indexes is not None:
+            x_coords = [
+                self.sites[i].coordinates for i in by_indexes
             ]
             mean_coords = np.mean(x_coords, axis=0)
         else:
@@ -507,7 +515,7 @@ class Molecule:
 
         group = group.copy()
 
-        group.centralize(by_atom=type_to_replace)
+        group.centralize(by_atom_type=type_to_replace)
 
         # Get the atom of type_to_replace on the group
         r_atom_indices = [
