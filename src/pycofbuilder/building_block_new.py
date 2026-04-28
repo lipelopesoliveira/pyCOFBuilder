@@ -134,5 +134,15 @@ class BuildingBlock(Molecule):
         )
 
     def from_file(self, file_path: Path) -> None:
-        self.from_mol(file_path)
+        """
+        Read the building block from a file.
+        """
         self.name = file_path.stem
+
+        # Check file extension
+        if file_path.suffix == '.mol':
+            self.from_mol(file_path)
+        else:
+            raise NotImplementedError(
+                f"File format '{file_path.suffix}' is not supported. Supported formats are: .mol"
+                )
