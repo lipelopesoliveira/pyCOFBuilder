@@ -35,13 +35,12 @@ class EdgeCenter:
     def __str__(self) -> str:
         return f"EdgeCenter: ({self.x}, {self.y}, {self.z})"
 
-@dataclass
 class Topology:
     """
     Represents the topology of a reticular material
     """
-    def __init__(self) -> None:
-        self._name: str = ""
+    def __init__(self, name: str = "") -> None:
+        self._name: str = name
         self._spacegroup: str = "P1"
         self._cell: Cell = Cell(np.eye(3))
         self._nodes: list[Node] = []
@@ -113,7 +112,7 @@ class Topology:
     def edge_centers(self, value: list[EdgeCenter]) -> None:
         self._edge_centers = value
 
-    def from_cgd(self, cgd_file: str | Path, expand_by_symmetry: bool = True) -> None:
+    def read_cgd_file(self, cgd_file: str | Path, expand_by_symmetry: bool = True) -> None:
         """
         Parses a CGD file to populate the topology's nodes and edge centers
         """
@@ -125,3 +124,42 @@ class Topology:
 
         self.nodes = [Node(**node) for node in parsed_file['nodes']]
         self.edge_centers = [EdgeCenter(*edge_center) for edge_center in parsed_file['edge_centers']]
+
+    @classmethod
+    def from_cgd_file(cls, cgd_file: str | Path, expand_by_symmetry: bool = True) -> 'Topology':
+        """
+        Parses a CGD file to populate the topology's nodes and edge centers
+        """
+        parsed_file = parse_cdg_file(cgd_file, expand_by_symmetry=expand_by_symmetry)
+
+        topology = cls()
+        topology.name = parsed_file['name']
+        topology.spacegroup = parsed_file['spacegroup']
+        topology.cell = parsed_file['cell']
+
+        topology.nodes = [Node(**node) for node in parsed_file['nodes']]
+        topology.edge_centers = [EdgeCenter(*edge_center) for edge_center in parsed_file['edge_centers']]
+
+        return topology
+
+    def to_cgd(self, output_file: str | Path) -> None:
+        """
+        Exports the topology to a CGD file
+        """
+
+        gcd_file = [
+            'CRYSTAL',
+            f"NAME {self.name}",
+            f"GROUP {self.spacegroup}",
+            "CELL {:<10.5f} {:<10.5f} {:<10.5f} {:<10.5f} {:<10.5f} {:<10.5f}".format(*self.cell.cellpar()),
+        ]
+
+        for node in self.nodes:
+            gcd_file.append("NODE {:2} {:2} {:<10.5f} {:<10.5f} {:<10.5f}".format(node.id, node.connectivity, node.x, node.y, node.z))
+        for edge_center in self.edge_centers:
+            gcd_file.append("# EDGE_CENTER {:<10.5f} {:<10.5f} {:<10.5f}".format(edge_center.x, edge_center.y, edge_center.z))
+
+        gcd_file.append("END")
+
+        with open(output_file, 'w') as f:
+            f.write("\n".join(gcd_file))
