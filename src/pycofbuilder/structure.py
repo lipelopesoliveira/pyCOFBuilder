@@ -1,34 +1,38 @@
 from __future__ import annotations
-
-import os
 from abc import abstractmethod
-from typing import Iterator, Sequence
+from typing import Iterator, Self, Sequence
+from ase.cell import Cell
+import numpy as np
+from numpy.typing import NDArray
 
 from collections import Counter
 from functools import reduce
 
-import numpy as np
-from numpy.typing import NDArray
-
+from pycofbuilder.molecule import Molecule
 from pycofbuilder.atom import AtomicSite
 from pycofbuilder.bond import Bond
-from pycofbuilder.io_tools import read_mol_file
-from pycofbuilder.tools import rotation_matrix_from_vectors
 
 
-class Molecule:
+class Structure:
     def __init__(
         self,
+        cell: Cell,
         atomTypes: Sequence[str] = [],
         cartesianCoords: Sequence[tuple[float, float, float]] = [],
-        atomLabels: Sequence[str] | None = None,
-        siteProperties: list[dict] | None = None,
+        fractionalCoords: Sequence[tuple[float, float, float]] = [],
+        atomLabels: Sequence[str] = [],
+        siteProperties: Sequence[dict] = [],
         bonds: Sequence[tuple[int, int]] | None = None,
         bondTypes: Sequence[int] | None = None,
-        properties: dict | None = None,
+        properties: dict | None = None
     ) -> None:
+        
+        self._cell: Cell = cell
 
-        self.sites = []
+        if len(fractionalCoords) > 0 and len(cartesianCoords) == 0:
+            cartesianCoords = cell.cartesian_positions(np.array(fractionalCoords))  # type: ignore
+
+        self.sites: list = []
 
         for i in range(len(atomTypes)):
             self.sites.append(
@@ -58,7 +62,7 @@ class Molecule:
         }
 
         self.check_partial_charges()
-
+        
     def __len__(self) -> int:
         return len(self.sites)
 
@@ -106,10 +110,10 @@ class Molecule:
         ):
             for site in self.sites:
                 site.coordinates = site.coordinates - np.array(to_subtract)
-
+    
     def __repr__(self) -> str:
-        return "Molecule Summary\n" + "\n".join(map(repr, self))
-
+        return "Structure Summary\n" + "\n".join(map(repr, self))
+    
     def __str__(self) -> str:
         outs = [
             f"Name: {self.properties.get('name', self.composition)}",
@@ -118,6 +122,12 @@ class Molecule:
             f"Charge = {self._charge}, Spin Mult = {self.spin_multiplicity}",
             f"Sites ({len(self)}), Bonds ({len(self.bonds)})",
         ]
+
+        outs.append('Unit Cell:')
+        outs.append('a: {:.6f} Å, b: {:.6f} Å, c: {:.6f} Å alpha: {:.6f}°, beta: {:.6f}°, gamma: {:.6f}°'.format(
+            *self.cell.lengths(), *self.cell.angles())  # type: ignore
+            )
+
         for site in self:
             outs.append(
                 "{:4} {:3} {}".format(
@@ -139,13 +149,13 @@ class Molecule:
                 )
             )
         return "\n".join(outs)
-
-    def copy(self):
+    
+    def copy(self) -> Self:
         """Create a deep copy of the molecule."""
         from copy import deepcopy
 
         return deepcopy(self)
-
+    
     def check_partial_charges(self):
         # Check if the difference on charge and sum of partial charges is significant
         if abs(sum(self.partial_charges) - self.charge) > 1e-3:
@@ -210,17 +220,41 @@ class Molecule:
         return 1 if n_electrons % 2 == 0 and n_electrons > 1 else 2
 
     @property
-    def positions(self) -> NDArray:
+    def cell(self) -> Cell:
+        """Get the unit cell of the molecule."""
+        return self._cell
+
+    @cell.setter
+    def cell(self, new_cell: Cell) -> None:
+        """Set the unit cell of the molecule."""
+        self._cell = new_cell
+
+    @property
+    def cartesian_positions(self) -> NDArray:
         """Get the positions of all atoms in the molecule as a numpy array."""
         return np.array([site.coordinates for site in self])
 
-    @positions.setter
-    def positions(self, new_positions: NDArray) -> None:
+    @cartesian_positions.setter
+    def cartesian_positions(self, new_positions: NDArray) -> None:
         """Set the positions of all atoms in the molecule."""
         if new_positions.shape != (len(self), 3):
             raise ValueError("New positions must have shape (n_atoms, 3).")
         for i, site in enumerate(self):
             site.coordinates = new_positions[i]
+
+    @property
+    def fractional_positions(self) -> NDArray:
+        """Get the fractional positions of all atoms in the molecule as a numpy array."""
+        return self.cell.scaled_positions(self.cartesian_positions)  # type: ignore
+    
+    @fractional_positions.setter
+    def fractional_positions(self, new_positions: NDArray) -> None:
+        """Set the fractional positions of all atoms in the molecule."""
+        if new_positions.shape != (len(self), 3):
+            raise ValueError("New positions must have shape (n_atoms, 3).")
+        cartesian = self.cell.cartesian_positions(new_positions)
+        for i, site in enumerate(self):
+            site.coordinates = cartesian[i]
 
     @property
     def labels(self) -> list[str]:
@@ -303,7 +337,7 @@ class Molecule:
     def n_bonds(self) -> int:
         """Number of bonds in the molecule."""
         return len(self.bonds)
-
+    
     @property
     def center_of_mass(self) -> NDArray[np.float64]:
         """Calculate the center of mass of the molecule."""
@@ -325,73 +359,33 @@ class Molecule:
 
     @abstractmethod
     def get_distance(self, i: int, j: int) -> float:
-        """Get the distance between i and j atoms in the molecule."""
-        atom1 = self.sites[i]
-        atom2 = self.sites[j]
-        return float(
-            np.linalg.norm(np.array(atom1.coordinates) -
-                           np.array(atom2.coordinates))
-        )
+        """Get the minimum-image distance between atoms i and j."""
+        r_i = np.array(self.sites[i].coordinates, dtype=float)
+        r_j = np.array(self.sites[j].coordinates, dtype=float)
+        dr = r_j - r_i
+
+        # Minimum image convention using the unit cell
+        inv_cell = np.linalg.inv(self.cell.array)
+        dr_frac = dr @ inv_cell
+        dr_frac -= np.round(dr_frac)
+        dr_mic = dr_frac @ self.cell.array
+
+        return float(np.linalg.norm(dr_mic))
 
     @abstractmethod
     def get_distances(self) -> np.ndarray:
-        """Get the distance matrix for the molecule."""
+        """Get the minimum-image distance matrix for the structure."""
         n_atoms = len(self)
-        dist_matrix = np.zeros((n_atoms, n_atoms))
+        dist_matrix = np.zeros((n_atoms, n_atoms), dtype=float)
+
         for i in range(n_atoms):
             for j in range(i + 1, n_atoms):
                 dist = self.get_distance(i, j)
                 dist_matrix[i, j] = dist
                 dist_matrix[j, i] = dist
+
         return dist_matrix
-
-    def get_closest_atom(self, atom_index: int) -> int:
-        """Get the index of the closest atom to the given atom index."""
-
-        distances = self.get_distances()[atom_index]
-
-        # Get the index of the closest atom (excluding itself)
-        closest_index = int(
-            np.argmin(
-                [
-                    dist if idx != atom_index else np.inf
-                    for idx, dist in enumerate(distances)
-                ]
-            )
-        )
-        return closest_index
-
-    def set_bonds(
-        self, bonds: Sequence[tuple[int, int]], bondTypes: Sequence[int]
-    ) -> None:
-        """Set the bonds for the molecule.
-
-        Bond index should start at 1.
-        """
-
-        bond_dict = {
-            "1": "single",
-            "2": "double",
-            "3": "triple",
-            "4": "aromatic",
-            "5": "ionic",
-            "6": "hydrogen",
-            "7": "metallic",
-            "8": "coordinate",
-        }
-
-        for i, (index1, index2) in enumerate(bonds):
-            bond_type_name = bond_dict.get(str(bondTypes[i]), "unknown")
-            self.bonds.append(
-                Bond(
-                    atom_1=self.sites[index1 - 1],
-                    atom_2=self.sites[index2 - 1],
-                    bond_type=bondTypes[i],
-                    bond_type_name=bond_type_name,
-                    bond_distance=self.get_distance(index1 - 1, index2 - 1),
-                )
-            )
-
+    
     def add_site_property(self, property_name: str, values: Sequence | list) -> None:
         """Add a property to a site. Note: This is the preferred method
         for adding magnetic moments, selective dynamics, and related
@@ -473,6 +467,37 @@ class Molecule:
         for site in self.sites:
             site.coordinates = site.coordinates - mean_coords
 
+    def set_bonds(
+        self, bonds: Sequence[tuple[int, int]], bondTypes: Sequence[int]
+    ) -> None:
+        """Set the bonds for the molecule.
+
+        Bond index should start at 1.
+        """
+
+        bond_dict = {
+            "1": "single",
+            "2": "double",
+            "3": "triple",
+            "4": "aromatic",
+            "5": "ionic",
+            "6": "hydrogen",
+            "7": "metallic",
+            "8": "coordinate",
+        }
+
+        for i, (index1, index2) in enumerate(bonds):
+            bond_type_name = bond_dict.get(str(bondTypes[i]), "unknown")
+            self.bonds.append(
+                Bond(
+                    atom_1=self.sites[index1 - 1],
+                    atom_2=self.sites[index2 - 1],
+                    bond_type=bondTypes[i],
+                    bond_type_name=bond_type_name,
+                    bond_distance=self.get_distance(index1 - 1, index2 - 1),
+                )
+            )
+    
     def bond_atoms(self, index_1, index_2, bond_type: int = 1) -> None:
         """
         Create a bond between two atoms in the molecule.
@@ -510,90 +535,6 @@ class Molecule:
             )
         )
 
-    def replace_by_atom_group(
-            self,
-            atom_index: int,
-            group: Molecule,
-            type_to_replace: str = "R") -> None:
-        """
-        Repleace an atom in the molecule with a group of atoms from another molecule.
-
-        The new molecule will be added such as the atom with the same atom type as the replaced occupies the same position.
-        The bond between the replaced atom and the closest atom in the current molecule will be replaced by a bond between the
-        closest atom and the new group.
-
-        Parameters
-        ----------
-        atom_index : int
-            Index of the atom to be replaced.
-        group : Molecule
-            Molecule object representing the group to be added.
-        type_to_replace : str
-            Atom type in the group molecule that will be aligned to the replaced atom. Default is "R".
-        """
-
-        closest_atom_index_molecule = self.get_closest_atom(atom_index)
-        # Get the alignment vector in the current molecule
-        alignment_vector = (
-            self.sites[atom_index].coordinates
-            - self.sites[closest_atom_index_molecule].coordinates
-        )
-
-        group = group.copy()
-
-        group.centralize(by_atom_type=type_to_replace)
-
-        # Get the atom of type_to_replace on the group
-        r_atom_indices = [
-            i for i, site in enumerate(group.sites) if site.atom_type == type_to_replace
-        ]
-
-        if not r_atom_indices:
-            raise ValueError(
-                f"The group molecule must contain an atom of type '{type_to_replace}' to align with the replaced atom."
-            )
-
-        if len(r_atom_indices) > 1:
-            raise ValueError(
-                f"The group molecule must contain only one atom of type '{type_to_replace}' to align with the replaced atom."
-            )
-
-        r_atom_index = r_atom_indices[0]
-
-        closest_atom_index_group = group.get_closest_atom(r_atom_index)
-
-        align_vector_group = (
-            group.sites[closest_atom_index_group].coordinates
-            - group.sites[r_atom_index].coordinates
-        )
-
-        Rot_m = rotation_matrix_from_vectors(
-            align_vector_group, alignment_vector)
-
-        # Rotate and translade the conector group to Q position in the strucutre
-        group.positions = (
-            np.dot(group.positions, np.transpose(Rot_m))
-            + self.sites[atom_index].coordinates
-        )
-
-        # Add the group to the molecule
-        for i, site in enumerate(group.sites):
-            site.index = len(self.sites) + i
-
-        self.sites.extend(group.sites)
-        self.bonds.extend(group.bonds)
-
-        # Bond the atoms together
-        self.bond_atoms(
-            closest_atom_index_molecule,
-            closest_atom_index_group + len(self.sites) - len(group.sites),
-            bond_type=1,
-        )
-
-        self.remove_atom(atom_index)
-
-        self.remove_atom(r_atom_index + len(self.sites) - len(group.sites))
-
     def view(self) -> None:
         """
         Visualize the molecule using the ase viewrer.
@@ -610,7 +551,7 @@ class Molecule:
             if symbol in ["R", "Xe", "Q"] + ["R" + str(i) for i in range(1, 10)]:
                 symbols[i] = "X"
 
-        ase_molecule = Atoms(symbols=symbols, positions=positions)
+        ase_molecule = Atoms(symbols=symbols, positions=positions, cell=self.cell, pbc=True)
 
         # Set initial charges if charge property exists
         if "partial_charge" in self.sites[0].properties:
@@ -619,109 +560,3 @@ class Molecule:
             ase_molecule.set_initial_charges(charges)
 
         view(ase_molecule)
-
-    def save_mol(self, path, filename) -> None:
-        """
-        Saves the molecule to a .mol file (V2000 format).
-
-        Parameters
-        ----------
-        path : str
-            Path to save the .mol file.
-        filename : str
-            Name of the .mol file (without extension).
-        """
-
-        # Check if the filename has an extension
-        if filename.endswith(".mol"):
-            filename = filename[:-4]
-
-        mol_txt = [f"{filename}\n\nCreated by pyCOFBuilder"]
-
-        mol_txt += [
-            f"{len(self.sites):>3}{len(self.bonds):>3}  0  0  0  0  0  0  0  0  0    0"
-        ]
-
-        for atom in self.sites:
-            mol_txt += [
-                "{:>10.4f}{:>10.4f}{:>10.4f} {:<3} 0  0  0  0  0  0  0  0  0  0  0  0".format(
-                    *atom.coordinates, atom.atom_type
-                )
-            ]
-
-        for bond in self.bonds:
-            mol_txt += [
-                "{:>3}{:>3}{:>3}  0  0  0  0".format(
-                    bond.atom_1.index + 1, bond.atom_2.index + 1, bond.bond_type
-                )
-            ]
-        mol_txt += ["M  END"]
-
-        with open(f"{path}\\{filename}.mol", "w") as f:
-            f.write("\n".join(mol_txt))
-
-    def save_xyz(self, path, filename) -> None:
-        """
-        Saves the molecule to a .xyz file on the file standard for poremake. 
-        It includes partial charges and bond information.
-        Parameters
-        ----------
-        path : str
-            Path to save the .xyz file.
-        filename : str
-            Name of the .xyz file (without extension).
-        """
-
-        if filename.endswith(".xyz"):
-            filename = filename[:-4]
-
-        bond_dict = {
-            1: "S",
-            2: "D",
-            3: "T",
-            4: "A"
-            }
-
-        X_index = [atom.index for atom in self.sites if atom.atom_type == "X"]
-
-        xyz_txt = [f"{self.n_atoms}", "  ".join(map(str, X_index))]
-
-        for atom in self.sites:
-            xyz_txt += [
-                "{:3s}    {:12.7f}  {:12.7f}  {:12.7f}  {:12.7f}".format(
-                    atom.atom_type, *
-                    atom.coordinates, atom.properties.get(
-                        "partial_charge", 0.0)
-                )
-            ]
-
-        for bond in self.bonds:
-            xyz_txt += [
-                "{:3}  {:3}   {:3}".format(
-                    bond.atom_1.index, bond.atom_2.index, bond_dict[bond.bond_type]
-                )
-            ]
-
-        with open(os.path.join(path, filename + ".xyz"), "w") as f:
-            f.write("\n".join(xyz_txt))
-
-    def from_mol(self, file_name) -> None:
-        """
-        Load a molecule from a .mol file.
-        """
-
-        atomTypes, cartPos, partialCharges, bonds, bondTypes = read_mol_file(
-            file_name)
-
-        for i in range(len(atomTypes)):
-            self.sites.append(
-                AtomicSite(
-                    atom_type=atomTypes[i],
-                    label=atomTypes[i],
-                    coordinates=np.array(cartPos[i]),
-                    index=i,
-                    properties={"partial_charge": partialCharges[i]},
-                )
-            )
-
-        self.set_bonds(bonds, bondTypes)
