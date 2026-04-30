@@ -165,5 +165,3 @@ def parse_cdg_content(content: str) -> dict:
             parsed_data["edge_centers"].append(center)
 
     return parsed_data
-
-parse_cdg_file('pcu.cgd')
