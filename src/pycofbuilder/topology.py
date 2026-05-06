@@ -150,14 +150,14 @@ class Topology:
         gcd_file = [
             'CRYSTAL',
             f"NAME {self.name}",
-            f"GROUP {self.spacegroup}",
+            f"GROUP P1",
             "CELL {:<10.5f} {:<10.5f} {:<10.5f} {:<10.5f} {:<10.5f} {:<10.5f}".format(*self.cell.cellpar()),
         ]
 
         for node in self.nodes:
             gcd_file.append("NODE {:2} {:2} {:<10.5f} {:<10.5f} {:<10.5f}".format(node.id, node.connectivity, node.x, node.y, node.z))
         for edge_center in self.edge_centers:
-            gcd_file.append("# EDGE_CENTER {:<10.5f} {:<10.5f} {:<10.5f}".format(edge_center.x, edge_center.y, edge_center.z))
+            gcd_file.append("EDGE_CENTER {:<10.5f} {:<10.5f} {:<10.5f}".format(edge_center.x, edge_center.y, edge_center.z))
 
         gcd_file.append("END")
 
