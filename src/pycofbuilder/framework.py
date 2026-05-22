@@ -110,11 +110,12 @@ class Framework:
         self.angle_tol: float = kwargs.get("angle_tol", 0.5)
         self.dist_threshold: float = kwargs.get("dist_threshold", 0.8)
         self.bond_threshold: float = kwargs.get("bond_threshold", 1.3)
+        self.calc_bonds: bool = kwargs.get("calc_bonds", False)
 
         self.bb1_name = None
         self.bb2_name = None
         self.topology = None
-        self.stacking: str | int = None
+        self.stacking: str | int | None = None
         self.smiles = None
 
         self.atom_types = []
@@ -391,7 +392,8 @@ class Framework:
             site_properties={"source": self.atom_labels},
         )
 
-        self.bonds = get_bonds(structure, self.bond_threshold)
+        if self.calc_bonds:
+            self.bonds = get_bonds(structure, self.bond_threshold)
 
         return result
 

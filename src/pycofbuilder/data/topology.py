@@ -77,10 +77,11 @@ TOPOLOGY_DICT = {
             {"position": [0, 1 / 2, 0], "angle": -45},
         ],
         "edges": [
-            {"position": [1 / 4, 1 / 4, 0], "angle": 45},
-            {"position": [3 / 4, 1 / 4, 0], "angle": 135},
-            {"position": [3 / 4, 3 / 4, 0], "angle": 225},
-            {"position": [1 / 4, 3 / 4, 0], "angle": 315},
+            {"position": [3 / 4, 1 / 4, 0], "angle": 45},
+            {"position": [3 / 4, 3 / 4, 0], "angle": 315},
+            {"position": [1 / 4, 3 / 4, 0], "angle": 135},
+            {"position": [1 / 4, 1 / 4, 0], "angle": 225},
+            
         ],
     },
     "KGD": {
