@@ -1,5 +1,6 @@
 from pathlib import Path
 from pycofbuilder.molecule import Molecule
+import warnings
 
 class BuildingBlock(Molecule):
 
@@ -23,12 +24,23 @@ class BuildingBlock(Molecule):
         self.allowed_connectors: list[str] = [c.stem for c in (database_path / connGroupsFolder).glob('*')]
         self.allowed_funcGroups: list[str] = [f.stem for f in (database_path / funcGroupsFolder).glob('*')]
 
+        self._name: str = ""
+
     def __repr__(self) -> str:
         return (
             "BuildingBlock(shape={}, core={}, connector={}, funcGroups={})".format(
                 self.shape, self.core, self.connector, self.funcGroups
             )
         )
+    
+    @property
+    def name(self) -> str:
+        return self._name
+    
+    @name.setter
+    def name(self, value: str) -> None:
+        self._name = value
+        self.properties['name'] = self._name
     
     def _check_name(self, name: str) -> None:
         if len(name.split('_')) < 3:
@@ -57,7 +69,7 @@ class BuildingBlock(Molecule):
         func_sites = list(set([s for s in self.atom_types if s.startswith("R")]))
 
         if len(self.funcGroups) > len(func_sites):
-            raise ValueError(
+            warnings.warn(
                 f"Number of functional groups ({len(self.funcGroups)}) exceeds the number of functionalizable sites ({len(func_sites)})."
                 )
     
@@ -90,9 +102,15 @@ class BuildingBlock(Molecule):
         The functional group molecule is read from the database based on the functional group name.
         """
         for i, funcGroup_name in enumerate(self.funcGroups):
+
+            if f"R{i+1}" not in self.atom_types:
+                break
+
             funcGroup: Molecule = Molecule()
             funcGroup.from_mol(self.database_path / self.funcGroupsFolder / f"{funcGroup_name}.mol")
 
+            self.name = self.name + f"_{funcGroup_name}"
+  
             while f"R{i+1}" in self.atom_types:
                 self.replace_by_atom_group(
                     atom_index=self.atom_types.index(f"R{i+1}"),
@@ -103,9 +121,12 @@ class BuildingBlock(Molecule):
         remaining_groups = list(set([s for s in self.atom_types if s.startswith("R")]))
 
         for group in remaining_groups:
+            self.name = self.name + f"_H"
+            
             while group in self.atom_types:
                 funcGroup: Molecule = Molecule()
                 funcGroup.from_mol(self.database_path / self.funcGroupsFolder / "H.mol")
+                
                 self.replace_by_atom_group(
                     atom_index=self.atom_types.index(group),
                     group=funcGroup,
@@ -126,26 +147,27 @@ class BuildingBlock(Molecule):
         self.connector: str = name.split('_')[2]
         self._check_connector()
         self.add_conector()
+
+        # Rebuild the name based on the shape, core, connector, and functional groups
+        self._name: str = "{shape}_{core}_{connector}".format(
+            shape=self.shape,
+            core=self.core,
+            connector=self.connector
+        )
+
+        
         
         self.funcGroups: list[str] = name.split('_')[3:]
         self._check_funcGroups()
         self.add_funcGroups()
 
-        # Rebuild the name based on the shape, core, connector, and functional groups
-        self.name: str = "{shape}_{core}_{connector}_{funcGroups}".format(
-            shape=self.shape,
-            core=self.core,
-            connector=self.connector,
-            funcGroups='_'.join(self.funcGroups)
-        )
-
-        self.properties['name'] = self.name
+        
 
     def from_file(self, file_path: Path) -> None:
         """
         Read the building block from a file.
         """
-        self.name = file_path.stem
+        self._name = file_path.stem
 
         # Check file extension
         if file_path.suffix == '.mol':
