@@ -17,11 +17,16 @@ from ase.io import read
 from pymatgen.io.cif import CifParser
 
 from pycofbuilder.cjson import ChemJSON
-from pycofbuilder.tools import (cell_to_cellpar, cell_to_ibrav,
-                                cellpar_to_cell, elements_dict,
-                                get_cartesian_to_fractional_matrix,
-                                get_fractional_to_cartesian_matrix, get_kgrid,
-                                smiles_to_xsmiles)
+from pycofbuilder.tools import (
+    cell_to_cellpar,
+    cell_to_ibrav,
+    cellpar_to_cell,
+    elements_dict,
+    get_cartesian_to_fractional_matrix,
+    get_fractional_to_cartesian_matrix,
+    get_kgrid,
+    smiles_to_xsmiles,
+)
 
 
 def read_xyz(path: str, file_name: str, extxyz=False) -> tuple:
@@ -297,7 +302,7 @@ def read_mol_file(
     file_path,
 ) -> tuple[list, list[list[float]], list[float], list[tuple[int, int]], list[int]]:
     """
-    Reads a .mol file and extracts 
+    Reads a .mol file and extracts
     atom types, Cartesian positions, partial charges, bonds, and bond types.
 
     This function assumes that the .mol file was created by GaussView, files created
@@ -344,6 +349,7 @@ def read_mol_file(
     bondTypes = [int(bond_line.split()[2]) for bond_line in bonds_non_processed]
 
     return atomTypes, np.array(cartPos).tolist(), partialCharges, bonds, bondTypes
+
 
 def save_csv(
     path: str, file_name: str, data: list, delimiter: str = ",", head: list = []

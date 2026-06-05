@@ -12,15 +12,20 @@ if sys.version_info[0] != 3:
 
 # Import ChemJSON
 import pycofbuilder.cjson as ChemJSON
+
 # Import Exceptions
 import pycofbuilder.exceptions as Exceptions
 import pycofbuilder.io_tools as IO_Tools
+
 # Import Logger
 import pycofbuilder.logger as Logger
+
 # Import Tools
 import pycofbuilder.tools as Tools
+
 # Import BuildingBlocks class
 from pycofbuilder.building_block import BuildingBlock
+
 # Import Framework class
 from pycofbuilder.framework import Framework
 

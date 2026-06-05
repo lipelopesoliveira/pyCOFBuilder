@@ -2,10 +2,9 @@ from __future__ import annotations
 
 import os
 from abc import abstractmethod
-from typing import Iterator, Sequence
-
 from collections import Counter
 from functools import reduce
+from typing import Iterator, Sequence
 
 import numpy as np
 from numpy.typing import NDArray
@@ -123,7 +122,13 @@ class Molecule:
                 "{:4} {:3} {}".format(
                     site.index,
                     site.atom_type,
-                    ' '.join([f'{site.coordinates[coord]:0.6f}'.rjust(12) for coord in range(3)]))
+                    " ".join(
+                        [
+                            f"{site.coordinates[coord]:0.6f}".rjust(12)
+                            for coord in range(3)
+                        ]
+                    ),
+                )
             )
 
         outs += ["Bonds:"]
@@ -151,8 +156,7 @@ class Molecule:
         if abs(sum(self.partial_charges) - self.charge) > 1e-3:
             raise Warning(
                 "Total partial charge {:.5f} does not match molecular charge {:.5f}.".format(
-                    sum(self.partial_charges),
-                    self.charge
+                    sum(self.partial_charges), self.charge
                 )
             )
 
@@ -256,14 +260,9 @@ class Molecule:
     def composition(self):
         """Composition of the molecule."""
         comp_dict = Counter([site.atom_type for site in self])
+        comp_str = "".join([f"{el}{comp_dict[el]}" for el in sorted(comp_dict.keys())])
+        return comp_str
 
-        nums = comp_dict.values()
-        gcd = reduce(np.gcd, nums)
-        # Convert to string
-        comp = "".join(
-            [f"{el}{comp_dict[el]}" for el in sorted(comp_dict.keys())])
-        return comp
-    
     @property
     def reduced_formula(self) -> str:
         """Reduced formula of the molecule."""
@@ -274,7 +273,8 @@ class Molecule:
 
         # Convert to string
         reduced = "".join(
-            [f"{el}{int(comp_dict[el] / gcd)}" for el in sorted(comp_dict.keys())])
+            [f"{el}{int(comp_dict[el] / gcd)}" for el in sorted(comp_dict.keys())]
+        )
         return reduced
 
     @property
@@ -329,8 +329,7 @@ class Molecule:
         atom1 = self.sites[i]
         atom2 = self.sites[j]
         return float(
-            np.linalg.norm(np.array(atom1.coordinates) -
-                           np.array(atom2.coordinates))
+            np.linalg.norm(np.array(atom1.coordinates) - np.array(atom2.coordinates))
         )
 
     @abstractmethod
@@ -441,10 +440,9 @@ class Molecule:
             values.append(site.properties[property_name])
         return values
 
-    def centralize(self,
-                   by_atom_type: str | None = None,
-                   by_indexes: Sequence[int] | None = None
-                   ) -> None:
+    def centralize(
+        self, by_atom_type: str | None = None, by_indexes: Sequence[int] | None = None
+    ) -> None:
         """
         Centralize the molecule by subtracting the mean coordinates.
         If by_atom_type is not None, centralize by the mean position of the atoms of this atom type.
@@ -459,13 +457,13 @@ class Molecule:
 
         if by_atom_type:
             x_coords = [
-                site.coordinates for site in self.sites if site.atom_type == by_atom_type
+                site.coordinates
+                for site in self.sites
+                if site.atom_type == by_atom_type
             ]
             mean_coords = np.mean(x_coords, axis=0)
         elif by_indexes is not None:
-            x_coords = [
-                self.sites[i].coordinates for i in by_indexes
-            ]
+            x_coords = [self.sites[i].coordinates for i in by_indexes]
             mean_coords = np.mean(x_coords, axis=0)
         else:
             mean_coords = self.geometrical_center
@@ -511,10 +509,8 @@ class Molecule:
         )
 
     def replace_by_atom_group(
-            self,
-            atom_index: int,
-            group: Molecule,
-            type_to_replace: str = "R") -> None:
+        self, atom_index: int, group: Molecule, type_to_replace: str = "R"
+    ) -> None:
         """
         Repleace an atom in the molecule with a group of atoms from another molecule.
 
@@ -567,8 +563,7 @@ class Molecule:
             - group.sites[r_atom_index].coordinates
         )
 
-        Rot_m = rotation_matrix_from_vectors(
-            align_vector_group, alignment_vector)
+        Rot_m = rotation_matrix_from_vectors(align_vector_group, alignment_vector)
 
         # Rotate and translade the conector group to Q position in the strucutre
         group.positions = (
@@ -614,8 +609,7 @@ class Molecule:
 
         # Set initial charges if charge property exists
         if "partial_charge" in self.sites[0].properties:
-            charges = [site.properties["partial_charge"]
-                       for site in self.sites]
+            charges = [site.properties["partial_charge"] for site in self.sites]
             ase_molecule.set_initial_charges(charges)
 
         view(ase_molecule)
@@ -662,7 +656,7 @@ class Molecule:
 
     def save_xyz(self, path, filename) -> None:
         """
-        Saves the molecule to a .xyz file on the file standard for poremake. 
+        Saves the molecule to a .xyz file on the file standard for poremake.
         It includes partial charges and bond information.
         Parameters
         ----------
@@ -675,12 +669,7 @@ class Molecule:
         if filename.endswith(".xyz"):
             filename = filename[:-4]
 
-        bond_dict = {
-            1: "S",
-            2: "D",
-            3: "T",
-            4: "A"
-            }
+        bond_dict = {1: "S", 2: "D", 3: "T", 4: "A"}
 
         X_index = [atom.index for atom in self.sites if atom.atom_type == "X"]
 
@@ -689,9 +678,9 @@ class Molecule:
         for atom in self.sites:
             xyz_txt += [
                 "{:3s}    {:12.7f}  {:12.7f}  {:12.7f}  {:12.7f}".format(
-                    atom.atom_type, *
-                    atom.coordinates, atom.properties.get(
-                        "partial_charge", 0.0)
+                    atom.atom_type,
+                    *atom.coordinates,
+                    atom.properties.get("partial_charge", 0.0),
                 )
             ]
 
@@ -710,8 +699,7 @@ class Molecule:
         Load a molecule from a .mol file.
         """
 
-        atomTypes, cartPos, partialCharges, bonds, bondTypes = read_mol_file(
-            file_name)
+        atomTypes, cartPos, partialCharges, bonds, bondTypes = read_mol_file(file_name)
 
         for i in range(len(atomTypes)):
             self.sites.append(

@@ -18,9 +18,14 @@ from pycofbuilder.cjson import ChemJSON
 from pycofbuilder.exceptions import MissingXError
 from pycofbuilder.io_tools import read_gjf, read_xyz, save_xyz
 from pycofbuilder.logger import create_logger
-from pycofbuilder.tools import (calculate_sides, closest_atom_struc,
-                                find_closest_atom, find_index,
-                                rotation_matrix_from_vectors, unit_vector)
+from pycofbuilder.tools import (
+    calculate_sides,
+    closest_atom_struc,
+    find_closest_atom,
+    find_index,
+    rotation_matrix_from_vectors,
+    unit_vector,
+)
 
 
 class BuildingBlock:

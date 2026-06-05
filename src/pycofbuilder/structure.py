@@ -1,16 +1,17 @@
 from __future__ import annotations
-from abc import abstractmethod
-from typing import Iterator, Self, Sequence
-from ase.cell import Cell
-import numpy as np
-from numpy.typing import NDArray
 
+from abc import abstractmethod
 from collections import Counter
 from functools import reduce
+from typing import Iterator, Self, Sequence
 
-from pycofbuilder.molecule import Molecule
+import numpy as np
+from ase.cell import Cell
+from numpy.typing import NDArray
+
 from pycofbuilder.atom import AtomicSite
 from pycofbuilder.bond import Bond
+from pycofbuilder.molecule import Molecule
 
 
 class Structure:
@@ -24,9 +25,9 @@ class Structure:
         siteProperties: Sequence[dict] = [],
         bonds: Sequence[tuple[int, int]] | None = None,
         bondTypes: Sequence[int] | None = None,
-        properties: dict | None = None
+        properties: dict | None = None,
     ) -> None:
-        
+
         self._cell: Cell = cell
 
         if len(fractionalCoords) > 0 and len(cartesianCoords) == 0:
@@ -62,7 +63,7 @@ class Structure:
         }
 
         self.check_partial_charges()
-        
+
     def __len__(self) -> int:
         return len(self.sites)
 
@@ -110,10 +111,10 @@ class Structure:
         ):
             for site in self.sites:
                 site.coordinates = site.coordinates - np.array(to_subtract)
-    
+
     def __repr__(self) -> str:
         return "Structure Summary\n" + "\n".join(map(repr, self))
-    
+
     def __str__(self) -> str:
         outs = [
             f"Name: {self.properties.get('name', self.composition)}",
@@ -123,17 +124,25 @@ class Structure:
             f"Sites ({len(self)}), Bonds ({len(self.bonds)})",
         ]
 
-        outs.append('Unit Cell:')
-        outs.append('a: {:.6f} Å, b: {:.6f} Å, c: {:.6f} Å alpha: {:.6f}°, beta: {:.6f}°, gamma: {:.6f}°'.format(
-            *self.cell.lengths(), *self.cell.angles())  # type: ignore
-            )
+        outs.append("Unit Cell:")
+        outs.append(
+            "a: {:.6f} Å, b: {:.6f} Å, c: {:.6f} Å alpha: {:.6f}°, beta: {:.6f}°, gamma: {:.6f}°".format(
+                *self.cell.lengths(), *self.cell.angles()
+            )  # type: ignore
+        )
 
         for site in self:
             outs.append(
                 "{:4} {:3} {}".format(
                     site.index,
                     site.atom_type,
-                    ' '.join([f'{site.coordinates[coord]:0.6f}'.rjust(12) for coord in range(3)]))
+                    " ".join(
+                        [
+                            f"{site.coordinates[coord]:0.6f}".rjust(12)
+                            for coord in range(3)
+                        ]
+                    ),
+                )
             )
 
         outs += ["Bonds:"]
@@ -149,20 +158,19 @@ class Structure:
                 )
             )
         return "\n".join(outs)
-    
+
     def copy(self) -> Self:
         """Create a deep copy of the molecule."""
         from copy import deepcopy
 
         return deepcopy(self)
-    
+
     def check_partial_charges(self):
         # Check if the difference on charge and sum of partial charges is significant
         if abs(sum(self.partial_charges) - self.charge) > 1e-3:
             raise Warning(
                 "Total partial charge {:.5f} does not match molecular charge {:.5f}.".format(
-                    sum(self.partial_charges),
-                    self.charge
+                    sum(self.partial_charges), self.charge
                 )
             )
 
@@ -246,7 +254,7 @@ class Structure:
     def fractional_positions(self) -> NDArray:
         """Get the fractional positions of all atoms in the molecule as a numpy array."""
         return self.cell.scaled_positions(self.cartesian_positions)  # type: ignore
-    
+
     @fractional_positions.setter
     def fractional_positions(self, new_positions: NDArray) -> None:
         """Set the fractional positions of all atoms in the molecule."""
@@ -290,14 +298,9 @@ class Structure:
     def composition(self):
         """Composition of the molecule."""
         comp_dict = Counter([site.atom_type for site in self])
+        comp_str = "".join([f"{el}{comp_dict[el]}" for el in sorted(comp_dict.keys())])
+        return comp_str
 
-        nums = comp_dict.values()
-        gcd = reduce(np.gcd, nums)
-        # Convert to string
-        comp = "".join(
-            [f"{el}{comp_dict[el]}" for el in sorted(comp_dict.keys())])
-        return comp
-    
     @property
     def reduced_formula(self) -> str:
         """Reduced formula of the molecule."""
@@ -308,7 +311,8 @@ class Structure:
 
         # Convert to string
         reduced = "".join(
-            [f"{el}{int(comp_dict[el] / gcd)}" for el in sorted(comp_dict.keys())])
+            [f"{el}{int(comp_dict[el] / gcd)}" for el in sorted(comp_dict.keys())]
+        )
         return reduced
 
     @property
@@ -337,7 +341,7 @@ class Structure:
     def n_bonds(self) -> int:
         """Number of bonds in the molecule."""
         return len(self.bonds)
-    
+
     @property
     def center_of_mass(self) -> NDArray[np.float64]:
         """Calculate the center of mass of the molecule."""
@@ -385,7 +389,7 @@ class Structure:
                 dist_matrix[j, i] = dist
 
         return dist_matrix
-    
+
     def add_site_property(self, property_name: str, values: Sequence | list) -> None:
         """Add a property to a site. Note: This is the preferred method
         for adding magnetic moments, selective dynamics, and related
@@ -435,10 +439,9 @@ class Structure:
             values.append(site.properties[property_name])
         return values
 
-    def centralize(self,
-                   by_atom_type: str | None = None,
-                   by_indexes: Sequence[int] | None = None
-                   ) -> None:
+    def centralize(
+        self, by_atom_type: str | None = None, by_indexes: Sequence[int] | None = None
+    ) -> None:
         """
         Centralize the molecule by subtracting the mean coordinates.
         If by_atom_type is not None, centralize by the mean position of the atoms of this atom type.
@@ -453,13 +456,13 @@ class Structure:
 
         if by_atom_type:
             x_coords = [
-                site.coordinates for site in self.sites if site.atom_type == by_atom_type
+                site.coordinates
+                for site in self.sites
+                if site.atom_type == by_atom_type
             ]
             mean_coords = np.mean(x_coords, axis=0)
         elif by_indexes is not None:
-            x_coords = [
-                self.sites[i].coordinates for i in by_indexes
-            ]
+            x_coords = [self.sites[i].coordinates for i in by_indexes]
             mean_coords = np.mean(x_coords, axis=0)
         else:
             mean_coords = self.geometrical_center
@@ -497,7 +500,7 @@ class Structure:
                     bond_distance=self.get_distance(index1 - 1, index2 - 1),
                 )
             )
-    
+
     def bond_atoms(self, index_1, index_2, bond_type: int = 1) -> None:
         """
         Create a bond between two atoms in the molecule.
@@ -551,12 +554,13 @@ class Structure:
             if symbol in ["R", "Xe", "Q"] + ["R" + str(i) for i in range(1, 10)]:
                 symbols[i] = "X"
 
-        ase_molecule = Atoms(symbols=symbols, positions=positions, cell=self.cell, pbc=True)
+        ase_molecule = Atoms(
+            symbols=symbols, positions=positions, cell=self.cell, pbc=True
+        )
 
         # Set initial charges if charge property exists
         if "partial_charge" in self.sites[0].properties:
-            charges = [site.properties["partial_charge"]
-                       for site in self.sites]
+            charges = [site.properties["partial_charge"] for site in self.sites]
             ase_molecule.set_initial_charges(charges)
 
         view(ase_molecule)

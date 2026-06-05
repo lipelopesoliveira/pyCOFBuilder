@@ -1,16 +1,18 @@
-from pathlib import Path
-from pycofbuilder.molecule import Molecule
 import warnings
+from pathlib import Path
+
+from pycofbuilder.molecule import Molecule
+
 
 class BuildingBlock(Molecule):
 
     def __init__(
-            self,
-            database_path: Path,
-            coreGroupsFolder: str = 'coreGroups',
-            connGroupsFolder: str = 'connGroups',
-            funcGroupsFolder: str = 'funcGroups'
-            ) -> None:
+        self,
+        database_path: Path,
+        coreGroupsFolder: str = "coreGroups",
+        connGroupsFolder: str = "connGroups",
+        funcGroupsFolder: str = "funcGroups",
+    ) -> None:
 
         super().__init__()
 
@@ -20,41 +22,45 @@ class BuildingBlock(Molecule):
         self.connGroupsFolder: str = connGroupsFolder
         self.funcGroupsFolder: str = funcGroupsFolder
 
-        self.allowed_shapes: list[str] = [s.stem for s in (database_path / coreGroupsFolder).glob('*') if s.is_dir()]
-        self.allowed_connectors: list[str] = [c.stem for c in (database_path / connGroupsFolder).glob('*')]
-        self.allowed_funcGroups: list[str] = [f.stem for f in (database_path / funcGroupsFolder).glob('*')]
+        self.allowed_shapes: list[str] = [
+            s.stem for s in (database_path / coreGroupsFolder).glob("*") if s.is_dir()
+        ]
+        self.allowed_connectors: list[str] = [
+            c.stem for c in (database_path / connGroupsFolder).glob("*")
+        ]
+        self.allowed_funcGroups: list[str] = [
+            f.stem for f in (database_path / funcGroupsFolder).glob("*")
+        ]
 
         self._name: str = ""
 
     def __repr__(self) -> str:
-        return (
-            "BuildingBlock(shape={}, core={}, connector={}, funcGroups={})".format(
-                self.shape, self.core, self.connector, self.funcGroups
-            )
+        return "BuildingBlock(shape={}, core={}, connector={}, funcGroups={})".format(
+            self.shape, self.core, self.connector, self.funcGroups
         )
-    
+
     @property
     def name(self) -> str:
         return self._name
-    
+
     @name.setter
     def name(self, value: str) -> None:
         self._name = value
-        self.properties['name'] = self._name
-    
+        self.properties["name"] = self._name
+
     def _check_name(self, name: str) -> None:
-        if len(name.split('_')) < 3:
+        if len(name.split("_")) < 3:
             raise ValueError(
-                f"Name '{name}' is not in the correct format. " \
-                 "Expected format: 'SHAPE_CORE_CONNECTOR_FUNCGROUP1_FUNCGROUP2_...'"
-                 )
-        
+                f"Name '{name}' is not in the correct format. "
+                "Expected format: 'SHAPE_CORE_CONNECTOR_FUNCGROUP1_FUNCGROUP2_...'"
+            )
+
     def _check_shape(self) -> None:
         if self.shape not in self.allowed_shapes:
             raise ValueError(
                 f"Shape '{self.shape}' is not allowed. Allowed shapes are: {self.allowed_shapes}"
-                )
-    
+            )
+
     def _check_core(self) -> None:
         pass
 
@@ -62,8 +68,8 @@ class BuildingBlock(Molecule):
         if self.connector not in self.allowed_connectors:
             raise ValueError(
                 f"Connector '{self.connector}' is not allowed. Allowed connectors are: {self.allowed_connectors}"
-                )
-    
+            )
+
     def _check_funcGroups(self) -> None:
         # Get the list of functionalizable sites in the building block
         func_sites = list(set([s for s in self.atom_types if s.startswith("R")]))
@@ -71,15 +77,17 @@ class BuildingBlock(Molecule):
         if len(self.funcGroups) > len(func_sites):
             warnings.warn(
                 f"Number of functional groups ({len(self.funcGroups)}) exceeds the number of functionalizable sites ({len(func_sites)})."
-                )
-    
+            )
+
         for funcGroup in self.funcGroups:
             if funcGroup not in self.allowed_funcGroups:
                 raise ValueError(
                     f"Functional group '{funcGroup}' is not allowed. Allowed functional groups are: {self.allowed_funcGroups}"
-                    )
+                )
 
-        self.funcGroups = self.funcGroups + ["H"] * (len(func_sites) - len(self.funcGroups))
+        self.funcGroups = self.funcGroups + ["H"] * (
+            len(func_sites) - len(self.funcGroups)
+        )
 
     def add_conector(self) -> None:
         """
@@ -88,13 +96,16 @@ class BuildingBlock(Molecule):
         """
 
         connector: Molecule = Molecule()
-        connector.from_mol(self.database_path / self.connGroupsFolder / f"{self.connector}.mol")
+        connector.from_mol(
+            self.database_path / self.connGroupsFolder / f"{self.connector}.mol"
+        )
 
         while "Q" in self.atom_types:
             self.replace_by_atom_group(
                 atom_index=self.atom_types.index("Q"),
                 group=connector,
-                type_to_replace="Q")
+                type_to_replace="Q",
+            )
 
     def add_funcGroups(self) -> None:
         """
@@ -107,61 +118,61 @@ class BuildingBlock(Molecule):
                 break
 
             funcGroup: Molecule = Molecule()
-            funcGroup.from_mol(self.database_path / self.funcGroupsFolder / f"{funcGroup_name}.mol")
+            funcGroup.from_mol(
+                self.database_path / self.funcGroupsFolder / f"{funcGroup_name}.mol"
+            )
 
             self.name = self.name + f"_{funcGroup_name}"
-  
+
             while f"R{i+1}" in self.atom_types:
                 self.replace_by_atom_group(
                     atom_index=self.atom_types.index(f"R{i+1}"),
                     group=funcGroup,
-                    type_to_replace="R")
-                
+                    type_to_replace="R",
+                )
+
         # Replace any remaining "RX" atoms with the first H functional group
         remaining_groups = list(set([s for s in self.atom_types if s.startswith("R")]))
 
         for group in remaining_groups:
-            self.name = self.name + f"_H"
-            
+            self.name = self.name + "_H"
+
             while group in self.atom_types:
                 funcGroup: Molecule = Molecule()
                 funcGroup.from_mol(self.database_path / self.funcGroupsFolder / "H.mol")
-                
+
                 self.replace_by_atom_group(
                     atom_index=self.atom_types.index(group),
                     group=funcGroup,
-                    type_to_replace="R")
+                    type_to_replace="R",
+                )
 
     def from_name(self, name: str) -> None:
         # Extract the shape, core, connector, and functional groups from the name
         self._check_name(name)
 
-        self.shape: str = name.split('_')[0]
+        self.shape: str = name.split("_")[0]
         self._check_shape()
 
-        self.core: str = name.split('_')[1]
+        self.core: str = name.split("_")[1]
         self._check_core()
 
-        self.from_mol(self.database_path / self.coreGroupsFolder / self.shape / f"{self.core}.mol")
+        self.from_mol(
+            self.database_path / self.coreGroupsFolder / self.shape / f"{self.core}.mol"
+        )
 
-        self.connector: str = name.split('_')[2]
+        self.connector: str = name.split("_")[2]
         self._check_connector()
         self.add_conector()
 
         # Rebuild the name based on the shape, core, connector, and functional groups
         self._name: str = "{shape}_{core}_{connector}".format(
-            shape=self.shape,
-            core=self.core,
-            connector=self.connector
+            shape=self.shape, core=self.core, connector=self.connector
         )
 
-        
-        
-        self.funcGroups: list[str] = name.split('_')[3:]
+        self.funcGroups: list[str] = name.split("_")[3:]
         self._check_funcGroups()
         self.add_funcGroups()
-
-        
 
     def from_file(self, file_path: Path) -> None:
         """
@@ -170,9 +181,9 @@ class BuildingBlock(Molecule):
         self._name = file_path.stem
 
         # Check file extension
-        if file_path.suffix == '.mol':
+        if file_path.suffix == ".mol":
             self.from_mol(file_path)
         else:
             raise NotImplementedError(
                 f"File format '{file_path.suffix}' is not supported. Supported formats are: .mol"
-                )
+            )

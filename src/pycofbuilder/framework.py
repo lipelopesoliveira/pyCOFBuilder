@@ -11,29 +11,50 @@ import os
 
 import numpy as np
 from ase import Atoms
+
 # Import pymatgen
 from pymatgen.core import Lattice, Structure
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
-from pymatgen.transformations.advanced_transformations import \
-    CubicSupercellTransformation
+from pymatgen.transformations.advanced_transformations import (
+    CubicSupercellTransformation,
+)
 from scipy.spatial.transform import Rotation as R
 
 # Import pycofbuilder building_block
 from pycofbuilder.building_block import BuildingBlock
+
 # Import pycofbuilder topology data
 from pycofbuilder.data.topology import TOPOLOGY_DICT
+
 # Import pycofbuilder exceptions
 from pycofbuilder.exceptions import BBConnectivityError, BondLenghError
+
 # Import pycofbuilder io_tools
-from pycofbuilder.io_tools import (save_chemjson, save_cif, save_gjf, save_pdb,
-                                   save_pqr, save_qe, save_turbomole,
-                                   save_vasp, save_xsf, save_xyz)
+from pycofbuilder.io_tools import (
+    save_chemjson,
+    save_cif,
+    save_gjf,
+    save_pdb,
+    save_pqr,
+    save_qe,
+    save_turbomole,
+    save_vasp,
+    save_xsf,
+    save_xyz,
+)
 from pycofbuilder.logger import create_logger
+
 # Import pycofbuilder tools
-from pycofbuilder.tools import (angle, cell_to_cellpar, cellpar_to_cell,
-                                get_bond_atom, get_bonds,
-                                get_framework_symm_text,
-                                rotation_matrix_from_vectors, unit_vector)
+from pycofbuilder.tools import (
+    angle,
+    cell_to_cellpar,
+    cellpar_to_cell,
+    get_bond_atom,
+    get_bonds,
+    get_framework_symm_text,
+    rotation_matrix_from_vectors,
+    unit_vector,
+)
 
 
 class Framework:

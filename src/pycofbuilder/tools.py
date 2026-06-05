@@ -147,6 +147,7 @@ def rotation_matrix_from_vectors(vec1: NDArray, vec2: NDArray) -> NDArray:
 
     return rotation_matrix
 
+
 def rmsd(V, W) -> float:
     """
     Calculate Root-mean-square deviation from two sets of vectors V and W.
@@ -854,7 +855,7 @@ def smiles_to_xsmiles(smiles_string: str) -> tuple[str, str, str]:
             xsmiles += "*"
             labels.append(letter)
             if letter == "R":
-                atom_list.append(smiles_string[i:i + 2])
+                atom_list.append(smiles_string[i : i + 2])
             else:
                 atom_list.append(letter)
 
