@@ -65,10 +65,11 @@
         }
     },
     "properties": {
-        "smiles": "[Q]C1=N(R1)C([Q])=NC1(R1)",
+        "smiles": "[Q]C1=N([R1])C([Q])=NC1([R1])",
         "code": "PRZN",
         "xsmiles": "[*]C1=N(*)C([*])=NC1(*)",
         "xsmiles_label": "|$Q;;;R1;;Q;;;R1$|"
     },
     "results": []
 }
+
